@@ -278,8 +278,10 @@ footer a{color:var(--ink-soft)}
 }
 /* ---- Banner (full-bleed hero) ---- */
 body{overflow-x:hidden}
-.hero-frame{width:100vw;margin-left:calc(50% - 50vw);border:0;border-radius:0;box-shadow:none;background:linear-gradient(135deg,var(--accent) 0%,var(--accent-deep) 100%);padding:52px 0 62px;color:#fff}
-.hero-frame::before{display:none}
+.hero-frame{width:100vw;margin-left:calc(50% - 50vw);border:0;border-radius:0;box-shadow:none;background:linear-gradient(135deg,var(--accent) 0%,var(--accent-deep) 100%);padding:32px 0 48px;color:#fff}
+.hero-frame{position:relative}
+.hero-frame::before{display:block;content:"";position:absolute;inset:0;background:radial-gradient(900px 420px at 88% -12%, rgba(255,255,255,.13), transparent 62%);pointer-events:none}
+.hero-inner{position:relative}
 .hero-inner{max-width:1080px;margin:0 auto;padding:0 24px}
 .hero-frame .hero-eyebrow{color:rgba(255,255,255,.85)}
 .hero-frame .hero-eyebrow::after{background:rgba(255,255,255,.28)}
@@ -288,7 +290,7 @@ body{overflow-x:hidden}
 .hero-frame .hero-meta{color:rgba(255,255,255,.6)}
 .hero-frame .hero-meta strong{color:rgba(255,255,255,.9)}
 .hero-frame .hero-note{color:rgba(255,255,255,.65)}
-.hero-ctas{margin-top:22px;display:flex;gap:12px;flex-wrap:wrap}
+.hero-ctas{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}
 .bbtn{display:inline-block;background:#fff;color:var(--accent);font-size:13.5px;font-weight:700;padding:11px 20px;border-radius:9px}
 .bbtn:hover{text-decoration:none;filter:brightness(.96)}
 .bbtn.o{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.55)}
@@ -326,6 +328,84 @@ body.admin footer .admin-link{color:#fff;background:var(--accent);border-color:v
   .navlink{display:none}
   .foot-cols{grid-template-columns:1fr 1fr;gap:24px;padding:32px 16px 22px}
   .fc-brand{grid-column:1/-1}
+}
+/* ---- Professional polish ---- */
+.hero-frame h1{font-size:29px;line-height:1.15;letter-spacing:-.022em;max-width:730px}
+.hero-frame p.lede{font-size:14.5px;line-height:1.6;max-width:720px;margin-top:10px}
+.hero-frame .hero-eyebrow{font-size:11px}
+.bbtn{letter-spacing:.01em;padding:10px 19px;font-size:13px}
+.topbar{box-shadow:0 1px 0 rgba(18,52,74,.03)}
+.brand-name{letter-spacing:-.015em}
+.p-head h2{font-size:18px}
+.p-head .kicker{letter-spacing:.14em}
+.pillar h3{font-size:13.5px}
+.pillar p{line-height:1.55}
+.seal-name{letter-spacing:-.005em}
+.menu>button,.navlink{letter-spacing:-.005em}
+details.panel{transition:box-shadow .15s}
+details.panel:hover{box-shadow:0 2px 4px rgba(18,52,74,.06),0 10px 26px rgba(18,52,74,.09)}
+.fc h4{letter-spacing:.16em}
+@media (max-width:920px){.hero-frame h1{font-size:23px}.hero-frame{padding:24px 0 38px}}
+/* ---- Inline edit mode ---- */
+.cyc,.rowbtn,.delbtn{display:none}
+body.editing [data-path]{outline:1px dashed rgba(125,99,181,.55);outline-offset:2px;border-radius:3px;min-width:22px;display:inline-block}
+body.editing td[data-path],body.editing p[data-path],body.editing div[data-path]{display:block}
+body.editing [data-path]:hover{background:var(--accent-tint)}
+body.editing [data-path]:focus{outline:2px solid var(--accent);background:#fff;box-shadow:0 0 0 4px var(--accent-tint)}
+body.editing .hero-frame [data-path]{outline-color:rgba(255,255,255,.6)}
+body.editing .hero-frame [data-path]:focus{background:rgba(255,255,255,.14);box-shadow:none}
+body.editing .cyc{display:inline-block;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border:1px solid var(--line);background:#fff;color:var(--ink-soft);border-radius:5px;padding:1px 7px;margin-left:6px;cursor:pointer}
+body.editing .cyc:hover{border-color:var(--accent);color:var(--accent)}
+body.editing .delbtn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1px solid #e6c3bd;background:#fdf1ef;color:#b3452f;font-size:13px;line-height:1;cursor:pointer;margin-left:8px;vertical-align:middle}
+body.editing .delbtn:hover{background:#b3452f;color:#fff;border-color:#b3452f}
+body.editing .rowbtn{display:inline-flex;align-items:center;gap:6px;margin:10px 0 2px;border:1px dashed var(--line);background:#fff;color:var(--accent);font-size:12px;font-weight:650;padding:6px 12px;border-radius:7px;cursor:pointer}
+body.editing .rowbtn:hover{border-color:var(--accent);background:var(--accent-tint)}
+body.editing .practice-add{grid-column:1/-1}
+body.editing .pillar{pointer-events:none}
+body.editing .pillar [data-path]{pointer-events:auto}
+.edit-bar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(120%);background:var(--petrol-deep);color:#fff;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:12px;z-index:180;box-shadow:0 12px 34px rgba(18,52,74,.35);transition:transform .2s}
+body.editing .edit-bar{transform:translateX(-50%) translateY(0)}
+.edit-bar span{font-size:12.5px;color:#c3d2dd}
+.edit-bar b{color:#fff}
+.edit-bar button{border:1px solid rgba(255,255,255,.28);background:transparent;color:#fff;font-size:12.5px;font-weight:650;padding:6px 13px;border-radius:8px;cursor:pointer}
+.edit-bar button.pri{background:#fff;color:var(--petrol-deep);border-color:#fff}
+.edit-bar button:hover{filter:brightness(1.1)}
+.empty-note{margin-top:18px;border:1px dashed var(--line);border-radius:11px;padding:18px 20px;font-size:13.5px;color:var(--ink-soft);background:#fff}
+.sev{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;font-weight:700;padding:2px 8px;border-radius:5px;background:var(--plan-tint);color:var(--plan)}
+.sev.s-critical,.sev.s-high{background:#fdeeec;color:#b3452f}
+.sev.s-medium{background:var(--progress-tint);color:var(--progress)}
+.sev.s-low{background:var(--align-tint);color:var(--align)}
+/* ---- Assistant ---- */
+.chat-fab{position:fixed;right:22px;bottom:22px;z-index:170;display:flex;align-items:center;gap:9px;border:0;background:var(--accent);color:#fff;font-size:13.5px;font-weight:650;padding:12px 18px;border-radius:999px;cursor:pointer;box-shadow:0 10px 30px rgba(18,52,74,.28)}
+.chat-fab:hover{filter:brightness(1.08)}
+.chat-fab svg{flex:none}
+body.editing .chat-fab{display:none}
+.chat-panel{position:fixed;right:22px;bottom:22px;width:min(400px,calc(100vw - 32px));height:min(600px,calc(100vh - 44px));background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 60px rgba(18,52,74,.28);z-index:175;display:none;flex-direction:column;overflow:hidden}
+.chat-panel.open{display:flex}
+.chat-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));color:#fff}
+.chat-head h3{font-size:14px;font-weight:750}
+.chat-head p{font-size:11.5px;color:rgba(255,255,255,.8)}
+.chat-head button{margin-left:auto;border:0;background:rgba(255,255,255,.16);color:#fff;width:26px;height:26px;border-radius:7px;cursor:pointer;font-size:14px;line-height:1}
+.chat-head button:hover{background:rgba(255,255,255,.28)}
+.chat-log{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--paper)}
+.msg{max-width:88%;font-size:13.5px;line-height:1.6;padding:10px 13px;border-radius:12px;white-space:pre-wrap;word-wrap:break-word}
+.msg.bot{background:#fff;border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.me{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.msg .src{display:block;margin-top:8px;padding-top:8px;border-top:1px solid var(--line-soft);font-size:11px;color:var(--ink-faint);font-family:var(--mono)}
+.msg .src a{color:var(--accent)}
+.msg.think{color:var(--ink-faint);font-style:italic;background:transparent;border:0}
+.chat-sugg{padding:0 16px 12px;display:flex;flex-wrap:wrap;gap:7px;background:var(--paper)}
+.chat-sugg button{border:1px solid var(--line);background:#fff;color:var(--ink-soft);font-size:11.5px;padding:6px 11px;border-radius:999px;cursor:pointer;text-align:left}
+.chat-sugg button:hover{border-color:var(--accent);color:var(--accent)}
+.chat-in{border-top:1px solid var(--line);padding:11px;display:flex;gap:9px;align-items:flex-end;background:#fff}
+.chat-in textarea{flex:1;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:13.5px;resize:none;min-height:38px;max-height:110px}
+.chat-in textarea:focus{outline:2px solid var(--accent);border-color:var(--accent)}
+.chat-in button{border:0;background:var(--accent);color:#fff;width:38px;height:38px;border-radius:9px;cursor:pointer;flex:none;font-size:15px}
+.chat-in button:disabled{opacity:.5;cursor:default}
+.chat-foot{padding:8px 14px 11px;font-size:10.5px;color:var(--ink-faint);text-align:center;background:#fff;border-top:1px solid var(--line-soft)}
+@media (max-width:920px){
+  .chat-panel{right:8px;left:8px;bottom:8px;width:auto;height:min(560px,calc(100vh - 20px))}
+  .chat-fab{right:14px;bottom:14px;padding:11px 15px;font-size:12.5px}
 }
 </style>
 </head>
@@ -452,6 +532,18 @@ body.admin footer .admin-link{color:#fff;background:var(--accent);border-color:v
           <thead><tr><th>Vendor</th><th>Purpose</th><th>Region</th><th>Safeguards</th></tr></thead>
           <tbody id="subTable"></tbody>
         </table></div>
+      </div>
+    </details>
+
+    <details class="panel" id="advisories">
+      <summary>
+        <div class="p-head"><div class="kicker">Advisories</div><h2>Security advisories &amp; CVEs</h2></div>
+        <button class="adm-edit" data-edit="advisories">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro">Published advisories affecting this product, including our assessment of relevant third-party CVEs. Ask the assistant about a specific CVE to have it check both this list and current public sources.</p>
+        <div id="advList"></div>
       </div>
     </details>
 
@@ -632,6 +724,7 @@ body.admin footer .admin-link{color:#fff;background:var(--accent);border-color:v
       <h4>Resources</h4>
       <a href="#documents">Document requests</a>
       <a href="#subprocessors">Subprocessors</a>
+      <a href="#advisories">Advisories &amp; CVEs</a>
       <a href="#disclosure">Responsible disclosure</a>
       <a href="#faq">FAQ</a>
     </div>
@@ -674,9 +767,10 @@ body.admin footer .admin-link{color:#fff;background:var(--accent);border-color:v
     <button class="btn ghost" id="adminClose">Close</button>
   </div>
   <div class="admin-body">
-    <div class="admin-note">Edits save to this browser only (localStorage) and take effect immediately here. To publish for everyone, use <b>Export config</b> and replace the CONFIG block in the deployed file (or commit the JSON alongside it). This gate is a convenience lock, not a security boundary — for a hosted admin route, front it with Cloudflare Access.</div>
+    <div class="admin-note"><b>Edit page inline</b> lets you click any text on the page and retype it — the fastest way to correct content. The JSON editors below are for bulk changes. Edits save to this browser only (localStorage) and take effect immediately here. To publish for everyone, use <b>Export config</b> and replace the CONFIG block in the deployed file (or commit the JSON alongside it). This gate is a convenience lock, not a security boundary — for a hosted admin route, front it with Cloudflare Access.</div>
     <div id="adminSections"></div>
     <div class="admin-global">
+      <button class="btn" id="admInline">Edit page inline</button>
       <button class="btn" id="admExport">Export config</button>
       <button class="btn ghost" id="admImport">Import config</button>
       <button class="btn ghost" id="admPass">Change passphrase</button>
@@ -685,6 +779,30 @@ body.admin footer .admin-link{color:#fff;background:var(--accent);border-color:v
     <div class="adm-hint">Import expects the JSON produced by Export. Reset restores this site's shipped defaults on this browser. Passphrase changes apply to this browser; to change the shipped default, update ADMIN_HASH in the file.</div>
   </div>
 </aside>
+
+<div class="edit-bar" id="editBar">
+  <span>Inline editing <b id="editSite"></b> — click any text to change it</span>
+  <button id="editDone" class="pri">Done</button>
+</div>
+
+<button class="chat-fab" id="chatFab" aria-label="Ask the trust assistant">
+  <svg width="17" height="17" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 5.5A2.5 2.5 0 0 1 5.5 3h9A2.5 2.5 0 0 1 17 5.5v6A2.5 2.5 0 0 1 14.5 14H8l-4 3.2V14H5.5A2.5 2.5 0 0 1 3 11.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M7 7.2h6M7 10h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+  Ask about security
+</button>
+
+<div class="chat-panel" id="chatPanel" role="dialog" aria-label="Trust assistant">
+  <div class="chat-head">
+    <div><h3 id="chatTitle">Trust Assistant</h3><p>Security, privacy &amp; compliance questions</p></div>
+    <button id="chatClose" aria-label="Close assistant">×</button>
+  </div>
+  <div class="chat-log" id="chatLog"></div>
+  <div class="chat-sugg" id="chatSugg"></div>
+  <div class="chat-in">
+    <textarea id="chatInput" rows="1" placeholder="Ask about SOC 2, data retention, a CVE…"></textarea>
+    <button id="chatSend" aria-label="Send">↑</button>
+  </div>
+  <div class="chat-foot">Answers are grounded in this Trust Center. Verify anything material with the trust desk.</div>
+</div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -708,9 +826,9 @@ const PILLAR_ICONS = {
 
 const DEFAULTS = {
   ph: {
-    accent:"#1b4965", accentTint:"#eef4f8", accentDeep:"#0f2f44",
+    accent:"#7e63a8", accentTint:"#f4f0fa", accentDeep:"#4a3470",
     name:"PromptHalo", sub:"Trust Center",
-    heroTitle:"Built for teams that answer to auditors.",
+    heroTitle:"Rapid. Continuous. Answerable to auditors.",
     heroLede:"PromptHalo Litmus provides automated penetration testing — continuously probing your applications and cloud environment the way an attacker would, and turning findings into evidence your auditors and customers accept. Companies point Litmus at their real attack surface, so we hold ourselves to the standard our customers are measured against: documented controls, minimal data, independent examination.",
     heroMeta:"",
     pillars:[
@@ -758,6 +876,8 @@ const DEFAULTS = {
       ["Cloudflare","DNS, delivery, access gateway","Global edge","SOC 2 / ISO 27001; TLS enforced"],
       ["Anthropic","AI-assisted features","US","SOC 2; no training on customer inputs"]
     ],
+    advisories:[],
+    assistantEndpoint:"",
     secTxtDomain:"prompthalo.com",
     trustEmail:"trust@prompthalo.com",
     securityEmail:"security@prompthalo.com",
@@ -780,9 +900,9 @@ const DEFAULTS = {
     ]
   },
   jf: {
-    accent:"#0f766e", accentTint:"#ecf7f5", accentDeep:"#07443f",
+    accent:"#b95560", accentTint:"#faf0f1", accentDeep:"#7d3540",
     name:"Jiffy", sub:"Trust Center",
-    heroTitle:"Speed you can verify. Trust you can audit.",
+    heroTitle:"Speed and accuracy of AI usage you can verify — and manage.",
     heroLede:"Jiffy improves AI observability and brings policy-as-code to your AI stack — real-time visibility into how models behave in production, with guardrails written, versioned, and enforced as code. It is built for teams that move fast without giving up control of their data: Jiffy collects the minimum needed to operate, protects it under the same program that covers all PromptHalo products, and makes its posture reviewable on this page.",
     heroMeta:"",
     pillars:[
@@ -824,9 +944,11 @@ const DEFAULTS = {
       ["Cloudflare","Hosting & edge delivery","Global edge","SOC 2 / ISO 27001; TLS enforced"],
       ["GitHub","Source control & build","US","SOC 2; protected branches, MFA"]
     ],
-    secTxtDomain:"jiffy.prompthalo.com",
-    trustEmail:"trust@prompthalo.com",
-    securityEmail:"security@prompthalo.com",
+    advisories:[],
+    assistantEndpoint:"",
+    secTxtDomain:"jiffy.com",
+    trustEmail:"trust@jiffy.com",
+    securityEmail:"security@jiffy.com",
     docs:[
       {n:"Security overview", s:"Product architecture & data-flow summary", gate:"Public"},
       {n:"Privacy notice", s:"Product-specific", gate:"Public"},
@@ -840,9 +962,9 @@ const DEFAULTS = {
       {q:"How do I verify these claims?", a:"Request the security overview from the trust desk — it documents the data flow — or raise specific questions with the security contact."}
     ],
     contacts:[
-      ["Security reports","security@prompthalo.com","Covers all PromptHalo products"],
-      ["Product support","support@prompthalo.com","Include 'Jiffy' in the subject"],
-      ["Privacy requests","privacy@prompthalo.com","Requests honored within 30 days"]
+      ["Security reports","security@jiffy.com","PGP key in security.txt"],
+      ["Product support","support@jiffy.com","Responses within 2 business days"],
+      ["Privacy requests","privacy@jiffy.com","Requests honored within 30 days"]
     ]
   }
 };
@@ -951,7 +1073,7 @@ document.querySelectorAll("[data-setview]").forEach(b =>
 function buildSectionsMenu(){
   const std = [
     ["#overview","Overview"],["#compliance","Compliance"],["#security","Security"],["#privacy","Privacy"],
-    ["#reliability","Reliability"],["#subprocessors","Subprocessors"],["#disclosure","Responsible disclosure"],
+    ["#reliability","Reliability"],["#subprocessors","Subprocessors"],["#advisories","Advisories & CVEs"],["#disclosure","Responsible disclosure"],
     ["#documents","Document requests"],["#faq","FAQ"],["#contact","Contact"]
   ];
   const bp = [["#bp-map","Page map"],["#bp-catalog","Element catalog"],["#bp-rightsize","Right-sizing"],["#bp-cadence","Owner & cadence"]];
@@ -969,29 +1091,37 @@ function renderBrand(){
   const b = getConfig(viewKey);
   $("brandLockup").innerHTML = LOGOS[viewKey] +
     `<div class="brand-text"><span class="brand-name">${esc(b.name)}</span><span class="brand-sub">${esc(b.sub)}</span></div>`;
-  $("heroTitle").textContent = b.heroTitle;
-  $("heroLede").textContent = b.heroLede;
+  bindText("heroTitle", b.heroTitle, "heroTitle");
+  bindText("heroLede", b.heroLede, "heroLede");
   $("heroMeta").innerHTML = b.heroMeta || "";
   $("ledgerStamp").textContent = "Updated " + LAST_UPDATED;
-  $("pillars").innerHTML = (b.pillars||[]).map(p =>
-    `<a class="pillar" href="${esc(p.href)}"><div class="p-ico">${PILLAR_ICONS[p.icon]||""}</div><h3>${esc(p.t)}</h3><p>${esc(p.d)}</p></a>`).join("");
-  $("ledgerGrid").innerHTML = b.ledger.map(l =>
-    `<div class="seal-cell">${SEAL(l.status)}<div>
-      <div class="seal-name">${esc(l.name)}</div><div class="seal-scope">${esc(l.scope)}</div>
-      <span class="seal-status st-${l.status}">${esc(l.label)}</span>
-      <div class="seal-date">${esc(l.date)}</div></div></div>`).join("");
-  $("frameworksIntro").textContent = b.frameworksIntro;
-  $("regList").innerHTML = b.regs.map(r =>
-    `<div class="reg-item"><div class="reg-name">${esc(r.name)}<span class="sub">${esc(r.sub)}</span></div><p>${esc(r.text)}</p></div>`).join("");
-  $("practicesIntro").textContent = b.practicesIntro;
-  $("practiceGrid").innerHTML = b.practices.map(p =>
-    `<div class="practice"><h3><span class="dot"></span>${esc(p.t)}</h3><p>${esc(p.d)}</p></div>`).join("");
-  $("dataIntro").textContent = b.dataIntro;
-  $("dataTable").innerHTML = b.data.map(r => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join("");
-  $("reliabilityIntro").textContent = b.reliabilityIntro || "";
-  $("reliabilityTable").innerHTML = (b.reliability||[]).map(r => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join("");
-  $("subTable").innerHTML = b.subs.map(r =>
-    `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td></tr>`).join("");
+  $("pillars").innerHTML = (b.pillars||[]).map((p,i) =>
+    `<a class="pillar" href="${esc(p.href)}"><div class="p-ico">${PILLAR_ICONS[p.icon]||""}</div><h3 data-path="pillars.${i}.t">${esc(p.t)}</h3><p data-path="pillars.${i}.d">${esc(p.d)}</p></a>`).join("");
+  $("ledgerGrid").innerHTML = b.ledger.map((l,i) =>
+    `<div class="seal-cell" data-item="ledger.${i}">${SEAL(l.status)}<div style="min-width:0">
+      <div class="seal-name" data-path="ledger.${i}.name">${esc(l.name)}</div>
+      <div class="seal-scope" data-path="ledger.${i}.scope">${esc(l.scope)}</div>
+      <span class="seal-status st-${l.status}" data-path="ledger.${i}.label">${esc(l.label)}</span>
+      <button class="cyc" data-cycle="ledger.${i}.status" title="Cycle status">${esc(l.status)}</button>
+      <div class="seal-date" data-path="ledger.${i}.date">${esc(l.date)}</div></div>${delBtn("ledger",i)}</div>`).join("")
+    + addBtn("ledger","assurance item");
+  bindText("frameworksIntro", b.frameworksIntro, "frameworksIntro");
+  $("regList").innerHTML = b.regs.map((r,i) =>
+    `<div class="reg-item" data-item="regs.${i}"><div class="reg-name"><span data-path="regs.${i}.name">${esc(r.name)}</span><span class="sub" data-path="regs.${i}.sub">${esc(r.sub)}</span></div><p data-path="regs.${i}.text">${esc(r.text)}</p>${delBtn("regs",i)}</div>`).join("")
+    + addBtn("regs","framework");
+  bindText("practicesIntro", b.practicesIntro, "practicesIntro");
+  $("practiceGrid").innerHTML = b.practices.map((p,i) =>
+    `<div class="practice" data-item="practices.${i}"><h3><span class="dot"></span><span data-path="practices.${i}.t">${esc(p.t)}</span></h3><p data-path="practices.${i}.d">${esc(p.d)}</p>${delBtn("practices",i)}</div>`).join("")
+    + addBtn("practices","practice","practice-add");
+  bindText("dataIntro", b.dataIntro, "dataIntro");
+  $("dataTable").innerHTML = b.data.map((r,i) => `<tr data-item="data.${i}"><td data-path="data.${i}.0">${esc(r[0])}</td><td data-path="data.${i}.1">${esc(r[1])}${delBtn("data",i)}</td></tr>`).join("")
+    + rowAdd("data", 2);
+  bindText("reliabilityIntro", b.reliabilityIntro || "", "reliabilityIntro");
+  $("reliabilityTable").innerHTML = (b.reliability||[]).map((r,i) => `<tr data-item="reliability.${i}"><td data-path="reliability.${i}.0">${esc(r[0])}</td><td data-path="reliability.${i}.1">${esc(r[1])}${delBtn("reliability",i)}</td></tr>`).join("")
+    + rowAdd("reliability", 2);
+  $("subTable").innerHTML = b.subs.map((r,i) =>
+    `<tr data-item="subs.${i}"><td data-path="subs.${i}.0">${esc(r[0])}</td><td data-path="subs.${i}.1">${esc(r[1])}</td><td data-path="subs.${i}.2">${esc(r[2])}</td><td data-path="subs.${i}.3">${esc(r[3])}${delBtn("subs",i)}</td></tr>`).join("")
+    + rowAdd("subs", 4);
   $("secTxt").innerHTML =
     `# https://${esc(b.secTxtDomain)}/.well-known/security.txt<br>` +
     `Contact: mailto:${esc(b.securityEmail || "security@example.com")}<br>` +
@@ -999,15 +1129,29 @@ function renderBrand(){
     `Preferred-Languages: en<br>` +
     `Policy: https://${esc(b.secTxtDomain)}/trust#disclosure<br>` +
     `Canonical: https://${esc(b.secTxtDomain)}/.well-known/security.txt`;
-  $("docList").innerHTML = b.docs.map(d =>
-    `<div class="doc-row"><div class="doc-name">${esc(d.n)}<span class="sub">${esc(d.s)}</span></div>
+  $("docList").innerHTML = b.docs.map((d,i) =>
+    `<div class="doc-row" data-item="docs.${i}"><div class="doc-name"><span data-path="docs.${i}.n">${esc(d.n)}</span><span class="sub" data-path="docs.${i}.s">${esc(d.s)}</span></div>
      <span class="gate ${d.gate==="Public"?"open":""}">${d.gate==="Public"?"Available on request":"Under NDA"}</span>
-     <button class="btn ghost" data-doc="${esc(d.n)}">Request</button></div>`).join("");
+     <button class="cyc" data-cycle="docs.${i}.gate" title="Toggle access">${esc(d.gate)}</button>
+     <button class="btn ghost" data-doc="${esc(d.n)}">Request</button>${delBtn("docs",i)}</div>`).join("")
+    + addBtn("docs","document");
   $("reqDoc").innerHTML = b.docs.map(d => `<option>${esc(d.n)}</option>`).join("");
-  $("faqList").innerHTML = b.faq.map(f =>
-    `<details class="faq"><summary>${esc(f.q)}</summary><div class="a">${esc(f.a)}</div></details>`).join("");
-  $("contactTable").innerHTML = b.contacts.map(c =>
-    `<tr><td style="width:260px">${esc(c[0])}</td><td><a href="mailto:${esc(c[1])}">${esc(c[1])}</a><span class="sub">${esc(c[2])}</span></td></tr>`).join("");
+  $("faqList").innerHTML = b.faq.map((f,i) =>
+    `<details class="faq" data-item="faq.${i}"><summary><span data-path="faq.${i}.q">${esc(f.q)}</span>${delBtn("faq",i)}</summary><div class="a" data-path="faq.${i}.a">${esc(f.a)}</div></details>`).join("")
+    + addBtn("faq","question");
+  $("contactTable").innerHTML = b.contacts.map((c,i) =>
+    `<tr data-item="contacts.${i}"><td style="width:260px" data-path="contacts.${i}.0">${esc(c[0])}</td><td><a href="mailto:${esc(c[1])}" data-path="contacts.${i}.1">${esc(c[1])}</a><span class="sub" data-path="contacts.${i}.2">${esc(c[2])}</span>${delBtn("contacts",i)}</td></tr>`).join("")
+    + rowAdd("contacts", 3);
+  $("advList").innerHTML = ((b.advisories||[]).length
+    ? `<div class="tbl"><table aria-label="Security advisories"><thead><tr><th style="width:150px">Identifier</th><th>Summary</th><th style="width:110px">Severity</th><th style="width:150px">Status</th></tr></thead><tbody>`
+      + b.advisories.map((a,i) =>
+        `<tr data-item="advisories.${i}"><td><span data-path="advisories.${i}.id">${esc(a.id)}</span><span class="sub" data-path="advisories.${i}.date">${esc(a.date||"")}</span></td>
+         <td><span data-path="advisories.${i}.title">${esc(a.title)}</span><span class="sub" data-path="advisories.${i}.detail">${esc(a.detail||"")}</span></td>
+         <td><span class="sev s-${(a.severity||"").toLowerCase()}" data-path="advisories.${i}.severity">${esc(a.severity||"")}</span></td>
+         <td><span data-path="advisories.${i}.status">${esc(a.status||"")}</span>${delBtn("advisories",i)}</td></tr>`).join("")
+      + `</tbody></table></div>`
+    : `<div class="empty-note">No advisories are currently published for this product. Vulnerabilities reported through the disclosure process are published here once remediated.</div>`)
+    + addBtn("advisories","advisory");
   $("footBrand").textContent = `© ${new Date().getFullYear()} ${b.name} · Trust Center`;
   $("footLogo").innerHTML = LOGOS[viewKey];
   $("footTag").textContent = (b.heroLede.split(". ")[0] || b.name) + ".";
@@ -1048,6 +1192,11 @@ function render(){
   if (isBP) renderBlueprint(); else renderBrand();
   if (adminOpen && !isBP) buildAdmin();
   if (isBP && adminOpen) closeAdmin();
+  if (isBP && editing) setEditing(false);
+  else if (editing) document.querySelectorAll("[data-path]").forEach(el => {
+    el.setAttribute("contenteditable","true"); el.setAttribute("spellcheck","false");
+  });
+  buildSuggestions();
 }
 function setView(k){
   viewKey = k;
@@ -1061,6 +1210,102 @@ $("ctaReport").addEventListener("click", () => {
   const p = $("disclosure"); if (p) p.open = true;
   setTimeout(() => { const f = $("vdpForm"); if (f) f.scrollIntoView({behavior:"smooth", block:"start"}); }, 60);
 });
+
+/* ===== Inline editing engine ===== */
+let editing = false;
+function pathParts(p){ return p.split(".").map(k => /^\d+$/.test(k) ? Number(k) : k); }
+function getByPath(o,p){ return pathParts(p).reduce((a,k) => (a==null?a:a[k]), o); }
+function setByPath(o,p,v){
+  const ks = pathParts(p), last = ks.pop();
+  let cur = o; ks.forEach(k => { cur = cur[k]; });
+  cur[last] = v;
+}
+function cloneCfg(){ return JSON.parse(JSON.stringify(getConfig(viewKey))); }
+function commit(cfg){ saveConfig(viewKey, cfg); render(); }
+function bindText(id, value, path){
+  const el = $(id);
+  el.textContent = value;
+  el.setAttribute("data-path", path);
+}
+const delBtn = (list,i) => `<button class="delbtn" data-del="${list}.${i}" title="Delete">×</button>`;
+const addBtn = (list,label,cls) => `<button class="rowbtn ${cls||""}" data-add="${list}">+ Add ${label}</button>`;
+const rowAdd = (list,cols) => `<tr class="addrow"><td colspan="${cols}"><button class="rowbtn" data-add="${list}">+ Add row</button></td></tr>`;
+
+const BLANKS = {
+  ledger:{name:"New item",scope:"Scope",status:"plan",label:"Planned",date:"Date"},
+  regs:{name:"Framework",sub:"Attestation",text:"Describe how this framework applies."},
+  practices:{t:"Practice",d:"Describe the control."},
+  docs:{n:"Document",s:"Description",gate:"NDA"},
+  faq:{q:"New question?",a:"Answer."},
+  pillars:{icon:"security",t:"Pillar",d:"Short blurb.",href:"#security"},
+  advisories:{id:"CVE-0000-0000",title:"Summary",severity:"Medium",status:"Under investigation",date:"",detail:"Assessment and remediation status."},
+  data:["Category","Handling"],
+  reliability:["Area","Commitment"],
+  subs:["Vendor","Purpose","Region","Safeguards"],
+  contacts:["Channel","name@example.com","Note"]
+};
+const CYCLES = { status:["ok","progress","align","plan"], gate:["NDA","Public"] };
+
+function setEditing(on){
+  editing = on;
+  document.body.classList.toggle("editing", on);
+  $("editSite").textContent = getConfig(viewKey).name;
+  document.querySelectorAll("[data-path]").forEach(el => {
+    if (on){ el.setAttribute("contenteditable","true"); el.setAttribute("spellcheck","false"); }
+    else el.removeAttribute("contenteditable");
+  });
+  if (on) toast("Inline editing on — changes save as you click away");
+}
+document.addEventListener("focusout", e => {
+  const el = e.target.closest && e.target.closest("[data-path]");
+  if (!el || !editing) return;
+  const path = el.getAttribute("data-path");
+  const val = el.textContent.trim();
+  if (val === String(getByPath(getConfig(viewKey), path) ?? "")) return;
+  const cfg = cloneCfg();
+  setByPath(cfg, path, val);
+  saveConfig(viewKey, cfg);
+  render();
+  setEditing(true);
+  toast("Saved");
+});
+document.addEventListener("keydown", e => {
+  if (!editing) return;
+  const el = e.target.closest && e.target.closest("[data-path]");
+  if (el && e.key === "Enter" && !e.shiftKey && el.tagName !== "P" && el.tagName !== "TD"){ e.preventDefault(); el.blur(); }
+  if (e.key === "Escape" && editing) setEditing(false);
+});
+document.addEventListener("click", e => {
+  if (!editing) return;
+  const cyc = e.target.closest("[data-cycle]");
+  if (cyc){
+    e.preventDefault(); e.stopPropagation();
+    const p = cyc.getAttribute("data-cycle"), key = p.split(".").pop();
+    const opts = CYCLES[key] || [];
+    const cfg = cloneCfg();
+    const cur = getByPath(cfg, p);
+    setByPath(cfg, p, opts[(opts.indexOf(cur)+1) % opts.length]);
+    commit(cfg); setEditing(true); return;
+  }
+  const del = e.target.closest("[data-del]");
+  if (del){
+    e.preventDefault(); e.stopPropagation();
+    const [list, idx] = del.getAttribute("data-del").split(".");
+    const cfg = cloneCfg();
+    cfg[list].splice(Number(idx), 1);
+    commit(cfg); setEditing(true); toast("Removed"); return;
+  }
+  const add = e.target.closest("[data-add]");
+  if (add){
+    e.preventDefault(); e.stopPropagation();
+    const list = add.getAttribute("data-add");
+    const cfg = cloneCfg();
+    if (!Array.isArray(cfg[list])) cfg[list] = [];
+    cfg[list].push(JSON.parse(JSON.stringify(BLANKS[list])));
+    commit(cfg); setEditing(true); toast("Added — click the new text to edit"); return;
+  }
+}, true);
+$("editDone").addEventListener("click", () => { setEditing(false); toast("Inline editing off"); });
 
 /* Any in-page link expands its target panel before scrolling */
 document.addEventListener("click", e => {
@@ -1185,6 +1430,7 @@ function closeAdmin(){
   if (location.hash === "#admin") history.replaceState(null,"",location.pathname + location.search);
 }
 $("adminClose").addEventListener("click", closeAdmin);
+$("admInline").addEventListener("click", () => { setEditing(!editing); if (editing) closeAdmin(); });
 $("adminLink").addEventListener("click", () => { if (adminOpen) closeAdmin(); else requestAdmin(); });
 document.querySelectorAll("[data-admsite]").forEach(btn => btn.addEventListener("click", () => {
   if (viewKey !== btn.dataset.admsite) setView(btn.dataset.admsite);
@@ -1197,6 +1443,10 @@ document.addEventListener("click", e => {
   const btn = e.target.closest(".adm-edit");
   if (!btn) return;
   e.preventDefault(); e.stopPropagation();
+  if (!isAdmin()){ requestAdmin(); return; }
+  if (!editing) setEditing(true);
+  const panel = btn.closest("details.panel");
+  if (panel){ panel.open = true; panel.scrollIntoView({behavior:"smooth", block:"start"}); }
   if (!adminOpen) openAdmin();
   const key = btn.dataset.edit;
   const target = key === "__fields" ? document.querySelector("details.adm[data-adm='__fields']")
@@ -1215,7 +1465,8 @@ const ADMIN_FIELDS = [
   {key:"accentDeep", label:"Accent deep (banner gradient end, hex)", type:"input"},
   {key:"secTxtDomain", label:"security.txt domain", type:"input"},
   {key:"trustEmail", label:"Trust desk email (document requests)", type:"input"},
-  {key:"securityEmail", label:"Security email (vulnerability reports)", type:"input"}
+  {key:"securityEmail", label:"Security email (vulnerability reports)", type:"input"},
+  {key:"assistantEndpoint", label:"Assistant proxy URL (blank = direct API)", type:"input"}
 ];
 const ADMIN_JSON = [
   {key:"pillars", label:"Trust pillars", hint:'[{"icon":"security|compliance|privacy|reliability","t":"Title","d":"Blurb","href":"#security"}]'},
@@ -1228,6 +1479,7 @@ const ADMIN_JSON = [
   {key:"docs", label:"Documents", hint:'[{"n":"Name","s":"Subtitle","gate":"NDA|Public"}]'},
   {key:"faq", label:"FAQ", hint:'[{"q":"Question","a":"Answer"}]'},
   {key:"contacts", label:"Contacts", hint:'[["Channel","email","Note"], ...]'},
+  {key:"advisories", label:"Security advisories / CVEs", hint:'[{"id":"CVE-2026-0001","title":"...","severity":"Critical|High|Medium|Low","status":"Fixed in 2.1","date":"2026-07-01","detail":"..."}]'},
   {key:"intros", label:"Section intros", multi:["frameworksIntro","practicesIntro","dataIntro","reliabilityIntro"], hint:'{"frameworksIntro":"...","practicesIntro":"...","dataIntro":"...","reliabilityIntro":"..."}'}
 ];
 function buildAdmin(){
@@ -1311,6 +1563,172 @@ $("admReset").addEventListener("click", () => {
   try { localStorage.removeItem("tc.cfg." + viewKey); } catch(e){}
   render(); buildAdmin();
   toast("Site reset to defaults");
+});
+
+/* ============================================================
+   TRUST ASSISTANT — retrieval over this page's content, with an
+   optional LLM layer that can web-search for CVEs / current info.
+   ============================================================ */
+const STOP = new Set("a an and are as at be by for from has have how in is it its of on or that the to we what when where which who will with you your do does can".split(" "));
+function tok(str){ return String(str).toLowerCase().replace(/[^a-z0-9\s-]/g," ").split(/\s+/).filter(w => w.length > 2 && !STOP.has(w)); }
+
+function buildCorpus(b){
+  const c = [];
+  const push = (s,t) => { if (t && String(t).trim()) c.push({s, t:String(t)}); };
+  push("Overview", b.heroTitle + " " + b.heroLede);
+  (b.pillars||[]).forEach(p => push("Pillar — " + p.t, p.d));
+  (b.ledger||[]).forEach(l => push("Assurance — " + l.name, `${l.scope}. Current status: ${l.label}. ${l.date}`));
+  push("Compliance overview", b.frameworksIntro);
+  (b.regs||[]).forEach(r => push("Compliance — " + r.name, `${r.sub}. ${r.text}`));
+  push("Security overview", b.practicesIntro);
+  (b.practices||[]).forEach(p => push("Security — " + p.t, p.d));
+  push("Privacy overview", b.dataIntro);
+  (b.data||[]).forEach(r => push("Privacy — " + r[0], r[1]));
+  push("Reliability overview", b.reliabilityIntro);
+  (b.reliability||[]).forEach(r => push("Reliability — " + r[0], r[1]));
+  (b.subs||[]).forEach(r => push("Subprocessor — " + r[0], `Purpose: ${r[1]}. Region: ${r[2]}. Safeguards: ${r[3]}`));
+  (b.advisories||[]).forEach(a => push("Advisory — " + a.id, `${a.title}. Severity: ${a.severity}. Status: ${a.status}. ${a.date||""} ${a.detail||""}`));
+  if (!(b.advisories||[]).length) push("Advisories", "No advisories are currently published for this product. Vulnerabilities reported through the disclosure process are published once remediated.");
+  (b.docs||[]).forEach(d => push("Document — " + d.n, `${d.s}. Access: ${d.gate === "Public" ? "available on request" : "shared under NDA"}`));
+  (b.faq||[]).forEach(f => push("FAQ — " + f.q, f.a));
+  (b.contacts||[]).forEach(r => push("Contact — " + r[0], `${r[1]}. ${r[2]}`));
+  push("Responsible disclosure", "Good-faith research is welcome and covered by safe harbor. Reports are acknowledged within 2 business days, triaged and severity-scored, and remediated on severity-based timelines: critical 7 days, high 30 days, medium 60 days, low 90 days. Coordinated disclosure within 90 days by default. Reports can be submitted from the Responsible disclosure section of this page.");
+  return c;
+}
+function retrieve(query, corpus, n){
+  const qt = tok(query);
+  if (!qt.length) return [];
+  const df = {};
+  corpus.forEach(c => { new Set(tok(c.s + " " + c.t)).forEach(w => df[w] = (df[w]||0) + 1); });
+  return corpus.map(c => {
+    const words = tok(c.s + " " + c.t), set = new Set(words);
+    let score = 0;
+    qt.forEach(q => {
+      const idf = Math.log(1 + corpus.length / (1 + (df[q]||0)));
+      if (set.has(q)) score += 2 * idf;
+      else if (words.some(w => w.startsWith(q.slice(0,5)) && q.length > 4)) score += 0.7 * idf;
+      if (tok(c.s).includes(q)) score += 1.2 * idf;
+    });
+    return {c, score};
+  }).filter(x => x.score > 0).sort((a,b) => b.score - a.score).slice(0, n || 6).map(x => x.c);
+}
+
+const chatHistory = [];
+function addMsg(role, text, sources){
+  const div = document.createElement("div");
+  div.className = "msg " + (role === "me" ? "me" : role === "think" ? "bot think" : "bot");
+  div.textContent = text;
+  if (sources && sources.length){
+    const sp = document.createElement("span");
+    sp.className = "src";
+    sp.textContent = "Sources: " + sources.join(" · ");
+    div.appendChild(sp);
+  }
+  $("chatLog").appendChild(div);
+  $("chatLog").scrollTop = $("chatLog").scrollHeight;
+  return div;
+}
+function buildSuggestions(){
+  if (viewKey === "bp") return;
+  const b = getConfig(viewKey);
+  const qs = [
+    "Are you SOC 2 certified?",
+    "How long do you retain my data?",
+    "Are you affected by any known CVEs?",
+    "Who are your subprocessors?",
+    "How do I report a vulnerability?"
+  ];
+  const el = $("chatSugg");
+  if (!el) return;
+  el.innerHTML = qs.map(q => `<button data-q="${esc(q)}">${esc(q)}</button>`).join("");
+  el.querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => ask(btn.dataset.q)));
+  $("chatTitle").textContent = b.name + " Trust Assistant";
+}
+
+function fallbackAnswer(hits, b){
+  if (!hits.length){
+    return "I could not find that on this Trust Center. For anything not covered here, contact " + (b.trustEmail || "the trust desk") + " and the team will answer directly.";
+  }
+  return hits.slice(0,3).map(h => h.s + ": " + h.t).join("\n\n");
+}
+
+async function callModel(question, hits, b){
+  const context = hits.map(h => "[" + h.s + "] " + h.t).join("\n");
+  const system = "You are the Trust Assistant for " + b.name + ", answering security, privacy, compliance, and vulnerability questions for prospective and existing customers.\n\n" +
+    "RULES:\n" +
+    "1. Answer primarily from the TRUST CENTER CONTEXT below. It is the authoritative source about " + b.name + ".\n" +
+    "2. Never invent or upgrade compliance claims. If the context says an audit is in progress, do not say certified. If something is not in the context, say it is not published on the Trust Center and point the user to " + (b.trustEmail || "the trust desk") + ".\n" +
+    "3. For questions about CVEs, vulnerabilities in third-party software, or current security news, use the web search tool, then state clearly what applies to " + b.name + " based on the context and what is general public information.\n" +
+    "4. Be concise: under 130 words, plain prose, no markdown headings.\n" +
+    "5. For vulnerability reports, direct the user to the Responsible disclosure section of this page.\n\n" +
+    "TRUST CENTER CONTEXT:\n" + context;
+
+  const payload = {
+    model: "claude-sonnet-4-6",
+    max_tokens: 1000,
+    system,
+    messages: chatHistory.concat([{ role: "user", content: question }]),
+    tools: [{ type: "web_search_20250305", name: "web_search" }]
+  };
+  const endpoint = (b.assistantEndpoint || "").trim() || "https://api.anthropic.com/v1/messages";
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  const data = await res.json();
+  const text = (data.content || []).map(i => i.type === "text" ? i.text : "").filter(Boolean).join("\n").trim();
+  if (!text) throw new Error("empty response");
+  return text;
+}
+
+let asking = false;
+async function ask(question){
+  question = (question || "").trim();
+  if (!question || asking) return;
+  asking = true;
+  $("chatSend").disabled = true;
+  addMsg("me", question);
+  $("chatInput").value = "";
+  const b = getConfig(viewKey);
+  const hits = retrieve(question, buildCorpus(b), 7);
+  const thinking = addMsg("think", "Checking the Trust Center…");
+  try {
+    const answer = await callModel(question, hits, b);
+    thinking.remove();
+    addMsg("bot", answer, hits.slice(0,3).map(h => h.s));
+    chatHistory.push({role:"user", content:question}, {role:"assistant", content:answer});
+    if (chatHistory.length > 8) chatHistory.splice(0, chatHistory.length - 8);
+  } catch(err){
+    thinking.remove();
+    const txt = fallbackAnswer(hits, b);
+    addMsg("bot", txt, hits.slice(0,3).map(h => h.s));
+    addMsg("think", "Quoted directly from this Trust Center (live assistant unavailable here). Configure an assistant proxy URL in admin to enable web-search answers.");
+  }
+  asking = false;
+  $("chatSend").disabled = false;
+}
+
+function openChat(){
+  $("chatPanel").classList.add("open");
+  $("chatFab").style.display = "none";
+  if (!$("chatLog").children.length){
+    const b = getConfig(viewKey);
+    addMsg("bot", "Hi — I answer questions about " + b.name + "'s security, privacy, and compliance posture using this Trust Center, and I can look up CVEs and current advisories on the web. What would you like to know?");
+  }
+  $("chatInput").focus();
+}
+function closeChat(){ $("chatPanel").classList.remove("open"); $("chatFab").style.display = ""; }
+$("chatFab").addEventListener("click", openChat);
+$("chatClose").addEventListener("click", closeChat);
+$("chatSend").addEventListener("click", () => ask($("chatInput").value));
+$("chatInput").addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey){ e.preventDefault(); ask($("chatInput").value); }
+});
+$("chatInput").addEventListener("input", function(){
+  this.style.height = "auto";
+  this.style.height = Math.min(this.scrollHeight, 110) + "px";
 });
 
 render();
