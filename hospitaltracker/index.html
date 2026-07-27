@@ -13,7 +13,11 @@
     <h1>Hospital &amp; Medical-Device Security Tracker</h1>
     <div class="sub">BitSense &middot; multi-state (MA · NH · RI · IL · MN) &middot; device fleet, CVE exposure &amp; incidents &middot; saved in this browser</div>
   </div>
-  <div style="display:flex;gap:8px">
+  <div class="header-actions">
+    <div class="header-search">
+      <input id="topsearch" class="search search-top" placeholder="Search any hospital, city, system, vendor…" onkeydown="if(event.key==='Enter'){event.preventDefault();runTopSearch();}">
+      <button onclick="runTopSearch()">Search</button>
+    </div>
     <button onclick="openAdd()">+ Add hospital</button>
     <button onclick="exportCsv()">Export CSV</button>
   </div>
@@ -30,16 +34,18 @@
 <!-- HOSPITALS -->
 <div class="wrap" id="tab-hospitals">
   <div class="cards" id="topsummary" style="margin-bottom:14px"></div>
-  <div class="note" style="margin-top:0">
-    <b>Device chips are color-coded by confidence.</b>
-    <div class="legend" style="margin-top:8px">
-      <span><i style="background:#dff3ea;border:1px solid #9ed9c3"></i> confirmed-fleet (cited, in clinical use)</span>
-      <span><i style="background:#e2eefb;border:1px solid #a8caee"></i> confirmed-research (cited, in a study)</span>
-      <span><i style="background:#faeeda;border:1px solid #e6cfa2"></i> inferred (market share / system standard)</span>
-      <span><i style="background:#fbe6d8;border:1px solid #edc3a5"></i> inferred, low confidence</span>
+  <details class="inline-fold" style="margin-top:0">
+    <summary>Device chips are color-coded by confidence.</summary>
+    <div class="note inline-note">
+      <div class="legend" style="margin-top:8px">
+        <span><i style="background:#dff3ea;border:1px solid #9ed9c3"></i> confirmed-fleet (cited, in clinical use)</span>
+        <span><i style="background:#e2eefb;border:1px solid #a8caee"></i> confirmed-research (cited, in a study)</span>
+        <span><i style="background:#faeeda;border:1px solid #e6cfa2"></i> inferred (market share / system standard)</span>
+        <span><i style="background:#fbe6d8;border:1px solid #edc3a5"></i> inferred, low confidence</span>
+      </div>
+      Inferred chips are hypotheses to <b>confirm on a call</b>; EHR is mostly confirmed, monitors/ventilators/pumps are market-leader inference. Citations (NCT / go-live dates) are in each hospital&rsquo;s Notes; sources on the Method tab.
     </div>
-    Inferred chips are hypotheses to <b>confirm on a call</b>; EHR is mostly confirmed, monitors/ventilators/pumps are market-leader inference. Citations (NCT / go-live dates) are in each hospital&rsquo;s Notes; sources on the Method tab.
-  </div>
+  </details>
   <div class="toolbar">
     <input class="search" id="search" placeholder="Filter hospitals, city, system, vendor…" oninput="renderHosp()">
     <select class="filter" id="fstate" onchange="renderHosp()"><option value="">All states</option><option>MA</option><option>NH</option><option>RI</option><option>IL</option><option>MN</option><option>MD</option></select>
@@ -240,6 +246,7 @@
   <div class="row"><button onclick="closeAdd()">Cancel</button><button class="primary" onclick="doAdd()">Save</button></div>
 </div></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="./app.js"></script>
 </body>
 </html>

@@ -278,7 +278,7 @@ function renderHosp(){
     return x<y?-1*sort.dir:x>y?1*sort.dir:0});
   const body=document.getElementById('hbody');
   body.innerHTML=rows.map(({d,i})=>`<tr>
-    <td><a class="hlink" onclick="openDetail(${i})">${esc(d.name)}</a></td>
+    <td><div class="row-actions"><a class="hlink" onclick="openDetail(${i})">${esc(d.name)}</a><button class="download-btn" onclick="downloadHospital(${i})">Download</button></div></td>
     <td>${esc(d.state||'')}</td>
     <td>${esc(d.city)}</td>
     <td>${sysPill(d.system)}</td>
@@ -424,7 +424,7 @@ function openDetail(i){
     <div class="detail-head">
       <div><div class="dh-title">${esc(h.name)}</div>
         <div class="dh-sub">${esc(h.city)}, ${esc(h.state)} &middot; ${esc(h.system)} &middot; ${esc(h.type)}${h.beds?' &middot; '+(+h.beds).toLocaleString()+' beds':''}</div></div>
-      <button onclick="closeDetail()">Close \u2715</button>
+      <div class="row-actions"><button onclick="downloadHospital(${i})">Download</button><button onclick="closeDetail()">Close \u2715</button></div>
     </div>
     <div class="detail-body">
       <div class="d-risk ${r.cls}"><div class="d-risk-score">${r.score}</div>
@@ -551,9 +551,11 @@ function ragContext(h){
 function renderAnswer(t){
   return esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').split(/\n\n+/).map(p=>'<p>'+p.replace(/\n/g,'<br>')+'</p>').join('');
 }
-// shared RAG runner: tries the Anthropic API with a timeout, falls back to a local answer that always works
-// ---- AGENTIC assistant: the model plans, calls tools over the tracker dataset, iterates, then answers.
-//      Falls back to the local engine when the Anthropic API isn't reachable (self-hosted without a proxy).
+// shared RAG runner: produces an instant deterministic answer, then upgrades it with a
+// browser-local WebGPU model when available.
+// ---- BROWSER-LOCAL RAG assistant: retrieves tracker context in-browser and sends the
+//      compact evidence packet to a small local model. If WebGPU/model loading fails,
+//      the deterministic local engine remains the final answer.
 const AGENT_TOOLS=[
   {name:'list_hospitals',description:'Filter & rank hospitals by state, minimum risk score, incident history, or a device/vendor substring. Returns name, state, beds, risk score+band, confidence, and whether a documented incident exists.',
    input_schema:{type:'object',properties:{state:{type:'string',description:'MA, NH, RI, IL, MN, or MD'},min_risk:{type:'number'},has_incident:{type:'boolean'},device_contains:{type:'string',description:'e.g. GE, BD Alaris, Epic'},limit:{type:'number'}}}},
@@ -592,42 +594,157 @@ function toolExec(name,input){
   if(name==='list_cves')return JSON.stringify(CVEDB.map(c=>({device:c.device,maxCvss:c.maxCvss,likely_status:c.rem,mitigation_if_unpatched:c.mitig,advisory:c.advisory})));
   return JSON.stringify({error:'unknown tool'});
 }
-const SYS_AGENT="You are BitSense's medical-device security analyst agent. You have tools to query a tracker of 85 US hospitals (device fleets, CVE exposure, composite risk, documented incidents) and a CISA advisory library with compensating-control mitigations. Plan, call tools to gather exactly what you need (you may call several), then answer. Rules: (1) Use ONLY tool results — never invent hospitals, devices, CVEs, or numbers. (2) Distinguish CONFIRMED (cited) from INFERRED (market-share/system hypothesis); never assert inferred as fact — say 'likely/inferred, to verify'. (3) When a vulnerability is not remediated, give the compensating-control mitigations from the tools. (4) Cite advisory IDs and incident sources. (5) Be concise and practical for a vCISO — lead with the answer, then the why. Risk scores discount likely-remediated CVEs; GE MDhex stays full-weight because its fix is network config, commonly incomplete.";
+const SYS_AGENT="You are BitSense's browser-local medical-device security analyst. Answer only from the provided retrieved tracker context. Never invent hospitals, devices, CVEs, incidents, counts, or risk scores. Distinguish CONFIRMED evidence from INFERRED hypotheses. When a vulnerability is not remediated, include the compensating controls found in the retrieved context. Be concise, operational, and useful to a vCISO. Lead with the answer, then explain why.";
+const LOCAL_LLM_STATE={engine:null,webllm:null,modelId:'',loading:null,loadError:'',supported:typeof navigator!=='undefined'&&!!navigator.gpu};
+const LOCAL_FIXED_MODEL_ID='Qwen2.5-0.5B-Instruct-q4f16_1-MLC';
+const LOCAL_MODEL_PREFERENCES=[/qwen.*0\.5b/i,/llama-3\.2.*1b/i,/qwen.*1\.5b/i,/gemma.*2b/i,/phi-3\.5-mini/i];
+function getModelId(record){ return record?.model_id||record?.model||record?.id||record?.name||record?.modelId||''; }
+function pickLocalModel(modelList){
+  if(!Array.isArray(modelList)||!modelList.length)return '';
+  const exact=modelList.find(record=>getModelId(record)===LOCAL_FIXED_MODEL_ID);
+  if(exact)return LOCAL_FIXED_MODEL_ID;
+  for(const pref of LOCAL_MODEL_PREFERENCES){
+    const found=modelList.find(record=>pref.test(JSON.stringify(record)));
+    const modelId=getModelId(found);
+    if(modelId)return modelId;
+  }
+  const fallback=modelList.map(record=>({record,id:getModelId(record)})).find(entry=>entry.id);
+  return fallback?fallback.id:'';
+}
+function formatProgress(progress){
+  if(!progress)return 'preparing local model…';
+  if(typeof progress==='string')return progress;
+  const parts=[];
+  if(progress.text)parts.push(progress.text);
+  if(typeof progress.progress==='number')parts.push(`${Math.round(progress.progress*100)}%`);
+  if(typeof progress.completed==='number'&&typeof progress.total==='number'&&progress.total>0)parts.push(`${progress.completed}/${progress.total}`);
+  return parts.join(' · ')||'preparing local model…';
+}
+async function ensureLocalLLM(setStatus){
+  if(LOCAL_LLM_STATE.engine)return LOCAL_LLM_STATE;
+  if(!LOCAL_LLM_STATE.supported)throw new Error('WebGPU is not available in this browser.');
+  if(LOCAL_LLM_STATE.loading)return LOCAL_LLM_STATE.loading;
+  LOCAL_LLM_STATE.loading=(async()=>{
+    setStatus&&setStatus('loading browser model…');
+    const webllm=await import('https://esm.run/@mlc-ai/web-llm');
+    const modelId=pickLocalModel(webllm.prebuiltAppConfig.model_list||[]);
+    if(!modelId)throw new Error('No compatible prebuilt WebLLM model was found.');
+    LOCAL_LLM_STATE.webllm=webllm;
+    LOCAL_LLM_STATE.modelId=modelId;
+    const appConfig={...webllm.prebuiltAppConfig,cacheBackend:'indexeddb'};
+    LOCAL_LLM_STATE.engine=await webllm.CreateMLCEngine(modelId,{
+      appConfig,
+      initProgressCallback:(report)=>{ setStatus&&setStatus(formatProgress(report)); },
+    });
+    setStatus&&setStatus(`local model ready · ${modelId}`);
+    return LOCAL_LLM_STATE;
+  })();
+  try{return await LOCAL_LLM_STATE.loading;}
+  catch(err){ LOCAL_LLM_STATE.loadError=err?.message||String(err); throw err; }
+  finally{ LOCAL_LLM_STATE.loading=null; }
+}
+function tokenizeQuery(text){ return String(text||'').toLowerCase().split(/[^a-z0-9.]+/).filter(token=>token.length>2); }
+function buildRetrievalDocs(scope){
+  const docs=[];
+  data.forEach(h=>docs.push({id:`hospital:${h.name}`,type:'hospital',title:h.name,scopeKey:h.name,text:ragContext(h)}));
+  CVEDB.forEach(c=>docs.push({
+    id:`device:${c.device}`,
+    type:'device',
+    title:c.device,
+    scopeKey:c.device,
+    text:deviceBriefing(c).replace(/<br>/g,'\n').replace(/<[^>]+>/g,''),
+  }));
+  Object.entries(INCIDENTS).forEach(([name,inc])=>docs.push({
+    id:`incident:${name}`,
+    type:'incident',
+    title:`Incident at ${name}`,
+    scopeKey:name,
+    text:`Hospital: ${name}\nIncident: ${inc.text}\nSource: ${inc.src}`,
+  }));
+  if(scope?.kind==='hospital'&&scope.hospital)docs.unshift({id:`focus:${scope.hospital.name}`,type:'focus-hospital',title:`Focus hospital: ${scope.hospital.name}`,scopeKey:scope.hospital.name,text:ragContext(scope.hospital)});
+  if(scope?.kind==='device'&&scope.device)docs.unshift({id:`focus:${scope.device.device}`,type:'focus-device',title:`Focus device: ${scope.device.device}`,scopeKey:scope.device.device,text:deviceBriefing(scope.device).replace(/<br>/g,'\n').replace(/<[^>]+>/g,'')});
+  return docs;
+}
+function scoreDoc(doc,question,scope){
+  const q=String(question||'').toLowerCase();
+  const hay=(doc.title+'\n'+doc.text).toLowerCase();
+  let score=0;
+  tokenizeQuery(question).forEach(token=>{
+    if(hay.includes(token))score+=2;
+    if(doc.title.toLowerCase().includes(token))score+=2;
+  });
+  if(scope?.kind==='hospital'&&scope.hospital&&doc.scopeKey===scope.hospital.name)score+=18;
+  if(scope?.kind==='device'&&scope.device&&doc.scopeKey===scope.device.device)score+=18;
+  if(/risk|highest|top|priority|worst/.test(q)&&/risk|cvss|incident/.test(hay))score+=3;
+  if(/mitig|fix|remedi|patch|control/.test(q)&&/mitig|remedi|patch|control/.test(hay))score+=4;
+  if(/incident|breach|ransom|phish/.test(q)&&doc.type==='incident')score+=6;
+  return score;
+}
+function retrieveDocs(question,scope,limit){
+  return buildRetrievalDocs(scope)
+    .map(doc=>({...doc,score:scoreDoc(doc,question,scope)}))
+    .filter(doc=>doc.score>0)
+    .sort((a,b)=>b.score-a.score)
+    .slice(0,limit||6);
+}
+function buildRagPacket(question,scope){
+  const docs=retrieveDocs(question,scope,6);
+  let intro='Scope: portfolio-wide.\n';
+  if(scope?.kind==='hospital'&&scope.hospital)intro=`Scope: hospital "${scope.hospital.name}". Prioritize this hospital unless the user explicitly asks otherwise.\n`;
+  if(scope?.kind==='device'&&scope.device)intro=`Scope: device "${scope.device.device}". Prioritize this device unless the user explicitly asks otherwise.\n`;
+  const context=docs.length?docs.map((doc,index)=>`[Doc ${index+1}] ${doc.title}\n${doc.text}`).join('\n\n'):'No retrieved documents matched the question. Use only explicit tracker facts if any are available.';
+  return `${intro}Question:\n${question}\n\nRetrieved context:\n${context}\n\nInstructions:\n- Answer only from the retrieved context.\n- If evidence is inferred, say so explicitly.\n- If the answer is missing, say what must be verified next.`;
+}
+async function generateLocalRagAnswer(question,scope,setStatus){
+  const state=await ensureLocalLLM(setStatus);
+  const response=await state.engine.chat.completions.create({
+    messages:[
+      {role:'system',content:SYS_AGENT},
+      {role:'user',content:buildRagPacket(question,scope)},
+    ],
+    temperature:0.2,
+    top_p:0.9,
+    max_tokens:700,
+    stream:false,
+  });
+  const text=response?.choices?.[0]?.message?.content;
+  if(typeof text==='string')return text.trim();
+  if(Array.isArray(text))return text.map(part=>typeof part?.text==='string'?part.text:'').join('').trim();
+  return '';
+}
+function detectScopeFromHint(hint){
+  const hospital=data.find(h=>hint&&hint.includes(`"${h.name}"`));
+  if(hospital)return {kind:'hospital',hospital};
+  const device=CVEDB.find(c=>hint&&hint.includes(`"${c.device}"`));
+  if(device)return {kind:'device',device};
+  return {kind:'portfolio'};
+}
 
 async function runAgent(outId,question,hint,localFn){
   const out=document.getElementById(outId); if(!out)return;
   if(!question||!question.trim()){ out.innerHTML='<span class="mut">Type a question first.</span>'; return; }
   // 1) INSTANT local answer — always works, even with no API
   out.className='ragout';
-  out.innerHTML='<div class="mut" style="font-size:11px;margin-bottom:6px">\u26A1 instant answer &middot; <span id="'+outId+'_st">checking live agent\u2026</span></div>'+localFn();
-  // 2) try the agent in the background; replace on success
-  let messages=[{role:'user',content:(hint?hint+'\n\n':'')+question}];
-  const used=[];
+  out.innerHTML='<div class="mut" style="font-size:11px;margin-bottom:6px">\u26A1 instant answer &middot; <span id="'+outId+'_st">loading browser-local WebGPU model\u2026</span></div>'+localFn();
+  const scope=detectScopeFromHint(hint);
+  const statusElId=outId+'_st';
   try{
-    for(let step=0; step<5; step++){
-      const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),10000);
-      const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},signal:ctrl.signal,
-        body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1200,system:SYS_AGENT,tools:AGENT_TOOLS,messages})});
-      clearTimeout(to);
-      if(!res.ok)throw new Error('http '+res.status);
-      const d=await res.json();
-      const toolUses=(d.content||[]).filter(b=>b.type==='tool_use');
-      if(d.stop_reason==='tool_use' && toolUses.length){
-        const stEl=document.getElementById(outId+'_st'); if(stEl)stEl.textContent='running '+toolUses.map(t=>t.name).join(', ')+'\u2026';
-        messages.push({role:'assistant',content:d.content});
-        messages.push({role:'user',content:toolUses.map(t=>{used.push(t.name);return{type:'tool_result',tool_use_id:t.id,content:toolExec(t.name,t.input)};})});
-        continue;
-      }
-      const text=(d.content||[]).map(b=>b.type==='text'?b.text:'').join('').trim();
-      if(text){
-        const trace='<div class="mut" style="font-size:11px;margin-bottom:8px">\u{1F916} agent'+(used.length?' &middot; tools: '+esc([...new Set(used)].join(', ')):'')+'</div>';
-        out.innerHTML=trace+renderAnswer(text);
-      }
-      return;
+    const text=await generateLocalRagAnswer(question,scope,(status)=>{
+      const stEl=document.getElementById(statusElId);
+      if(stEl)stEl.textContent=status;
+    });
+    if(text){
+      const modelNote=LOCAL_LLM_STATE.modelId?` &middot; ${esc(LOCAL_LLM_STATE.modelId)}`:'';
+      const trace='<div class="mut" style="font-size:11px;margin-bottom:8px">\u{1F916} browser-local RAG'+modelNote+'</div>';
+      out.innerHTML=trace+renderAnswer(text);
     }
   }catch(err){
-    const stEl=document.getElementById(outId+'_st');
-    if(stEl){ stEl.textContent='live agent unavailable — local answer shown'; stEl.style.color='var(--mut)'; }
+    const stEl=document.getElementById(statusElId);
+    if(stEl){
+      stEl.textContent='browser-local model unavailable — deterministic local answer shown';
+      stEl.style.color='var(--mut)';
+      stEl.title=err?.message||String(err);
+    }
   }
 }
 // legacy single-shot (kept as a simple fallback path if ever needed)
@@ -666,7 +783,7 @@ function localHosp(h,q){
   } else {
     out+=ragContext(h).split('\n').map(esc).join('<br>');
   }
-  return '<div class="mut" style="margin-bottom:8px;font-size:12px">Local answer (from this hospital\u2019s record). Live AI needs the Anthropic API \u2014 works in Claude.ai or via your Worker proxy.</div>'+out.replace(/\n/g,'<br>');
+  return '<div class="mut" style="margin-bottom:8px;font-size:12px">Deterministic local answer from this hospital\u2019s tracker record. If WebGPU is available, the browser-local model will try to upgrade it.</div>'+out.replace(/\n/g,'<br>');
 }
 function localGlobal(q){
   const ql=q.toLowerCase(); const hit=w=>w.some(x=>ql.includes(x));
@@ -694,7 +811,7 @@ function localGlobal(q){
     out+=ln('Try: "highest-risk hospitals", "which have documented breaches", "hospitals in MN", "how many critical", or open a hospital for its detail + Ask box.');
     out+=ln(`Quick take: top risk is <b>${esc(ranked[0].h.name)}</b> at ${ranked[0].r.score}/100.`);
   }
-  return '<div class="mut" style="margin-bottom:8px;font-size:12px">Local answer (across all '+data.length+' hospitals). Live AI needs the Anthropic API.</div>'+out.replace(/\n/g,'<br>');
+  return '<div class="mut" style="margin-bottom:8px;font-size:12px">Deterministic local answer across '+data.length+' hospitals. If WebGPU is available, the browser-local model will try to upgrade it.</div>'+out.replace(/\n/g,'<br>');
 }
 function localDevice(q){
   const ql=q.toLowerCase(); const hit=w=>w.some(x=>ql.includes(x));
@@ -711,7 +828,7 @@ function localDevice(q){
     if(wantMitig||c.rem==='residual'||c.rem==='partial'){ if(c.mitig)out+=ln(`<b>Mitigations if unpatched:</b> ${esc(c.mitig)}`); }
     out+='\n';
   });
-  return '<div class="mut" style="margin-bottom:8px;font-size:12px">Local answer (device CVE library + mitigations). Live AI needs the Anthropic API.</div>'+out.replace(/\n/g,'<br>');
+  return '<div class="mut" style="margin-bottom:8px;font-size:12px">Deterministic local answer from the device CVE library. If WebGPU is available, the browser-local model will try to upgrade it.</div>'+out.replace(/\n/g,'<br>');
 }
 function askRAG(i){ const q=(document.getElementById('ragq').value||''); runAgent('ragout',q,'Focus on this hospital unless asked otherwise: "'+data[i].name+'". Use get_hospital first.',()=>localHosp(data[i],q)); }
 function askGlobal(){ const q=(document.getElementById('ragq_g').value||''); runAgent('ragout_g',q,'Portfolio-wide question across all hospitals. Use list_hospitals to filter/rank.',()=>localGlobal(q)); }
@@ -761,6 +878,15 @@ function renderVend(){
   document.getElementById('vcount').textContent=`${list.length} vendor${list.length===1?'':'s'} tracked`;
 }
 function jumpTo(name){switchTab('hospitals');document.getElementById('search').value=name;renderHosp()}
+function runTopSearch(){
+  const q=(document.getElementById('topsearch')?.value||'').trim();
+  switchTab('hospitals');
+  const searchEl=document.getElementById('search');
+  if(searchEl)searchEl.value=q;
+  renderHosp();
+  const hospitalsTab=document.getElementById('tab-hospitals');
+  if(hospitalsTab)hospitalsTab.scrollIntoView({behavior:'smooth',block:'start'});
+}
 
 // ---------- summary ----------
 function renderSummary(){
@@ -816,6 +942,62 @@ function exportCsv(){
   }));
   const blob=new Blob([lines.join('\n')],{type:'text/csv'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ma_nh_ri_hospitals.csv';a.click();
+}
+function downloadHospital(i){
+  const h=data[i]; if(!h)return;
+  const text=htmlToText(hospitalBriefing(h));
+  const stamp='Hospital & Medical-Device Security Tracker · generated '+new Date().toLocaleString();
+  const footer='Device attributions may be confirmed or inferred as labeled. Public CVE data is used as a prioritization signal, not an attestation.';
+  const filename=(h.name||'hospital').replace(/[^a-z0-9]+/gi,'_').replace(/^_+|_+$/g,'')+'.pdf';
+  const jspdfApi=window.jspdf;
+  if(!jspdfApi||!jspdfApi.jsPDF){
+    alert('PDF library did not load. Check your internet connection and reload the page.');
+    return;
+  }
+  const { jsPDF }=jspdfApi;
+  const doc=new jsPDF({unit:'pt',format:'letter'});
+  const pageWidth=doc.internal.pageSize.getWidth();
+  const pageHeight=doc.internal.pageSize.getHeight();
+  const margin=42;
+  const usableWidth=pageWidth-(margin*2);
+  let y=margin;
+  const ensureSpace=(needed=18)=>{
+    if(y+needed<=pageHeight-margin)return;
+    doc.addPage();
+    y=margin;
+  };
+  const writeLines=(lines,fontSize,lineHeight,color)=>{
+    doc.setFontSize(fontSize);
+    doc.setTextColor(...color);
+    lines.forEach(line=>{
+      ensureSpace(lineHeight);
+      doc.text(line,margin,y);
+      y+=lineHeight;
+    });
+  };
+
+  doc.setFont('helvetica','bold');
+  writeLines([`BitSense - ${h.name}`],18,22,[27,73,101]);
+  doc.setFont('helvetica','normal');
+  writeLines(doc.splitTextToSize(stamp,usableWidth),10,14,[95,94,90]);
+  y+=8;
+  doc.setDrawColor(27,73,101);
+  doc.line(margin,y,pageWidth-margin,y);
+  y+=18;
+
+  const sections=text.split(/\n{2,}/).map(part=>part.trim()).filter(Boolean);
+  sections.forEach(section=>{
+    const lines=doc.splitTextToSize(section,usableWidth);
+    writeLines(lines,11,15,[44,44,42]);
+    y+=8;
+  });
+
+  ensureSpace(40);
+  doc.setDrawColor(211,209,199);
+  doc.line(margin,y,pageWidth-margin,y);
+  y+=16;
+  writeLines(doc.splitTextToSize(footer,usableWidth),9,12,[95,94,90]);
+  doc.save(filename);
 }
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 
@@ -875,26 +1057,26 @@ async function runChat(bubbleId,question,sc){
   const local=sc.localFn(question);
   const setBody=(html,withActions)=>{ bubbleData[bubbleId].html=html;
     bubble.innerHTML=html+(withActions?`<div class="acts"><button onclick="dlPdf('${bubbleId}')">\u21E9 PDF</button><button onclick="emailMsg('${bubbleId}')">\u2709 Email</button></div>`:''); scrollChat(); };
-  setBody('<div class="mut" style="font-size:11px;margin-bottom:6px">\u26A1 instant &middot; <span id="'+bubbleId+'_st">checking live agent\u2026</span></div>'+local,true);
-  let working=chatMessages.slice(0,-1).map(m=>({role:m.role,content:m.text}));
-  working.push({role:'user',content:sc.hint+'\n\n'+question});
-  const used=[]; let answered=false;
+  setBody('<div class="mut" style="font-size:11px;margin-bottom:6px">\u26A1 instant &middot; <span id="'+bubbleId+'_st">loading browser-local WebGPU model\u2026</span></div>'+local,true);
+  let answered=false;
   try{
-    for(let step=0;step<5;step++){
-      const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),10000);
-      const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},signal:ctrl.signal,
-        body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1200,system:SYS_AGENT,tools:AGENT_TOOLS,messages:working})});
-      clearTimeout(to); if(!res.ok)throw new Error('http '+res.status);
-      const d=await res.json(); const tu=(d.content||[]).filter(b=>b.type==='tool_use');
-      if(d.stop_reason==='tool_use'&&tu.length){ const st=document.getElementById(bubbleId+'_st'); if(st)st.textContent='running '+tu.map(t=>t.name).join(', ')+'\u2026';
-        working.push({role:'assistant',content:d.content});
-        working.push({role:'user',content:tu.map(t=>{used.push(t.name);return{type:'tool_result',tool_use_id:t.id,content:toolExec(t.name,t.input)};})}); continue; }
-      const text=(d.content||[]).map(b=>b.type==='text'?b.text:'').join('').trim();
-      if(text){ const trace='<div class="mut" style="font-size:11px;margin-bottom:6px">\u{1F916} agent'+(used.length?' &middot; '+[...new Set(used)].join(', '):'')+'</div>';
-        setBody(trace+renderAnswer(text),true); chatMessages.push({role:'assistant',text:text}); answered=true; }
-      break;
+    const scope=detectScopeFromHint(sc.hint);
+    const text=await generateLocalRagAnswer(question,scope,(status)=>{
+      const st=document.getElementById(bubbleId+'_st');
+      if(st)st.textContent=status;
+    });
+    if(text){
+      const modelNote=LOCAL_LLM_STATE.modelId?` &middot; ${esc(LOCAL_LLM_STATE.modelId)}`:'';
+      const trace='<div class="mut" style="font-size:11px;margin-bottom:6px">\u{1F916} browser-local RAG'+modelNote+'</div>';
+      setBody(trace+renderAnswer(text),true); chatMessages.push({role:'assistant',text:text}); answered=true;
     }
-  }catch(err){ const st=document.getElementById(bubbleId+'_st'); if(st){st.textContent='live agent unavailable — local answer'; } }
+  }catch(err){
+    const st=document.getElementById(bubbleId+'_st');
+    if(st){
+      st.textContent='browser-local model unavailable — deterministic local answer';
+      st.title=err?.message||String(err);
+    }
+  }
   if(!answered)chatMessages.push({role:'assistant',text:htmlToText(local)});
 }
 // ---- detailed briefings (local, instant; describe incidents & aspects in full) ----
