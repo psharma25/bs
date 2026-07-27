@@ -1,0 +1,1 @@
+"""Medtech Risk Assessment backend."""
