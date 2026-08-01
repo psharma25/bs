@@ -202,6 +202,98 @@ details[open] summary{background:#F3F7F9}
 }
 .deckctl button:hover{background:var(--card)}
 
+/* ---------- lede ---------- */
+.lede{
+  border-left:4px solid var(--petrol);padding:2px 0 2px 24px;margin:0 0 34px;
+}
+.lede p{font-size:17px;line-height:1.6;color:var(--ink);margin:0 0 15px;max-width:64ch}
+.lede p:last-child{margin-bottom:0}
+.lede b{font-weight:600}
+.lede .kicker{
+  font-family:var(--display);font-size:20.5px;line-height:1.45;
+  color:var(--petrol);margin-bottom:16px;max-width:52ch;
+}
+
+/* ---------- play control ---------- */
+.playrow{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;margin-top:20px;flex-wrap:wrap;
+}
+.playbtn{
+  appearance:none;background:none;border:1px solid var(--rule);
+  font-family:var(--body);font-size:11px;font-weight:700;
+  letter-spacing:.11em;text-transform:uppercase;color:var(--petrol);
+  padding:9px 16px;cursor:pointer;transition:background .15s ease,border-color .15s ease;
+  flex:none;
+}
+.playbtn:hover{background:var(--paper);border-color:var(--petrol-2)}
+.statepill{
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  font-weight:700;transition:color .3s ease;flex:none;
+}
+.hint{font-size:12.5px;color:var(--muted);flex:1;min-width:140px;text-align:right}
+
+/* ---------- interfaces ---------- */
+.rels{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0 0 34px}
+.rel{background:var(--card);border:1px solid var(--rule);border-top:4px solid var(--petrol-2);padding:18px 20px}
+.rel h3{
+  font-family:var(--display);font-weight:400;font-size:19px;
+  margin:0 0 10px;color:var(--petrol);line-height:1.25;
+}
+.rel .q{font-size:14px;line-height:1.5;color:var(--friction);margin:0 0 11px;font-style:italic}
+.rel p{font-size:14px;line-height:1.52;margin:0;color:var(--muted)}
+.rel .fixline{
+  margin-top:12px;padding-top:12px;border-top:1px solid var(--rule-soft);
+  font-size:14px;color:var(--ink);line-height:1.5;
+}
+.rel .fixline b{color:var(--flow);font-weight:700}
+
+.pair{display:grid;grid-template-columns:0.82fr 1.18fr;gap:16px;align-items:start;margin-top:16px}
+.src{background:#FAF3F0;border-left:4px solid var(--friction);padding:15px 17px}
+.src h4,.fix h4{
+  font-size:10px;letter-spacing:.15em;text-transform:uppercase;
+  font-weight:700;margin:0 0 10px;
+}
+.src h4{color:var(--friction)}
+.fix h4{color:var(--flow)}
+.src ul{margin:0;padding:0;list-style:none}
+.src li{font-size:14px;line-height:1.5;padding:6px 0 6px 15px;position:relative}
+.src li::before{content:"";position:absolute;left:0;top:14px;width:7px;height:2px;background:var(--friction)}
+.fix{background:var(--paper);border:1px solid var(--rule);padding:15px 17px}
+.fix ol{margin:0;padding:0;list-style:none;counter-reset:fx}
+.fix li{
+  position:relative;padding:0 0 0 28px;margin-bottom:11px;
+  font-size:14.5px;line-height:1.52;counter-increment:fx;
+}
+.fix li:last-child{margin-bottom:0}
+.fix li::before{
+  content:counter(fx);position:absolute;left:0;top:1px;
+  font-family:var(--mono);font-size:10px;font-weight:700;color:var(--flow);
+  border:1.5px solid var(--flow);border-radius:50%;
+  width:18px;height:18px;display:grid;place-items:center;line-height:1;
+}
+.currency{
+  margin-top:16px;padding:12px 16px;background:#F1F7F5;
+  border-left:4px solid var(--flow);font-size:14.5px;line-height:1.5;
+}
+.currency b{font-weight:700;color:var(--flow)}
+
+.spine-h{
+  font-family:var(--display);font-weight:400;font-size:23px;
+  color:var(--petrol);margin:44px 0 6px;
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+.cell{
+  background:var(--card);border:1px solid var(--rule);
+  padding:17px 19px;display:grid;grid-template-columns:auto 1fr;gap:14px;
+}
+.cell .b{
+  font-family:var(--mono);font-size:11px;font-weight:700;
+  color:var(--petrol-2);letter-spacing:.05em;padding-top:3px;
+}
+.cell h3{font-size:16px;font-weight:600;margin:0 0 5px;line-height:1.3;color:var(--ink)}
+.cell p{font-size:14px;color:var(--muted);margin:0;line-height:1.5}
+
 /* ---------- footer ---------- */
 .close{background:var(--petrol);color:#fff;padding:56px 0}
 .close p{
@@ -213,6 +305,7 @@ footer{padding:26px 0 46px;font-size:12.5px;color:var(--muted)}
 
 @media (max-width:720px){
   .readouts{grid-template-columns:1fr}
+  .rels,.pair,.grid2{grid-template-columns:1fr}
   .panel{padding:40px 0 50px}
   header{padding:54px 0 46px}
   .dial{padding:22px 18px 26px}
@@ -237,6 +330,7 @@ footer{padding:26px 0 46px;font-size:12.5px;color:var(--muted)}
   <div class="wrap" role="tablist" aria-label="Sections">
     <button class="tab" role="tab" id="t-mech" aria-controls="p-mech" aria-selected="true">The mechanism</button>
     <button class="tab" role="tab" id="t-lev" aria-controls="p-lev" aria-selected="false" tabindex="-1">Four levers</button>
+    <button class="tab" role="tab" id="t-int" aria-controls="p-int" aria-selected="false" tabindex="-1">Interfaces</button>
     <button class="tab" role="tab" id="t-ops" aria-controls="p-ops" aria-selected="false" tabindex="-1">Operating plan</button>
   </div>
 </nav>
@@ -246,7 +340,7 @@ footer{padding:26px 0 46px;font-size:12.5px;color:var(--muted)}
   <div class="wrap">
     <p class="eyebrow">The mechanism</p>
     <h2>Friction decides everything</h2>
-    <p class="dek">People take the path of least resistance. Culture change that needs sustained willpower fails; culture change that makes the right behaviour the easy default succeeds. Drag the control to see the same organisation at different friction levels.</p>
+    <p class="dek">Policies and regulations raise the bar. What decides the outcome is how the friction of clearing that bar gets managed. People take the path of least resistance, so culture change that needs sustained willpower fails and culture change that makes the right behaviour the easy default succeeds. The model runs on its own — pause it or drag the control to hold a state.</p>
 
     <div class="dial">
       <div class="roadwrap">
@@ -285,7 +379,13 @@ footer{padding:26px 0 46px;font-size:12.5px;color:var(--muted)}
 
       <div class="control">
         <div class="ctl-labels"><span class="l">Paved road</span><span class="r">Gate</span></div>
-        <input id="slider" type="range" min="0" max="100" value="15" step="1" aria-label="Friction on the secure path, from paved road to gate">
+        <input id="slider" type="range" min="0" max="100" value="0" step="1" aria-label="Friction on the secure path, from paved road to gate">
+      </div>
+
+      <div class="playrow">
+        <button type="button" class="playbtn" id="playbtn" aria-label="Pause the animation">Pause</button>
+        <span class="statepill" id="statepill">Paved road</span>
+        <span class="hint">Dragging the control pauses playback</span>
       </div>
 
       <div class="readouts">
@@ -365,6 +465,166 @@ footer{padding:26px 0 46px;font-size:12.5px;color:var(--muted)}
         </div>
       </details>
 
+    </div>
+  </div>
+</div>
+
+<!-- ============ INTERFACES ============ -->
+<div class="panel" id="p-int" role="tabpanel" aria-labelledby="t-int" tabindex="0" hidden>
+  <div class="wrap">
+    <p class="eyebrow">Where the friction actually sits</p>
+    <h2>Three interfaces, three different problems</h2>
+    <p class="dek">"Reduce friction with the business" is not one task. Each counterparty resents something different, so each needs a different fix.</p>
+
+    <div class="rels">
+      <div class="rel">
+        <h3>Cyber &harr; IT</h3>
+        <p class="q">"You keep telling me to patch the thing I'm not allowed to take down."</p>
+        <p>Overlapping ownership. Duplicate tooling. Patch urgency against uptime commitments.</p>
+        <div class="fixline"><b>Fix:</b> settle ownership and share the queue.</div>
+      </div>
+      <div class="rel">
+        <h3>Cyber &harr; Business</h3>
+        <p class="q">"You showed up in week eleven and said no."</p>
+        <p>Arrives late, speaks in vulnerabilities, blocks deals, never quantifies anything in money.</p>
+        <div class="fixline"><b>Fix:</b> enter early and price the risk.</div>
+      </div>
+      <div class="rel">
+        <h3>Cyber &harr; Product Eng</h3>
+        <p class="q">"You sent a 400-page PDF and called it a partnership."</p>
+        <p>Gates at the end of the cycle. Findings without owners. Tooling that costs velocity.</p>
+        <div class="fixline"><b>Fix:</b> pave the road and hand back the pen.</div>
+      </div>
+    </div>
+
+    <div class="deckctl"><button type="button" data-toggle="int">Expand all</button></div>
+    <div class="deck" data-deck="int">
+
+      <details>
+        <summary>
+          <span class="badge">I1</span>
+          <span><span class="tag">Interface 01</span><span class="sm-title">Cyber &harr; IT</span>
+          <span class="sm-sub">Most conflict here is an unresolved boundary, not a disagreement.</span></span>
+          <span class="chev"></span>
+        </summary>
+        <div class="dbody">
+          <div class="pair">
+            <div class="src">
+              <h4>Where friction comes from</h4>
+              <ul>
+                <li>Contested ownership of identity, endpoint, network, cloud accounts</li>
+                <li>Duplicate agents and overlapping tool budgets</li>
+                <li>Patch urgency colliding with uptime commitments</li>
+                <li>Findings arriving outside IT's ticketing system</li>
+              </ul>
+            </div>
+            <div class="fix">
+              <h4>What reduces it</h4>
+              <ol>
+                <li><b>Write the RACI once</b> for every contested asset class, and publish it where both teams work.</li>
+                <li><b>Sit on the Change Advisory Board</b> as a standing member, not an escalation path. Proximity beats process.</li>
+                <li><b>One queue, in their tool.</b> Vulnerabilities land in the existing ticketing system with owner and severity — never a separate security portal.</li>
+                <li><b>Set the clock jointly.</b> Security sets remediation SLAs by severity; IT sets the maintenance windows. Neither imposes on the other.</li>
+                <li><b>Consolidate agents.</b> Every duplicate endpoint agent is a performance complaint that eventually becomes a political one.</li>
+                <li><b>Commit reciprocal SLAs.</b> Publish your own turnaround times for triage, exception review, and architecture sign-off.</li>
+              </ol>
+            </div>
+          </div>
+          <div class="currency"><b>Speak their currency:</b> uptime, change success rate, MTTR — not vulnerability counts.</div>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <span class="badge">I2</span>
+          <span><span class="tag">Interface 02</span><span class="sm-title">Cyber &harr; Business</span>
+          <span class="sm-sub">Late arrival is what makes security a blocker rather than an input.</span></span>
+          <span class="chev"></span>
+        </summary>
+        <div class="dbody">
+          <div class="pair">
+            <div class="src">
+              <h4>Where friction comes from</h4>
+              <ul>
+                <li>Security enters at contract review, not deal qualification</li>
+                <li>Questionnaires sit on the seller's critical path</li>
+                <li>Risk described in severities nobody can price</li>
+                <li>Controls change without notice or a named contact</li>
+              </ul>
+            </div>
+            <div class="fix">
+              <h4>What reduces it</h4>
+              <ol>
+                <li><b>Get in early.</b> Join deal qualification and roadmap planning, not the contract review.</li>
+                <li><b>Own the questionnaire.</b> Trust Center, evidence library, pre-answered responses. Take security review off the seller's plate entirely.</li>
+                <li><b>Pre-negotiate risk thresholds.</b> Agree who can accept what, in writing, before a deal is hot. Otherwise the loudest escalation wins.</li>
+                <li><b>Build a fast lane.</b> Publish a pre-approved path for low-risk deals so scrutiny concentrates where it earns its cost.</li>
+                <li><b>Run change management properly.</b> Control changes get lead time, a written rationale, and a named human to argue with.</li>
+                <li><b>Never say no alone.</b> Every no ships with an alternative and a date. "No" without "instead" is how security loses standing.</li>
+              </ol>
+            </div>
+          </div>
+          <div class="currency"><b>Speak their currency:</b> deal cycle days saved, contracts unblocked, revenue enabled — not risks closed.</div>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <span class="badge">I3</span>
+          <span><span class="tag">Interface 03</span><span class="sm-title">Cyber &harr; Product Engineering</span>
+          <span class="sm-sub">Shift left means paving the road, not moving the gate earlier.</span></span>
+          <span class="chev"></span>
+        </summary>
+        <div class="dbody">
+          <div class="pair">
+            <div class="src">
+              <h4>Where friction comes from</h4>
+              <ul>
+                <li>Review gates at the end, when change is most expensive</li>
+                <li>Findings delivered as reports rather than backlog items</li>
+                <li>Blank templates that tax the team to fill in</li>
+                <li>Security holding permission instead of offering advice</li>
+              </ul>
+            </div>
+            <div class="fix">
+              <h4>What reduces it</h4>
+              <ol>
+                <li><b>Shift left with paved roads, not new gates.</b> Golden pipelines, secure defaults in scaffolding, SBOM in CI. A new service should be compliant on creation.</li>
+                <li><b>Pre-fill the templates.</b> Threat models per architecture class, already carrying the five threats that class always has.</li>
+                <li><b>Findings go to the backlog</b> they already use, with an owner and a severity. Never a PDF, never a portal.</li>
+                <li><b>Champion per squad, with real allocation</b> — ten to fifteen per cent of sprint capacity. Volunteering is not ownership.</li>
+                <li><b>Definition of done, not release checklist.</b> Late checklists surface friction too late to absorb.</li>
+                <li><b>Advise, don't gate.</b> Move approval rights into the line and keep escalation. You will hear about problems earlier.</li>
+              </ol>
+            </div>
+          </div>
+          <div class="currency"><b>Speak their currency:</b> cycle time, change failure rate, escaped defects — not policy coverage.</div>
+        </div>
+      </details>
+
+    </div>
+
+    <h3 class="spine-h">The spine</h3>
+    <p class="dek">Six things that work at every interface. Without these, the interface-specific moves decay back to where they started.</p>
+    <div class="grid2">
+      <div class="cell"><span class="b">S1</span><div>
+        <h3>Executive buy-in, expressed as a question</h3>
+        <p>One metric on the existing executive review, presented by the counterparty — not a new forum, not a security slide.</p></div></div>
+      <div class="cell"><span class="b">S2</span><div>
+        <h3>One scorecard, same definitions</h3>
+        <p>Common metrics across IT, business and engineering. Published per team and unranked — ranking produces gaming.</p></div></div>
+      <div class="cell"><span class="b">S3</span><div>
+        <h3>Automate the repeatable</h3>
+        <p>Reserve human review for design decisions and hard cases. Every manual check that survives is a tax you chose to keep.</p></div></div>
+      <div class="cell"><span class="b">S4</span><div>
+        <h3>Make security usable</h3>
+        <p>If it needs a separate portal, a separate login, or a wiki page to explain it, it loses to the workaround. Usability is a control.</p></div></div>
+      <div class="cell"><span class="b">S5</span><div>
+        <h3>A named counterpart, both directions</h3>
+        <p>Every team knows who to call; security knows who owns the decision. Relationships route around broken process; anonymity does not.</p></div></div>
+      <div class="cell"><span class="b">S6</span><div>
+        <h3>Trade a control for a capability</h3>
+        <p>Retire something every time you add something. Reciprocity is what converts compliance into cooperation.</p></div></div>
     </div>
   </div>
 </div>
@@ -517,8 +777,9 @@ footer{padding:26px 0 46px;font-size:12.5px;color:var(--muted)}
   var barrier = document.getElementById('barrier'), detour = document.getElementById('detour');
   var paved = document.getElementById('paved'), pavedLabel = document.getElementById('pavedlabel');
   var cars = [document.getElementById('c1'), document.getElementById('c2'), document.getElementById('c3')];
+  var playbtn = document.getElementById('playbtn'), statepill = document.getElementById('statepill');
   var flowX = [90, 290, 490], jamX = [140, 226, 312];
-  var FLOW = '#2E7D6F', FRICTION = '#B5502F', PETROL = '#1B4965';
+  var FLOW = '#2E7D6F', FRICTION = '#B5502F', PETROL = '#1B4965', AMBER = '#8A6E11';
 
   function lerp(a,b,t){ return a + (b-a)*t; }
   function clamp(x){ return Math.min(1, Math.max(0, x)); }
@@ -544,25 +805,62 @@ footer{padding:26px 0 46px;font-size:12.5px;color:var(--muted)}
     paved.setAttribute('opacity', Math.max(0.12, clamp(1-f*1.1)).toFixed(2));
     pavedLabel.setAttribute('opacity', clamp(1-f*2.2).toFixed(2));
 
-    var msg, colour;
+    var msg, colour, label;
     if (f < 0.25){
-      colour = FLOW;
+      colour = FLOW; label = 'Paved road';
       msg = '<b>Paved road.</b> The secure path is the cheap path, so almost everyone takes it. Exceptions are rare enough that each one is worth reading.';
     } else if (f < 0.55){
-      colour = PETROL;
+      colour = PETROL; label = 'Drag starting';
       msg = '<b>Drag starting.</b> Compliance still holds, but effort is now visible. This is where exception volume becomes the metric to watch — an early warning, not an administrative chore.';
     } else if (f < 0.8){
-      colour = FRICTION;
+      colour = FRICTION; label = 'The gate is real';
       msg = '<b>The gate is real.</b> Workarounds are appearing and are being tolerated. Nothing about the policy changed — only the cost of following it.';
     } else {
-      colour = FRICTION;
+      colour = FRICTION; label = 'Routine bypass';
       msg = '<b>Routine bypass.</b> Going around security is now the normal way to ship. Your policy library is unchanged and entirely irrelevant. This is a friction problem wearing a compliance costume.';
     }
-    verdict.innerHTML = msg;
-    verdict.style.borderLeftColor = colour;
+    if (verdict.getAttribute('data-state') !== label){
+      verdict.setAttribute('data-state', label);
+      verdict.innerHTML = msg;
+      verdict.style.borderLeftColor = colour;
+      statepill.textContent = label;
+      statepill.style.color = (colour === PETROL) ? AMBER : colour;
+    }
   }
-  s.addEventListener('input', render);
-  render();
+
+  /* auto-run */
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var CYCLE = 15000, HOLD = 0.16;
+  var playing = !reduced, t0 = null, elapsed = 0, raf = null;
+
+  function smooth(x){ return x*x*(3-2*x); }
+  function phase(ms){
+    var u = (ms % CYCLE) / CYCLE;
+    var tri = u < 0.5 ? u*2 : (1-u)*2;
+    return smooth(clamp((tri - HOLD) / (1 - 2*HOLD)));
+  }
+  function tick(ts){
+    if (t0 === null) t0 = ts;
+    elapsed += ts - t0;
+    t0 = ts;
+    s.value = Math.round(phase(elapsed) * 100);
+    render();
+    if (playing) raf = requestAnimationFrame(tick);
+  }
+  function setPlaying(on){
+    playing = on;
+    playbtn.textContent = on ? 'Pause' : 'Play';
+    playbtn.setAttribute('aria-label', on ? 'Pause the animation' : 'Play the animation');
+    if (on){ t0 = null; elapsed = 0; raf = requestAnimationFrame(tick); }
+    else if (raf){ cancelAnimationFrame(raf); raf = null; }
+  }
+
+  playbtn.addEventListener('click', function(){ setPlaying(!playing); });
+  s.addEventListener('input', function(){ if (playing) setPlaying(false); render(); });
+  s.addEventListener('pointerdown', function(){ if (playing) setPlaying(false); });
+
+  if (reduced){ s.value = 72; render(); playbtn.textContent = 'Play'; }
+  else { render(); raf = requestAnimationFrame(tick); }
 
   /* ---------- tabs ---------- */
   var tabs = Array.prototype.slice.call(document.querySelectorAll('[role=tab]'));
