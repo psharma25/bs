@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Security, AI and the People Who Have to Live With Both</title>
+<meta name="description" content="Practical control maps for agentic AI and enterprise data, a model AI governance policy, and what actually moves cyber culture.">
+<style>
+:root{
+  --petrol:#1b4965; --petrol-lt:#2a6e86;
+  --ink:#1c2126; --ink-soft:#4a555e; --ink-faint:#7b8790;
+  --rule:#e2e8ea; --wash:#f4f7f8;
+  --aisec:#3872e0; --gov:#9031aa; --culture:#457c3c; --deck:#d55c26;
+  --shadow:0 2px 10px rgba(20,40,55,.08);
+  --shadow-hi:0 6px 20px rgba(20,40,55,.13);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:#fbfcfd;color:var(--ink);
+  font-family:Inter,Calibri,"Segoe UI",Helvetica,Arial,sans-serif;
+  font-size:16.5px;line-height:1.65;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:960px;margin:0 auto;padding:0 24px}
+a{color:var(--petrol-lt)}
+
+header.top{padding:52px 0 8px}
+header.top .eyebrow{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--petrol-lt);font-weight:600}
+header.top h1{margin:12px 0 0;font-size:38px;line-height:1.16;letter-spacing:-.022em}
+header.top .stand{margin:16px 0 0;font-size:18.5px;line-height:1.55;color:var(--ink-soft);max-width:74ch}
+hr.rule{border:0;border-top:1.75px solid #003767;margin:26px 0 0}
+
+.note{margin:24px 0 0;padding:15px 20px;background:#fff;border:1.5px solid var(--rule);
+  border-left:4px solid var(--petrol);border-radius:8px;box-shadow:var(--shadow);
+  font-size:15px;line-height:1.6;color:var(--ink-soft)}
+.note b{color:var(--ink)}
+
+/* ---------- contents ---------- */
+.toc{margin:26px 0 0;background:#fff;border:1.5px solid var(--rule);border-radius:10px;
+  box-shadow:var(--shadow);padding:20px 24px}
+.toc h4{margin:0 0 14px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--petrol)}
+.toc ol{margin:0;padding:0;list-style:none;counter-reset:toc}
+.toc > ol > li{counter-increment:toc;margin:0 0 16px;padding-left:36px;position:relative}
+.toc > ol > li:last-child{margin-bottom:0}
+.toc > ol > li::before{content:counter(toc);position:absolute;left:0;top:2px;
+  width:24px;height:24px;border-radius:50%;background:var(--petrol);color:#fff;
+  font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.toc .sect{font-weight:700;font-size:15.5px;color:var(--ink);text-decoration:none}
+.toc .sect:hover{color:var(--petrol-lt)}
+.toc .path{font-size:12px;color:var(--ink-faint);font-weight:400;margin-left:8px}
+.toc ul{margin:7px 0 0;padding:0;list-style:none}
+.toc ul li{margin:5px 0;font-size:14px;color:var(--ink-faint);line-height:1.5}
+.toc ul a{text-decoration:none;font-weight:600}
+.toc ul a:hover{text-decoration:underline}
+.toc .fmt{display:inline-block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;
+  color:#fff;border-radius:9px;padding:1px 8px;margin-right:8px;min-width:44px;text-align:center}
+.f-web{background:var(--aisec)}
+.f-gov{background:var(--gov)}
+.f-cul{background:var(--culture)}
+.f-deck{background:var(--deck)}
+.f-img{background:#7b8790}
+
+h2{margin:46px 0 4px;font-size:15px;letter-spacing:.1em;text-transform:uppercase}
+h2 .fold{font-size:11.5px;letter-spacing:.06em;text-transform:none;color:var(--ink-faint);
+  font-weight:400;margin-left:10px}
+h2 + p{margin:0 0 4px;font-size:14.5px;color:var(--ink-faint)}
+#s-aisec{color:var(--aisec)} #s-gov{color:var(--gov)} #s-culture{color:var(--culture)} #s-decks{color:var(--deck)}
+
+.cards{display:grid;gap:14px;margin:18px 0 0}
+.two{grid-template-columns:1fr 1fr}
+.card{display:block;background:#fff;border:1.5px solid var(--rule);border-radius:9px;padding:20px 22px;
+  text-decoration:none;color:inherit;box-shadow:var(--shadow);
+  transition:border-color .12s, box-shadow .12s, transform .12s}
+.card:hover{box-shadow:var(--shadow-hi);transform:translateY(-2px)}
+.card .kind{display:inline-block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+  color:#fff;padding:3px 10px;border-radius:11px;margin-bottom:10px}
+.k-web{background:var(--aisec)}
+.k-gov{background:var(--gov)}
+.k-cul{background:var(--culture)}
+.k-deck{background:var(--deck)}
+.card h3{margin:0 0 6px;font-size:19px;letter-spacing:-.012em}
+.card p{margin:0;font-size:14.5px;color:var(--ink-soft);line-height:1.55}
+.card .meta{margin-top:10px;font-size:12.5px;color:var(--ink-faint)}
+.card .go{margin-top:12px;font-size:13.5px;font-weight:600;color:var(--petrol-lt)}
+
+footer{margin:52px 0 0;padding:22px 0 64px;border-top:1px solid var(--rule);
+  font-size:13px;color:var(--ink-faint);line-height:1.6}
+footer .disc{font-style:italic;margin:0 0 14px}
+
+@media (max-width:760px){
+  header.top h1{font-size:28px}
+  .two{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">Security &middot; AI &middot; Governance &middot; Culture</div>
+  <h1>Security, AI, and the People Who Have to Live With Both</h1>
+  <p class="stand">Control maps you can work from, a model policy you can adapt, and the part everyone skips &mdash; why people do what they do when the tooling is not watching. Everything here is a single file you can open, print or hand to someone else.</p>
+</header>
+<hr class="rule">
+
+<div class="note">
+  <b>Where to start.</b> If the question is &ldquo;should we turn Copilot on&rdquo;, or &ldquo;how do we share data without it training somebody&rsquo;s model&rdquo;, start with the enterprise data map. If it is &ldquo;we are giving an agent write access to production&rdquo;, start with the agentic control map. If you are writing the policy, start with governance. If the controls exist and people still route around them, the answer is in culture.
+</div>
+
+<!-- ============ CONTENTS ============ -->
+<nav class="toc" aria-label="Contents">
+  <h4>Contents</h4>
+  <ol>
+    <li>
+      <a class="sect" href="#s-aisec">AI security</a><span class="path">/aisec</span>
+      <ul>
+        <li><span class="fmt f-web">Web</span><a href="aisec/enterprise-ai-data-protection.html">Protecting Enterprise Data in the Age of AI</a> &mdash; Copilot, paid accounts, shadow AI, data you sell</li>
+        <li><span class="fmt f-web">Web</span><a href="aisec/agentic-ai-system.html">Agentic AI control map</a> &mdash; four layers, 24 risks, tools by stack</li>
+        <li><span class="fmt f-web">Read</span><a href="aisec/agentic-ai-insights.html">Securing Agentic AI Without Slowing It Down</a> &mdash; about 12 minutes</li>
+      </ul>
+    </li>
+    <li>
+      <a class="sect" href="#s-gov">Governance</a><span class="path">/governance</span>
+      <ul>
+        <li><span class="fmt f-gov">Web</span><a href="governance/ai-governance-policy.html">AI Governance Is Not Data Governance</a> &mdash; what differs, what good looks like, and a model policy</li>
+      </ul>
+    </li>
+    <li>
+      <a class="sect" href="#s-culture">Culture</a><span class="path">/culture</span>
+      <ul>
+        <li><span class="fmt f-cul">Web</span><a href="culture/cyber-culture.html">Cyber Culture &mdash; what it is, and how to move it</a> &mdash; friction, four levers, an operating plan</li>
+      </ul>
+    </li>
+    <li>
+      <a class="sect" href="#s-decks">Decks and visuals</a><span class="path">/aisec</span>
+      <ul>
+        <li><span class="fmt f-deck">PPTX</span><a href="aisec/enterprise-ai-data-protection.pptx">Protecting Enterprise Data in the Age of AI</a> &mdash; 4 slides</li>
+        <li><span class="fmt f-deck">PPTX</span><a href="aisec/agentic-ai-system.pptx">Agentic AI &mdash; risk, control and tooling</a> &mdash; 7 slides</li>
+        <li><span class="fmt f-deck">1 page</span><a href="aisec/ai-innovation-lanes.pptx">Keep It Safe Without Slowing People Down</a> &mdash; single-slide visual</li>
+        <li><span class="fmt f-img">PNG</span><a href="aisec/ai-innovation-lanes.png">Lanes visual, full size</a> &middot; <a href="aisec/ai-innovation-lanes-square.png">square for social</a></li>
+      </ul>
+    </li>
+  </ol>
+</nav>
+
+<!-- ============ AI SECURITY ============ -->
+<h2 id="s-aisec">1 &middot; AI security<span class="fold">/aisec</span></h2>
+<p>What actually goes wrong, and what to configure. Filterable, searchable, works offline.</p>
+<div class="cards">
+  <a class="card" href="aisec/enterprise-ai-data-protection.html" style="border-color:#3872e0">
+    <span class="kind k-web">Interactive</span>
+    <h3>Protecting Enterprise Data in the Age of AI</h3>
+    <p>The four ways company data meets AI &mdash; Copilot inside your own systems, paid Claude or ChatGPT accounts, personal logins nobody told you about, and data you license to other people. For each: what to change in your settings, which tools do the work and what they actually do, how to spot it, stop it and keep it fixed &mdash; plus the real gaps none of it solves.</p>
+    <div class="meta">Six views &middot; a real-life example on every tab &middot; gaps flagged in red</div>
+    <div class="go">Open it &rarr;</div>
+  </a>
+  <a class="card" href="aisec/agentic-ai-system.html" style="border-color:#3872e0">
+    <span class="kind k-web">Interactive</span>
+    <h3>Agentic AI control map</h3>
+    <p>The system diagram, the five CISA / ASD ACSC risk categories, a tool matrix arranged by the stack you already run, and each of the four layers with 24 risks &mdash; every one carrying its preventive control, detective control, configuration and example tooling, mapped to OWASP, MITRE ATLAS and NIST AI RMF.</p>
+    <div class="meta">Seven views &middot; filter by OWASP category &middot; free-text search</div>
+    <div class="go">Open it &rarr;</div>
+  </a>
+  <a class="card" href="aisec/agentic-ai-insights.html" style="border-color:#3872e0">
+    <span class="kind k-web">Long read</span>
+    <h3>Securing Agentic AI Without Slowing It Down</h3>
+    <p>Layer by layer &mdash; inputs, training, the agent itself, outputs &mdash; each risk mapped to three frameworks, with the preventive control, the detective control and the configuration that makes both real. Closes on where the trade-off between innovation and control actually sits.</p>
+    <div class="meta">About 12 minutes &middot; 24 risks &middot; six control categories by stack</div>
+    <div class="go">Read it &rarr;</div>
+  </a>
+</div>
+
+<!-- ============ GOVERNANCE ============ -->
+<h2 id="s-gov">2 &middot; Governance<span class="fold">/governance</span></h2>
+<p>The policy layer, and what to do before you write it.</p>
+<div class="cards">
+  <a class="card" href="governance/ai-governance-policy.html" style="border-color:#9031aa">
+    <span class="kind k-gov">Interactive</span>
+    <h3>AI Governance Is Not Data Governance</h3>
+    <p>Data governance is about a noun; AI governance is about a verb. Where the line actually sits and why one depends on the other. Twelve things a good AI policy does, twelve failure patterns to avoid, the eleven pieces of pre-work worth doing before you write a word &mdash; and a short model policy you can copy and adapt.</p>
+    <div class="meta">Six views &middot; model policy with copy and print &middot; anti-patterns flagged in red</div>
+    <div class="go">Open it &rarr;</div>
+  </a>
+</div>
+
+<!-- ============ CULTURE ============ -->
+<h2 id="s-culture">3 &middot; Culture<span class="fold">/culture</span></h2>
+<p>Why people route around good controls, and what changes that.</p>
+<div class="cards">
+  <a class="card" href="culture/cyber-culture.html" style="border-color:#457c3c">
+    <span class="kind k-cul">Interactive</span>
+    <h3>Cyber Culture &mdash; what it is, and how to move it</h3>
+    <p>Culture is what people do when no one is watching. Friction decides most of it: make the safe route the easy route and behaviour follows, no matter what the policy says. Four levers that actually shift it, and an operating plan for doing so.</p>
+    <div class="meta">Three parts &middot; the mechanism, four levers, an operating plan</div>
+    <div class="go">Open it &rarr;</div>
+  </a>
+</div>
+
+<!-- ============ DECKS ============ -->
+<h2 id="s-decks">4 &middot; Decks and visuals<span class="fold">/aisec</span></h2>
+<p>4:3 PowerPoint, ready to use or adapt.</p>
+<div class="cards two">
+  <a class="card" href="aisec/enterprise-ai-data-protection.pptx" style="border-color:#d55c26">
+    <span class="kind k-deck">Deck</span>
+    <h3>Protecting Enterprise Data in the Age of AI</h3>
+    <p>Four slides: the four situations with what to do in each, what to set up and which tools do it, sharing licensed data without it becoming training corpus, and a four-week runbook.</p>
+    <div class="meta">PowerPoint &middot; 4 slides</div>
+    <div class="go">Download &rarr;</div>
+  </a>
+  <a class="card" href="aisec/agentic-ai-system.pptx" style="border-color:#d55c26">
+    <span class="kind k-deck">Deck</span>
+    <h3>Agentic AI &mdash; risk, control and tooling</h3>
+    <p>Seven slides: the system diagram, what goes wrong and what covers most of it, the four layers one at a time, and references.</p>
+    <div class="meta">PowerPoint &middot; 7 slides</div>
+    <div class="go">Download &rarr;</div>
+  </a>
+</div>
+<div class="cards">
+  <a class="card" href="aisec/ai-innovation-lanes.pptx" style="border-color:#d55c26">
+    <span class="kind k-deck">One-page visual</span>
+    <h3>Keep It Safe Without Slowing People Down</h3>
+    <p>A single slide for the innovation conversation. Three lanes sorted by what the work can actually break &mdash; just go, quick check, proper review &mdash; with what each one is, what happens, and how long it takes. Plus the four things that keep the top lane full.</p>
+    <div class="meta">PowerPoint &middot; 1 slide &middot; also as <a href="aisec/ai-innovation-lanes.png">PNG</a> and <a href="aisec/ai-innovation-lanes-square.png">square PNG</a> for social</div>
+    <div class="go">Download &rarr;</div>
+  </a>
+</div>
+
+<footer>
+  <p class="disc">The views expressed here are my own. They do not represent the views of any employer, client, or other organisation with which I am or have been associated, and nothing here should be taken as legal advice.</p>
+  Built in part on <em>Careful Adoption of Agentic AI Services</em> &mdash; ASD&rsquo;s ACSC, CISA, NSA, the Canadian Centre for Cyber Security, NCSC-NZ and NCSC-UK, 30 April 2026. Diagram redrawn from Figure 1. &copy; Commonwealth of Australia 2026, licensed CC BY 4.0.<br><br>
+  OWASP and MITRE ATLAS identifiers change between published versions &mdash; verify against the current release before using them in an assessment. NIST AI RMF subcategory mappings are a derivation, not an official crosswalk. Products named are examples of a control category, not recommendations or an endorsement. The model policy is a starting point, not a compliant document.
+</footer>
+
+</div>
+</body>
+</html>
