@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protecting Critical Data in Copilot, Enterprise Chat and Shadow AI</title>
+<meta name="description" content="Three channels enterprise data leaves by - Microsoft Copilot, sanctioned enterprise Claude or ChatGPT, and shadow AI - with a four-week runbook to close them.">
+<style>
+:root{--petrol:#1b4965;--petrol-dk:#12354a;--petrol-lt:#2a6e86;
+ --ink:#1c2126;--ink-soft:#4a555e;--ink-faint:#7b8790;--rule:#e2e8ea;--wash:#f4f7f8}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:#fff;color:var(--ink);font-family:Inter,Calibri,"Segoe UI",Helvetica,Arial,sans-serif;
+ font-size:16.5px;line-height:1.68;-webkit-font-smoothing:antialiased}
+.wrap{max-width:940px;margin:0 auto;padding:0 24px}
+a{color:var(--petrol-lt)}
+.site{border-bottom:1px solid var(--rule)}
+.site .wrap{display:flex;align-items:center;gap:14px;padding:16px 24px}
+.site .logo{font-weight:700;letter-spacing:-.01em;color:var(--petrol);font-size:18px}
+.site .crumb{font-size:12.5px;color:var(--ink-faint);letter-spacing:.06em;text-transform:uppercase}
+header.post{padding:44px 0 8px}
+header.post .eyebrow{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--petrol-lt);font-weight:600}
+header.post h1{margin:12px 0 0;font-size:40px;line-height:1.14;letter-spacing:-.022em}
+header.post .stand{margin:16px 0 0;font-size:19px;line-height:1.55;color:var(--ink-soft)}
+header.post .meta{margin:22px 0 0;padding-top:16px;border-top:1px solid var(--rule);
+ font-size:13px;color:var(--ink-faint);display:flex;gap:18px;flex-wrap:wrap}
+.toc{background:var(--wash);border-left:3px solid var(--petrol);padding:16px 20px;margin:32px 0}
+.toc h5{margin:0 0 8px;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--petrol)}
+.toc ol{margin:0;padding-left:20px;font-size:14.5px}
+.toc li{margin:4px 0}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+h2{margin:46px 0 6px;font-size:26px;letter-spacing:-.015em;display:flex;align-items:center;gap:12px}
+h2 .lnum{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;
+ border-radius:50%;color:#fff;font-size:15px;font-weight:700;flex:0 0 auto}
+h3{margin:32px 0 6px;font-size:20px;letter-spacing:-.01em}
+p{margin:0 0 16px}
+.sublayer{color:var(--ink-faint);font-size:14px;margin:2px 0 0}
+.pull{margin:16px 0 0;padding-left:14px;border-left:3px solid;font-style:italic;font-size:16px}
+.lede{font-size:18px;color:var(--ink-soft)}
+.bottomline{margin:14px 0 8px;padding:14px 18px;background:var(--wash);border-left:4px solid;font-size:14.5px;line-height:1.62}
+.bottomline .bl{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:5px}
+.pgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:24px 0}
+.pcard{border:1.5px solid;border-radius:7px;padding:16px 18px}
+.pcard .pnum{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;
+ border-radius:50%;color:#fff;font-size:12px;font-weight:700;margin-bottom:8px}
+.pcard h4{margin:0 0 6px;font-size:16px;letter-spacing:-.01em}
+.pcard p{margin:0;font-size:14px;color:var(--ink-soft);line-height:1.6}
+.kicker{margin:30px 0;padding:22px 24px;background:var(--petrol);color:#fff;border-radius:6px}
+.kicker p{margin:0;font-size:17.5px;line-height:1.6}
+.kicker b{color:#cfe3ee}
+.caveat{margin:30px 0 0;padding:14px 18px;border:1px solid var(--rule);background:var(--wash);
+ font-size:13px;color:var(--ink-soft);line-height:1.6}
+.caveat b{color:var(--ink)}
+footer.post{margin:44px 0 0;padding:24px 0 60px;border-top:1px solid var(--rule);font-size:14px;color:var(--ink-soft)}
+footer.post .who{font-weight:600;color:var(--ink)}
+.fig{margin:30px 0 34px}
+.diagram{display:grid;grid-template-columns:1fr auto 2.6fr auto 1fr;gap:0 10px;align-items:stretch}
+.arrow{align-self:center;color:#555;font-size:20px}
+.panel{border-radius:7px;border:1.5px solid;overflow:hidden;display:flex;flex-direction:column}
+.panel > .hd{padding:7px 8px;font-size:11.5px;font-weight:700;color:#fff;text-align:center}
+.panel .body{padding:9px 8px 12px;text-align:center;font-size:11px}
+.panel .body b{display:block;margin-bottom:5px}
+.panel .li{margin:3px 0}
+.p-in{border-color:#622195;background:#f1e9fd;color:#622195}
+.p-in > .hd{background:#9031aa}
+.p-tr{margin:6px 8px 10px}
+.p-tr .hd2{background:#441887;color:#fff;font-size:11.5px;font-weight:700;padding:6px;border-radius:6px}
+.p-tr .body2{color:#441887;font-size:11px;padding-top:6px;text-align:center}
+.dash{border-top:1px dashed currentColor;opacity:.5;margin:9px 10px 0}
+.p-ag{border-color:#3872e0;background:#eaf0fd;color:#20469c}
+.p-ag > .hd{background:#3872e0}
+.p-out{border-color:#3064ba;background:#e6f2fc;color:#3064ba}
+.p-out > .hd{background:#3064ba}
+.core{background:#fff;border:1.5px solid #3872e0;border-radius:7px;margin:10px;padding:9px;text-align:center}
+.core b{display:block;font-size:13.5px;color:#20469c}
+.core span{display:block;font-size:11px;color:#20469c;margin-top:3px}
+.core em{display:block;font-size:11px;color:#3872e0;margin-top:2px}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 10px}
+.trio .c{border-radius:7px;border:1.25px solid;padding:8px 6px;text-align:center;font-size:10.5px}
+.trio .c b{display:block;font-size:11.5px;margin-bottom:4px}
+.c-plan{border-color:#457c3c;background:#ebf5ea;color:#305d28}
+.c-mem{border-color:#e68636;background:#fdf4e2;color:#d55c26}
+.c-tool{border-color:#3064ba;background:#e6f2fc;color:#20469c}
+.priv{margin:10px;border-radius:7px;border:1.5px solid #edac46;background:#fef8e4;color:#d55c26;padding:8px;text-align:center;font-size:10.5px}
+.priv b{display:block;font-size:11.5px;margin-bottom:3px}
+.rcat{margin:0 10px 12px}
+.rcat .lbl{font-size:10.5px;font-weight:700;color:#a82e26;margin-bottom:5px}
+.rcat .chips{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.rcat .chips span{border:1px solid #e39e9c;background:#f9eceb;color:#a82e26;border-radius:12px;padding:4px 2px;text-align:center;font-size:10px}
+.loop{margin:10px 0 0;text-align:center;color:#b63831;font-size:11.5px}
+.loop .ln{border-top:1.5px dashed #b63831;margin:0 12% 6px}
+figcaption{margin-top:14px;font-size:12.5px;color:#6b7780;text-align:center;font-style:italic}
+.tw{overflow-x:auto}
+table.map{width:100%;border-collapse:collapse;margin:16px 0 6px;font-size:13px}
+table.map thead th{color:#fff;font-size:11px;font-weight:700;letter-spacing:.03em;padding:8px 10px;text-align:left}
+table.map thead th.c1{background:#a82e26;width:36%}
+table.map thead th.c2{background:#2f6b3c}
+table.map td{border:1px solid #dcdcdc;padding:9px 10px;vertical-align:top}
+table.map tbody tr:nth-child(even) td{background:#f7f7f7}
+.rc{display:flex;gap:8px;align-items:flex-start}
+.rc .num{flex:0 0 auto;width:19px;height:19px;border-radius:50%;color:#fff;font-size:10.5px;font-weight:700;
+ display:flex;align-items:center;justify-content:center;margin-top:1px}
+.rc svg{flex:0 0 auto;width:18px;height:18px;stroke:#3a3a3a;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin-top:1px}
+.rc .t{font-size:12.5px;font-weight:700;color:#3a3a3a}
+.rc .m{margin-top:4px;font-size:10.5px;color:#8a8a8a}
+.ctl{font-size:12px;color:#565656;line-height:1.55}
+.ctl b{color:#3a3a3a}
+.ctl .tools{color:#5e5e5e}
+@media (max-width:820px){
+ header.post h1{font-size:31px}
+ .diagram{grid-template-columns:1fr;gap:12px}
+ .arrow{display:none}
+ .trio{grid-template-columns:1fr}
+ .rcat .chips{grid-template-columns:repeat(2,1fr)}
+ .pgrid{grid-template-columns:1fr}
+ table.map thead{display:none}
+ table.map td{display:block;border-bottom:none}
+ table.map tr{display:block;border:1px solid #dcdcdc;margin-bottom:10px}
+ table.map td:last-child{border-bottom:1px solid #dcdcdc}
+}
+@media print{.toc,.site{display:none}body{font-size:11pt}h2{page-break-after:avoid}table.map,.pcard{page-break-inside:avoid}}
+
+.modelrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0 6px}
+.mlabel{font-size:12.5px;font-weight:600;color:#1b4965}
+.mchip{border:1.25px solid;border-radius:14px;padding:4px 11px;font-size:12px}
+.mchip b{margin-right:5px}
+table.stack{width:100%;border-collapse:collapse;margin:12px 0 6px;font-size:13px}
+table.stack thead th{color:#fff;font-size:11px;font-weight:700;padding:8px 10px;text-align:left}
+table.stack thead th.s0{background:#1b4965;width:31%}
+table.stack thead th.s1{background:#d55c26}
+table.stack thead th.s2{background:#3064ba}
+table.stack thead th.s3{background:#457c3c}
+table.stack td{border:1px solid #dcdcdc;padding:9px 10px;vertical-align:middle;color:#565656;font-size:12.5px}
+table.stack tbody tr:nth-child(even) td{background:#f7f7f7}
+td.cc{display:flex;gap:9px;align-items:flex-start}
+td.cc .sn{flex:0 0 auto;width:19px;height:19px;border-radius:50%;background:#1b4965;color:#fff;
+ font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
+td.cc b{display:block;color:#3a3a3a;font-size:12.5px}
+td.cc .cv{display:block;font-size:10.5px;color:#8a8a8a;margin-top:2px}
+@media (max-width:820px){table.stack thead{display:none}table.stack td{display:block;border-bottom:none}
+ table.stack tr{display:block;border:1px solid #dcdcdc;margin-bottom:10px}
+ table.stack td:last-child{border-bottom:1px solid #dcdcdc}}
+
+.epanels{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}
+.epanel{border:1.5px solid;border-radius:7px;overflow:hidden}
+.epanel .eh{color:#fff;font-weight:700;font-size:14px;padding:9px 14px}
+.epanel .esub{margin:9px 14px 4px;font-size:12px;font-style:italic;color:#8a8a8a}
+.eblock{margin:10px 14px 12px}
+.eblock .ek{display:inline-block;color:#fff;font-size:10px;font-weight:700;letter-spacing:.1em;
+ padding:2px 9px;border-radius:9px;margin-bottom:6px}
+.eblock ul{margin:0;padding-left:18px}
+.eblock li{font-size:12.5px;color:#565656;line-height:1.5;margin:4px 0}
+.exh{margin:26px 0 4px;font-size:15px;color:#1b4965}
+.esteps{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:12px 0 4px}
+.estep{border:1.25px solid #cdd8dd;border-radius:7px;padding:12px}
+.estep .esn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;
+ border-radius:50%;background:#1b4965;color:#fff;font-size:11px;font-weight:700}
+.estep .ew{font-size:10.5px;color:#8a8a8a;margin-left:7px;font-weight:600}
+.estep h5{margin:7px 0 4px;font-size:12.5px;color:#1b4965}
+.estep p{margin:0;font-size:11.5px;color:#565656;line-height:1.5}
+@media (max-width:820px){.epanels{grid-template-columns:1fr}.esteps{grid-template-columns:1fr}}
+
+
+.epanels{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}
+.epanel{border:1.5px solid;border-radius:7px;overflow:hidden}
+.epanel .eh{color:#fff;font-weight:700;font-size:14px;padding:9px 14px}
+.epanel .esub{margin:9px 14px 4px;font-size:12px;font-style:italic;color:#8a8a8a}
+.eblock{margin:10px 14px 12px}
+.eblock .ek{display:inline-block;color:#fff;font-size:10px;font-weight:700;letter-spacing:.1em;
+ padding:2px 9px;border-radius:9px;margin-bottom:6px}
+.eblock ul{margin:0;padding-left:18px}
+.eblock li{font-size:12.5px;color:#565656;line-height:1.5;margin:4px 0}
+.exh{margin:26px 0 4px;font-size:15px;color:#1b4965}
+.esteps{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:12px 0 4px}
+.estep{border:1.25px solid #cdd8dd;border-radius:7px;padding:12px}
+.estep .esn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;
+ border-radius:50%;background:#1b4965;color:#fff;font-size:11px;font-weight:700}
+.estep .ew{font-size:10.5px;color:#8a8a8a;margin-left:7px;font-weight:600}
+.estep h5{margin:7px 0 4px;font-size:12.5px;color:#1b4965}
+.estep p{margin:0;font-size:11.5px;color:#565656;line-height:1.5}
+@media (max-width:820px){.epanels{grid-template-columns:1fr}.esteps{grid-template-columns:1fr}}
+
+.ewhat{padding:10px 12px;margin:8px 14px;border-radius:5px;font-size:12px;line-height:1.5}
+.wgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0}
+.wcard{border:1.4px solid #cdd8dd;border-radius:7px;overflow:hidden}
+.wcard .wh{background:#1b4965;color:#fff;font-size:12px;font-weight:700;padding:7px 12px;letter-spacing:.06em}
+.wcard h5{margin:11px 12px 6px;font-size:14px;color:#1b4965}
+.wcard ul{margin:0;padding:0 12px 0 28px}
+.wcard li{font-size:12px;color:#565656;line-height:1.5;margin:4px 0}
+.wout{margin:10px 12px 12px;padding-top:8px;border-top:1px solid #dde5e8}
+.wout span{display:block;font-size:9.5px;letter-spacing:.12em;color:#8a8a8a;font-weight:700;margin-bottom:3px}
+.wout{font-size:12px;color:#1b4965;font-style:italic;line-height:1.5}
+.sgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:16px 0}
+.scard{background:#f4f7f8;border:1px solid #dde5e8;border-radius:6px;padding:12px}
+.scard b{display:block;font-size:12.5px;color:#1b4965;margin-bottom:5px}
+.scard p{margin:0;font-size:11.5px;color:#565656;line-height:1.5}
+@media (max-width:820px){.wgrid,.sgrid{grid-template-columns:1fr}}
+
+.epanels3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0}
+@media (max-width:820px){.epanels3{grid-template-columns:1fr}}
+
+.refgrid{display:grid;grid-template-columns:180px 1fr;gap:12px 18px;margin:18px 0 6px;align-items:start}
+.rlabel{color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+ padding:6px 10px;border-radius:5px;text-align:center}
+.ritems p{margin:0 0 10px;font-size:13px;line-height:1.55;color:#4a555e}
+.ritems p:last-child{margin-bottom:0}
+.ritems b{color:#1c2126}
+.creditline{margin:14px 0 0;font-size:11.5px;font-style:italic;color:#9aa4ab;text-align:center}
+@media (max-width:820px){.refgrid{grid-template-columns:1fr}.rlabel{text-align:left}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="post">
+  <div class="eyebrow">AI Security &middot; Enterprise Data Protection</div>
+  <h1>Protecting Critical Data in Copilot, Enterprise Chat and Shadow AI</h1>
+  <p class="stand">Three channels your data leaves by, what to detect and prevent on each, and a four-week runbook that ends with a test anyone can understand.</p>
+  <div class="meta"><span>Microsoft 365 Copilot &middot; enterprise Claude / ChatGPT &middot; shadow AI</span><span>~8 min read</span></div>
+</header>
+
+<div class="toc"><h5>In this piece</h5><ol>
+  <li><a href="#channels">Three channels your data leaves by</a></li>
+  <li><a href="#runbook">A four-week runbook</a></li><li><a href="#references">References</a></li>
+</ol></div>
+
+
+<section id="channels">
+<h3>Three channels your data leaves by</h3>
+<p class="lede">Most organisations are not building agents yet. They are rolling out Copilot, standing up an enterprise Claude or ChatGPT tenant, and quietly discovering how much shadow AI is already in use.</p>
+<p>Those are three different problems with three different answers. Ranked by what you actually hold: with Copilot you have a control, with sanctioned enterprise chat you have a contract, and with shadow AI you have nothing at all.</p>
+<div class="epanels3"><div class='epanel' style='border-color:#3064ba'><div class='eh' style='background:#3064ba'>Copilot</div><p class='esub'>Inside the tenant. Nothing leaves &mdash; but everything the user can read is now findable.</p><div class='ewhat' style='background:#3064ba18;color:#3064ba'>Copilot inherits the user&rsquo;s permissions. A decade of &lsquo;anyone with the link&rsquo; sharing becomes a search index.</div><div class='eblock'><span class='ek' style='background:#3064ba'>DETECT</span><ul><li>Oversharing report on SharePoint and OneDrive &mdash; files on org-wide or anonymous links</li><li>Purview audit of Copilot interactions</li><li>DLP alerts on prompt and response content</li></ul></div><div class='eblock'><span class='ek' style='background:#3064ba'>PREVENT</span><ul><li>Remediate permissions before rollout, not after</li><li>Restricted SharePoint Search as a fence while you clean up</li><li>Sensitivity labels on HR, finance, legal and M&amp;A sites</li></ul></div></div><div class='epanel' style='border-color:#9031aa'><div class='eh' style='background:#9031aa'>Sanctioned enterprise chat</div><p class='esub'>Claude or ChatGPT on a commercial tier. Data leaves, under contract.</p><div class='ewhat' style='background:#9031aa18;color:#9031aa'>Terms govern training, retention, region and subprocessors &mdash; but only if the tenant setting matches the contract.</div><div class='eblock'><span class='ek' style='background:#9031aa'>DETECT</span><ul><li>Read the agreement: training use, retention, subprocessors, region</li><li>Screenshot the live tenant setting beside the contract clause</li><li>Connector and integration inventory; egress DLP on the API path</li></ul></div><div class='eblock'><span class='ek' style='background:#9031aa'>PREVENT</span><ul><li>Commercial or enterprise tier only &mdash; never a consumer tier for business data</li><li>Configure region and retention before first use</li><li>Connector allow-list; disable file upload where not needed</li></ul></div></div><div class='epanel' style='border-color:#a82e26'><div class='eh' style='background:#a82e26'>Shadow AI</div><p class='esub'>Personal accounts on managed devices. Data leaves, with no contract at all.</p><div class='ewhat' style='background:#a82e2618;color:#a82e26'>Consumer terms commonly permit training on inputs. There is no DPA, no retention control and no audit trail.</div><div class='eblock'><span class='ek' style='background:#a82e26'>DETECT</span><ul><li>Proxy, DNS or CASB: traffic to consumer AI domains from managed devices</li><li>Entra app-consent and OAuth grants to unsanctioned AI apps</li><li>Expense reports &mdash; individual subscriptions charged to a card</li></ul></div><div class='eblock'><span class='ek' style='background:#a82e26'>PREVENT</span><ul><li>Give people a sanctioned tool first; blocking without an alternative fails</li><li>Block consumer AI domains at the proxy once the alternative exists</li><li>Browser policy against pasting labelled content into unmanaged sites</li></ul></div></div></div>
+<div class="bottomline" style="border-color:#1b4965"><span class="bl" style="color:#1b4965">The takeaway</span>
+Copilot does not leak data &mdash; it finds the data you already over-shared. Permission remediation is the control, and it is work you owed anyway. For the other two channels the test is just as blunt: if the contract clause and the live tenant setting disagree, you do not have a control &mdash; you have a promise. And shadow AI has neither.</div>
+</section>
+
+<section id="runbook">
+<h3>A four-week runbook</h3>
+<p>What to actually do, in order, with a test at the end that gives an unambiguous answer.</p>
+<div class="wgrid"><div class='wcard'><div class='wh'>Week 1</div><h5>Measure before you enable</h5><ul><li>Run the oversharing report across SharePoint and OneDrive</li><li>Pull 90 days of proxy or CASB data for consumer AI domains</li><li>List every AI tool already in use, including ones bundled into existing licences</li></ul><div class='wout'><span>OUTCOME</span>A number you can show leadership. Expect thousands of over-shared files.</div></div><div class='wcard'><div class='wh'>Week 2</div><h5>Remediate the crown jewels</h5><ul><li>Remove org-wide and anonymous links on HR, finance, legal and M&amp;A sites</li><li>Apply sensitivity labels to those sites, not to individual files</li><li>Name a data owner per site &mdash; remediation without an owner does not stick</li></ul><div class='wout'><span>OUTCOME</span>The files that would end a career are no longer reachable by search.</div></div><div class='wcard'><div class='wh'>Week 3</div><h5>Fence the rest and give people a path</h5><ul><li>Restricted SharePoint Search scoped to remediated sites only</li><li>Provision the sanctioned enterprise tier and tell everyone it exists</li><li>Verify the vendor tenant setting matches the contract clause; screenshot both</li></ul><div class='wout'><span>OUTCOME</span>A sanctioned route exists, so blocking the unsanctioned one becomes reasonable.</div></div><div class='wcard'><div class='wh'>Week 4</div><h5>Try to break it</h5><ul><li>As a pilot user with ordinary permissions, ask for &lsquo;salary bands&rsquo; and &lsquo;termination letters&rsquo;</li><li>If either returns, stop the rollout and go back to week 2</li><li>Only then block consumer AI domains at the proxy</li></ul><div class='wout'><span>OUTCOME</span>An unambiguous pass or fail that a non-technical executive can understand.</div></div></div>
+<h4 class="exh">Then keep it closed &mdash; five standing controls</h4>
+<div class="sgrid"><div class='scard'><b>Monthly delta</b><p>Oversharing report re-run monthly. Track the trend, not the absolute number.</p></div><div class='scard'><b>Alerts to the owner</b><p>Route DLP alerts to the named data owner, not only to IT. IT cannot judge whether a file is sensitive.</p></div><div class='scard'><b>Annual re-verification</b><p>Re-check every vendor tenant setting against the contract, and after any vendor migration.</p></div><div class='scard'><b>One written rule</b><p>What may never leave: CUI, PHI, privileged material, source code, unreleased financials.</p></div><div class='scard'><b>Records coverage</b><p>Retention, legal hold and eDiscovery extended to prompts and responses, not just files.</p></div></div>
+<div class="bottomline" style="border-color:#1b4965"><span class="bl" style="color:#1b4965">Order matters</span>
+Do not block first. Blocking consumer AI before a sanctioned tool exists moves the traffic to phones and home laptops, where you cannot see it at all. Sanction, then fence, then block &mdash; in that order.</div>
+</section>
+
+
+
+<section id="references">
+<h3>References</h3>
+<div class="refgrid">
+  <div class="rlabel" style="background:#3872e0">Primary guidance</div>
+  <div class="ritems">
+    <p><b>Careful Adoption of Agentic AI Services</b> &mdash; ASD&rsquo;s ACSC, CISA, NSA, the Canadian Centre for Cyber Security, NCSC-NZ and NCSC-UK, 30 April 2026. The first coordinated Five Eyes guidance on agentic AI; source of the five risk categories and the system diagram. <a href="https://www.cisa.gov/resources-tools/resources/careful-adoption-agentic-ai-services">cisa.gov</a> &middot; <a href="https://media.defense.gov/2026/Apr/30/2003922823/-1/-1/0/CAREFUL%20ADOPTION%20OF%20AGENTIC%20AI%20SERVICES_FINAL.PDF">full PDF</a></p>
+  </div>
+
+  <div class="rlabel" style="background:#d55c26">Industry research</div>
+  <div class="ritems">
+    <p><b>Cloud Security Alliance, AI Safety Initiative</b> &mdash; research notes on the joint guidance and the 2026 agentic identity survey: 82% of organisations have found unknown AI agents in their environment, 65% had an agent security incident in the past twelve months, and 21% have a formal agent decommissioning process. <a href="https://labs.cloudsecurityalliance.org">labs.cloudsecurityalliance.org</a></p>
+  </div>
+
+  <div class="rlabel" style="background:#457c3c">Frameworks used for mapping</div>
+  <div class="ritems">
+    <p><b>OWASP Top 10 for LLM Applications</b> &mdash; source of the OWASP identifiers on every risk row. The guidance also cites OWASP Top 10 for Agentic Applications (2026), worth reviewing alongside it.</p>
+    <p><b>MITRE ATLAS&trade;</b> &mdash; Adversarial Threat Landscape for AI Systems; source of the AML.T identifiers, and named in the guidance as a recommended threat-modelling taxonomy.</p>
+    <p><b>NIST AI Risk Management Framework</b> &mdash; source of the GOVERN / MAP / MEASURE / MANAGE subcategory references. Those mappings are our derivation, not an official crosswalk.</p>
+  </div>
+
+  <div class="rlabel" style="background:#9031aa">Also cited in the guidance</div>
+  <div class="ritems">
+    <p>NIST SP 800-207 Zero Trust Architecture &middot; CISA 2025 Minimum Elements for a Software Bill of Materials &middot; CISA AI Cybersecurity Collaboration Playbook &middot; NCSC-UK Guidelines for Secure AI System Development &middot; MIT STAMP / STPA-Sec materials</p>
+  </div>
+</div>
+
+<div class="caveat"><b>Verification note.</b> OWASP and MITRE ATLAS identifiers change between published versions &mdash; check both against the current release before using them in an assessment. The NIST AI RMF subcategory mappings are our derivation; NIST has not published a crosswalk at this granularity. Products named throughout are examples of a control category, not recommendations or an endorsement.</div>
+<p class="creditline">Diagram redrawn from Figure 1 of the joint guidance. &copy; Commonwealth of Australia 2026, licensed CC BY 4.0.</p>
+</section>
+
+<div class="caveat"><b>On the product names.</b> Feature names reflect Microsoft 365 and major AI vendor offerings at time of writing. Tiers, names and availability change; verify in your own tenant before relying on any of it.</div>
+
+<footer class="post">
+  <p>If you want this runbook turned into something specific to your tenant, get in touch.</p>
+  <p style="margin-top:18px;font-size:12.5px;color:#7b8790">Feature names reflect Microsoft 365 and major AI vendor offerings at time of writing; verify in your own tenant.</p>
+</footer>
+</div>
+</body>
+</html>

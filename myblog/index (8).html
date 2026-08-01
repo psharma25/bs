@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Securing Agentic AI &mdash; control maps, runbooks and decks</title>
+<meta name="description" content="A layer-by-layer control map for agentic AI mapped to OWASP, MITRE ATLAS and NIST AI RMF, plus a runbook for protecting enterprise data in Copilot, enterprise chat and shadow AI.">
+<style>
+:root{
+  --petrol:#1b4965; --petrol-lt:#2a6e86;
+  --ink:#1c2126; --ink-soft:#4a555e; --ink-faint:#7b8790;
+  --rule:#e2e8ea; --wash:#f4f7f8;
+  --blue:#3872e0; --purple:#9031aa; --green:#457c3c; --orange:#d55c26;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:#fff;color:var(--ink);
+  font-family:Inter,Calibri,"Segoe UI",Helvetica,Arial,sans-serif;
+  font-size:16.5px;line-height:1.65;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px}
+a{color:var(--petrol-lt)}
+
+header.top{padding:56px 0 8px}
+header.top .eyebrow{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--petrol-lt);font-weight:600}
+header.top h1{margin:12px 0 0;font-size:38px;line-height:1.15;letter-spacing:-.022em}
+header.top .stand{margin:16px 0 0;font-size:18.5px;line-height:1.55;color:var(--ink-soft);max-width:70ch}
+hr.rule{border:0;border-top:1.75px solid #003767;margin:26px 0 0}
+
+.note{margin:24px 0 0;padding:14px 18px;background:var(--wash);border-left:3px solid var(--petrol);
+  font-size:14.5px;line-height:1.6;color:var(--ink-soft)}
+.note b{color:var(--ink)}
+
+h2{margin:44px 0 4px;font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:var(--petrol)}
+h2 + p{margin:0 0 4px;font-size:14.5px;color:var(--ink-faint)}
+
+.cards{display:grid;gap:14px;margin:18px 0 0}
+.card{display:block;border:1.5px solid var(--rule);border-radius:8px;padding:20px 22px;
+  text-decoration:none;color:inherit;transition:border-color .12s, box-shadow .12s, transform .12s}
+.card:hover{border-color:var(--petrol-lt);box-shadow:0 3px 14px rgba(27,73,101,.10);transform:translateY(-1px)}
+.card .kind{display:inline-block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+  color:#fff;padding:3px 10px;border-radius:11px;margin-bottom:10px}
+.k-web{background:var(--blue)}
+.k-read{background:var(--green)}
+.k-deck{background:var(--orange)}
+.card h3{margin:0 0 6px;font-size:19px;letter-spacing:-.012em}
+.card p{margin:0;font-size:14.5px;color:var(--ink-soft);line-height:1.55}
+.card .meta{margin-top:10px;font-size:12.5px;color:var(--ink-faint)}
+.card .go{margin-top:12px;font-size:13.5px;font-weight:600;color:var(--petrol-lt)}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+footer{margin:52px 0 0;padding:22px 0 64px;border-top:1px solid var(--rule);
+  font-size:13px;color:var(--ink-faint);line-height:1.6}
+
+@media (max-width:760px){
+  header.top h1{font-size:29px}
+  .two{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">AI Security &middot; Practical Control Maps</div>
+  <h1>Securing Agentic AI</h1>
+  <p class="stand">Two sets of material for two different questions. One for organisations rolling out Copilot and enterprise chat. One for organisations building or deploying agents that hold tool access.</p>
+</header>
+<hr class="rule">
+
+<div class="note">
+  <b>Which do you need?</b> If the question is &ldquo;should we turn Copilot on&rdquo;, start with the enterprise data material. If the question is &ldquo;we are giving an agent write access to a production system&rdquo;, start with the agentic control map.
+</div>
+
+<h2>Start here &mdash; interactive</h2>
+<p>Filterable, searchable, works offline in a single file.</p>
+<div class="cards">
+  <a class="card" href="agentic-ai-system.html">
+    <span class="kind k-web">Interactive</span>
+    <h3>Agentic AI control map</h3>
+    <p>The system diagram, the five CISA / ASD ACSC risk categories, a tool matrix by stack, and each of the four layers with 24 risks &mdash; every one carrying its preventive control, detective control, configuration and example tooling.</p>
+    <div class="meta">Seven views &middot; filter by OWASP category &middot; free-text search</div>
+    <div class="go">Open the control map &rarr;</div>
+  </a>
+</div>
+
+<h2>Read</h2>
+<p>Long-form, with the full tables and the reasoning behind them.</p>
+<div class="cards two">
+  <a class="card" href="agentic-ai-insights.html">
+    <span class="kind k-read">Article</span>
+    <h3>Securing Agentic AI Without Slowing It Down</h3>
+    <p>Layer by layer, mapped to OWASP LLM Top 10, MITRE ATLAS and NIST AI RMF &mdash; and where the real trade-off between innovation and control sits.</p>
+    <div class="meta">~12 min read</div>
+    <div class="go">Read &rarr;</div>
+  </a>
+  <a class="card" href="copilot-data-protection.html">
+    <span class="kind k-read">Article</span>
+    <h3>Protecting Critical Data in Copilot, Enterprise Chat and Shadow AI</h3>
+    <p>Three channels your data leaves by, what to detect and prevent on each, and a four-week runbook ending in a test anyone can understand.</p>
+    <div class="meta">~8 min read</div>
+    <div class="go">Read &rarr;</div>
+  </a>
+</div>
+
+<h2>Present</h2>
+<p>4:3 decks, ready to use or adapt.</p>
+<div class="cards two">
+  <a class="card" href="agentic-ai-system.pptx">
+    <span class="kind k-deck">Deck</span>
+    <h3>Agentic AI &mdash; risk, control and tooling</h3>
+    <p>Seven slides: the system, what goes wrong and what covers it, the four layers, and references.</p>
+    <div class="meta">PowerPoint &middot; 7 slides</div>
+    <div class="go">Download &rarr;</div>
+  </a>
+  <a class="card" href="copilot-data-protection.pptx">
+    <span class="kind k-deck">Deck</span>
+    <h3>Copilot, enterprise chat and shadow AI</h3>
+    <p>Three slides: the three channels, a four-week runbook with five standing controls, and references.</p>
+    <div class="meta">PowerPoint &middot; 3 slides</div>
+    <div class="go">Download &rarr;</div>
+  </a>
+</div>
+
+<footer>
+  Built on <em>Careful Adoption of Agentic AI Services</em> &mdash; ASD&rsquo;s ACSC, CISA, NSA, the Canadian Centre for Cyber Security, NCSC-NZ and NCSC-UK, 30 April 2026. Diagram redrawn from Figure 1. &copy; Commonwealth of Australia 2026, licensed CC BY 4.0.<br><br>
+  OWASP and MITRE ATLAS identifiers change between published versions &mdash; verify against the current release before using them in an assessment. NIST AI RMF subcategory mappings are a derivation, not an official crosswalk. Products named are examples of a control category, not recommendations.
+</footer>
+
+</div>
+</body>
+</html>
