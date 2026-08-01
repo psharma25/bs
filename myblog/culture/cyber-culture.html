@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cyber Culture — What it is, and how to move it</title>
+<style>
+:root{
+  --ink:#0F2733;
+  --petrol:#1B4965;
+  --petrol-2:#2C6B8F;
+  --paper:#F6F8F9;
+  --card:#FFFFFF;
+  --rule:#D8E2E8;
+  --rule-soft:#E9EFF2;
+  --friction:#B5502F;
+  --flow:#2E7D6F;
+  --muted:#5C7080;
+  --display:Georgia,"Iowan Old Style","Times New Roman",serif;
+  --body:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Calibri,Roboto,Helvetica,Arial,sans-serif;
+  --mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation:none!important;transition:none!important}
+}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--body);font-size:16.5px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:880px;margin:0 auto;padding:0 28px}
+:focus-visible{outline:2.5px solid var(--petrol-2);outline-offset:3px;border-radius:2px}
+
+.eyebrow{
+  font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--petrol-2);margin:0 0 14px;
+}
+
+/* ---------- hero ---------- */
+header{
+  background:var(--petrol);color:#EAF1F5;
+  padding:74px 0 66px;border-bottom:5px solid var(--ink);
+}
+header .eyebrow{color:#8FB6CC}
+h1{
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(38px,6.4vw,62px);line-height:1.06;
+  letter-spacing:-.018em;margin:0 0 26px;color:#fff;
+}
+h1 em{font-style:italic;color:#9FD4C6}
+.standfirst{
+  font-size:clamp(17px,2.1vw,20px);line-height:1.55;
+  max-width:62ch;color:#CFE0E9;margin:0;
+}
+.standfirst b{color:#fff;font-weight:600}
+
+/* ---------- tabs ---------- */
+.tabbar{
+  background:var(--card);border-bottom:1px solid var(--rule);
+  position:sticky;top:0;z-index:20;
+}
+.tabbar .wrap{display:flex;gap:0;overflow-x:auto;scrollbar-width:none}
+.tabbar .wrap::-webkit-scrollbar{display:none}
+.tab{
+  appearance:none;background:none;border:0;cursor:pointer;
+  font-family:var(--body);font-size:12.5px;font-weight:600;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+  padding:18px 20px 15px;border-bottom:3px solid transparent;
+  white-space:nowrap;transition:color .15s ease,border-color .15s ease;
+}
+.tab:first-child{padding-left:0}
+.tab:hover{color:var(--petrol)}
+.tab[aria-selected="true"]{color:var(--petrol);border-bottom-color:var(--petrol)}
+
+.panel{padding:56px 0 66px}
+.panel[hidden]{display:none}
+h2{
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(27px,3.7vw,36px);line-height:1.18;
+  letter-spacing:-.012em;margin:0 0 8px;color:var(--petrol);
+}
+.dek{color:var(--muted);font-size:16px;margin:0 0 30px;max-width:62ch}
+p{margin:0 0 17px;max-width:66ch}
+
+/* ---------- dial ---------- */
+.dial{background:var(--card);border:1px solid var(--rule);padding:30px 30px 34px}
+.roadwrap svg{width:100%;height:auto;display:block}
+.control{margin:20px 0 4px}
+.ctl-labels{
+  display:flex;justify-content:space-between;
+  font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+}
+.ctl-labels .l{color:var(--flow)}
+.ctl-labels .r{color:var(--friction)}
+input[type=range]{
+  width:100%;margin:12px 0 0;height:28px;background:transparent;
+  -webkit-appearance:none;appearance:none;cursor:grab;
+}
+input[type=range]:active{cursor:grabbing}
+input[type=range]::-webkit-slider-runnable-track{
+  height:6px;border-radius:3px;
+  background:linear-gradient(90deg,var(--flow),#C9A227,var(--friction));
+}
+input[type=range]::-moz-range-track{
+  height:6px;border-radius:3px;
+  background:linear-gradient(90deg,var(--flow),#C9A227,var(--friction));
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:26px;height:26px;border-radius:50%;margin-top:-10px;
+  background:var(--petrol);border:3px solid #fff;
+  box-shadow:0 1px 5px rgba(15,39,51,.35);
+}
+input[type=range]::-moz-range-thumb{
+  width:26px;height:26px;border-radius:50%;
+  background:var(--petrol);border:3px solid #fff;
+  box-shadow:0 1px 5px rgba(15,39,51,.35);
+}
+.readouts{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--rule);border:1px solid var(--rule);margin-top:26px;
+}
+.ro{background:var(--card);padding:18px 16px}
+.ro .k{
+  font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  font-weight:700;color:var(--muted);margin:0 0 8px;line-height:1.35;
+}
+.ro .v{
+  font-family:var(--display);font-size:34px;line-height:1;
+  font-variant-numeric:tabular-nums;transition:color .25s ease;
+}
+.verdict{
+  margin-top:18px;padding:15px 18px;font-size:15.5px;line-height:1.5;
+  border-left:4px solid var(--petrol);background:var(--paper);
+  transition:border-color .25s ease;
+}
+.caveat{font-size:12.5px;color:var(--muted);margin:16px 0 0;font-style:italic}
+
+/* ---------- accordion ---------- */
+.deck{border-top:2px solid var(--petrol)}
+details{border-bottom:1px solid var(--rule);background:var(--card)}
+details summary{
+  list-style:none;cursor:pointer;padding:19px 22px 19px 20px;
+  display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:start;
+  transition:background .15s ease;
+}
+details summary::-webkit-details-marker{display:none}
+details summary:hover{background:#FAFCFD}
+.badge{
+  font-family:var(--mono);font-size:12px;font-weight:700;
+  color:var(--petrol-2);letter-spacing:.04em;padding-top:14px;
+}
+.tag{
+  font-size:10px;letter-spacing:.11em;text-transform:uppercase;
+  font-weight:700;color:var(--muted);display:block;margin-bottom:6px;
+}
+.sm-title{
+  font-family:var(--display);font-size:19.5px;line-height:1.3;
+  color:var(--petrol);font-weight:400;display:block;
+}
+.sm-sub{font-size:14.5px;color:var(--muted);line-height:1.5;margin-top:5px;display:block}
+.chev{
+  width:11px;height:11px;border-right:2px solid var(--petrol-2);
+  border-bottom:2px solid var(--petrol-2);transform:rotate(45deg);
+  transition:transform .2s ease;margin-top:16px;flex:none;
+}
+details[open] .chev{transform:rotate(-135deg);margin-top:22px}
+details[open] summary{background:#F3F7F9}
+.dbody{padding:4px 22px 26px 20px;border-top:1px solid var(--rule-soft)}
+.dbody p{font-size:15.5px;margin:16px 0 0}
+.dbody ol{margin:14px 0 0;padding-left:0;list-style:none;counter-reset:st}
+.dbody ol li{
+  position:relative;padding:0 0 0 30px;margin-bottom:13px;
+  font-size:15.5px;line-height:1.56;counter-increment:st;
+}
+.dbody ol li::before{
+  content:counter(st);position:absolute;left:0;top:2px;
+  font-family:var(--mono);font-size:11px;font-weight:700;color:var(--flow);
+  border:1.5px solid var(--flow);border-radius:50%;
+  width:19px;height:19px;display:grid;place-items:center;line-height:1;
+}
+.dbody b{font-weight:600}
+.stop{
+  margin-top:20px;padding:13px 16px;background:#FAF3F0;
+  border-left:4px solid var(--friction);font-size:14.5px;line-height:1.55;
+}
+.stop b{font-weight:700;color:var(--friction)}
+.done{
+  margin-top:16px;padding:13px 16px;background:#F1F7F5;
+  border-left:4px solid var(--flow);font-size:14.5px;line-height:1.55;
+}
+.done b{font-weight:700;color:var(--flow)}
+.deckctl{display:flex;justify-content:flex-end;margin-bottom:12px}
+.deckctl button{
+  appearance:none;background:none;border:1px solid var(--rule);
+  font-family:var(--body);font-size:11.5px;font-weight:600;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--petrol);
+  padding:8px 14px;cursor:pointer;transition:background .15s ease;
+}
+.deckctl button:hover{background:var(--card)}
+
+/* ---------- footer ---------- */
+.close{background:var(--petrol);color:#fff;padding:56px 0}
+.close p{
+  font-family:var(--display);font-size:clamp(21px,3vw,27px);
+  line-height:1.42;max-width:30ch;margin:0;color:#fff;
+}
+.close .eyebrow{color:#8FB6CC}
+footer{padding:26px 0 46px;font-size:12.5px;color:var(--muted)}
+
+@media (max-width:720px){
+  .readouts{grid-template-columns:1fr}
+  .panel{padding:40px 0 50px}
+  header{padding:54px 0 46px}
+  .dial{padding:22px 18px 26px}
+  .wrap{padding:0 20px}
+  details summary{padding:16px;gap:12px}
+  .dbody{padding:4px 16px 22px 16px}
+  .badge{padding-top:12px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <p class="eyebrow">Cyber Culture</p>
+    <h1>Culture is what people do<br>when <em>no one is watching</em>.</h1>
+    <p class="standfirst">Not the values on the wall. Not the training completion rate. <b>The behaviour people default to when no policy covers the case</b> — and in security, that default is set almost entirely by how much friction stands between them and the right thing.</p>
+  </div>
+</header>
+
+<nav class="tabbar">
+  <div class="wrap" role="tablist" aria-label="Sections">
+    <button class="tab" role="tab" id="t-mech" aria-controls="p-mech" aria-selected="true">The mechanism</button>
+    <button class="tab" role="tab" id="t-lev" aria-controls="p-lev" aria-selected="false" tabindex="-1">Four levers</button>
+    <button class="tab" role="tab" id="t-ops" aria-controls="p-ops" aria-selected="false" tabindex="-1">Operating plan</button>
+  </div>
+</nav>
+
+<!-- ============ MECHANISM ============ -->
+<div class="panel" id="p-mech" role="tabpanel" aria-labelledby="t-mech" tabindex="0">
+  <div class="wrap">
+    <p class="eyebrow">The mechanism</p>
+    <h2>Friction decides everything</h2>
+    <p class="dek">People take the path of least resistance. Culture change that needs sustained willpower fails; culture change that makes the right behaviour the easy default succeeds. Drag the control to see the same organisation at different friction levels.</p>
+
+    <div class="dial">
+      <div class="roadwrap">
+        <svg viewBox="0 0 700 210" role="img" aria-labelledby="roadtitle">
+          <title id="roadtitle">A road showing traffic flowing freely at low friction and queuing behind a barrier at high friction</title>
+          <g id="detour" opacity="0">
+            <path d="M300 118 Q400 34 545 62" fill="none" stroke="#B5502F" stroke-width="1.6" stroke-dasharray="6 5" opacity=".7"/>
+            <g transform="translate(548,48)">
+              <rect x="0" y="0" width="62" height="23" rx="8" fill="#F3E3DC" stroke="#B5502F" stroke-width="1.2"/>
+              <circle cx="15" cy="26" r="6" fill="#F3E3DC" stroke="#B5502F" stroke-width="1.2"/>
+              <circle cx="47" cy="26" r="6" fill="#F3E3DC" stroke="#B5502F" stroke-width="1.2"/>
+              <text x="31" y="12.5" text-anchor="middle" dominant-baseline="central" font-family="Inter,sans-serif" font-size="10.5" font-weight="600" fill="#B5502F">workaround</text>
+            </g>
+          </g>
+          <g id="barrier" opacity="0">
+            <line x1="392" y1="106" x2="392" y2="156" stroke="#0F2733" stroke-width="3" stroke-linecap="round"/>
+            <line x1="388" y1="112" x2="470" y2="112" stroke="#B5502F" stroke-width="5.5" stroke-linecap="round"/>
+          </g>
+          <rect x="40" y="156" width="620" height="26" rx="4" fill="#DFE7EB" stroke="#C6D3DA" stroke-width="1"/>
+          <rect id="paved" x="40" y="182" width="620" height="14" rx="3" fill="#2E7D6F" opacity="1"/>
+          <text id="pavedlabel" x="350" y="189.5" text-anchor="middle" dominant-baseline="central" font-family="Inter,sans-serif" font-size="10" font-weight="700" letter-spacing="1.1" fill="#fff">SECURE PATH — PAVED, DEFAULT, LOW EFFORT</text>
+          <g id="c1"><rect x="0" y="126" width="74" height="26" rx="8" fill="#E4EAEE" stroke="#1B4965" stroke-width="1.2"/>
+            <circle cx="18" cy="156" r="7" fill="#E4EAEE" stroke="#1B4965" stroke-width="1.2"/>
+            <circle cx="56" cy="156" r="7" fill="#E4EAEE" stroke="#1B4965" stroke-width="1.2"/>
+            <text x="37" y="139" text-anchor="middle" dominant-baseline="central" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#1B4965">Product</text></g>
+          <g id="c2"><rect x="0" y="126" width="74" height="26" rx="8" fill="#E4EAEE" stroke="#1B4965" stroke-width="1.2"/>
+            <circle cx="18" cy="156" r="7" fill="#E4EAEE" stroke="#1B4965" stroke-width="1.2"/>
+            <circle cx="56" cy="156" r="7" fill="#E4EAEE" stroke="#1B4965" stroke-width="1.2"/>
+            <text x="37" y="139" text-anchor="middle" dominant-baseline="central" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#1B4965">Business</text></g>
+          <g id="c3"><rect x="0" y="126" width="74" height="26" rx="8" fill="#E4EAEE" stroke="#1B4965" stroke-width="1.2"/>
+            <circle cx="18" cy="156" r="7" fill="#E4EAEE" stroke="#1B4965" stroke-width="1.2"/>
+            <circle cx="56" cy="156" r="7" fill="#E4EAEE" stroke="#1B4965" stroke-width="1.2"/>
+            <text x="37" y="139" text-anchor="middle" dominant-baseline="central" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#1B4965">IT</text></g>
+        </svg>
+      </div>
+
+      <div class="control">
+        <div class="ctl-labels"><span class="l">Paved road</span><span class="r">Gate</span></div>
+        <input id="slider" type="range" min="0" max="100" value="15" step="1" aria-label="Friction on the secure path, from paved road to gate">
+      </div>
+
+      <div class="readouts">
+        <div class="ro"><p class="k">Teams using the secure path</p><div class="v" id="v1">85%</div></div>
+        <div class="ro"><p class="k">Teams routing around it</p><div class="v" id="v2">15%</div></div>
+        <div class="ro"><p class="k">Exception requests per quarter</p><div class="v" id="v3">4</div></div>
+      </div>
+
+      <div class="verdict" id="verdict"></div>
+      <p class="caveat">Illustrative model, not measured data. The shape of the relationship is the point, not the numbers.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LEVERS ============ -->
+<div class="panel" id="p-lev" role="tabpanel" aria-labelledby="t-lev" tabindex="0" hidden>
+  <div class="wrap">
+    <p class="eyebrow">How to move it</p>
+    <h2>Four levers that actually work</h2>
+    <p class="dek">Everything else is theatre. Ordered by cost, not by impact — the cheapest one is also the fastest.</p>
+    <div class="deckctl"><button type="button" data-toggle="lev">Expand all</button></div>
+    <div class="deck" data-deck="lev">
+
+      <details>
+        <summary>
+          <span class="badge">L1</span>
+          <span><span class="tag">Cheapest · fastest</span><span class="sm-title">What leaders ask about first</span>
+          <span class="sm-sub">The recurring question sets the culture, not the stated priority.</span></span>
+          <span class="chev"></span>
+        </summary>
+        <div class="dbody">
+          <p>Not what leaders say matters — what they ask in the first five minutes of a status meeting. If the VP always asks about schedule and never about quality debt, you have a schedule culture regardless of the wall art.</p>
+          <p>People optimise for the question they know is coming. Change the question and the optimisation target moves with it, without a single policy edit.</p>
+          <div class="done"><b>You'll know it worked when</b> teams start bringing risk items to the meeting unprompted, because they expect to be asked.</div>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <span class="badge">L2</span>
+          <span><span class="tag">Loudest signal</span><span class="sm-title">Who gets promoted, who survives</span>
+          <span class="sm-sub">Promotion decisions are the clearest statement an organisation makes about what it values.</span></span>
+          <span class="chev"></span>
+        </summary>
+        <div class="dbody">
+          <p>If the person who ships fast by cutting corners gets the director role, everyone recalibrates within a quarter. No memo required — people read the outcome, not the intent.</p>
+          <p>The inverse is equally powerful and much cheaper. If someone escalates bad news and is visibly protected rather than punished, you have bought psychological safety more effectively than any training module could.</p>
+          <div class="stop"><b>Watch for</b> the gap between stated criteria and actual outcomes. If risk work appears in the promotion rubric but never in the justifications, people already know.</div>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <span class="badge">L3</span>
+          <span><span class="tag">Highest leverage</span><span class="sm-title">Friction design</span>
+          <span class="sm-sub">Make the secure path the low-effort path, and the behaviour follows without persuasion.</span></span>
+          <span class="chev"></span>
+        </summary>
+        <div class="dbody">
+          <p>Pre-hardened pipelines. Templated threat models. SBOM generation in CI. Secrets managers that are faster than pasting into chat. The goal is that no engineer ever has to choose between shipping and complying.</p>
+          <p>Anything that depends on sustained willpower will fail. Anything that changes the default will hold, quietly, for years.</p>
+          <div class="done"><b>The test:</b> time the secure path and the insecure path with a stopwatch. If the secure one is slower, you have a design problem, not a discipline problem.</div>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <span class="badge">L4</span>
+          <span><span class="tag">Slowest · most durable</span><span class="sm-title">Story and precedent</span>
+          <span class="sm-sub">Organisations run on a small canon of stories about what happened to the person who did X.</span></span>
+          <span class="chev"></span>
+        </summary>
+        <div class="dbody">
+          <p>You cannot fabricate these stories, and attempting to is transparent. What you can do is create the events that become them, and then make sure they circulate.</p>
+          <p>One engineer who reported a costly mistake and was publicly thanked will do more for reporting rates than three years of awareness messaging. The story travels on its own.</p>
+          <div class="stop"><b>Do not</b> announce the story in a company-wide email. Manufactured circulation reads as manufactured, and burns the precedent.</div>
+        </div>
+      </details>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============ OPERATING PLAN ============ -->
+<div class="panel" id="p-ops" role="tabpanel" aria-labelledby="t-ops" tabindex="0" hidden>
+  <div class="wrap">
+    <p class="eyebrow">Operationally</p>
+    <h2>The operating plan</h2>
+    <p class="dek">Six moves, in order. Each assumes the previous one is done — running 05 before 01 gives you metrics you cannot interpret.</p>
+    <div class="deckctl"><button type="button" data-toggle="ops">Expand all</button></div>
+    <div class="deck" data-deck="ops">
+
+      <details>
+        <summary>
+          <span class="badge">01</span>
+          <span><span class="tag">Weeks 1–4</span><span class="sm-title">Diagnose the general culture first</span>
+          <span class="sm-sub">Blame orientation and the schedule-versus-quality signal predict most security behaviour.</span></span>
+          <span class="chev"></span>
+        </summary>
+        <div class="dbody">
+          <ol>
+            <li>Pull twelve months of incidents and near-misses. Split them into <b>self-reported</b> versus <b>found by tooling or a customer</b>. A low self-reported share means people are not telling you things, and no reporting campaign will fix that.</li>
+            <li>Read the last eight promotion justifications in engineering. Note whether risk, quality, or reliability work appears at all. This tells you what the organisation actually rewards.</li>
+            <li>Sit in three status meetings and say nothing. Write down the first three questions each leader asks. That transcript is your culture, documented.</li>
+            <li>Ask five engineers privately: <b>"What is the last thing you decided not to escalate, and why?"</b> The reasons are your diagnosis.</li>
+            <li>Pull the exception request log. Count the volume, note who files them, and check whether reasons are captured. If reasons are not recorded, that is finding number one.</li>
+          </ol>
+          <div class="done"><b>Deliverable:</b> a one-page diagnosis naming the blame orientation and the speed-versus-quality signal, with evidence. No programme starts before this page exists.</div>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <span class="badge">02</span>
+          <span><span class="tag">Months 1–4</span><span class="sm-title">Pave the road before you police it</span>
+          <span class="sm-sub">Reduce the effort before you raise the requirement.</span></span>
+          <span class="chev"></span>
+        </summary>
+        <div class="dbody">
+          <ol>
+            <li>Identify the single control with the <b>highest violation rate</b>. Treat that as a friction signal, not a discipline signal, and pave it first.</li>
+            <li>Build one golden-path pipeline template with SAST, SCA, secrets scanning, and SBOM generation pre-wired. Make it the default in your repository scaffolding, so a new service is compliant on creation.</li>
+            <li>Publish threat-model templates per architecture class, each pre-filled with the five threats that class always has. A blank STRIDE canvas is a tax; a pre-filled one is a head start.</li>
+            <li>Move the secrets manager into the CLI and IDE people already use. If it requires opening a separate portal, it will lose to pasting into chat.</li>
+            <li>Time both paths with a stopwatch and publish the comparison. If secure is slower, you have not finished.</li>
+            <li><b>Retire one control for every two you automate.</b> Friction has a budget, and most programmes have been overdrawn for years.</li>
+          </ol>
+          <div class="stop"><b>Do not</b> add a new gate in this phase. Adding enforcement before paving converts a friction problem into a trust problem.</div>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <span class="badge">03</span>
+          <span><span class="tag">At the first real incident</span><span class="sm-title">Create one visible no-blame precedent</span>
+          <span class="sm-sub">One protected reporter beats a year of "speak up" messaging.</span></span>
+          <span class="chev"></span>
+        </summary>
+        <div class="dbody">
+          <ol>
+            <li>Write the blameless review standard <b>before</b> you need it. One page: the questions that get asked, and the questions that never get asked.</li>
+            <li>Separate <b>learning review</b> from <b>performance management</b> in writing, then honour it absolutely. One violation of that boundary costs three years of trust.</li>
+            <li>Take the next real incident with a human cause. Run the review openly. Have the person involved present it themselves, and have leadership thank them by name.</li>
+            <li>Have the most senior person in the room name one of their own mistakes first. This is the cheapest move in the entire plan and most leaders skip it.</li>
+            <li>Publish the write-up internally. Name individuals only in the acknowledgements, never in the findings.</li>
+            <li>Then stop talking and let it travel.</li>
+          </ol>
+          <div class="stop"><b>Do not</b> follow this with a company-wide email about psychological safety. The precedent is the message; commentary undermines it.</div>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <span class="badge">04</span>
+          <span><span class="tag">One quarter to install, three to land</span><span class="sm-title">Move the recurring executive question</span>
+          <span class="sm-sub">A new line on an existing meeting, not a new meeting.</span></span>
+          <span class="chev"></span>
+        </summary>
+        <div class="dbody">
+          <ol>
+            <li>Get <b>one</b> metric onto the existing executive business review. Do not create a security forum — forums are where security topics go to be contained.</li>
+            <li>Choose vulnerability ageing or remediation performance, not a posture score. It must be something a product leader can personally act on.</li>
+            <li>Give it an owner in Product who presents it. If the CISO presents, it stays a security topic.</li>
+            <li>Brief the CEO or CPO on the one question to ask every time: <b>"What is our oldest unremediated critical, and who owns it?"</b></li>
+            <li>Hold the question steady for three quarters. Changing it early resets the signal and teaches people the metric is decorative.</li>
+          </ol>
+          <div class="done"><b>You'll know it worked when</b> teams pre-empt the question in their own planning, before it is asked.</div>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <span class="badge">05</span>
+          <span><span class="tag">Continuous</span><span class="sm-title">Measure behaviour, not awareness</span>
+          <span class="sm-sub">Training completion correlates with nothing. These five do.</span></span>
+          <span class="chev"></span>
+        </summary>
+        <div class="dbody">
+          <ol>
+            <li>Baseline five measures: <b>median time to report</b>, <b>design-review coverage before architecture freeze</b>, <b>mean time to remediate by severity band</b>, <b>exception volume with reasons</b>, and <b>unmanaged secrets in repositories</b>.</li>
+            <li>Instrument time-to-report first. It is the best available proxy for blame orientation and costs almost nothing to capture.</li>
+            <li>Report exception <b>reasons</b> as a categorised list rather than a count. Those categories are your friction backlog, handed to you for free.</li>
+            <li>Publish per-team and unranked. Ranking produces gaming; visibility produces conversation.</li>
+            <li>Remove training completion from every dashboard an executive can see. While it is visible, it will be managed instead of the real thing.</li>
+          </ol>
+          <div class="stop"><b>Watch for</b> time-to-report improving while incident volume falls. That is usually under-reporting, not improvement. Check it against tooling-detected findings.</div>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <span class="badge">06</span>
+          <span><span class="tag">Structural · 2–4 quarters</span><span class="sm-title">Give it an owner inside the line</span>
+          <span class="sm-sub">Culture belongs to the line, not to staff.</span></span>
+          <span class="chev"></span>
+        </summary>
+        <div class="dbody">
+          <ol>
+            <li>Name a security champion per product team with <b>real allocation</b> — ten to fifteen per cent of capacity in the sprint plan. Volunteering is not ownership.</li>
+            <li>Put a product security objective into the product organisation's own OKRs, owned by a product director who reports on it.</li>
+            <li>Move design-review approval rights into the line. Security advises and retains escalation, but does not hold the gate.</li>
+            <li>Add product security to the <b>definition of done</b>, not to a checklist at release. Late checklists are where friction is discovered too late to absorb.</li>
+            <li>Fund it from the product budget. The moment it is a security cost centre, it becomes optional under pressure.</li>
+            <li>Redirect the security function to standards, tooling, and hard cases. <b>If security is still doing the reviews, ownership has not moved.</b></li>
+          </ol>
+          <div class="done"><b>You'll know it worked when</b> a product team escalates a risk decision to security for advice rather than for permission.</div>
+        </div>
+      </details>
+
+    </div>
+  </div>
+</div>
+
+<div class="close">
+  <div class="wrap">
+    <p class="eyebrow">In one line</p>
+    <p>Every organisation has a car going around the barrier. How routine that has become is your real security culture score.</p>
+  </div>
+</div>
+
+<footer><div class="wrap">Cyber culture — reducing friction between security and Product, Business, and IT.</div></footer>
+
+<script>
+(function(){
+  /* ---------- dial ---------- */
+  var s = document.getElementById('slider');
+  var v1 = document.getElementById('v1'), v2 = document.getElementById('v2'), v3 = document.getElementById('v3');
+  var verdict = document.getElementById('verdict');
+  var barrier = document.getElementById('barrier'), detour = document.getElementById('detour');
+  var paved = document.getElementById('paved'), pavedLabel = document.getElementById('pavedlabel');
+  var cars = [document.getElementById('c1'), document.getElementById('c2'), document.getElementById('c3')];
+  var flowX = [90, 290, 490], jamX = [140, 226, 312];
+  var FLOW = '#2E7D6F', FRICTION = '#B5502F', PETROL = '#1B4965';
+
+  function lerp(a,b,t){ return a + (b-a)*t; }
+  function clamp(x){ return Math.min(1, Math.max(0, x)); }
+
+  function render(){
+    var f = +s.value / 100;
+    var adopt = Math.round(98 - 85*f), around = 100 - adopt;
+    var exceptions = Math.round(2 + 88*f*f);
+
+    v1.textContent = adopt + '%';
+    v2.textContent = around + '%';
+    v3.textContent = exceptions;
+
+    v1.style.color = f < 0.4 ? FLOW : (f < 0.7 ? PETROL : FRICTION);
+    v2.style.color = around > 45 ? FRICTION : (around > 20 ? PETROL : FLOW);
+    v3.style.color = exceptions > 45 ? FRICTION : (exceptions > 15 ? PETROL : FLOW);
+
+    for (var i=0;i<3;i++){
+      cars[i].setAttribute('transform','translate('+lerp(flowX[i],jamX[i],f).toFixed(1)+',0)');
+    }
+    barrier.setAttribute('opacity', clamp((f-0.25)/0.45).toFixed(2));
+    detour.setAttribute('opacity', clamp((f-0.5)/0.4).toFixed(2));
+    paved.setAttribute('opacity', Math.max(0.12, clamp(1-f*1.1)).toFixed(2));
+    pavedLabel.setAttribute('opacity', clamp(1-f*2.2).toFixed(2));
+
+    var msg, colour;
+    if (f < 0.25){
+      colour = FLOW;
+      msg = '<b>Paved road.</b> The secure path is the cheap path, so almost everyone takes it. Exceptions are rare enough that each one is worth reading.';
+    } else if (f < 0.55){
+      colour = PETROL;
+      msg = '<b>Drag starting.</b> Compliance still holds, but effort is now visible. This is where exception volume becomes the metric to watch — an early warning, not an administrative chore.';
+    } else if (f < 0.8){
+      colour = FRICTION;
+      msg = '<b>The gate is real.</b> Workarounds are appearing and are being tolerated. Nothing about the policy changed — only the cost of following it.';
+    } else {
+      colour = FRICTION;
+      msg = '<b>Routine bypass.</b> Going around security is now the normal way to ship. Your policy library is unchanged and entirely irrelevant. This is a friction problem wearing a compliance costume.';
+    }
+    verdict.innerHTML = msg;
+    verdict.style.borderLeftColor = colour;
+  }
+  s.addEventListener('input', render);
+  render();
+
+  /* ---------- tabs ---------- */
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role=tab]'));
+
+  function select(tab){
+    tabs.forEach(function(t){
+      var on = (t === tab);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+    });
+  }
+
+  tabs.forEach(function(t, i){
+    t.addEventListener('click', function(){ select(t); });
+    t.addEventListener('keydown', function(e){
+      var next = null;
+      if (e.key === 'ArrowRight') next = tabs[(i+1) % tabs.length];
+      else if (e.key === 'ArrowLeft') next = tabs[(i-1+tabs.length) % tabs.length];
+      else if (e.key === 'Home') next = tabs[0];
+      else if (e.key === 'End') next = tabs[tabs.length-1];
+      if (next){ e.preventDefault(); select(next); next.focus(); }
+    });
+  });
+
+  /* ---------- expand all ---------- */
+  Array.prototype.slice.call(document.querySelectorAll('[data-toggle]')).forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var deck = document.querySelector('[data-deck="' + btn.getAttribute('data-toggle') + '"]');
+      var items = Array.prototype.slice.call(deck.querySelectorAll('details'));
+      var openAll = items.some(function(d){ return !d.open; });
+      items.forEach(function(d){ d.open = openAll; });
+      btn.textContent = openAll ? 'Collapse all' : 'Expand all';
+    });
+  });
+})();
+</script>
+</body>
+</html>
