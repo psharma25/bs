@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protecting Company Data When Using AI</title>
+<meta name="description" content="Copilot, business AI accounts, personal AI accounts and licensed data: what can go wrong, what to change in your settings, which tools help and how, and how to do it without slowing people down.">
+<style>
+:root{
+  --petrol:#1b4965; --petrol-lt:#2a6e86;
+  --ink:#1c2126; --ink-soft:#4a555e; --ink-faint:#7b8790;
+  --rule:#e2e8ea; --wash:#f6f8f9;
+  --shadow:0 2px 10px rgba(20,40,55,.09);
+  --shadow-hi:0 6px 22px rgba(20,40,55,.14);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:#fbfcfd;color:var(--ink);
+  font-family:Inter,Calibri,"Segoe UI",Helvetica,Arial,sans-serif;
+  font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+a{color:var(--petrol-lt)}
+
+header.top{padding:46px 0 10px}
+header.top .eyebrow{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--petrol-lt);font-weight:600}
+header.top h1{margin:12px 0 0;font-size:37px;line-height:1.14;letter-spacing:-.022em}
+header.top .stand{margin:15px 0 0;font-size:18px;line-height:1.55;color:var(--ink-soft);max-width:76ch}
+hr.rule{border:0;border-top:1.75px solid #003767;margin:22px 0 0}
+
+nav.tabs{display:flex;gap:9px;flex-wrap:wrap;padding:18px 0 6px}
+nav.tabs button{font:inherit;font-size:13px;font-weight:700;padding:9px 16px;border-radius:20px;cursor:pointer;
+  border:1.5px solid var(--rule);background:#fff;color:#6a7379;box-shadow:var(--shadow);
+  transition:transform .12s, box-shadow .12s, color .12s, border-color .12s}
+nav.tabs button:hover{transform:translateY(-1px);box-shadow:var(--shadow-hi);color:var(--ink)}
+nav.tabs button[aria-selected="true"]{color:#fff}
+
+.view{display:none}
+.view.active{display:block}
+
+.lhead{margin:22px 0 0}
+.lhead h2{margin:0;font-size:25px;letter-spacing:-.015em;display:flex;align-items:center;gap:12px}
+.lhead h2 .n{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;
+  border-radius:50%;color:#fff;font-size:15px;font-weight:700;flex:0 0 auto;box-shadow:var(--shadow)}
+.lhead .sub{margin:5px 0 0;font-size:13.5px;color:var(--ink-faint)}
+.lede{margin:14px 0 4px;font-size:16.5px;color:var(--ink-soft);max-width:82ch}
+
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:20px 0 4px}
+.bar input,.bar select{font:inherit;font-size:13px;padding:8px 11px;border:1.5px solid var(--rule);
+  border-radius:7px;background:#fff;color:#333;box-shadow:var(--shadow)}
+.bar input{min-width:260px}
+.bar .count{margin-left:auto;font-size:12.5px;color:var(--ink-faint)}
+
+.rcard{background:#fff;border:1.5px solid;border-radius:10px;box-shadow:var(--shadow);
+  margin:14px 0;overflow:hidden;transition:transform .12s, box-shadow .12s}
+.rcard:hover{transform:translateY(-2px);box-shadow:var(--shadow-hi)}
+.rcard .rh{display:flex;gap:12px;align-items:flex-start;padding:16px 20px 12px}
+.rcard .rn{flex:0 0 auto;width:26px;height:26px;border-radius:50%;color:#fff;font-size:13px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;margin-top:2px}
+.rcard h3{margin:0;font-size:17.5px;letter-spacing:-.012em}
+.rcard .why{margin:5px 0 0;font-size:14.5px;color:var(--ink-soft);line-height:1.55}
+.tag{display:inline-block;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+  padding:2px 8px;border-radius:10px;margin-left:8px;vertical-align:2px}
+.t-confirmed{background:#e7f2ea;color:#2f6b3c;border:1px solid #b9d8c2}
+.t-inferred{background:#fdf3e2;color:#a2691a;border:1px solid #ecd3a6}
+
+.sec{padding:14px 20px;border-top:1px solid var(--rule)}
+.sec h4{margin:0 0 7px;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:700}
+.sec p{margin:0;font-size:14.5px;color:var(--ink-soft);line-height:1.56}
+
+.tools{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.tools li{background:var(--wash);border:1px solid var(--rule);border-radius:8px;padding:10px 13px}
+.tools b{display:block;font-size:14px;color:var(--ink);margin-bottom:2px}
+.tools span{font-size:13.5px;color:var(--ink-soft);line-height:1.5}
+
+.dpm{display:grid;grid-template-columns:repeat(3,1fr);background:var(--wash);border-top:1px solid var(--rule)}
+.dpm .sec{border-top:0;border-right:1px solid var(--rule)}
+.dpm .sec:last-child{border-right:0}
+.dpm p{font-size:14px}
+
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0}
+.pcard{background:#fff;border:1.5px solid;border-radius:10px;padding:18px 20px;box-shadow:var(--shadow);
+  transition:transform .12s, box-shadow .12s}
+.pcard:hover{transform:translateY(-2px);box-shadow:var(--shadow-hi)}
+.pcard .pn{display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;
+  border-radius:50%;color:#fff;font-size:12.5px;font-weight:700;margin-bottom:9px}
+.pcard h4{margin:0 0 7px;font-size:16.5px;letter-spacing:-.01em}
+.pcard p{margin:0;font-size:14.5px;color:var(--ink-soft);line-height:1.58}
+
+.refblock{background:#fff;border:1.5px solid;border-radius:10px;box-shadow:var(--shadow);
+  padding:16px 20px;margin:14px 0}
+.refblock h4{margin:0 0 10px;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:700}
+.refblock p{margin:0 0 11px;font-size:14.5px;color:var(--ink-soft);line-height:1.55}
+.refblock p:last-child{margin-bottom:0}
+.refblock b{color:var(--ink)}
+
+.note{background:#fff;border:1.5px solid var(--rule);border-radius:10px;box-shadow:var(--shadow);
+  padding:15px 20px;margin:18px 0 0;font-size:14.5px;color:var(--ink-soft);line-height:1.58}
+.note b{color:var(--ink)}
+.empty{padding:26px;text-align:center;color:var(--ink-faint);font-style:italic;
+  background:#fff;border:1.5px dashed var(--rule);border-radius:10px}
+
+footer{margin:48px 0 0;padding:22px 0 66px;border-top:1px solid var(--rule);
+  font-size:13px;color:var(--ink-faint);line-height:1.6}
+
+@media (max-width:880px){
+  header.top h1{font-size:28px}
+  .dpm,.pgrid{grid-template-columns:1fr}
+  .dpm .sec{border-right:0;border-top:1px solid var(--rule)}
+}
+@media print{
+  nav.tabs,.bar{display:none}
+  .view{display:block!important;page-break-before:always}
+  .rcard,.pcard{break-inside:avoid;box-shadow:none}
+  body{background:#fff;font-size:11pt}
+}
+
+.flow{display:grid;grid-template-columns:1.3fr 6fr 1.3fr;gap:14px;align-items:stretch;margin:20px 0 0}
+.fnode{background:#fff;border:1.5px solid #dbe3e7;border-radius:10px;box-shadow:var(--shadow);
+ padding:16px 14px;display:flex;flex-direction:column;justify-content:center;text-align:center;position:relative;overflow:hidden}
+.fnode .ftop{position:absolute;top:0;left:2px;right:2px;height:5px;border-radius:3px}
+.fnode p{margin:0;font-size:13.5px;color:var(--ink-soft);line-height:1.45}
+.fnode.start p{font-weight:700;color:var(--petrol);font-size:14.5px}
+.fnode.end b{display:block;font-size:19px;color:#457c3c;margin-bottom:7px}
+.lanes{display:flex;flex-direction:column;gap:12px}
+.lane{position:relative;background:#fff;border:1.5px solid;border-radius:10px;box-shadow:var(--shadow);
+ display:grid;grid-template-columns:1.5fr 3fr 2fr;overflow:hidden;transition:transform .12s,box-shadow .12s}
+.lane:hover{transform:translateY(-2px);box-shadow:var(--shadow-hi)}
+.lane .ledge{position:absolute;left:0;top:2px;bottom:2px;width:5px}
+.lname{padding:14px 16px 14px 20px}
+.lname b{display:block;font-size:17px;letter-spacing:-.01em}
+.ltime{display:inline-block;margin-top:8px;border:1.25px solid;border-radius:12px;padding:2px 12px;
+ font-size:12px;font-weight:700;box-shadow:var(--shadow)}
+.lcell{padding:14px 16px;border-left:1px solid var(--rule)}
+.lcell h5{margin:0 0 4px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#9aa4ab;font-weight:700}
+.lcell p{margin:0;font-size:13.5px;color:var(--ink-soft);line-height:1.5}
+.kh{margin:26px 0 0;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--petrol)}
+.ktiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:12px 0 0}
+.ktile{position:relative;background:#fff;border:1.5px solid;border-radius:10px;box-shadow:var(--shadow);
+ padding:16px 16px 14px;overflow:hidden;transition:transform .12s,box-shadow .12s}
+.ktile:hover{transform:translateY(-2px);box-shadow:var(--shadow-hi)}
+.ktile .ktop{position:absolute;top:0;left:2px;right:2px;height:5px;border-radius:3px}
+.ktile b{display:block;font-size:14.5px;margin-bottom:6px}
+.ktile p{margin:0;font-size:13px;color:var(--ink-soft);line-height:1.5}
+@media (max-width:880px){.flow{grid-template-columns:1fr}.lane{grid-template-columns:1fr}
+ .lcell{border-left:0;border-top:1px solid var(--rule)}.ktiles{grid-template-columns:1fr}}
+
+.egbox{background:#fff;border:1.5px solid;border-radius:10px;box-shadow:var(--shadow);
+ padding:15px 20px;margin:16px 0 0;font-size:15.5px;line-height:1.58;color:var(--ink)}
+.egbox .eglab{display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+ font-weight:700;margin-bottom:6px}
+
+.gapbox{background:#fdf2f0;border-top:1.5px solid #ebb9b2;padding:13px 20px;
+ font-size:13.5px;line-height:1.55;color:#c4635a}
+.gapbox .gaplab{display:block;font-size:10px;letter-spacing:.13em;text-transform:uppercase;
+ font-weight:700;color:#c4635a;margin-bottom:4px}
+.disclaimer{margin:18px 0 0;font-size:12px;font-style:italic;color:#9aa4ab;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">Company data &middot; Practical guide</div>
+  <h1>Protecting Company Data When Using AI</h1>
+  <p class="stand">Four situations: Copilot inside your company, AI accounts your company pays for, staff using free personal accounts, and data you sell to other companies. For each one &mdash; what can go wrong, what to change in your settings, which tools help and what each one actually does, and what to watch for afterwards.</p>
+</header>
+<hr class="rule">
+
+<nav class="tabs" role="tablist" id="tabs"></nav>
+<div id="views"></div>
+
+<footer id="foot"></footer>
+</div>
+
+<script>
+"use strict";
+var DATA  = {"copilot": {"label": "Copilot", "num": "1", "colour": "3064ba", "sub": "Microsoft 365 Copilot &mdash; stays inside your company", "lede": "Copilot does not send your files to an outside company. It answers questions using files the person asking is already allowed to open. So the risk is not leaking. The risk is that things nobody could find before are now easy to find.", "rows": [{"n": 1, "tag": "confirmed", "risk": "Files shared too widely are suddenly easy to find", "why": "For years people shared files using links that anyone in the company could open. Those files were always readable, but nobody could find them. Copilot can find them in seconds.", "config": "Stop company-wide links being the default in your sharing settings. Turn on Restricted SharePoint Search so Copilot only looks at sites you have already cleaned up. Put sensitivity labels on HR, finance, legal and deal sites.", "tools": [{"n": "SharePoint Advanced Management", "d": "Produces the report that lists every file shared too widely, and lets you switch on Restricted Search while you fix them."}, {"n": "Microsoft Purview", "d": "Applies sensitivity labels to whole sites, so anything inside them is protected without tagging files one by one."}, {"n": "Entra ID Access Reviews", "d": "Asks site owners to re-approve who has access, on a schedule, so cleanups do not quietly undo themselves."}], "detect": "Run the oversharing report before you turn Copilot on. Then run it every month and compare the numbers.", "prevent": "Fix the sharing links first. Turning Copilot on before you do that is the mistake.", "manage": "Give every site a named owner. Cleanups with no owner drift back within a few months."}, {"n": 2, "tag": "confirmed", "risk": "Sensitive content shows up inside an answer", "why": "Copilot summarises what it finds. If the original file was not marked as sensitive, the summary will not be either.", "config": "Put sensitivity labels on the source files and sites. Set up a data loss prevention rule that covers Copilot. Where a label says content must not be summarised, apply encryption so Copilot cannot use it.", "tools": [{"n": "Purview Information Protection", "d": "Adds the sensitivity labels. Labels travel with the file, so a copy is still protected."}, {"n": "Purview Data Loss Prevention", "d": "Blocks or warns when sensitive content is about to be used or shared, including in Copilot."}], "detect": "Watch the data loss prevention alerts, and read a sample of Copilot activity each week during rollout.", "prevent": "Label the source, not the chat. A label on the site protects everything that comes out of it.", "manage": "Review your list of labels every few months. Labels nobody uses are not protecting anything.", "gap": "There is no reliable way to label a decade of existing files automatically. Auto-labelling catches obvious patterns and misses context. Label by site and accept that file-level accuracy will be imperfect."}, {"n": 3, "tag": "confirmed", "risk": "No record of what was asked or produced", "why": "Questions and answers are business records. If they sit outside your normal retention and legal hold, you cannot answer a regulator or a court later.", "config": "Turn on the audit log. Extend your retention policy and legal hold to cover Copilot questions and answers, not just files.", "tools": [{"n": "Purview Audit", "d": "Records who asked what and when, so you can reconstruct events afterwards."}, {"n": "Purview eDiscovery", "d": "Lets legal search and place a hold on those records the same way they do with email."}], "detect": "Pick one project and try to reconstruct how AI was used on it. If you cannot, the logging is not working.", "prevent": "Set this up before rollout. You cannot go back and create records you never kept.", "manage": "Match the retention period to your existing records rules. Do not invent a separate one for AI."}, {"n": 4, "tag": "inferred", "risk": "Guests and contractors can see more than you think", "why": "Guest accounts build up over years. Each one is another person whose access Copilot will honour.", "config": "Tighten your guest settings so guest access expires automatically. Block guests from sites that hold labelled content.", "tools": [{"n": "Entra ID Access Reviews", "d": "Asks the site owner, not IT, whether each guest still needs access."}, {"n": "Microsoft Purview", "d": "Shows which guests can reach labelled or sensitive sites."}], "detect": "Pull a list of guest accounts and check which ones can reach sensitive sites.", "prevent": "Make guest access expire by default. Renewing is easier than remembering to remove.", "manage": "Review guests every quarter, and make the site owner do it rather than IT."}], "tab": "1 · Copilot (your own files)", "example": "Someone asks Copilot to pull together last quarter’s numbers — and it finds the board pack that was shared with ‘anyone in the company’ three years ago. Nobody broke a rule. The file was always open; it just could not be found before."}, "chat": {"label": "Paid AI accounts", "num": "2", "colour": "9031aa", "sub": "Claude or ChatGPT on a company-paid plan &mdash; data goes outside, under contract", "lede": "Here your data does go to an outside company. That is fine, as long as the contract says the right things and your settings match the contract. Almost every problem is a settings problem, not a contract problem.", "rows": [{"n": 1, "tag": "confirmed", "risk": "Your data used to improve the vendor&rsquo;s model", "why": "Free and personal plans often allow the vendor to learn from what you type. Business plans usually do not. Which plan you are on is a fact you can check, not something to assume.", "config": "Use a business or enterprise plan only. Open the admin console and confirm the setting that says your data is not used for training. Turn on zero retention if the vendor offers it.", "tools": [{"n": "Claude Enterprise admin console", "d": "Shows the training and retention settings for your organisation in one place."}, {"n": "OpenAI Enterprise compliance settings", "d": "Same idea: confirms training is off and shows how long data is kept."}, {"n": "Azure OpenAI", "d": "Runs inside your own Azure subscription, and does not train on your data by default."}], "detect": "Take a screenshot of the setting and put it next to the contract clause. Repeat every year and after any vendor change.", "prevent": "Block the free versions at your web filter, once the paid version is available to staff.", "manage": "Have a data processing agreement in place, with a requirement that the vendor tells you when it changes suppliers.", "gap": "You cannot technically verify that the vendor honours the no-training setting, or that deleted data is gone from backups and derived stores. You have a toggle and a contractual promise — nobody in the market currently offers more than that."}, {"n": 2, "tag": "confirmed", "risk": "Chats kept longer than your records rules allow", "why": "Chat history containing client or company content sits outside your retention rules unless you deliberately put it inside them.", "config": "Set retention to the shortest period the work actually needs. Turn chat history off where it is not needed.", "tools": [{"n": "Vendor admin console", "d": "Where you set how long chats are kept, and whether history is stored at all."}, {"n": "Purview retention policies", "d": "Brings connected apps under the same retention rules you already apply to email and files."}], "detect": "Check the setting, then actually test it. Delete something and confirm it is gone.", "prevent": "Start with short retention and extend it deliberately, rather than the other way round.", "manage": "Write down how a legal hold would work here before you need one.", "gap": "Deletion is an attestation, not something you can observe. You can confirm it disappears from the interface; you cannot confirm it left every copy."}, {"n": 3, "tag": "confirmed", "risk": "Connectors reach further than you expected", "why": "A connector gets whatever permission it was granted. People grant broad permissions because the approval screen makes it easy to click yes.", "config": "Keep a list of approved connectors. Turn off users&rsquo; ability to approve apps themselves. Grant the narrowest permission that works. Turn off file upload where the job does not need it.", "tools": [{"n": "Entra ID app consent policies", "d": "Stops staff approving apps on their own and routes requests to an admin."}, {"n": "Cloud access security broker (CASB)", "d": "Shows which cloud apps are actually connected and what they can reach."}], "detect": "List the approved apps and permissions every month and look for ones nobody recognises.", "prevent": "Default to no, but answer requests within two days so people do not go round you.", "manage": "Review connectors quarterly and remove the ones nobody uses."}, {"n": 4, "tag": "confirmed", "risk": "Data processed in the wrong country", "why": "Where processing happens is usually chosen once, at setup, and changing it later means a migration.", "config": "Choose the processing region before anyone starts using the tool. Check the vendor&rsquo;s list of suppliers against what your own contracts allow.", "tools": [{"n": "Vendor trust centre", "d": "Publishes where data is processed and which suppliers are involved."}, {"n": "Contract schedule and DPA annex", "d": "The place those commitments become enforceable rather than informational."}], "detect": "Confirm the region setting, and compare the supplier list with your client commitments.", "prevent": "Do not let anyone start using the tool until the region is set.", "manage": "Require the vendor to tell you when suppliers change, and review when they do."}], "tab": "2 · Paid AI accounts (Claude, ChatGPT)", "example": "An analyst pastes a client contract into the company ChatGPT account to get a summary. The data left the building — legitimately, under a contract you signed. Whether that is safe comes down to a setting nobody has looked at."}, "shadow": {"label": "Personal accounts", "num": "3", "colour": "a82e26", "sub": "Staff using free AI accounts for work &mdash; data goes outside, with no contract", "lede": "People using free AI accounts to do their job. There is no contract, no record of what was shared, no control over how long it is kept, and free plans often allow the vendor to learn from what was typed. Of the four situations here, this is the one where you have nothing.", "rows": [{"n": 1, "tag": "confirmed", "risk": "Staff use personal AI accounts for work content", "why": "People are not being careless. They are trying to finish something, with the only tool available to them.", "config": "Provide the paid version first and tell everyone it exists. Only then block the free versions at your web filter. Apply a browser policy on work devices.", "tools": [{"n": "Defender for Cloud Apps / Netskope / Zscaler", "d": "Show which AI sites staff are visiting and let you block the ones you choose."}, {"n": "Entra ID", "d": "Shows who signed in where, and which outside apps they connected to."}], "detect": "Look at web filter and DNS logs for AI sites. Check expense claims for individual subscriptions.", "prevent": "Give people somewhere to go first. Blocking with no alternative does not work.", "manage": "Run an amnesty: a stated period to move over, with no consequences. You will find more that way than by enforcing.", "gap": "Personal phones and home computers sit outside every tool listed here. Someone photographing a screen or retyping from a personal device leaves no trace anywhere in your estate. That residual risk is managed by culture and consequence, not technology."}, {"n": 2, "tag": "confirmed", "risk": "Staff approve AI apps that can read company email and files", "why": "Approving an app can hand it lasting read access to mail and documents. Nothing is downloaded, so nothing looks unusual.", "config": "Turn off users&rsquo; ability to approve outside apps. Set up a request process with a published response time.", "tools": [{"n": "Entra ID app consent policies", "d": "Removes the ability for staff to approve apps themselves and sends requests to an admin instead."}, {"n": "Enterprise app inventory", "d": "Lists every outside app already connected and what it can reach."}], "detect": "Review connected apps and their permissions once a month.", "prevent": "Default to no, and answer within two days so the control does not become the reason people work around IT.", "manage": "Publish the list of already-approved apps so people stop asking for what they can already use."}, {"n": 3, "tag": "inferred", "risk": "Staff paste company text into sites you do not manage", "why": "Your device tools see the copy. Your network tools see the destination. Neither sees the whole thing on its own.", "config": "Turn on device-level data loss prevention covering copy, paste and upload to sites you do not manage. Use browser isolation only for the highest-risk roles.", "tools": [{"n": "Purview Endpoint DLP", "d": "Watches copy, paste and upload actions on the device itself and can block them."}, {"n": "Browser enterprise policy", "d": "Controls what the browser is allowed to do on work devices, including where it may upload files."}], "detect": "Review device alerts alongside the site the content was headed to.", "prevent": "Block pasting labelled content into sites you do not manage.", "manage": "Tune the rules hard in the first month. A rule that fires constantly gets turned off."}], "tab": "3 · Personal accounts (shadow AI)", "example": "A manager uses their own ChatGPT login on a work laptop to rewrite a proposal. No contract, no record of what was shared, no way to have it deleted. Free plans often allow the provider to learn from what was typed in."}, "broker": {"label": "Data you sell", "num": "4", "colour": "457c3c", "sub": "If you sell or license data &mdash; sharing it without it ending up in someone&rsquo;s AI", "lede": "This one works the other way round. You are not trying to keep data in. You are trying to let paying customers use it without it ending up inside an AI model, where you can neither charge for it nor get it back.", "rows": [{"n": 1, "tag": "confirmed", "risk": "A customer uses your data to train their model", "why": "A customer allowed to <em>use</em> your data may reasonably think that includes training a model on it. If the contract does not say no, they will read that as yes.", "config": "Say plainly in the licence that the data may not be used to train, fine-tune or build a model. Define what counts as data derived from yours, and say who owns a model trained on it. Require the customer to pass the same terms on to their own AI suppliers.", "tools": [{"n": "Licence template", "d": "The one place this can actually be settled. Everything else is detection after the fact."}, {"n": "Licence register", "d": "Tracks which customers signed which version, so you know who is covered by what."}], "detect": "Ask customers to confirm in writing each year how they use the data with AI. Keep audit rights you are willing to use.", "prevent": "Write it into the licence. If it is ambiguous, it will be read against you.", "manage": "Track who has confirmed and when. A confirmation nobody chases is just paperwork.", "gap": "Audit rights over how a customer trains models are extremely hard to exercise in practice. Very few licensors ever have."}, {"n": 2, "tag": "confirmed", "risk": "A customer downloads everything to build a data set", "why": "Building a training set means pulling all of it. That looks nothing like normal use, which is what makes it possible to spot.", "config": "Deliver through an interface that checks entitlement record by record, instead of handing over bulk files. Set limits per customer key. Use links that expire. Turn bulk export off unless someone has specifically paid for it.", "tools": [{"n": "API gateway (Kong, Apigee, AWS API Gateway)", "d": "Enforces per-customer limits and records exactly what each key retrieved."}, {"n": "Web application firewall", "d": "Catches automated scraping patterns before they finish."}, {"n": "Expiring signed links", "d": "Makes sure a copy handed over today cannot be re-downloaded next month."}], "detect": "Compare each customer&rsquo;s usage with their normal pattern. Alert when someone starts reading everything in order.", "prevent": "Make bulk download a deliberate, paid, logged exception rather than something available by default.", "manage": "Record what normal looks like for each customer at sign-up, so unusual actually means something."}, {"n": 3, "tag": "inferred", "risk": "You cannot prove your data ended up in a model", "why": "Without a marker you have a suspicion and no evidence. With one, the conversation starts somewhere very different.", "config": "Add a small number of invented records that look real but are not, different for each customer. Write down how the scheme works and have a lawyer look at it first, because some markets limit what you may insert.", "tools": [{"n": "Canary record generation", "d": "Creates the invented records and keeps track of which customer got which."}, {"n": "Scheduled model probing", "d": "Asks public and customer models questions only your invented records could answer."}], "detect": "Run the probes on a schedule and keep the results, whether or not anything turns up.", "prevent": "Say in the licence that markers exist. Most of the value is that people know.", "manage": "Keep the marker list, the probe schedule and the results together. Any claim you make later depends on that record.", "gap": "No dependable watermarking technique exists for structured or tabular data. Marker records can be found and stripped by a determined party. Treat detection as deterrence and evidence-building, not proof."}, {"n": 4, "tag": "confirmed", "risk": "The customer needs the answer, not the data", "why": "Most commercial uses need a result, not a copy of everything. Handing over the whole set when a question would do gives away the thing you are selling.", "config": "Let customers run questions against the data in a controlled environment instead of receiving it. Return totals rather than rows, with a minimum group size. Turn off raw download at the platform level.", "tools": [{"n": "AWS Clean Rooms / Snowflake Data Clean Rooms", "d": "Let two parties combine and query data without either side getting the other&rsquo;s raw records."}, {"n": "Confidential computing (AWS Nitro Enclaves, Intel SGX)", "d": "Runs the calculation in a sealed environment, so even the host cannot read the inputs."}], "detect": "Review the queries. Watch for people rebuilding individual rows out of repeated totals.", "prevent": "Design the product so raw download is not an option. Far easier than taking it away later.", "manage": "Where the maths supports it, cap how much each customer can learn in a given period."}, {"n": 5, "tag": "confirmed", "risk": "You bought licensed data and fed it to your own AI", "why": "If you buy data, the no-training rule applies to you. Most breaches here are accidental: the data went into a search index nobody linked back to a licence.", "config": "Keep licensed data in its own separate index with its own retention. Keep a simple register of which licensed source feeds which AI system. Confirm the no-training setting before you load anything licensed.", "tools": [{"n": "Vector database namespaces and access controls", "d": "Keep licensed data separate so it can be removed cleanly if the licence ends."}, {"n": "Data catalogue", "d": "Records where each data set came from and what the licence allows."}], "detect": "Once a quarter, check every index and ask which licence it sits under. If you cannot answer, that is the finding.", "prevent": "Check the licence before loading data into an AI system, the same way you check a software licence before shipping code.", "manage": "Re-check when the licence changes or when the system changes. Either one can break the other.", "gap": "Nothing technically prevents an engineer loading licensed data into an index that never made it onto the register. This control depends on process, not enforcement."}], "tab": "4 · Data you sell to others", "example": "A customer loads the data feed you license to them into their own model. You cannot charge for that, you cannot prove it happened, and you cannot get it back out."}};
+var INNOV = [{"n": "1", "t": "Build one easy approved path", "c": "3872e0", "d": "Publish two or three ready-made setups &mdash; the approved chat plan, the approved way to connect documents, the practice area &mdash; and let teams use them without asking. Asking should be the exception, not the rule."}, {"n": "2", "t": "Match the checks to the risk", "c": "9031aa", "d": "If it only reads, and only internally, let it go the same day. If it writes to a live system, moves money or reaches a customer, review it. Judge by what could go wrong, not by how new it is."}, {"n": "3", "t": "Give people a practice area", "c": "457c3c", "d": "A permanent test environment with made-up data and no approval needed. Nearly all experimenting does not need real records, and this removes most of the reason to go around you."}, {"n": "4", "t": "Publish what is allowed", "c": "d55c26", "d": "Most AI policies list what is banned. People cannot act on that. One page listing the approved tools, the data you may use with them, and where to ask for anything else is worth more than twenty pages of rules."}, {"n": "5", "t": "Answer within two days", "c": "3064ba", "d": "If approval takes two weeks, you have given people a reason to use a personal account. Commit to a response time and measure yourself against it."}, {"n": "6", "t": "Offer an amnesty first", "c": "a82e26", "d": "Give people a stated period to declare what they are already using and move across, with no consequences. You will learn more than any scanning tool will tell you. Enforce afterwards."}];
+var REFS  = [["Primary guidance", "3872e0", [["Careful Adoption of Agentic AI Services", "Published by the cyber security agencies of Australia, the United States, Canada, New Zealand and the United Kingdom on 30 April 2026. The first guidance these countries have issued together on AI that acts on its own.", "https://www.cisa.gov/resources-tools/resources/careful-adoption-agentic-ai-services", "cisa.gov"]]], ["Research", "d55c26", [["Cloud Security Alliance, AI Safety Initiative", "Survey work behind the numbers often quoted on this topic: 82% of organisations have found AI tools in use they did not know about, 65% have had an AI-related security incident in the past year, and only 21% have a process for shutting an AI tool down properly.", "https://labs.cloudsecurityalliance.org", "labs.cloudsecurityalliance.org"]]], ["Frameworks", "457c3c", [["OWASP Top 10 for LLM Applications", "A widely used list of the main security problems in AI applications.", "", ""], ["MITRE ATLAS", "A catalogue of the ways attackers go after AI systems, in the same style as MITRE ATT&amp;CK.", "", ""], ["NIST AI Risk Management Framework", "A structure for governing AI risk. Any detailed mapping to it in my material is my own reading, not an official one.", "", ""]]], ["Vendor documentation to check yourself", "9031aa", [["Microsoft Purview, SharePoint Advanced Management, Entra ID", "Feature names and which plan includes them change often. Check your own tenant rather than trusting a slide.", "", ""], ["Claude Enterprise, OpenAI Enterprise, Azure OpenAI", "Training, retention and location settings live in the admin console. Check each against your contract.", "", ""], ["AWS Clean Rooms, Snowflake Data Clean Rooms", "For the licensed data section.", "", ""]]]];
+var ORDER = ["copilot","chat","shadow","broker"];
+
+function toolsHTML(list){
+  return '<ul class="tools">' + list.map(function(t){
+    return '<li><b>' + t.n + '</b><span>' + t.d + '</span></li>'; }).join("") + '</ul>';
+}
+
+function rowHTML(r, c){
+  return '<article class="rcard" style="border-color:#' + c + '">'
+   + '<div class="rh"><span class="rn" style="background:#' + c + '">' + r.n + '</span>'
+   +   '<div><h3>' + r.risk + '<span class="tag t-' + r.tag + '">' + r.tag + '</span></h3>'
+   +   '<p class="why">' + r.why + '</p></div></div>'
+   + '<div class="sec"><h4 style="color:#' + c + '">What to change in your settings</h4><p>' + r.config + '</p></div>'
+   + '<div class="sec"><h4 style="color:#' + c + '">Which tools help, and what they do</h4>' + toolsHTML(r.tools) + '</div>'
+   + '<div class="dpm">'
+   +   '<div class="sec"><h4 style="color:#' + c + '">How to spot it</h4><p>' + r.detect + '</p></div>'
+   +   '<div class="sec"><h4 style="color:#' + c + '">How to stop it</h4><p>' + r.prevent + '</p></div>'
+   +   '<div class="sec"><h4 style="color:#' + c + '">How to keep it fixed</h4><p>' + r.manage + '</p></div>'
+   + '</div>'
+   + (r.gap ? '<div class="gapbox"><span class="gaplab">Real gap \u2014 what none of this solves</span>' + r.gap + '</div>' : '')
+   + '</article>';
+}
+
+var tabsEl=document.getElementById("tabs"), viewsEl=document.getElementById("views");
+var defs = ORDER.map(function(k){ return { k:k, label:DATA[k].tab, colour:DATA[k].colour }; });
+defs.push({ k:"innovation", label:"How to keep it quick for people", colour:"1b4965" });
+defs.push({ k:"refs", label:"Where all this comes from", colour:"1b4965" });
+
+defs.forEach(function(t,i){
+  var b=document.createElement("button");
+  b.type="button"; b.dataset.k=t.k; b.setAttribute("role","tab");
+  b.setAttribute("aria-selected", i===0?"true":"false");
+  b.textContent=t.label;
+  if(i===0){ b.style.background="#"+t.colour; b.style.borderColor="#"+t.colour; }
+  b.addEventListener("click", function(){ show(t.k); });
+  tabsEl.appendChild(b);
+});
+
+ORDER.forEach(function(k,idx){
+  var L=DATA[k];
+  var sec=document.createElement("section");
+  sec.className="view"+(idx===0?" active":""); sec.id="v-"+k; sec.setAttribute("role","tabpanel");
+  sec.innerHTML='<div class="lhead"><h2><span class="n" style="background:#'+L.colour+'">'+L.num+'</span>'+L.label+'</h2>'
+    +'<p class="sub">'+L.sub+'</p></div>'
+    +'<div class="egbox" style="border-color:#'+L.colour+'"><span class="eglab" style="color:#'+L.colour+'">What this looks like in real life</span>'+L.example+'</div>'
+    +'<p class="lede">'+L.lede+'</p>'
+    +'<div class="bar"><input type="search" placeholder="Search this section\u2026">'
+    +'<select><option value="">All</option><option value="confirmed">Confirmed only</option><option value="inferred">Inferred only</option></select>'
+    +'<span class="count"></span></div><div class="rows"></div>';
+  viewsEl.appendChild(sec);
+
+  function render(){
+    var q=sec.querySelector("input").value.toLowerCase().trim();
+    var tg=sec.querySelector("select").value;
+    var rows=L.rows.filter(function(r){
+      if(tg && r.tag!==tg) return false;
+      if(!q) return true;
+      var hay=[r.risk,r.why,r.config,r.detect,r.prevent,r.manage]
+        .concat(r.tools.map(function(t){return t.n+" "+t.d;})).join(" ").toLowerCase();
+      return hay.indexOf(q)>=0;
+    });
+    sec.querySelector(".rows").innerHTML = rows.length
+      ? rows.map(function(r){ return rowHTML(r,L.colour); }).join("")
+      : '<div class="empty">Nothing matches that search.</div>';
+    sec.querySelector(".count").textContent = rows.length+" of "+L.rows.length;
+  }
+  sec.querySelector("input").addEventListener("input",render);
+  sec.querySelector("select").addEventListener("change",render);
+  render();
+});
+
+var iv=document.createElement("section");
+iv.className="view"; iv.id="v-innovation"; iv.setAttribute("role","tabpanel");
+iv.innerHTML='<div class="lhead"><h2><span class="n" style="background:#1b4965">&#10003;</span>Keep it safe without slowing people down</h2>'
+  + '<p class="sub">Most AI work is low risk. Sort it by what it can break, and let most of it through</p></div>'
+  + '<div class="flow"><div class="fnode start"><span class="ftop" style="background:#1b4965"></span><p>Someone wants to use AI for something</p></div><div class="lanes"><div class=\'lane\' style=\'border-color:#457c3c\'><span class=\'ledge\' style=\'background:#457c3c\'></span><div class=\'lname\'><b style=\'color:#457c3c\'>Just go</b><span class=\'ltime\' style=\'border-color:#457c3c;color:#457c3c\'>Today</span></div><div class=\'lcell\'><h5>What it is</h5><p>Reading, drafting, summarising. Fake or public data. The output stays inside the team.</p></div><div class=\'lcell\'><h5>What happens</h5><p style=\'color:#457c3c;font-weight:600\'>No approval. Use an approved tool and go.</p></div></div><div class=\'lane\' style=\'border-color:#d55c26\'><span class=\'ledge\' style=\'background:#d55c26\'></span><div class=\'lname\'><b style=\'color:#d55c26\'>Quick check</b><span class=\'ltime\' style=\'border-color:#d55c26;color:#d55c26\'>2 days</span></div><div class=\'lcell\'><h5>What it is</h5><p>Real company data goes in. A person reads the output before anyone acts on it. Nothing is written or sent automatically.</p></div><div class=\'lcell\'><h5>What happens</h5><p style=\'color:#d55c26;font-weight:600\'>One short form. We answer within 48 hours.</p></div></div><div class=\'lane\' style=\'border-color:#a82e26\'><span class=\'ledge\' style=\'background:#a82e26\'></span><div class=\'lname\'><b style=\'color:#a82e26\'>Proper review</b><span class=\'ltime\' style=\'border-color:#a82e26;color:#a82e26\'>2 weeks</span></div><div class=\'lcell\'><h5>What it is</h5><p>It writes to a live system, moves money, or reaches a customer, a court or a regulator.</p></div><div class=\'lcell\'><h5>What happens</h5><p style=\'color:#a82e26;font-weight:600\'>Sit down with the data owner and security.</p></div></div></div><div class="fnode end"><span class="ftop" style="background:#457c3c"></span><b>In use</b><p>Every lane ends here. The only question is how long it takes to arrive.</p></div></div><h4 class="kh">Four things that keep the top lane full</h4><div class="ktiles"><div class=\'ktile\' style=\'border-color:#457c3c\'><span class=\'ktop\' style=\'background:#457c3c\'></span><b style=\'color:#457c3c\'>A sandbox that is always on</b><p>Fake data, no approval, nobody has to ask. Most experiments never need real records.</p></div><div class=\'ktile\' style=\'border-color:#3064ba\'><span class=\'ktop\' style=\'background:#3064ba\'></span><b style=\'color:#3064ba\'>Publish the yes-list</b><p>One page of tools people may use. Lists of what is banned tell nobody what to do next.</p></div><div class=\'ktile\' style=\'border-color:#d55c26\'><span class=\'ktop\' style=\'background:#d55c26\'></span><b style=\'color:#d55c26\'>Hold yourself to the clock</b><p>48 hours has to mean 48 hours. If it slips, people stop asking and start hiding.</p></div><div class=\'ktile\' style=\'border-color:#9031aa\'><span class=\'ktop\' style=\'background:#9031aa\'></span><b style=\'color:#9031aa\'>Amnesty before enforcement</b><p>Let people tell you what they already use, with no trouble. You will learn more that way.</p></div></div><div class="legend"><b>If saying yes takes three weeks, people stop asking.</b> Then you have no idea what is running. Nobody sets out to break the rules &mdash; they are trying to finish a job. Make the safe route the fast route and most of this problem goes away. Measure how long you take to say yes, and report it next to the incident count.</div>';
+viewsEl.appendChild(iv);
+
+var rv=document.createElement("section");
+rv.className="view"; rv.id="v-refs"; rv.setAttribute("role","tabpanel");
+rv.innerHTML='<div class="lhead"><h2><span class="n" style="background:#1b4965">&#167;</span>Where this comes from</h2>'
+ +'<p class="sub">Sources, and how to read the two tags</p></div>'
+ +REFS.map(function(g){
+   return '<div class="refblock" style="border-color:#'+g[1]+'"><h4 style="color:#'+g[1]+'">'+g[0]+'</h4>'
+    +g[2].map(function(it){ var l=it[2]?' <a href="'+it[2]+'">'+it[3]+'</a>':'';
+      return '<p><b>'+it[0]+'</b> &mdash; '+it[1]+l+'</p>';}).join("")+'</div>';}).join("")
+ +'<div class="note"><b>Confirmed</b> means the setting or control is documented by the vendor or by the official guidance, and can be stated as fact. '
+ +'<b>Inferred</b> means it is a judgement or a common practice rather than something you can point to in a document. Both are useful. Only one is quotable.</div>';
+viewsEl.appendChild(rv);
+
+document.getElementById("foot").innerHTML =
+  '<span class="disclaimer">The views expressed here are my own. They do not represent the views of any employer, client, or other organisation with which I am or have been associated, and nothing here should be taken as legal advice.</span><br><br>'
+  + 'Product names, plan names and which features are included all change often. Check your own account rather than trusting any slide, including this one. '
+  +'Tools listed are examples of what does the job, not recommendations.<br><br>'
+  +'Partly based on <em>Careful Adoption of Agentic AI Services</em>, published by the cyber security agencies of Australia, the United States, Canada, New Zealand and the United Kingdom, 30 April 2026. '
+  +'\u00a9 Commonwealth of Australia 2026, licensed CC BY 4.0.';
+
+function show(k){
+  document.querySelectorAll(".view").forEach(function(v){ v.classList.remove("active"); });
+  var t=document.getElementById("v-"+k); if(t) t.classList.add("active");
+  document.querySelectorAll("nav.tabs button").forEach(function(b){
+    var on=b.dataset.k===k;
+    b.setAttribute("aria-selected", on?"true":"false");
+    var d=defs.filter(function(x){return x.k===b.dataset.k;})[0];
+    b.style.background = on?"#"+d.colour:"#fff";
+    b.style.borderColor = on?"#"+d.colour:"";
+  });
+  if(window.scrollTo) window.scrollTo({top:0,behavior:"smooth"});
+}
+</script>
+</body>
+</html>
