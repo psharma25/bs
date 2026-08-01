@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI BOM vs SBOM — Scope, Fit, and Limits</title>
+<style>
+:root{
+  --petrol:#1b4965;
+  --petrol-deep:#0f2e42;
+  --petrol-mid:#2c6e8f;
+  --sky:#62b6cb;
+  --pale:#e6f2f7;
+  --paper:#f6f8fa;
+  --card:#ffffff;
+  --ink:#1c2126;
+  --muted:#5b6a76;
+  --rule:#dbe3ea;
+  --clay:#9a5b34;
+  --clay-pale:#f8efe9;
+  --green:#3f6b4a;
+  --green-pale:#eaf1eb;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:Inter,Calibri,"Segoe UI",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
+  font-size:15px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1040px;margin:0 auto;padding:0 28px 80px}
+
+/* ---------- masthead ---------- */
+header.mast{
+  background:var(--petrol);
+  color:#fff;
+  border-bottom:4px solid var(--sky);
+}
+.mast-inner{max-width:1040px;margin:0 auto;padding:34px 28px 30px}
+.eyebrow{
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--sky);font-weight:600;margin:0 0 10px
+}
+h1{
+  margin:0 0 10px;font-size:31px;line-height:1.2;font-weight:600;letter-spacing:-.01em
+}
+.dek{margin:0;font-size:16px;line-height:1.55;color:#cfe3ee;max-width:72ch}
+.mast-meta{
+  margin-top:22px;padding-top:16px;border-top:1px solid rgba(255,255,255,.18);
+  display:flex;flex-wrap:wrap;gap:26px;font-size:12px;color:#a8c8d9
+}
+.mast-meta b{color:#fff;font-weight:500}
+
+/* ---------- nav ---------- */
+nav.toc{
+  position:sticky;top:0;z-index:20;background:var(--card);
+  border-bottom:1px solid var(--rule);
+}
+.toc-inner{
+  max-width:1040px;margin:0 auto;padding:0 28px;
+  display:flex;gap:4px;overflow-x:auto;scrollbar-width:thin
+}
+.toc a{
+  flex:0 0 auto;padding:13px 12px;font-size:12.5px;color:var(--muted);
+  text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap
+}
+.toc a:hover{color:var(--petrol)}
+.toc a.on{color:var(--petrol);border-bottom-color:var(--petrol);font-weight:500}
+.toc a:focus-visible{outline:2px solid var(--sky);outline-offset:-4px}
+
+/* ---------- sections ---------- */
+section{padding-top:44px;scroll-margin-top:56px}
+h2{
+  margin:0 0 6px;font-size:20px;font-weight:600;color:var(--petrol-deep);
+  letter-spacing:-.005em
+}
+h2 .num{
+  display:inline-block;min-width:26px;font-size:12px;color:var(--sky);
+  font-weight:600;vertical-align:2px
+}
+.lede{margin:0 0 20px;color:var(--muted);font-size:14px;max-width:78ch}
+h3{margin:26px 0 8px;font-size:15px;font-weight:600;color:var(--petrol)}
+p{margin:0 0 14px;max-width:80ch}
+a{color:var(--petrol-mid)}
+
+.card{
+  background:var(--card);border:1px solid var(--rule);border-radius:6px;
+  padding:22px 24px;margin-bottom:16px
+}
+
+/* ---------- thesis callout ---------- */
+.thesis{
+  background:var(--pale);border-left:4px solid var(--petrol);
+  padding:18px 22px;border-radius:0;margin:0 0 8px
+}
+.thesis p{margin:0;font-size:15.5px;color:var(--petrol-deep)}
+
+/* ---------- figure ---------- */
+figure{margin:0 0 8px;background:var(--card);border:1px solid var(--rule);
+  border-radius:6px;padding:26px 20px 18px}
+figure svg{display:block;width:100%;height:auto}
+figcaption{
+  margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);
+  font-size:12px;color:var(--muted);text-align:center
+}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:6px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:640px}
+thead th{
+  background:var(--petrol);color:#fff;text-align:left;font-weight:500;
+  padding:11px 14px;font-size:12px;letter-spacing:.03em
+}
+tbody td,tbody th{padding:11px 14px;border-top:1px solid var(--rule);vertical-align:top}
+tbody th{text-align:left;font-weight:500;color:var(--petrol-deep);width:22%}
+tbody tr:nth-child(even) td,tbody tr:nth-child(even) th{background:#fafcfd}
+
+/* ---------- layer cards ---------- */
+.layers{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.layer{background:var(--card);border:1px solid var(--rule);border-top:3px solid var(--sky);
+  border-radius:0 0 6px 6px;padding:16px 18px}
+.layer.base{border-top-color:var(--muted)}
+.layer h4{margin:0 0 4px;font-size:14px;font-weight:600;color:var(--petrol-deep)}
+.layer .tag{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--sky);
+  font-weight:600;display:block;margin-bottom:8px}
+.layer.base .tag{color:var(--muted)}
+.layer ul{margin:0;padding-left:17px;font-size:13px;color:var(--muted)}
+.layer li{margin-bottom:3px}
+
+/* ---------- fit / no-fit ---------- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.fit,.nofit{border:1px solid var(--rule);border-radius:6px;padding:18px 20px;background:var(--card)}
+.fit{border-top:3px solid var(--green)}
+.nofit{border-top:3px solid var(--clay)}
+.fit h3,.nofit h3{margin:0 0 12px;font-size:14px}
+.fit h3{color:var(--green)}
+.nofit h3{color:var(--clay)}
+.fit ul,.nofit ul{margin:0;padding-left:0;list-style:none}
+.fit li,.nofit li{
+  padding:8px 0 8px 22px;border-top:1px solid var(--rule);font-size:13.5px;position:relative
+}
+.fit li:first-child,.nofit li:first-child{border-top:none}
+.fit li::before{content:"\2713";position:absolute;left:0;top:8px;color:var(--green);font-weight:600}
+.nofit li::before{content:"\2715";position:absolute;left:0;top:8px;color:var(--clay);font-weight:600}
+.fit li b,.nofit li b{display:block;font-weight:600;color:var(--ink);margin-bottom:1px}
+.fit li span,.nofit li span{color:var(--muted)}
+
+/* ---------- checklist ---------- */
+.check{list-style:none;margin:0;padding:0;counter-reset:c}
+.check li{
+  counter-increment:c;position:relative;padding:13px 0 13px 40px;
+  border-top:1px solid var(--rule);font-size:14px
+}
+.check li:first-child{border-top:none}
+.check li::before{
+  content:counter(c,decimal-leading-zero);position:absolute;left:0;top:13px;
+  font-size:11px;font-weight:600;color:var(--sky);letter-spacing:.05em
+}
+.check li b{font-weight:600;color:var(--petrol-deep)}
+.check li span{display:block;color:var(--muted);font-size:13px;margin-top:1px}
+
+/* ---------- references ---------- */
+ol.refs{margin:0;padding-left:20px;font-size:13.5px}
+ol.refs li{margin-bottom:10px;color:var(--muted)}
+ol.refs b{color:var(--ink);font-weight:500}
+ol.refs a{word-break:break-word}
+
+.note{
+  background:var(--clay-pale);border-left:3px solid var(--clay);
+  padding:13px 16px;font-size:13.5px;color:#5c3a20;margin:16px 0 0
+}
+.note b{font-weight:600}
+
+footer{
+  margin-top:56px;padding-top:20px;border-top:1px solid var(--rule);
+  font-size:12px;color:var(--muted);display:flex;justify-content:space-between;
+  flex-wrap:wrap;gap:12px
+}
+.btn{
+  background:none;border:1px solid var(--rule);color:var(--muted);font:inherit;
+  font-size:12px;padding:6px 13px;border-radius:4px;cursor:pointer
+}
+.btn:hover{border-color:var(--petrol-mid);color:var(--petrol)}
+.btn:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+
+@media (max-width:720px){
+  .split{grid-template-columns:1fr}
+  h1{font-size:24px}
+  .wrap,.mast-inner,.toc-inner{padding-left:18px;padding-right:18px}
+}
+@media print{
+  nav.toc,.btn{display:none}
+  body{background:#fff;font-size:11pt}
+  section{page-break-inside:avoid;padding-top:24px}
+  header.mast{background:#fff;color:var(--ink);border-bottom:2px solid var(--petrol)}
+  h1,.dek,.mast-meta,.mast-meta b{color:var(--ink)}
+  .eyebrow{color:var(--petrol)}
+  thead th{background:#e9eff3;color:var(--ink)}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="mast-inner">
+    <p class="eyebrow">Security architecture brief</p>
+    <h1>AI BOM vs SBOM</h1>
+    <p class="dek">An SBOM inventories the code that ships. An AI BOM inventories everything that determines how the system behaves — which, for a model, is mostly not code. This brief sets out the scope difference, where the artifact earns its keep, and where it is currently being oversold.</p>
+    <div class="mast-meta">
+      <span>Prepared by <b>BitSense, LLC</b></span>
+      <span>Audience <b>Product security, regulatory affairs, procurement</b></span>
+      <span>Standards current as of <b>August 2026</b></span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Section navigation">
+  <div class="toc-inner">
+    <a href="#definition">Definition</a>
+    <a href="#scope">Scope</a>
+    <a href="#layers">Four layers</a>
+    <a href="#differences">Key differences</a>
+    <a href="#fit">Where it fits</a>
+    <a href="#standards">Standards</a>
+    <a href="#regulatory">Regulatory drivers</a>
+    <a href="#adoption">Adoption path</a>
+    <a href="#references">References</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<section id="definition">
+  <h2><span class="num">01</span>What an AI BOM is</h2>
+  <div class="thesis">
+    <p>An AI BOM is not a replacement for an SBOM. It is a superset. The software stack an AI system runs on still needs a conventional SBOM; the AI BOM adds the model, the data, and the runtime configuration — the three places where AI-specific risk actually lives.</p>
+  </div>
+  <p>A traditional SBOM answers one question well: <em>which known-vulnerable components am I shipping?</em> It works because a package identifier resolves deterministically to a version, and a version resolves to a CVE. That chain is what made SBOM operationally useful rather than merely bureaucratic.</p>
+  <p>An AI system breaks that chain. Its behaviour is not determined by its source code. It is determined by a set of weights produced from a training corpus under a training regime, then shaped at inference time by a system prompt, a retrieval corpus, a guardrail configuration, and a tool surface. None of those are packages. None of them have CVEs. An SBOM of an AI product will faithfully list PyTorch, CUDA, transformers, and vLLM — and tell you nothing about the thing that actually makes decisions.</p>
+</section>
+
+<section id="scope">
+  <h2><span class="num">02</span>Scope comparison</h2>
+  <p class="lede">Grey is the portion your existing SBOM programme already covers. Everything in petrol is what an AI BOM adds.</p>
+  <figure>
+    <svg viewBox="0 0 680 400" role="img" xmlns="http://www.w3.org/2000/svg" aria-labelledby="figTitle figDesc">
+      <title id="figTitle">AI BOM scope compared with SBOM scope</title>
+      <desc id="figDesc">A container labelled AI BOM holds four component inventories. Software BOM, shown in grey, is the portion a traditional SBOM already covers. Model BOM, Data BOM and Runtime BOM, shown in petrol blue, are the layers an AI BOM adds.</desc>
+      <rect x="40" y="40" width="600" height="290" rx="14" fill="#f2f6f8" stroke="#c3d2db" stroke-width="1"/>
+      <text x="60" y="72" font-family="Inter,Calibri,sans-serif" font-size="14" font-weight="600" fill="#0f2e42">AI BOM: the whole system record</text>
+
+      <rect x="60" y="92" width="265" height="100" rx="6" fill="#ffffff" stroke="#9fb2bf" stroke-width="1"/>
+      <text x="192" y="124" text-anchor="middle" font-family="Inter,Calibri,sans-serif" font-size="14" font-weight="600" fill="#3c4a55">Software BOM</text>
+      <text x="192" y="149" text-anchor="middle" font-family="Inter,Calibri,sans-serif" font-size="12" fill="#5b6a76">Libraries, versions, licences</text>
+      <text x="192" y="169" text-anchor="middle" font-family="Inter,Calibri,sans-serif" font-size="12" fill="#5b6a76">Matched to CVEs via PURL</text>
+
+      <rect x="355" y="92" width="265" height="100" rx="6" fill="#e6f2f7" stroke="#62b6cb" stroke-width="1"/>
+      <text x="487" y="124" text-anchor="middle" font-family="Inter,Calibri,sans-serif" font-size="14" font-weight="600" fill="#0f2e42">Model BOM</text>
+      <text x="487" y="149" text-anchor="middle" font-family="Inter,Calibri,sans-serif" font-size="12" fill="#1b4965">Weights, architecture, quantisation</text>
+      <text x="487" y="169" text-anchor="middle" font-family="Inter,Calibri,sans-serif" font-size="12" fill="#1b4965">Base model and fine-tune lineage</text>
+
+      <rect x="60" y="212" width="265" height="100" rx="6" fill="#e6f2f7" stroke="#62b6cb" stroke-width="1"/>
+      <text x="192" y="244" text-anchor="middle" font-family="Inter,Calibri,sans-serif" font-size="14" font-weight="600" fill="#0f2e42">Data BOM</text>
+      <text x="192" y="269" text-anchor="middle" font-family="Inter,Calibri,sans-serif" font-size="12" fill="#1b4965">Training and evaluation sets</text>
+      <text x="192" y="289" text-anchor="middle" font-family="Inter,Calibri,sans-serif" font-size="12" fill="#1b4965">Provenance, licence, PII or PHI</text>
+
+      <rect x="355" y="212" width="265" height="100" rx="6" fill="#e6f2f7" stroke="#62b6cb" stroke-width="1"/>
+      <text x="487" y="244" text-anchor="middle" font-family="Inter,Calibri,sans-serif" font-size="14" font-weight="600" fill="#0f2e42">Runtime BOM</text>
+      <text x="487" y="269" text-anchor="middle" font-family="Inter,Calibri,sans-serif" font-size="12" fill="#1b4965">System prompt, guardrails, RAG</text>
+      <text x="487" y="289" text-anchor="middle" font-family="Inter,Calibri,sans-serif" font-size="12" fill="#1b4965">Tool surface and agent scope</text>
+
+      <rect x="150" y="352" width="12" height="12" rx="2" fill="#ffffff" stroke="#9fb2bf"/>
+      <text x="170" y="362" font-family="Inter,Calibri,sans-serif" font-size="12" fill="#5b6a76">Already covered by SBOM</text>
+      <rect x="366" y="352" width="12" height="12" rx="2" fill="#e6f2f7" stroke="#62b6cb"/>
+      <text x="386" y="362" font-family="Inter,Calibri,sans-serif" font-size="12" fill="#5b6a76">Added by AI BOM</text>
+    </svg>
+    <figcaption>One document, four inventories. CycloneDX carries all four in a single file — the AI components are additional component types, not a parallel artifact.</figcaption>
+  </figure>
+</section>
+
+<section id="layers">
+  <h2><span class="num">03</span>The four layers, field by field</h2>
+  <p class="lede">What a defensible AI BOM actually has to contain in each layer.</p>
+  <div class="layers">
+    <div class="layer base">
+      <span class="tag">Existing scope</span>
+      <h4>Software BOM</h4>
+      <ul>
+        <li>Component name, version, supplier</li>
+        <li>PURL or CPE identifier</li>
+        <li>Cryptographic hashes</li>
+        <li>Declared and concluded licence</li>
+        <li>Dependency relationships</li>
+        <li>Inference stack: CUDA, PyTorch, serving runtime</li>
+      </ul>
+    </div>
+    <div class="layer">
+      <span class="tag">Added</span>
+      <h4>Model BOM</h4>
+      <ul>
+        <li>Model name, version, artifact hash</li>
+        <li>Architecture and parameter count</li>
+        <li>Serialisation format and quantisation</li>
+        <li>Base model provenance and fine-tune lineage</li>
+        <li>Adapters, merges, distillation steps</li>
+        <li>Evaluation results and known limitations</li>
+        <li>Intended and out-of-scope use</li>
+      </ul>
+    </div>
+    <div class="layer">
+      <span class="tag">Added</span>
+      <h4>Data BOM</h4>
+      <ul>
+        <li>Datasets used for pretraining, fine-tuning, evaluation</li>
+        <li>Source, collection method, date range</li>
+        <li>Licence and redistribution terms</li>
+        <li>Presence of PII, PHI, or regulated data</li>
+        <li>Curation, filtering, and deduplication applied</li>
+        <li>Consent or lawful basis where applicable</li>
+      </ul>
+    </div>
+    <div class="layer">
+      <span class="tag">Added</span>
+      <h4>Runtime BOM</h4>
+      <ul>
+        <li>System prompt and version</li>
+        <li>Guardrail and content-filter configuration</li>
+        <li>Retrieval corpus and embedding model</li>
+        <li>Tool and function-calling surface</li>
+        <li>Agent scope, autonomy level, human gates</li>
+        <li>Decoding parameters that affect behaviour</li>
+      </ul>
+    </div>
+  </div>
+  <div class="note">
+    <b>Why runtime belongs in the BOM.</b> A pinned package at a given hash behaves identically everywhere. Identical model weights do not. Change the system prompt, the retrieval corpus, or the tool set and you have materially changed the system's behaviour without changing a single artifact hash. An inventory that stops at the weights describes an artifact, not a system.
+  </div>
+</section>
+
+<section id="differences">
+  <h2><span class="num">04</span>Key structural differences</h2>
+  <p class="lede">These are the differences that change how you operate the programme, not just what you file.</p>
+  <div class="tbl-scroll">
+    <table>
+      <thead>
+        <tr><th scope="col">Dimension</th><th scope="col">SBOM</th><th scope="col">AI BOM</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">Unit of composition</th>
+          <td>Code packages with linear versions</td>
+          <td>Models, datasets, prompts — artifacts that do not version linearly</td>
+        </tr>
+        <tr>
+          <th scope="row">Identifier to risk</th>
+          <td>PURL or CPE resolves deterministically to CVE and KEV</td>
+          <td>No equivalent registry. Nearest analogues are MITRE ATLAS (tactics, not instances) and OWASP LLM Top 10 (categories)</td>
+        </tr>
+        <tr>
+          <th scope="row">Composition shape</th>
+          <td>Acyclic, fully enumerable dependency tree</td>
+          <td>Lineage chain: base → fine-tune → merge → quantise → adapter, with a hard visibility wall at the base model</td>
+        </tr>
+        <tr>
+          <th scope="row">Immutability</th>
+          <td>Version plus hash fixes behaviour</td>
+          <td>Same weights, different behaviour under different prompt, retrieval corpus, or decoding parameters</td>
+        </tr>
+        <tr>
+          <th scope="row">Meaning of "vulnerable"</th>
+          <td>Boolean match against an affected version range</td>
+          <td>Distributional: poisoned training data, weight backdoors, membership inference, prompt injection surface, model extraction</td>
+        </tr>
+        <tr>
+          <th scope="row">Data as a component</th>
+          <td>Not represented</td>
+          <td>First-class. Licence contamination, privacy exposure, and poisoning risk all live here</td>
+        </tr>
+        <tr>
+          <th scope="row">Automation maturity</th>
+          <td>Mature: generation, ingestion, diffing, VEX, continuous monitoring</td>
+          <td>Generation is emerging; automated match-to-known-bad does not yet exist</td>
+        </tr>
+        <tr>
+          <th scope="row">Primary consumer</th>
+          <td>PSIRT and vulnerability management</td>
+          <td>Model risk governance, procurement, privacy counsel, regulatory affairs</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="fit">
+  <h2><span class="num">05</span>Where it applies — and where it does not</h2>
+  <p class="lede">The honest read. An AI BOM is a transparency and governance artifact. Treating it as a vulnerability-management artifact will disappoint you.</p>
+  <div class="split">
+    <div class="fit">
+      <h3>Where an AI BOM earns its keep</h3>
+      <ul>
+        <li><b>Third-party model procurement</b><span>The AI equivalent of asking for a SOC 2. Establishes what you are actually buying before it is embedded in a product.</span></li>
+        <li><b>Regulatory technical documentation</b><span>Supplies the inventory backbone for EU AI Act Annex IV, ISO/IEC 42001 clause evidence, and NIST AI RMF Map function outputs.</span></li>
+        <li><b>Licence and IP exposure</b><span>The only systematic way to surface training-data licence contamination and redistribution constraints before legal discovers them.</span></li>
+        <li><b>Privacy and data-residency review</b><span>Makes PII, PHI, and cross-border training data visible to counsel rather than tacit in an ML team's notebooks.</span></li>
+        <li><b>Incident scoping</b><span>When a base model or public dataset is reported as poisoned or backdoored, the lineage record is what lets you answer "are we affected" in hours.</span></li>
+        <li><b>Change control and drift</b><span>A diffable record of prompt, guardrail, and corpus changes — the AI analogue of configuration management.</span></li>
+        <li><b>Deprecation and end-of-support</b><span>Tracks which products depend on a model version the provider is about to retire.</span></li>
+      </ul>
+    </div>
+    <div class="nofit">
+      <h3>Where it does not help — yet</h3>
+      <ul>
+        <li><b>Automated vulnerability matching</b><span>There is no CVE for a biased checkpoint or a trojaned weight file. Nothing downstream of the AI BOM will page your on-call.</span></li>
+        <li><b>Closed-weight commercial models</b><span>For a hosted frontier API you will get a name, a version string, and a model card. Training data and pretraining regime will not be disclosed. The Data BOM is largely empty by construction.</span></li>
+        <li><b>Behavioural assurance</b><span>An inventory does not tell you the system is safe. Red-teaming, evaluation harnesses, and runtime monitoring do that work; the AI BOM only records that they happened.</span></li>
+        <li><b>Classical ML with no external dependencies</b><span>A logistic regression trained on your own clinical data is well served by existing design controls. A full AI BOM is documentation overhead with little residual risk reduction.</span></li>
+        <li><b>Agentic runtime risk</b><span>The BOM captures the declared tool surface. It does not capture what the agent actually did at 3am. That is a telemetry and audit-log problem.</span></li>
+        <li><b>Substituting for model risk management</b><span>An AI BOM is an input to governance, not a governance programme. It answers "what is in it", never "should we ship it".</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="standards">
+  <h2><span class="num">06</span>Standards status</h2>
+  <p class="lede">Two formats matter. Both are viable; the choice is driven by tooling and by who reads the file.</p>
+  <div class="tbl-scroll">
+    <table>
+      <thead>
+        <tr><th scope="col"></th><th scope="col">CycloneDX</th><th scope="col">SPDX</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Steward</th><td>OWASP; Ecma International standard (ECMA-424)</td><td>Linux Foundation; ISO/IEC 5962</td></tr>
+        <tr><th scope="row">Origin bias</th><td>Application security and supply-chain risk</td><td>Licence compliance and legal review</td></tr>
+        <tr><th scope="row">AI support</th><td>ML-BOM as a native component type</td><td>AI Profile and Dataset Profile in the 3.0 line</td></tr>
+        <tr><th scope="row">Current versions</th><td>1.7 is the latest and last release of the 1.x line; 1.6 remains the stable production target with the broadest tooling. An API-first 2.0 has been signalled.</td><td>3.0.1, with a 3.1 release candidate underway. The 3.0 line shipped April 2024 with an element-based model.</td></tr>
+        <tr><th scope="row">Notable 2026 additions</th><td>1.7 added data provenance and citations, patent and patent-family metadata, TLP distribution markers, and an expanded cryptography registry</td><td>3.0 restructured into profiles — Core, Software, Build, AI, Dataset, Security — on a JSON-LD foundation</td></tr>
+        <tr><th scope="row">Tooling</th><td>Dependency-Track, Grype, OWASP AIBOM Generator, most commercial SBOM platforms consume it natively</td><td>Strong in licence-compliance toolchains; AI-profile tooling is thinner</td></tr>
+        <tr><th scope="row">Practical call</th><td>Lower-friction default for a programme starting AI BOM work now</td><td>Correct extension if you already run SPDX deeply for licence reasons, and carries more weight in some regulatory filings</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note">
+    <b>Do not maintain both.</b> The recurring failure mode is a programme that emits CycloneDX and SPDX in parallel and keeps neither current. Pick one canonical internal format, convert on egress if a counterparty insists.
+  </div>
+</section>
+
+<section id="regulatory">
+  <h2><span class="num">07</span>Regulatory drivers</h2>
+  <p class="lede">The framing that works with a regulated-industry board: an AI BOM is to the EU AI Act and ISO 42001 what an SBOM is to FD&amp;C §524B and the Cyber Resilience Act — the machine-readable evidence artifact that makes downstream controls auditable.</p>
+  <div class="tbl-scroll">
+    <table>
+      <thead>
+        <tr><th scope="col">Regime</th><th scope="col">What it wants</th><th scope="col">Which layer answers it</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">EU AI Act, Art. 11 and Annex IV</th><td>Technical documentation for high-risk systems, including design, training methodology, and datasets</td><td>Model BOM, Data BOM</td></tr>
+        <tr><th scope="row">EU AI Act, Art. 53 (GPAI)</th><td>Sufficiently detailed summary of training content</td><td>Data BOM</td></tr>
+        <tr><th scope="row">ISO/IEC 42001</th><td>AI system inventory, lifecycle and impact assessment evidence</td><td>All four layers</td></tr>
+        <tr><th scope="row">NIST AI RMF</th><td>Map function: establish context and catalogue AI system components</td><td>All four layers</td></tr>
+        <tr><th scope="row">FD&amp;C §524B / FDA Feb 2026 guidance</th><td>Machine-readable SBOM, SPDF, security risk management, CVD</td><td>Software BOM today; Model and Data BOM where AI/ML is part of the device function</td></tr>
+        <tr><th scope="row">EU Cyber Resilience Act</th><td>SBOM for products with digital elements</td><td>Software BOM</td></tr>
+        <tr><th scope="row">Enterprise procurement</th><td>Vendor qualification evidence for AI components</td><td>Model BOM, Data BOM, Runtime BOM</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note">
+    <b>Verify the AI Act date before citing it.</b> Article 11 and Annex IV obligations for high-risk systems took effect 2 August 2026 under current law, but the proposed Digital Omnibus would defer them to December 2027 and was still in trilogue as of mid-2026. Confirm the position at time of use.
+  </div>
+</section>
+
+<section id="adoption">
+  <h2><span class="num">08</span>Adoption path</h2>
+  <p class="lede">A pragmatic sequence for an organisation that already runs an SBOM programme.</p>
+  <div class="card">
+    <ol class="check">
+      <li><b>Inventory the AI systems first, not the components</b><span>You cannot produce an AI BOM for a system you have not acknowledged exists. Shadow AI in business units is the usual first finding.</span></li>
+      <li><b>Pick one canonical format</b><span>CycloneDX unless you have an existing SPDX licence-compliance investment. Document the decision so it is not relitigated quarterly.</span></li>
+      <li><b>Extend the existing SBOM pipeline rather than building a second one</b><span>Same generation step, same repository, same ingestion. AI components are additional component types in the same document.</span></li>
+      <li><b>Set a completeness floor, not a completeness target</b><span>Define the minimum fields you will accept from an internal team and from a vendor. Expect the Data BOM to be sparse for closed-weight models and record that gap explicitly rather than leaving it blank.</span></li>
+      <li><b>Write it into procurement before you write it into engineering</b><span>The vendor requirement drives the internal capability, not the reverse. Specify format, cadence, and completeness in the contract.</span></li>
+      <li><b>Trigger regeneration on material change</b><span>New base model, new fine-tune, changed system prompt, changed retrieval corpus, changed tool surface. Not on a calendar.</span></li>
+      <li><b>Mark confirmed versus inferred</b><span>Fields derived from a model card are asserted by the supplier, not verified by you. Distinguish them in the record; an auditor will ask.</span></li>
+      <li><b>Connect it to a decision</b><span>An AI BOM that no gate consumes is documentation theatre. Wire it to a procurement approval, a release gate, or a risk-acceptance record.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section id="references">
+  <h2><span class="num">09</span>References</h2>
+  <p class="lede">Primary sources. Verify version numbers and effective dates at time of use — this space is moving quickly.</p>
+  <ol class="refs">
+    <li><b>OWASP CycloneDX specification and Tool Center.</b> Format specification, ML-BOM component types, and the tool ecosystem. <a href="https://cyclonedx.org/">cyclonedx.org</a></li>
+    <li><b>SPDX 3.0 specification, AI Profile and Dataset Profile.</b> Linux Foundation. <a href="https://spdx.dev/">spdx.dev</a></li>
+    <li><b>OWASP GenAI Security Project — AI BOM guidance and AIBOM Generator.</b> Field definitions and completeness scoring against Hugging Face model metadata.</li>
+    <li><b>MITRE ATLAS.</b> Adversarial threat landscape for AI systems; the closest available taxonomy for AI-specific attack techniques. <a href="https://atlas.mitre.org/">atlas.mitre.org</a></li>
+    <li><b>OWASP Top 10 for LLM Applications.</b> Risk categories referenced throughout AI BOM tooling.</li>
+    <li><b>NIST AI 100-1, Artificial Intelligence Risk Management Framework.</b> Map, Measure, Manage, Govern functions. <a href="https://www.nist.gov/itl/ai-risk-management-framework">nist.gov</a></li>
+    <li><b>ISO/IEC 42001:2023.</b> Artificial intelligence management system requirements.</li>
+    <li><b>Regulation (EU) 2024/1689 (Artificial Intelligence Act).</b> Article 11 and Annex IV technical documentation; Article 53 GPAI training-content summary. Check current status of the Digital Omnibus amendment.</li>
+    <li><b>FDA, Cybersecurity in Medical Devices: Quality Management System Considerations and Content of Premarket Submissions.</b> Final guidance, 3 February 2026 — supersedes the September 2023 and June 2025 versions and aligns to QMSR. <a href="https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cybersecurity-medical-devices-quality-management-system-considerations-and-content-premarket">fda.gov</a></li>
+    <li><b>CISA and NSA joint guidance on AI data security.</b> Practices for securing data used to train and operate AI systems.</li>
+  </ol>
+</section>
+
+<footer>
+  <span>BitSense, LLC &middot; thebitsense.com &middot; Security architecture brief</span>
+  <button class="btn" type="button" id="printBtn">Print or save as PDF</button>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  var btn = document.getElementById('printBtn');
+  if (btn) { btn.addEventListener('click', function () { window.print(); }); }
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('nav.toc a'));
+  var sections = links
+    .map(function (a) { return document.querySelector(a.getAttribute('href')); })
+    .filter(Boolean);
+
+  function setActive(id) {
+    links.forEach(function (a) {
+      a.classList.toggle('on', a.getAttribute('href') === '#' + id);
+    });
+  }
+
+  if ('IntersectionObserver' in window && sections.length) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { setActive(e.target.id); }
+      });
+    }, { rootMargin: '-56px 0px -70% 0px', threshold: 0 });
+    sections.forEach(function (s) { io.observe(s); });
+  }
+
+  if (links.length) { links[0].classList.add('on'); }
+})();
+</script>
+
+</body>
+</html>
