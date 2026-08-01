@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Governance and Data Governance &mdash; what is different, what good looks like, and a model policy</title>
+<meta name="description" content="How AI governance differs from data governance, what makes a good AI governance policy, the anti-patterns to avoid, the pre-work to do first, and a model policy you can adapt.">
+<style>
+:root{
+  --petrol:#1b4965; --petrol-lt:#2a6e86;
+  --ink:#1c2126; --ink-soft:#4a555e; --ink-faint:#7b8790;
+  --rule:#e2e8ea; --wash:#f6f8f9;
+  --bad:#c4635a; --bad-fill:#fdf2f0; --bad-edge:#ebb9b2;
+  --shadow:0 2px 10px rgba(20,40,55,.09);
+  --shadow-hi:0 6px 22px rgba(20,40,55,.14);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:#fbfcfd;color:var(--ink);
+  font-family:Inter,Calibri,"Segoe UI",Helvetica,Arial,sans-serif;
+  font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+a{color:var(--petrol-lt)}
+
+header.top{padding:46px 0 10px}
+header.top .eyebrow{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--petrol-lt);font-weight:600}
+header.top h1{margin:12px 0 0;font-size:36px;line-height:1.15;letter-spacing:-.022em}
+header.top .stand{margin:15px 0 0;font-size:18px;line-height:1.55;color:var(--ink-soft);max-width:76ch}
+hr.rule{border:0;border-top:1.75px solid #003767;margin:22px 0 0}
+
+nav.tabs{display:flex;gap:9px;flex-wrap:wrap;padding:18px 0 6px}
+nav.tabs button{font:inherit;font-size:13px;font-weight:700;padding:9px 16px;border-radius:20px;cursor:pointer;
+  border:1.5px solid var(--rule);background:#fff;color:#6a7379;box-shadow:var(--shadow);
+  transition:transform .12s,box-shadow .12s,color .12s}
+nav.tabs button:hover{transform:translateY(-1px);box-shadow:var(--shadow-hi);color:var(--ink)}
+nav.tabs button[aria-selected="true"]{color:#fff;background:var(--petrol);border-color:var(--petrol)}
+
+.view{display:none} .view.active{display:block}
+.lhead{margin:24px 0 0}
+.lhead h2{margin:0;font-size:25px;letter-spacing:-.015em}
+.lhead .sub{margin:5px 0 0;font-size:14px;color:var(--ink-faint)}
+.lede{margin:16px 0 0;font-size:16.5px;color:var(--ink-soft);max-width:82ch}
+
+.voice{margin:18px 0 0;background:#fff;border:1.5px solid var(--petrol);border-left-width:5px;border-radius:9px;
+  padding:15px 20px;box-shadow:var(--shadow);font-size:15.5px;line-height:1.6}
+.voice .vh{display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+  color:var(--petrol);margin-bottom:5px}
+
+table.cmp{width:100%;border-collapse:separate;border-spacing:0 10px;margin:18px 0 0}
+table.cmp th{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#fff;padding:9px 16px;text-align:left}
+table.cmp th.q{background:var(--petrol);border-radius:8px 0 0 8px;width:22%}
+table.cmp th.d{background:#9031aa;width:39%}
+table.cmp th.a{background:#457c3c;border-radius:0 8px 8px 0;width:39%}
+table.cmp td{background:#fff;border-top:1.5px solid var(--rule);border-bottom:1.5px solid var(--rule);
+  padding:14px 16px;vertical-align:top;font-size:14px;color:var(--ink-soft);line-height:1.55}
+table.cmp td:first-child{border-left:1.5px solid var(--rule);border-radius:8px 0 0 8px;
+  font-weight:700;color:var(--ink);font-size:14.5px}
+table.cmp td:last-child{border-right:1.5px solid var(--rule);border-radius:0 8px 8px 0}
+
+.ogrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0 0}
+.ocard{background:#fff;border:1.5px solid;border-radius:10px;box-shadow:var(--shadow);overflow:hidden}
+.ocard .oh{color:#fff;font-size:13px;font-weight:700;padding:10px 16px}
+.ocard ul{margin:0;padding:12px 18px 16px 34px}
+.ocard li{font-size:13.5px;color:var(--ink-soft);line-height:1.5;margin:6px 0}
+
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:20px 0 0}
+.gcard{background:#fff;border:1.5px solid;border-radius:10px;box-shadow:var(--shadow);padding:17px 20px;
+  transition:transform .12s,box-shadow .12s}
+.gcard:hover{transform:translateY(-2px);box-shadow:var(--shadow-hi)}
+.gcard h4{margin:0 0 7px;font-size:16.5px;letter-spacing:-.01em}
+.gcard p{margin:0;font-size:14px;color:var(--ink-soft);line-height:1.58}
+
+.bcard{background:var(--bad-fill);border:1.5px solid var(--bad-edge);border-radius:10px;
+  box-shadow:var(--shadow);padding:16px 20px;transition:transform .12s,box-shadow .12s}
+.bcard:hover{transform:translateY(-2px);box-shadow:var(--shadow-hi)}
+.bcard h4{margin:0 0 6px;font-size:16px;color:var(--bad);letter-spacing:-.01em}
+.bcard p{margin:0;font-size:14px;color:#8a5049;line-height:1.55}
+
+table.pre{width:100%;border-collapse:separate;border-spacing:0 9px;margin:20px 0 0}
+table.pre td{background:#fff;border-top:1.5px solid var(--rule);border-bottom:1.5px solid var(--rule);
+  padding:14px 16px;vertical-align:top;font-size:14px;color:var(--ink-soft);line-height:1.55}
+table.pre td:first-child{border-left:1.5px solid var(--rule);border-radius:8px 0 0 8px;width:52px;text-align:center}
+table.pre td:last-child{border-right:1.5px solid var(--rule);border-radius:0 8px 8px 0}
+table.pre .num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;
+  border-radius:50%;background:var(--petrol);color:#fff;font-size:13px;font-weight:700}
+table.pre .st{font-weight:700;color:var(--ink);font-size:15px;display:block;margin-bottom:3px}
+table.pre .who{display:inline-block;font-size:11px;letter-spacing:.05em;text-transform:uppercase;
+  font-weight:700;color:var(--petrol-lt);background:var(--wash);border:1px solid var(--rule);
+  border-radius:10px;padding:2px 9px;margin-bottom:6px}
+
+.policy{background:#fff;border:1.5px solid var(--rule);border-radius:10px;box-shadow:var(--shadow);
+  padding:30px 36px;margin:20px 0 0}
+.policy .ptitle{font-size:22px;font-weight:700;letter-spacing:-.015em;margin:0 0 4px}
+.policy .pmeta{font-size:12.5px;color:var(--ink-faint);margin:0 0 22px;padding-bottom:16px;
+  border-bottom:1.5px solid var(--rule)}
+.policy h5{margin:22px 0 8px;font-size:15.5px;color:var(--petrol);letter-spacing:-.01em}
+.policy h5:first-of-type{margin-top:0}
+.policy p{margin:0 0 9px;font-size:14.5px;color:var(--ink-soft);line-height:1.62}
+.policy p:last-child{margin-bottom:0}
+.policy b{color:var(--ink)}
+.fillin{background:#fff7e0;border-bottom:1.5px dotted #d6a93a;padding:0 3px;font-weight:600;color:#8a6512}
+.copybar{display:flex;gap:10px;align-items:center;margin:18px 0 0;flex-wrap:wrap}
+.copybar button{font:inherit;font-size:13px;font-weight:700;padding:9px 16px;border-radius:7px;cursor:pointer;
+  border:1.5px solid var(--petrol);background:var(--petrol);color:#fff;box-shadow:var(--shadow)}
+.copybar button.alt{background:#fff;color:var(--petrol)}
+.copybar .hint{font-size:12.5px;color:var(--ink-faint)}
+
+.refblock{background:#fff;border:1.5px solid;border-radius:10px;box-shadow:var(--shadow);padding:16px 20px;margin:14px 0}
+.refblock h4{margin:0 0 10px;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:700}
+.refblock p{margin:0 0 11px;font-size:14px;color:var(--ink-soft);line-height:1.55}
+.refblock p:last-child{margin-bottom:0}
+.refblock b{color:var(--ink)}
+
+.legend{background:#fff;border:1.5px solid var(--rule);border-radius:10px;box-shadow:var(--shadow);
+  padding:15px 20px;margin:20px 0 0;font-size:14px;color:var(--ink-soft);line-height:1.6}
+.legend b{color:var(--ink)}
+
+footer{margin:48px 0 0;padding:22px 0 66px;border-top:1px solid var(--rule);
+  font-size:12.5px;color:var(--ink-faint);line-height:1.6}
+footer .disc{font-style:italic;margin:0 0 12px}
+
+@media (max-width:900px){
+  header.top h1{font-size:27px}
+  .ogrid,.cards{grid-template-columns:1fr}
+  table.cmp,table.cmp tbody,table.cmp tr,table.cmp td{display:block;width:100%}
+  table.cmp thead{display:none}
+  table.cmp td{border:1.5px solid var(--rule);border-radius:8px;margin-bottom:-1px}
+  .policy{padding:22px}
+}
+@media print{
+  nav.tabs,.copybar{display:none}
+  .view{display:block!important;page-break-before:always}
+  body{background:#fff;font-size:11pt}
+  .gcard,.bcard,.ocard,.policy{break-inside:avoid;box-shadow:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">AI Governance &middot; Policy</div>
+  <h1>AI Governance Is Not Data Governance</h1>
+  <p class="stand">They overlap, and one depends on the other, but they answer different questions and fail in different ways. What follows: where the line actually sits, what a good AI policy does, the mistakes I see most often, the pre-work worth doing before you write a word, and a model policy you can adapt.</p>
+</header>
+<hr class="rule">
+
+<nav class="tabs" role="tablist" id="tabs"></nav>
+<div id="views"></div>
+
+<footer>
+  <p class="disc">The views expressed here are my own. They do not represent the views of any employer, client, or other organisation with which I am or have been associated, and nothing here should be taken as legal advice.</p>
+  The model policy is a starting point, not a compliant document. It has to be adapted to your sector, your jurisdictions and your contractual obligations before use, and reviewed by someone qualified to do so.
+</footer>
+</div>
+
+<script>
+"use strict";
+var D = {"compare": [["The question it answers", "What data do we hold, who owns it, who may see it, how long do we keep it, is it accurate?", "What decisions or actions are we handing to a system, on what basis, with what authority, and how do we know it still behaves?"], ["What it governs", "State. A dataset&rsquo;s classification does not change on its own.", "Behaviour. The same system can act differently after a vendor update, a prompt change or a re-indexed corpus."], ["The unit of control", "The dataset, the record, the system of record.", "The use case, plus the model version, plus the permission set the system holds."], ["What evidence looks like", "Largely static artifacts: catalogue entries, lineage, access lists, retention schedules.", "Evidence that has to be regenerated. An evaluation that passed last quarter says nothing about this quarter."], ["How failure shows up", "Disclosure, loss, corruption, inaccuracy.", "All of that, plus: an action nobody authorised, a decision nobody can explain, and capability that drifted since approval."], ["Who normally owns it", "Data owners, the data office, records management.", "Product and engineering owners, with security, legal and the business owner of the decision."], ["Change cadence", "Slow. Schedules and classifications hold for years.", "Fast. A vendor can change the model underneath you with no notice and no code change."]], "overlap": [["Shared ground — do these once, use them twice", "3872e0", ["Access control and least privilege", "Classification and sensitivity labelling", "Retention, legal hold and disposal", "Lineage and provenance", "Third-party and subprocessor due diligence"]], ["Only in data governance", "9031aa", ["Data quality and accuracy standards", "Master and reference data management", "System-of-record designation", "Schema and definition stewardship"]], ["Only in AI governance", "457c3c", ["Inventory of AI use cases and model versions", "Evaluation thresholds as a release gate", "Human oversight design — who reviews what, and when", "Agent permissions, identity and blast radius", "AI-specific failure modes: hallucination, prompt injection, goal drift", "Disclosure and transparency obligations"]]], "good": [["Scopes by consequence, not by technology", "3872e0", "Do not write &lsquo;this policy applies to large language models&rsquo;. That misses the AI already bundled into tools you own, and it dates the moment the technology moves. Scope on what the system is allowed to affect."], ["Tiers obligations by blast radius", "457c3c", "A summariser and a payment agent should not carry the same approval burden. Most policies fail here: one heavy process for everything, so people route around it for the trivial cases and you lose sight of both."], ["Names a person, not a committee", "d55c26", "Every use case has an accountable owner by name. &lsquo;The AI Governance Committee is responsible&rsquo; means nobody is, and it shows the first time something goes wrong."], ["States what is allowed", "9031aa", "Most AI policies are a list of prohibitions. People cannot act on a prohibition. A short list of approved tools, approved data classes and the request route does more work than twenty pages of restriction."], ["Extends processes you already run", "3064ba", "Change management, third-party risk, records, incident response, secure development. Building a parallel AI governance stack alongside these is a trap — it doubles the work and halves the adoption."], ["Requires an inventory, and makes registration the front door", "457c3c", "You cannot govern a population you have not defined. Registration should be the cheapest possible step — a form, not a submission."], ["Asks only for evidence you can actually produce", "3872e0", "If the policy requires an audit trail your platform cannot generate, you have written an aspiration. Write what is achievable now and put the rest on a dated roadmap."], ["Defines human oversight concretely", "d55c26", "Not &lsquo;a human will review output&rsquo;. Say who, at what point, what they are checking for, and how the review is recorded. An unrecorded review cannot be evidenced later."], ["Covers bought and embedded AI, not just built", "9031aa", "Most organisations will never train a model. Nearly all of them already run AI features inside products they licensed years ago."], ["Has a change trigger", "3064ba", "Approval is not permanent. Name the events that force re-review: model version change, scope change, new data class, new connector, a supplier change."], ["Has an off-ramp", "a82e26", "Who can stop it, how quickly, and what decommissioning involves. Very few policies say this, and it is the first thing you need in an incident."], ["Puts a service level on itself", "457c3c", "If approval takes three weeks, the policy has created the shadow AI it was written to prevent. Publish your own turnaround time and report against it."]], "bad": [["Prohibition-only", "Bans tools, offers no sanctioned alternative. Traffic moves to personal phones where you have no visibility at all. The risk does not fall — it goes dark."], ["Borrowed from a much larger organisation", "A template full of controls you cannot operate. Every unevidenced control is a finding waiting to happen, and reviewers spot the mismatch immediately."], ["Scoped to &lsquo;LLMs&rsquo; or &lsquo;generative AI&rsquo;", "Misses the recommendation engine, the transcription service, the CV screener and the AI features switched on inside your existing licences."], ["Committee as the control", "A monthly review board governing systems that change weekly. The board becomes a queue, and the queue becomes the reason people stop asking."], ["Uniform obligations", "The same forms for a spellcheck-grade use and an agent with write access to production. Guarantees both over-control and under-control at once."], ["Written before the inventory", "Governing a population nobody has defined. The first audit question is &lsquo;how many AI systems do you have?&rsquo; and there is no answer."], ["Aspirational language with no test", "&lsquo;We will ensure AI is fair, ethical and transparent.&rsquo; Nobody can tell whether that was complied with, so nobody can be held to it."], ["Generic explainability requirements", "Demanding explainability without saying what artifact would satisfy it. Teams cannot comply and auditors cannot assess."], ["Silent on shadow AI", "Assumes procurement is the only way AI enters the organisation. It is usually the least common way."], ["No change trigger", "Approved once in March, never looked at again, despite three model updates since."], ["Policy and procedure fused", "Tool names and settings written into the policy, so changing a product requires re-approving the policy. Split the durable rule from the changeable detail."], ["Silent on the output side", "All the attention on what goes in, none on review, disclosure, records or reversal of what comes out."]], "prework": [["1", "Inventory what is already running", "IT, procurement, practice leads", "Include AI features bundled into tools you already licence. Expect this to be the longest step and the most surprising."], ["2", "Pull the shadow AI picture", "Security", "Proxy, DNS or CASB data for consumer AI domains, plus app-consent grants and expense claims. You need the size of the gap before you write rules about it."], ["3", "Check the state of your data governance", "Data owner, records", "Classification applied or not, the oversharing position, retention schedule. AI governance sits on top of this; if it is weak, fix it first."], ["4", "List your actual obligations", "Legal, compliance", "Sector regulation, jurisdictions you operate in, client contract terms, professional rules. Write the list before the policy, not after."], ["5", "Decide your risk tiers", "Security with the business", "Define them by what the system can affect — read-only, internal, customer-facing, writes to a live system. Two or three tiers is usually enough."], ["6", "Map the processes you will extend", "Risk, IT", "Change management, third-party risk, records, incident response, secure development. Decide what plugs in rather than what gets rebuilt."], ["7", "Choose your reference framework", "Security, compliance", "NIST AI RMF, ISO/IEC 42001, sector guidance. Decide the depth of crosswalk you will actually maintain — a mapping you cannot defend is worse than none."], ["8", "Find the accountable owners", "Executive sponsor", "Named people who will sign for real use cases. If you cannot fill this list, the policy is not ready."], ["9", "Agree what evidence you can produce today", "IT, security", "Logs, review records, evaluation results. Anything you cannot produce goes on a dated roadmap rather than into the policy as a requirement."], ["10", "Draft the yes-list", "Security, IT", "Approved tools, approved data classes, the request route and your own turnaround commitment. Publish this with the policy or the policy will be ignored."], ["11", "Tabletop one real use case", "Everyone above", "Walk a live request through the draft. You will find the ambiguity in an hour — far cheaper than finding it in an audit."]], "policy": [["1. Purpose", ["This policy sets out how [ORGANISATION] uses artificial intelligence, who is accountable, and what must be true before an AI system is used in our work.", "It exists so that people can use AI confidently and quickly, and so that we can show a client, a regulator or an insurer how a given piece of work was produced."]], ["2. Scope", ["This policy applies to every use of AI in the course of work for [ORGANISATION], by employees, contractors and anyone acting on our behalf.", "It covers AI we build, AI we buy, and AI features included in products we already licence. It applies whether or not the tool was procured through IT.", "Scope is determined by what the system is permitted to affect, not by the technology it uses."]], ["3. Definitions", ["<b>AI system</b> — any system that produces content, recommendations, classifications or actions from a learned model rather than from explicitly written rules.", "<b>Use case</b> — a specific task an AI system performs in a specific context. Approval attaches to the use case, not to the tool.", "<b>Owner</b> — the named individual accountable for a use case.", "<b>Approved tool</b> — a product listed on the current AI Yes-List, published alongside this policy."]], ["4. Risk tiers", ["<b>Tier 1 — Open.</b> The system only reads, drafts or summarises; it uses public or synthetic data; its output stays within the team and is read by a person before use. No approval is required. Register the use case and proceed.", "<b>Tier 2 — Checked.</b> Real organisational data is used, or the output is relied on by others, but the system takes no action on its own. Requires registration and a check by the Security team. We will respond within two working days.", "<b>Tier 3 — Reviewed.</b> The system writes to a live system, transacts, or its output reaches a customer, a court, a regulator or the public. Requires registration, review by Security, the data owner and Legal, and a named approver.", "Where a use case could sit in two tiers, the higher tier applies."]], ["5. Always prohibited", ["Using a personal or non-approved AI account for organisational data.", "Entering data classified [RESTRICTED] or above into any AI system not explicitly approved for that classification.", "Allowing an AI system to take an irreversible action — payment, deletion, external send, contractual commitment — without a person approving that specific action.", "Presenting AI-generated output as reviewed work without a person having actually reviewed it."]], ["6. The AI register", ["Every use case must be registered before use, at any tier. Registration is a short form and is not an approval gate for Tier 1.", "The register records: the use case, the owner, the tool and model version, the data classes involved, the tier, the date, and the review date.", "The register is the definitive list of AI in use at [ORGANISATION]. An unregistered use case is a policy breach regardless of how low-risk it is."]], ["7. Human oversight", ["For Tier 2 and Tier 3, a named person must review output before it is relied on or released.", "The reviewer must be competent to detect errors in that subject matter. Review by someone who cannot evaluate the content is not review.", "The review must be recorded — who reviewed, what, and when. An unrecorded review cannot be evidenced later and is treated as not having happened."]], ["8. Data", ["Data entered into an AI system must be permitted for that system by classification and by any applicable contract or licence.", "Where a supplier offers a setting that prevents our data being used to train their models, it must be enabled and verified in the administration console before first use, and re-verified annually.", "Retention of prompts and outputs follows the existing records schedule. Legal hold applies to them as it applies to documents."]], ["9. Suppliers and embedded AI", ["AI suppliers are assessed through the existing third-party risk process, with an AI supplement covering training use, retention, processing location and sub-processors.", "AI features inside products we already licence must be explicitly enabled or disabled by decision, and that decision recorded. Default-on is not a decision.", "Contracts must require notice of material model change and of sub-processor change."]], ["10. Change and re-review", ["Approval is not permanent. A use case returns for review when any of the following occurs: the model or version changes; the data classes change; the system gains a new connector or permission; the supplier changes a material term; or twelve months pass.", "The owner is responsible for raising a re-review. Security may also initiate one."]], ["11. Monitoring and evidence", ["For each registered use case we must be able to produce, on request: what the system was asked, what it produced, who reviewed it, and when.", "Where the platform cannot produce that today, the gap is recorded in the register with a remediation date. We do not claim controls we cannot evidence."]], ["12. Incidents", ["Suspected AI incidents are reported through the existing incident process. These include: organisational data entered into a non-approved system; incorrect AI output relied on externally; an AI system acting outside its approved scope; and suspected manipulation of an AI system through its inputs.", "There is no penalty for reporting in good faith. There is one for not reporting."]], ["13. Stopping and decommissioning", ["The owner, the Security lead, or the executive sponsor may suspend any AI use case immediately and without prior consultation.", "Decommissioning includes removing access, deleting or exporting retained prompts and outputs per the records schedule, and closing the register entry."]], ["14. Roles", ["<b>Use case owner</b> — accountable for the use case, its registration, its reviews and its evidence.", "<b>Security</b> — maintains the Yes-List, performs Tier 2 checks, participates in Tier 3 review, monitors for unregistered use.", "<b>Data owner</b> — approves the data classes used, and receives alerts relating to their data.", "<b>Legal</b> — advises on regulatory, contractual and disclosure obligations.", "<b>Executive sponsor</b> — owns this policy, resolves disputes, and reports AI risk to the board."]], ["15. If you cannot comply", ["Raise an exception rather than working around the policy. Exceptions are recorded, time-limited and approved by the executive sponsor.", "A documented exception is a manageable risk. An undocumented workaround is not."]], ["16. Our commitments to you", ["Tier 2 checks answered within two working days.", "The Yes-List kept current and published.", "A sandbox with synthetic data available with no approval required.", "This policy reviewed every twelve months, or sooner if the regulatory position changes."]]], "refs": [["Frameworks", "3872e0", [["NIST AI Risk Management Framework", "The GOVERN function is the closest thing to a reference structure for a policy of this kind."], ["ISO/IEC 42001", "AI management system standard, if you want something certifiable."], ["ISO/IEC 27001 and your existing ISMS", "Most of the process this policy leans on already exists here."]]], ["Guidance", "457c3c", [["Careful Adoption of Agentic AI Services", "ASD&rsquo;s ACSC, CISA, NSA, Canadian Centre for Cyber Security, NCSC-NZ, NCSC-UK, 30 April 2026. Relevant once systems start taking actions rather than producing text."], ["OWASP Top 10 for LLM Applications and MITRE ATLAS", "For the technical threat side that sits underneath the policy."]]]]};
+
+function el(tag, cls, html){ var n=document.createElement(tag); if(cls)n.className=cls; if(html!==undefined)n.innerHTML=html; return n; }
+
+var TABS = [
+  { k:"difference", label:"1 \u00b7 What is different" },
+  { k:"good",       label:"2 \u00b7 What good looks like" },
+  { k:"bad",        label:"3 \u00b7 What not to do" },
+  { k:"prework",    label:"4 \u00b7 Pre-work" },
+  { k:"policy",     label:"5 \u00b7 A model policy" },
+  { k:"refs",       label:"References" },
+];
+
+var tabsEl=document.getElementById("tabs"), viewsEl=document.getElementById("views");
+TABS.forEach(function(t,i){
+  var b=el("button"); b.type="button"; b.dataset.k=t.k;
+  b.setAttribute("role","tab"); b.setAttribute("aria-selected", i===0?"true":"false");
+  b.innerHTML=t.label;
+  b.addEventListener("click", function(){ show(t.k); });
+  tabsEl.appendChild(b);
+});
+
+/* ---- 1. difference ---- */
+var v1=el("section","view active"); v1.id="v-difference";
+v1.innerHTML =
+  '<div class="lhead"><h2>Where the line actually sits</h2>'
+  +'<p class="sub">Same vocabulary, different object</p></div>'
+  +'<p class="lede">Data governance is about a noun. AI governance is about a verb. Data governance asks what we hold and who may see it. AI governance asks what we have handed to a machine to decide or do, and how we know it is still doing it properly.</p>'
+  +'<div class="voice"><span class="vh">Where I land on this</span>'
+  +'A large share of what gets sold as AI governance is repackaged data governance. That is not a criticism \u2014 it is the reason so many AI programmes stall. Organisations failing at AI governance are usually failing at asset inventory and access control, and no amount of AI policy fixes that. '
+  +'Build the AI layer on top of what you already run. A parallel governance stack doubles the work and halves the adoption.</div>'
+  +'<table class="cmp"><thead><tr><th class="q">&nbsp;</th><th class="d">Data governance</th><th class="a">AI governance</th></tr></thead><tbody>'
+  + D.compare.map(function(r){ return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>'; }).join("")
+  + '</tbody></table>'
+  + '<div class="ogrid">' + D.overlap.map(function(g){
+      return '<div class="ocard" style="border-color:#'+g[1]+'"><div class="oh" style="background:#'+g[1]+'">'+g[0]+'</div>'
+       + '<ul>'+g[2].map(function(i){return '<li>'+i+'</li>';}).join("")+'</ul></div>'; }).join("")
+  + '</div>'
+  + '<div class="legend"><b>The practical consequence.</b> If your data governance is weak, start there \u2014 the first three items in the shared column do most of the work in both disciplines. '
+  + 'Copilot is the clearest example: it does not leak data, it finds what was already over-shared. That is a data governance failure surfaced by an AI tool, and no AI policy would have prevented it.</div>';
+viewsEl.appendChild(v1);
+
+/* ---- 2. good ---- */
+var v2=el("section","view"); v2.id="v-good";
+v2.innerHTML =
+  '<div class="lhead"><h2>What a good AI governance policy does</h2>'
+  +'<p class="sub">Twelve things worth checking your draft against</p></div>'
+  +'<p class="lede">The test I apply to a policy is simple: could someone read it on Monday and know what they are allowed to do on Tuesday? Most fail that test, not because they are wrong but because they describe intentions rather than routes.</p>'
+  +'<div class="cards">' + D.good.map(function(g){
+      return '<div class="gcard" style="border-color:#'+g[1]+'"><h4 style="color:#'+g[1]+'">'+g[0]+'</h4><p>'+g[2]+'</p></div>'; }).join("")
+  + '</div>';
+viewsEl.appendChild(v2);
+
+/* ---- 3. bad ---- */
+var v3=el("section","view"); v3.id="v-bad";
+v3.innerHTML =
+  '<div class="lhead"><h2>What not to do</h2>'
+  +'<p class="sub">Twelve failure patterns, most of them well-intentioned</p></div>'
+  +'<p class="lede">None of these come from carelessness. They come from writing the policy before knowing what is running, or from borrowing a document built for a different organisation.</p>'
+  +'<div class="cards">' + D.bad.map(function(b){
+      return '<div class="bcard"><h4>'+b[0]+'</h4><p>'+b[1]+'</p></div>'; }).join("")
+  + '</div>'
+  + '<div class="legend"><b>The one that costs most.</b> Prohibition without a sanctioned alternative. '
+  + 'Block consumer AI before a paid account exists and the traffic moves to personal phones, where you have no telemetry at all. The risk does not go down. It goes dark.</div>';
+viewsEl.appendChild(v3);
+
+/* ---- 4. prework ---- */
+var v4=el("section","view"); v4.id="v-prework";
+v4.innerHTML =
+  '<div class="lhead"><h2>Pre-work, before you write a word</h2>'
+  +'<p class="sub">Eleven steps \u2014 most of them evidence-gathering, not drafting</p></div>'
+  +'<p class="lede">A policy written before this work is a guess. A policy written after it is mostly transcription, and takes a fraction of the time.</p>'
+  +'<table class="pre"><tbody>' + D.prework.map(function(p){
+      return '<tr><td><span class="num">'+p[0]+'</span></td>'
+       + '<td><span class="st">'+p[1]+'</span><span class="who">'+p[2]+'</span><br>'+p[3]+'</td></tr>'; }).join("")
+  + '</tbody></table>'
+  + '<div class="legend"><b>If you only do three.</b> Steps 1, 2 and 8 \u2014 the inventory, the shadow AI picture, and the named owners. '
+  + 'Without the first two you are governing a population you cannot see. Without the third, nothing in the policy has anyone behind it.</div>';
+viewsEl.appendChild(v4);
+
+/* ---- 5. policy ---- */
+var v5=el("section","view"); v5.id="v-policy";
+v5.innerHTML =
+  '<div class="lhead"><h2>A model AI use and governance policy</h2>'
+  +'<p class="sub">Short on purpose. Highlighted text is for you to replace.</p></div>'
+  +'<p class="lede">This is written to be readable in one sitting and operable without a new committee. It assumes you already run change management, third-party risk, records and incident response, and plugs into them rather than duplicating them.</p>'
+  +'<div class="copybar">'
+  +'<button type="button" id="copyBtn">Copy the policy text</button>'
+  +'<button type="button" class="alt" id="printBtn">Print this page</button>'
+  +'<span class="hint">Adapt before use. This is a starting point, not a compliant document.</span></div>'
+  +'<div class="policy" id="policyDoc">'
+  +'<p class="ptitle">AI Use and Governance Policy</p>'
+  +'<p class="pmeta"><span class="fillin">[ORGANISATION]</span> &middot; Version <span class="fillin">[0.1]</span> &middot; Owner: <span class="fillin">[EXECUTIVE SPONSOR]</span> &middot; Effective <span class="fillin">[DATE]</span> &middot; Next review <span class="fillin">[DATE + 12 MONTHS]</span></p>'
+  + D.policy.map(function(sec){
+      return '<h5>'+sec[0]+'</h5>' + sec[1].map(function(p){ return '<p>'+p+'</p>'; }).join("");
+    }).join("")
+  +'</div>';
+viewsEl.appendChild(v5);
+
+/* ---- 6. refs ---- */
+var v6=el("section","view"); v6.id="v-refs";
+v6.innerHTML =
+  '<div class="lhead"><h2>References</h2><p class="sub">What this leans on</p></div>'
+  + D.refs.map(function(g){
+      return '<div class="refblock" style="border-color:#'+g[1]+'"><h4 style="color:#'+g[1]+'">'+g[0]+'</h4>'
+       + g[2].map(function(i){ return '<p><b>'+i[0]+'</b> &mdash; '+i[1]+'</p>'; }).join("") + '</div>'; }).join("")
+  + '<div class="legend"><b>On the model policy.</b> It is my own drafting, informed by the structures above rather than reproduced from any of them. '
+  + 'It has not been reviewed by counsel and is not aligned to any single certification scheme. Treat it as a starting point that saves you a blank page, not as a compliant document.</div>';
+viewsEl.appendChild(v6);
+
+/* ---- wiring ---- */
+document.getElementById("printBtn").addEventListener("click", function(){ window.print(); });
+document.getElementById("copyBtn").addEventListener("click", function(){
+  var t = document.getElementById("policyDoc").innerText;
+  var btn = document.getElementById("copyBtn");
+  function done(ok){ btn.textContent = ok ? "Copied" : "Select and copy manually";
+                     setTimeout(function(){ btn.textContent = "Copy the policy text"; }, 2200); }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(t).then(function(){ done(true); }, function(){ done(false); });
+  } else { done(false); }
+});
+
+function show(k){
+  document.querySelectorAll(".view").forEach(function(v){ v.classList.remove("active"); });
+  var t=document.getElementById("v-"+k); if(t) t.classList.add("active");
+  document.querySelectorAll("nav.tabs button").forEach(function(b){
+    b.setAttribute("aria-selected", b.dataset.k===k ? "true":"false"); });
+  if(window.scrollTo) window.scrollTo({ top:0, behavior:"smooth" });
+}
+</script>
+</body>
+</html>
