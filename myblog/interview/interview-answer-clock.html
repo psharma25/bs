@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Answer Clock — read the room, answer in the time you have</title>
+<style>
+:root{
+  --ink:#0f2733;
+  --petrol:#1b4965;
+  --petrol-mid:#2c6e8f;
+  --petrol-soft:#e4edf2;
+  --slate:#5a7183;
+  --paper:#f4f7f8;
+  --card:#ffffff;
+  --line:#d5e0e6;
+  --amber:#b26b00;
+  --amber-soft:#fdf3e2;
+  --clay:#a8324a;
+  --clay-soft:#fbeef1;
+  --moss:#2f6f57;
+  --moss-soft:#eaf3ef;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:"Inter","Segoe UI",system-ui,-apple-system,Calibri,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--sans);
+  background:var(--paper);
+  color:var(--ink);
+  font-size:15px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-0.015em;line-height:1.2}
+p{margin:0 0 .7em}
+button{font-family:inherit;font-size:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+
+/* ---------- header ---------- */
+header{
+  background:linear-gradient(150deg,var(--ink) 0%,var(--petrol) 62%,#245a7d 100%);
+  color:#fff;padding:38px 0 30px;
+}
+header .eyebrow{
+  font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:#8fb8ce;margin-bottom:12px;
+}
+header h1{font-size:34px;color:#fff;max-width:22ch}
+header .sub{margin-top:12px;max-width:62ch;color:#cfe0ea;font-size:15px}
+.spine{
+  margin-top:24px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);
+  border-radius:10px;padding:14px 16px;max-width:820px;
+}
+.spine label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:#9fc3d6;margin-bottom:7px}
+.spine input{
+  width:100%;background:transparent;border:0;border-bottom:1px dashed rgba(255,255,255,.35);
+  color:#fff;font-family:var(--sans);font-size:16px;padding:5px 0;outline:none;
+}
+.spine input::placeholder{color:#7fa5bb}
+.spine .hint{font-size:12.5px;color:#9fc3d6;margin-top:8px}
+
+/* ---------- nav ---------- */
+nav{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;gap:2px;overflow-x:auto}
+nav button{
+  border:0;background:none;padding:14px 14px 11px;cursor:pointer;color:var(--slate);
+  font-size:13.5px;font-weight:550;border-bottom:3px solid transparent;white-space:nowrap;
+}
+nav button:hover{color:var(--petrol)}
+nav button[aria-selected="true"]{color:var(--petrol);border-bottom-color:var(--petrol)}
+nav button:focus-visible{outline:2px solid var(--petrol-mid);outline-offset:-2px}
+
+main{padding:30px 0 70px}
+.panel[hidden]{display:none}
+.lede{max-width:66ch;color:var(--slate);font-size:15.5px;margin-bottom:22px}
+h2.sec{font-size:22px;margin-bottom:6px}
+h3.sub{font-size:15px;font-family:var(--mono);font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--petrol-mid);margin:34px 0 14px}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+
+/* ---------- answer clock (signature) ---------- */
+.clockbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:18px}
+.chip{
+  border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;
+  cursor:pointer;color:var(--slate);font-size:13px;font-weight:550;
+}
+.chip[aria-pressed="true"]{background:var(--petrol);border-color:var(--petrol);color:#fff}
+.chip:focus-visible{outline:2px solid var(--petrol-mid);outline-offset:2px}
+
+.clockshell{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px 22px 16px}
+.clockhead{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.clockhead .mname{font-size:19px;font-weight:650}
+.clockhead .mdesc{color:var(--slate);font-size:13.5px;max-width:52ch}
+.readout{font-family:var(--mono);text-align:right}
+.readout .big{font-size:34px;font-weight:600;letter-spacing:-.02em;line-height:1}
+.readout .small{font-size:11.5px;color:var(--slate);letter-spacing:.1em;text-transform:uppercase}
+.readout.over .big{color:var(--clay)}
+
+.track{position:relative;height:74px;display:flex;border-radius:8px;overflow:hidden;
+  border:1px solid var(--line);background:var(--petrol-soft)}
+.band{
+  position:relative;padding:9px 11px;border-right:1px solid rgba(255,255,255,.75);
+  overflow:hidden;transition:background .18s ease;cursor:pointer;min-width:0;
+}
+.band:last-child{border-right:0}
+.band .bn{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--petrol);opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.band .bl{font-size:13px;font-weight:600;margin-top:3px;line-height:1.25;
+  overflow:hidden;text-overflow:ellipsis}
+.band .bs{position:absolute;bottom:7px;left:11px;font-family:var(--mono);font-size:11px;color:var(--slate)}
+.band.b0{background:#dcebf3}
+.band.b1{background:#cfe3ee}
+.band.b2{background:#bfd9e8}
+.band.b3{background:#e9dfc9}
+.band.b4{background:#d8e6dc}
+.band.active{background:var(--petrol);}
+.band.active .bn,.band.active .bl,.band.active .bs{color:#fff;opacity:1}
+.band.past{opacity:.5}
+.playhead{position:absolute;top:0;bottom:0;width:2px;background:var(--clay);z-index:5;
+  box-shadow:0 0 0 1px rgba(255,255,255,.6);display:none}
+.playhead::before{content:"";position:absolute;top:-1px;left:-5px;border:6px solid transparent;
+  border-top-color:var(--clay)}
+.ticks{position:relative;height:20px;margin-top:2px}
+.tick{position:absolute;top:0;transform:translateX(-50%);font-family:var(--mono);font-size:10.5px;color:var(--slate)}
+.tick i{display:block;width:1px;height:5px;background:var(--line);margin:0 auto 2px}
+
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px}
+.btn{
+  background:var(--petrol);color:#fff;border:0;border-radius:8px;padding:10px 20px;
+  font-weight:600;cursor:pointer;font-size:14px;
+}
+.btn:hover{background:#164058}
+.btn.ghost{background:#fff;color:var(--petrol);border:1px solid var(--line)}
+.btn.ghost:hover{background:var(--petrol-soft)}
+.btn:focus-visible{outline:2px solid var(--petrol-mid);outline-offset:2px}
+.nowline{margin-left:auto;font-size:13.5px;color:var(--slate)}
+.nowline b{color:var(--ink)}
+
+.banddetail{margin-top:20px;display:grid;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.bd{display:grid;grid-template-columns:96px 1fr;gap:16px;padding:14px 16px;border-bottom:1px solid var(--line);background:#fff}
+.bd:last-child{border-bottom:0}
+.bd.on{background:var(--petrol-soft)}
+.bd .t{font-family:var(--mono);font-size:12px;color:var(--petrol);font-weight:600}
+.bd .t span{display:block;color:var(--slate);font-weight:400;font-size:11px;margin-top:2px}
+.bd h4{font-size:14.5px;margin-bottom:4px}
+.bd .say{color:var(--slate);font-size:13.5px}
+.bd .say em{color:var(--ink);font-style:normal;background:#fffbf0;box-shadow:inset 0 -6px 0 var(--amber-soft)}
+.bd .no{color:var(--clay);font-size:12.5px;margin-top:5px}
+
+/* ---------- generic content bits ---------- */
+.kv{display:grid;grid-template-columns:130px 1fr;gap:10px 16px;font-size:14px}
+.kv dt{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--petrol-mid);padding-top:2px}
+.kv dd{margin:0}
+.tagrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.tag{font-size:12px;padding:3px 9px;border-radius:5px;background:var(--moss-soft);color:var(--moss);font-weight:550}
+.tag.no{background:var(--clay-soft);color:var(--clay)}
+.pcard h3{font-size:17px}
+.pcard .owns{font-size:12.5px;color:var(--slate);font-family:var(--mono);margin:4px 0 12px}
+.quote{border-left:3px solid var(--amber);background:var(--amber-soft);padding:10px 14px;
+  border-radius:0 8px 8px 0;font-size:14px;margin:12px 0}
+.quote b{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--amber);margin-bottom:4px}
+
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:10px}
+th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top;font-size:14px}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--petrol-mid);background:var(--petrol-soft)}
+tr:last-child td{border-bottom:0}
+td.sig{font-weight:600;width:30%}
+td.mv{color:var(--petrol);width:34%}
+
+/* ---------- archetypes ---------- */
+.qcard{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.qcard summary{list-style:none;cursor:pointer;padding:16px 18px;display:flex;gap:14px;align-items:flex-start}
+.qcard summary::-webkit-details-marker{display:none}
+.qcard summary:focus-visible{outline:2px solid var(--petrol-mid);outline-offset:-2px}
+.qcard .cat{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+  background:var(--petrol-soft);color:var(--petrol);padding:4px 7px;border-radius:4px;white-space:nowrap;margin-top:2px}
+.qcard .qt{font-weight:600;font-size:15.5px;flex:1}
+.qcard .caret{color:var(--slate);font-family:var(--mono);font-size:16px;line-height:1}
+.qcard[open] .caret{transform:rotate(45deg)}
+.qbody{padding:0 18px 18px;border-top:1px dashed var(--line);margin-top:0}
+.qbody .row{margin-top:14px}
+.qbody .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--petrol-mid);margin-bottom:4px}
+.skel{display:grid;gap:6px;margin-top:6px}
+.skel div{display:grid;grid-template-columns:74px 1fr;gap:12px;font-size:13.5px}
+.skel span{font-family:var(--mono);font-size:11.5px;color:var(--amber);padding-top:2px}
+.locker{margin-top:14px;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.locker textarea{width:100%;border:1px solid var(--line);border-radius:6px;padding:9px 10px;
+  font-family:var(--sans);font-size:13.5px;resize:vertical;min-height:62px;background:#fff;color:var(--ink)}
+.locker .lbl2{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--slate);margin:0 0 5px}
+.locker .saved{font-size:12px;color:var(--moss);height:16px;margin-top:5px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.filters input[type=search]{
+  border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-family:inherit;
+  font-size:14px;min-width:230px;background:#fff;color:var(--ink)
+}
+.count{font-family:var(--mono);font-size:12px;color:var(--slate);margin-left:auto}
+.stack{display:grid;gap:10px}
+
+footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--slate);font-size:12.5px}
+@media (max-width:640px){
+  header h1{font-size:26px}
+  .band .bl{display:none}
+  .kv{grid-template-columns:1fr}
+  .bd{grid-template-columns:1fr}
+  .skel div{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow">Interview craft · intent + time budget</div>
+    <h1>Figure out what they're really asking. Answer it inside the clock.</h1>
+    <p class="sub">Most interview answers fail on two axes at once: they answer the literal question instead of the underlying worry, and they run long enough that the point arrives after the interviewer stopped listening. This tool fixes both — decode the need, then land it on a timed structure.</p>
+    <div class="spine">
+      <label for="spine">Your narrative spine — one sentence, used in every answer</label>
+      <input id="spine" type="text" placeholder="e.g. I take product security from &quot;we'll deal with it at submission&quot; to a clearance-ready program, without slowing the release train.">
+      <div class="hint">Every answer below should be a different proof of this one sentence. If an answer doesn't ladder up to it, it's a tangent.</div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="wrap" role="tablist" aria-label="Sections">
+    <button role="tab" aria-selected="true" data-tab="clock">The answer clock</button>
+    <button role="tab" aria-selected="false" data-tab="room">Read the room</button>
+    <button role="tab" aria-selected="false" data-tab="decode">Question decoder</button>
+    <button role="tab" aria-selected="false" data-tab="live">Live signals</button>
+    <button role="tab" aria-selected="false" data-tab="repair">Repair moves</button>
+    <button role="tab" aria-selected="false" data-tab="locker">Prep locker</button>
+  </div>
+</nav>
+
+<main>
+<div class="wrap">
+
+<!-- ============ CLOCK ============ -->
+<section class="panel" id="p-clock">
+  <h2 class="sec">The answer clock</h2>
+  <p class="lede">Pick the format you're in. The bands rescale to the time you actually have — the shape stays the same, only the budget changes. Press <b>Start</b> and talk out loud; the playhead shows where you should be, not where you are.</p>
+
+  <div class="clockbar" id="modechips"></div>
+
+  <div class="clockshell">
+    <div class="clockhead">
+      <div>
+        <div class="mname" id="mname"></div>
+        <div class="mdesc" id="mdesc"></div>
+      </div>
+      <div class="readout" id="readout">
+        <div class="big" id="elapsed">0:00</div>
+        <div class="small" id="budget"></div>
+      </div>
+    </div>
+
+    <div class="track" id="track"><div class="playhead" id="playhead"></div></div>
+    <div class="ticks" id="ticks"></div>
+
+    <div class="controls">
+      <button class="btn" id="startbtn">Start</button>
+      <button class="btn ghost" id="resetbtn">Reset</button>
+      <div class="nowline" id="nowline">Not running — click a band to read its guidance.</div>
+    </div>
+  </div>
+
+  <div class="banddetail" id="banddetail"></div>
+
+  <h3 class="sub">Why this shape</h3>
+  <div class="grid g3">
+    <div class="card">
+      <h4>Answer first, evidence second</h4>
+      <p style="margin-top:6px;color:var(--slate)">Interviewers decide whether you're answering the question in the first ten seconds. Narrative order ("so back in 2019 we had this vendor…") spends that window on setup. Lead with the conclusion, then earn it.</p>
+    </div>
+    <div class="card">
+      <h4>Context is a tax, not a gift</h4>
+      <p style="margin-top:6px;color:var(--slate)">Give only the context that makes the decision hard. Team size, regulator, deadline, the constraint you couldn't move. Everything else is detail you find interesting and they don't.</p>
+    </div>
+    <div class="card">
+      <h4>Stop early, on purpose</h4>
+      <p style="margin-top:6px;color:var(--slate)">Ending 15 seconds under budget with a clean hand-back reads as executive control. Running 40 seconds over reads as someone who won't be manageable in a board meeting.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ROOM ============ -->
+<section class="panel" id="p-room" hidden>
+  <h2 class="sec">Read the room</h2>
+  <p class="lede">The same question means different things depending on who's asking. Before the call, write down each interviewer's title and what that title is <em>accountable for</em> — that's the need your answer has to service. Their unspoken question is almost always about their own week getting better or worse.</p>
+  <div class="grid g2" id="personas"></div>
+
+  <h3 class="sub">Three questions to answer before you join the call</h3>
+  <div class="grid g3">
+    <div class="card"><h4>What is this hire supposed to fix?</h4><p style="margin-top:6px;color:var(--slate)">Open roles exist because something broke, someone left, or an auditor/regulator/customer applied pressure. Find the trigger from the job description's oddly specific line — that line is the real requirement.</p></div>
+    <div class="card"><h4>Who gets blamed if it stays broken?</h4><p style="margin-top:6px;color:var(--slate)">That person is your sponsor, whether or not they're on the panel. Aim your proof at their exposure.</p></div>
+    <div class="card"><h4>What's the cheapest reason to say no to me?</h4><p style="margin-top:6px;color:var(--slate)">Too consultative, too technical, too senior, too regulated-industry, too long out of a big-company seat. Name it yourself in one clause, early, then move past it. Unnamed doubts grow.</p></div>
+  </div>
+</section>
+
+<!-- ============ DECODER ============ -->
+<section class="panel" id="p-decode" hidden>
+  <h2 class="sec">Question decoder</h2>
+  <p class="lede">Every common question has a surface form and a real need. Answer the surface form and you sound fine and forgettable; answer the real need and you sound like the person they've been describing to each other. Expand any question for the underlying worry, the usual failure, and a timed skeleton.</p>
+  <div class="filters">
+    <input type="search" id="qsearch" placeholder="Search questions…" aria-label="Search questions">
+    <button class="chip" data-cat="all" aria-pressed="true">All</button>
+    <button class="chip" data-cat="Narrative" aria-pressed="false">Narrative</button>
+    <button class="chip" data-cat="Risk screen" aria-pressed="false">Risk screen</button>
+    <button class="chip" data-cat="Behavioral" aria-pressed="false">Behavioral</button>
+    <button class="chip" data-cat="Strategy" aria-pressed="false">Strategy</button>
+    <button class="chip" data-cat="Conflict" aria-pressed="false">Conflict</button>
+    <button class="chip" data-cat="Closing" aria-pressed="false">Closing</button>
+    <span class="count" id="qcount"></span>
+  </div>
+  <div class="stack" id="qlist"></div>
+</section>
+
+<!-- ============ LIVE SIGNALS ============ -->
+<section class="panel" id="p-live" hidden>
+  <h2 class="sec">Live signals</h2>
+  <p class="lede">You get feedback in real time; most candidates are too deep in their own answer to catch it. These are the tells and what each one is asking you to do differently — in the next sentence, not the next answer.</p>
+  <table>
+    <thead><tr><th>What they do</th><th>What it means</th><th>Your move, immediately</th></tr></thead>
+    <tbody id="cues"></tbody>
+  </table>
+
+  <h3 class="sub">Two habits that buy you information</h3>
+  <div class="grid g2">
+    <div class="card">
+      <h4>Scope the question before you spend 90 seconds on it</h4>
+      <p style="margin-top:6px;color:var(--slate)">One short clarifier, not a stalling one: "Happy to go into either the program build or the incident side — which is more useful?" You get the real need handed to you, and it reads as consultative rather than uncertain. Use this at most twice per interview.</p>
+    </div>
+    <div class="card">
+      <h4>Hand back at the end</h4>
+      <p style="margin-top:6px;color:var(--slate)">Close with "That's the short version — want the regulatory detail or the org detail?" It ends the answer cleanly, proves you have depth in reserve, and lets them steer instead of politely enduring.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REPAIR ============ -->
+<section class="panel" id="p-repair" hidden>
+  <h2 class="sec">Repair moves</h2>
+  <p class="lede">Nothing here is a rescue for a bad interview. These are the small, unglamorous saves that stop one weak moment from setting the tone for the remaining forty minutes.</p>
+  <div class="grid g2" id="repairs"></div>
+</section>
+
+<!-- ============ LOCKER ============ -->
+<section class="panel" id="p-locker" hidden>
+  <h2 class="sec">Prep locker</h2>
+  <p class="lede">Everything you've written in the decoder, in one place. Saved in this browser only. Export before an interview and read the headlines — not the full answers — in the ten minutes beforehand.</p>
+  <div class="controls" style="margin:0 0 18px">
+    <button class="btn" id="exportbtn">Export as text file</button>
+    <button class="btn ghost" id="clearbtn">Clear all saved notes</button>
+  </div>
+  <div class="stack" id="lockerview"></div>
+</section>
+
+</div>
+</main>
+
+<footer><div class="wrap">Answer Clock · single-file, no network calls, notes stored in this browser's local storage only.</div></footer>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------------- data: timing modes ---------------- */
+var MODES = [
+  { id:"rapid", name:"Recruiter screen / rapid fire", total:30,
+    desc:"Phone screens, hallway questions, anything where they're checking a box and moving on.",
+    bands:[
+      {n:"Headline", s:6,  h:"Answer the literal question in one sentence",
+       say:"<em>Yes — I've run product security for two Class II device portfolios through 510(k) submission.</em> No preamble, no \"great question\".",
+       no:"Don't start with career history. They asked one thing."},
+      {n:"Proof", s:12, h:"One concrete anchor",
+       say:"Name the company, the scope, and the hardest constraint. One example, not three.",
+       no:"Don't list every employer where it was partially true."},
+      {n:"Outcome", s:8, h:"A number or a decision",
+       say:"Cleared it, cut it, shipped it, closed it. Something that happened as a result.",
+       no:"Don't end on responsibilities. Responsibilities aren't outcomes."},
+      {n:"Hand back", s:4, h:"Stop and return the floor",
+       say:"\"Happy to go deeper on any of that.\" Then silence.",
+       no:"Don't add a second example because they paused."}
+    ]},
+  { id:"standard", name:"Behavioral answer (the default)", total:90,
+    desc:"The workhorse. Any \"tell me about a time…\" question in a hiring-manager or panel round.",
+    bands:[
+      {n:"Headline", s:10, h:"State the answer before the story",
+       say:"<em>The hardest one was a firmware vulnerability found two weeks before a submission date — I held the release.</em> They now know how it ends and can follow the detail.",
+       no:"Don't open with \"so there's a bit of background here.\""},
+      {n:"Frame", s:15, h:"Only the context that makes the decision hard",
+       say:"Stakes, constraint, and who disagreed. Three facts maximum.",
+       no:"Don't explain the org chart, the product line, or the acronym unless they'd otherwise be lost."},
+      {n:"The move", s:35, h:"What you personally decided, and the tradeoff",
+       say:"First person singular. The alternative you rejected and why. This is the band they're actually scoring.",
+       no:"Don't say \"we\" for the decision. \"We\" for the work, \"I\" for the call."},
+      {n:"Outcome", s:20, h:"Result, then what it cost",
+       say:"A number if you have one, a verifiable state change if you don't. Naming the cost makes the win credible.",
+       no:"Don't oversell. An outcome with no downside sounds invented."},
+      {n:"Bridge", s:10, h:"Connect it to their problem, then stop",
+       say:"\"Which is why I asked about your submission calendar — that's the same shape of decision.\"",
+       no:"Don't trail off. End on a full stop, not a fade."}
+    ]},
+  { id:"strategy", name:"Strategy / case question", total:180,
+    desc:"\"How would you approach X here?\" — first 90 days, program build, architecture calls, board framing.",
+    bands:[
+      {n:"Thesis", s:15, h:"Your answer in one line, before any structure",
+       say:"<em>I'd spend the first month proving what's actually deployed, because every program I've inherited was wrong about its own inventory.</em>",
+       no:"Don't open with \"it depends\" or a list of things you'd need to know."},
+      {n:"Scope", s:30, h:"Assumptions you're making, out loud",
+       say:"Two or three, each falsifiable. Invite correction: \"stop me if that's wrong.\" They usually will, and that's free intelligence.",
+       no:"Don't ask five clarifying questions in a row. It reads as stalling."},
+      {n:"Structure", s:75, h:"Three pillars, each with a first action",
+       say:"Three is the number people can hold. Each pillar gets a name, a reason, and one thing that happens in week one.",
+       no:"Don't produce a framework with no verbs in it."},
+      {n:"Risk", s:35, h:"Where your own plan breaks",
+       say:"Name the thing that would make this fail — usually a person, a budget cycle, or a dependency you don't control. Then the mitigation.",
+       no:"Don't present a plan with no failure mode. Senior people distrust it instantly."},
+      {n:"Ask", s:25, h:"What you'd need from them, then hand back",
+       say:"Ending on a specific ask makes it feel like a working session, not a test.",
+       no:"Don't recap the three pillars. They heard them."}
+    ]},
+  { id:"exec", name:"Executive panel / final round", total:300,
+    desc:"Longer-form with the CEO, board member, or full leadership panel. Fewer questions, more weight each.",
+    bands:[
+      {n:"Position", s:20, h:"Your view, stated as a position not an option set",
+       say:"Executives are hiring judgement. Lead with the call you'd make.",
+       no:"Don't survey the landscape neutrally. Neutrality reads as not having done the job."},
+      {n:"Landscape", s:45, h:"What's actually true about their situation",
+       say:"Evidence you gathered before the call — their filings, recalls, published incidents, product roadmap. Shows you did the work.",
+       no:"Don't recite public information without a conclusion attached."},
+      {n:"Plan", s:120, h:"Sequenced, with owners and time",
+       say:"Phase it. Say what happens in 30, 90, and 180 days and what you'd stop doing to fund it.",
+       no:"Don't describe an ideal-state program. Describe the path from here."},
+      {n:"Evidence", s:60, h:"One deep proof from your own record",
+       say:"The single strongest thing you've done that maps to this plan. Full detail — this is the one place depth beats brevity.",
+       no:"Don't spread three shallow examples across this band."},
+      {n:"Risk & ask", s:55, h:"What could go wrong, and what you need",
+       say:"Close on the conditions for success and one direct question back to the most senior person present.",
+       no:"Don't end with \"any questions for me?\" — end with your question for them."}
+    ]}
+];
+
+/* ---------------- data: personas ---------------- */
+var PERSONAS = [
+  { role:"CEO / Founder", owns:"Revenue, funding, existential risk",
+    unspoken:"Will this person protect the company without becoming a tax on it?",
+    lead:"Business consequence first — deals unblocked, clearance obtained, customer retained.",
+    cut:"Control frameworks, tooling names, org design detail.",
+    use:["revenue at risk","time to market","customer trust","insurable"],
+    avoid:["maturity model","control coverage","CVSS"],
+    proof:"A time security was the reason a deal closed or a launch held its date." },
+  { role:"CIO / CTO", owns:"Delivery velocity, platform stability",
+    unspoken:"Is this a partner, or someone who'll file tickets and escalate around me?",
+    lead:"How you work with engineering — what you automate, what you absorb, what you refuse to block on.",
+    cut:"Compliance language, audit narrative, anything that sounds like paperwork for their teams.",
+    use:["shift left","developer experience","in the pipeline","paved road"],
+    avoid:["mandate","enforce","non-negotiable"],
+    proof:"A change your team shipped that engineers actually adopted without being made to." },
+  { role:"Chief Product Officer / Head of Product", owns:"Roadmap, launch dates, market fit",
+    unspoken:"Will security show up at the end and blow up my schedule?",
+    lead:"When in the lifecycle you engage and what you commit to turn around in how long.",
+    cut:"Incident war stories that end with a delayed release.",
+    use:["design input","submission-ready","predictable turnaround","release gate we agreed"],
+    avoid:["hard stop","risk acceptance memo","escalation path"],
+    proof:"A launch that went out on time because security work was scheduled, not discovered." },
+  { role:"General Counsel / Compliance", owns:"Defensibility, regulator relationship",
+    unspoken:"If this ends up in front of a regulator or in discovery, does this person's work hold?",
+    lead:"Evidence, documentation, and the decision trail behind your calls.",
+    cut:"Improvisation stories, however heroic.",
+    use:["documented rationale","reasonable and defensible","attestation","the record shows"],
+    avoid:["we moved fast","informally","worked around it"],
+    proof:"A time your documentation was tested — by an auditor, a regulator, or a customer's legal team." },
+  { role:"Peer executive on the panel", owns:"Their own function, and not losing turf",
+    unspoken:"Is this person easy to work with, and are they coming for my scope?",
+    lead:"Collaboration, credit-sharing, and where you'd defer to them.",
+    cut:"Anything implying their function is currently doing it wrong.",
+    use:["jointly owned","I'd defer to","your team would keep"],
+    avoid:["I'd take over","centralize under me","clean that up"],
+    proof:"A cross-functional win where you name the other leader and what they contributed." },
+  { role:"Recruiter / talent screen", owns:"Pipeline quality, level and comp fit",
+    unspoken:"Will this candidate embarrass me with the hiring manager, and will comp work?",
+    lead:"Clean, short answers that match the job description's own vocabulary.",
+    cut:"Nuance, caveats, and the interesting complications.",
+    use:["the words in the posting, verbatim"],
+    avoid:["long qualifications","reframing the role"],
+    proof:"Direct yes/no on the stated must-haves, with one line of evidence each." },
+  { role:"Technical panel / senior engineer", owns:"Craft standards",
+    unspoken:"Has this person actually done the work, or only managed people who did?",
+    lead:"A specific technical decision with the reasoning, at real depth.",
+    cut:"Strategy language, program metrics, leadership philosophy.",
+    use:["specifics — protocols, failure modes, why the obvious fix didn't work"],
+    avoid:["at a high level","my team handled"],
+    proof:"One thing you personally debugged, designed, or got wrong and corrected." },
+  { role:"Board member / investor", owns:"Portfolio risk, governance",
+    unspoken:"Can this person be put in front of a customer, an auditor, or the board?",
+    lead:"Concise framing, quantified exposure, and confident handling of what you don't know.",
+    cut:"Everything operational.",
+    use:["material exposure","governance","the two things I'd watch"],
+    avoid:["tooling","ticket volume","team process"],
+    proof:"A time you briefed a board or regulator and what you recommended." }
+];
+
+/* ---------------- data: question archetypes ---------------- */
+var QUESTIONS = [
+  { id:"tellme", cat:"Narrative", q:"Tell me about yourself.",
+    need:"They want the throughline that makes this role the obvious next step — not a career recital. It's a test of whether you can structure information under no constraints.",
+    fail:"Chronological walk from first job forward. By the time you reach relevance, you've spent three minutes and their attention.",
+    skel:[["0–10s","Who you are now, in one line, in the vocabulary of the role you want."],
+          ["10–35s","The two or three moves that built that capability — as a pattern, not a timeline."],
+          ["35–70s","The single credential or result that would be hardest for another candidate to claim."],
+          ["70–90s","Why this role, this company, now. Specific to them."]],
+    bridge:"End on why you're in this conversation. That sentence sets the frame for every question that follows." },
+  { id:"why", cat:"Risk screen", q:"Why are you leaving / why the consulting gap?",
+    need:"Pure risk screen. They're checking for a bad exit, a performance issue, or someone who'll leave in a year.",
+    fail:"Over-explaining. Length signals discomfort, and discomfort invites follow-up.",
+    skel:[["0–10s","The reason, stated plainly and without grievance."],
+          ["10–25s","What you did with the time — framed as deliberate, with evidence."],
+          ["25–35s","What you're looking for now, which happens to be this."]],
+    bridge:"Short and unbothered. Then stop talking and let them move on." },
+  { id:"failure", cat:"Behavioral", q:"Tell me about your biggest failure.",
+    need:"Whether you can hold accountability without collapsing into it — and whether your judgement improved as a result.",
+    fail:"A disguised strength (\"I care too much about quality\"), or a failure caused entirely by other people.",
+    skel:[["0–10s","Name the failure, in your own words, owning it."],
+          ["10–30s","What you believed at the time that turned out to be wrong."],
+          ["30–60s","The cost — real, and stated without flinching."],
+          ["60–80s","What you changed, and evidence it stuck."],
+          ["80–90s","Where that lesson would apply here."]],
+    bridge:"The change has to be structural, not attitudinal. \"I'm more careful now\" is not a change." },
+  { id:"first90", cat:"Strategy", q:"What would your first 90 days look like?",
+    need:"Do you have a repeatable method, or do you improvise? Also: will you break things in month one?",
+    fail:"A generic listen-learn-assess plan with no opinion in it, or a plan that assumes you already know their environment.",
+    skel:[["0–15s","Your thesis for what a first 90 days is actually for."],
+          ["15–45s","Days 1–30: what you'd establish as ground truth, and how."],
+          ["45–110s","Days 31–60: the one or two things you'd start changing, and why those first."],
+          ["110–155s","Days 61–90: what you'd have to show, and to whom."],
+          ["155–180s","What you'd need from them to make that work."]],
+    bridge:"Name at least one thing you would deliberately not touch in 90 days. Restraint is the senior signal." },
+  { id:"conflict", cat:"Conflict", q:"Tell me about a conflict with another leader.",
+    need:"How you handle being overruled or resisted by a peer with equal standing — and whether you escalate wisely.",
+    fail:"A story where you were right, they were wrong, and everyone eventually agreed with you.",
+    skel:[["0–10s","The disagreement, stated fairly from both sides."],
+          ["10–30s","Their position and why it was reasonable given what they owned."],
+          ["30–60s","What you did to resolve it — the specific move, not the sentiment."],
+          ["60–80s","The outcome, including what you gave up."],
+          ["80–90s","The working relationship afterward."]],
+    bridge:"Steelman the other person. Candidates who can't do this read as difficult to work with." },
+  { id:"overruled", cat:"Conflict", q:"What if the CEO overrules you on a risk decision?",
+    need:"Whether you understand that you advise and they decide — without abandoning your professional obligation.",
+    fail:"Either \"I'd escalate to the board\" (reads as a threat) or \"I'd defer\" (reads as no spine).",
+    skel:[["0–10s","That's their call to make, and my job is to make it an informed one."],
+          ["10–35s","How you'd present the decision: the exposure, the options, your recommendation."],
+          ["35–65s","What you'd do after: document the decision and rationale, adjust compensating controls."],
+          ["65–85s","The line you wouldn't cross — legal or regulatory obligation, stated calmly and once."],
+          ["85–90s","Hand back."]],
+    bridge:"Naming your one hard line, without drama, is what separates this answer from the safe non-answer." },
+  { id:"measure", cat:"Strategy", q:"How do you measure whether security is working?",
+    need:"Business literacy. Can you talk about value in terms an executive committee already uses?",
+    fail:"Activity metrics — tickets closed, scans run, training completion. These measure that you're busy.",
+    skel:[["0–15s","Your principle: measure exposure and speed, not effort."],
+          ["15–60s","Two or three measures you'd actually report, and to whom."],
+          ["60–80s","How you'd show trend rather than snapshot."],
+          ["80–90s","What you'd stop reporting, and why."]],
+    bridge:"Saying which metrics you'd retire is more memorable than listing the ones you'd add." },
+  { id:"scale", cat:"Risk screen", q:"You've mostly worked at bigger companies — how would you handle this scale?",
+    need:"They suspect you need infrastructure, headcount, and budget you won't get here.",
+    fail:"Insisting the size difference doesn't matter. It does, and they know it.",
+    skel:[["0–10s","Acknowledge the difference in one clause, without apology."],
+          ["10–35s","The most recent thing you built with almost no resources — hands-on evidence."],
+          ["35–65s","What you'd deliberately not build at this size."],
+          ["65–90s","What you'd bring from the larger environment that translates cleanly."]],
+    bridge:"The convincing part is what you'd choose not to do. That's what proves you've calibrated." },
+  { id:"tech", cat:"Behavioral", q:"Walk me through something you built yourself.",
+    need:"Whether you're still technical enough to be credible with the people who'd report to you.",
+    fail:"Answering at the program level. \"My team implemented\" answers a different question.",
+    skel:[["0–10s","What it is and what problem it solves."],
+          ["10–40s","One design decision and the alternative you rejected."],
+          ["40–70s","Something that broke and how you found it."],
+          ["70–90s","What it's used for now, by whom."]],
+    bridge:"Depth on one thing beats breadth across five. Pick the thing you can go three questions deep on." },
+  { id:"whyus", cat:"Narrative", q:"Why us?",
+    need:"Did you research them, and is your interest specific enough to be durable?",
+    fail:"Mission language from their homepage. Every candidate says it and it signals nothing.",
+    skel:[["0–15s","Something specific and current about their situation that you found yourself."],
+          ["15–45s","Why that particular problem is one you're unusually equipped for."],
+          ["45–75s","What you'd want to work on first."],
+          ["75–90s","A question back that only someone who'd done the research would ask."]],
+    bridge:"Ending on your own informed question is worth more than the rest of the answer combined." },
+  { id:"weak", cat:"Risk screen", q:"What's your biggest weakness?",
+    need:"Self-awareness, and whether you'll be manageable when given critical feedback.",
+    fail:"A humblebrag, or a weakness so central to the role it disqualifies you.",
+    skel:[["0–10s","A real one, adjacent to the role rather than at its core."],
+          ["10–30s","A concrete instance where it cost something."],
+          ["30–60s","The specific mechanism you use to manage it now."],
+          ["60–75s","Honest current state — managed, not cured."]],
+    bridge:"Naming a mechanism (a habit, a check, a person you ask) is the part that lands." },
+  { id:"questions", cat:"Closing", q:"Do you have any questions for us?",
+    need:"Your questions reveal what you think the job is. This is a scored part of the interview, not the wind-down.",
+    fail:"Process questions (\"what are next steps?\") or questions answered on their careers page.",
+    skel:[["0–20s","One question about the problem behind the role — why now, what's failed before."],
+          ["20–50s","One question about how success is judged in the first year, and by whom."],
+          ["50–80s","One question aimed at the specific person in front of you and what they own."],
+          ["80–90s","Close: what you'd want to do first, in one sentence."]],
+    bridge:"Have six prepared; ask three. Never ask a question whose answer doesn't change your decision." },
+  { id:"comp", cat:"Closing", q:"What are your compensation expectations?",
+    need:"Whether you're in band, and whether you negotiate reasonably.",
+    fail:"A precise number given too early, or an evasion that continues for three rounds.",
+    skel:[["0–10s","Ask for their range first, once, politely."],
+          ["10–25s","If pressed: give a range, with the basis for it."],
+          ["25–40s","Signal flexibility on structure without lowering the range."]],
+    bridge:"Answer this one in under 40 seconds. Length here reads as anxiety about money." },
+  { id:"disagree", cat:"Behavioral", q:"Tell me about a time you were wrong.",
+    need:"Whether you update on evidence, and how fast.",
+    fail:"A trivial example, or one where being wrong had no consequence.",
+    skel:[["0–10s","The position you held and how confidently you held it."],
+          ["10–30s","What evidence changed it."],
+          ["30–60s","What you did once you knew — especially who you told."],
+          ["60–90s","What you now do differently to catch it earlier."]],
+    bridge:"Who you told, and how quickly, is the part that separates a good answer here." }
+];
+
+/* ---------------- data: live cues & repairs ---------------- */
+var CUES = [
+  ["They rephrase the question","You answered a different question than the one asked.","Stop. \"Let me take that more directly —\" then answer the literal question in one sentence."],
+  ["\"And what did <em>you</em> do?\"","You've been saying \"we\". They can't score a team.","Switch to first person singular for the rest of the answer. Name the decision that was yours alone."],
+  ["\"How did that turn out?\"","You gave process, not outcome. Your answer had no ending.","Give the result and a number now. Then stop — don't restart the story."],
+  ["They ask about size, headcount, or budget","They're testing whether your scope claims are real.","Answer with exact figures immediately. Vagueness here reads as inflation."],
+  ["Note-taking stops","You're past the point of interest.","Land the current sentence, give the outcome, hand back. Don't finish the planned arc."],
+  ["Silence after your answer","They expected a decision and got a description.","Fill it once, with a decision: \"The call I made was X, and I'd make it again because Y.\" Then let the silence be theirs."],
+  ["They start selling the company to you","They've decided they want you.","Stop proving. Switch to asking. Your questions now shape the offer conversation."],
+  ["Rapid-fire short questions","They're behind schedule or checking boxes.","Shrink every answer to the 30-second budget. Match their tempo or you'll lose the last third of the interview."],
+  ["They go quiet and let you keep talking","Sometimes a test of whether you know when to stop.","End the answer. A candidate who fills every silence is a candidate who'll do it in front of a customer."],
+  ["\"Interesting\" with no follow-up","Polite disengagement.","Next answer: cut the setup entirely, lead with the sharpest result you have."]
+];
+
+var REPAIRS = [
+  ["You're 30 seconds over and not finished",
+   "Don't accelerate — cut. Say \"I'll jump to the outcome:\" and deliver the result and bridge. Skipping the middle is invisible; running long is not."],
+  ["You genuinely don't know the answer",
+   "Say so in one clause, then show your method: \"I haven't dealt with that specific regulation. Here's how I'd get to an answer in a week, and who I'd call.\" Method is a legitimate substitute for knowledge; bluffing is not."],
+  ["You gave a weak answer two questions ago",
+   "Reopen it once, briefly, when there's a natural gap: \"Earlier I gave you a thin answer on X — the better example is Y.\" Once. Reopening twice looks anxious."],
+  ["You realise mid-answer it's the wrong example",
+   "Finish it fast rather than abandoning it — abandoning mid-story is more damaging than a mediocre example. Then offer the right one in one line: \"A closer parallel to your situation is…\""],
+  ["They challenge a claim you made",
+   "Don't defend and don't fold. Ask what's behind the challenge: \"What's driving the question — the scale, or the regulatory side?\" Answer the actual objection, not the sentence."],
+  ["You blanked completely",
+   "Buy time honestly: \"Give me a second on that one.\" Three seconds of visible thinking is fine. Filler while you search for a story is not."],
+  ["The panel is clearly split on you",
+   "Aim the next two answers at the skeptic, not the ally. Address their function's concern directly and by name. Allies stay; skeptics decide."],
+  ["The interview is ending flat",
+   "Use the last question to state your position: \"If I'm honest about what I'd focus on first here, it's X — because of Y.\" A specific, slightly risky closing view is more memorable than a safe thank-you."]
+];
+
+/* ---------------- store ---------------- */
+var KEY="answerclock.v1";
+var store={};
+try{ store=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ store={}; }
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(store)); }catch(e){} }
+function el(t,c,h){var d=document.createElement(t); if(c)d.className=c; if(h!==undefined)d.innerHTML=h; return d;}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function fmt(sec){var m=Math.floor(sec/60),s=Math.floor(sec%60);return m+":"+(s<10?"0":"")+s;}
+
+/* ---------------- tabs ---------------- */
+var tabs=[].slice.call(document.querySelectorAll("nav button"));
+tabs.forEach(function(b){
+  b.addEventListener("click",function(){
+    tabs.forEach(function(x){x.setAttribute("aria-selected",x===b?"true":"false");});
+    ["clock","room","decode","live","repair","locker"].forEach(function(id){
+      document.getElementById("p-"+id).hidden = (id!==b.dataset.tab);
+    });
+    if(b.dataset.tab==="locker") renderLocker();
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+});
+
+/* ---------------- spine ---------------- */
+var spineInput=document.getElementById("spine");
+spineInput.value=store.spine||"";
+spineInput.addEventListener("input",function(){store.spine=spineInput.value;save();});
+
+/* ---------------- clock ---------------- */
+var mode=MODES[1], running=false, t0=0, raf=null;
+var track=document.getElementById("track"),
+    playhead=document.getElementById("playhead"),
+    ticks=document.getElementById("ticks"),
+    bandDetail=document.getElementById("banddetail"),
+    elapsedEl=document.getElementById("elapsed"),
+    budgetEl=document.getElementById("budget"),
+    readout=document.getElementById("readout"),
+    nowline=document.getElementById("nowline"),
+    startbtn=document.getElementById("startbtn");
+
+var chips=document.getElementById("modechips");
+MODES.forEach(function(m){
+  var b=el("button","chip",esc(m.name)+' <span style="font-family:var(--mono);opacity:.7">'+m.total+'s</span>');
+  b.setAttribute("aria-pressed", m===mode?"true":"false");
+  b.addEventListener("click",function(){
+    mode=m; stop();
+    [].slice.call(chips.children).forEach(function(c){c.setAttribute("aria-pressed",c===b?"true":"false");});
+    renderClock();
+  });
+  chips.appendChild(b);
+});
+
+function renderClock(){
+  document.getElementById("mname").textContent=mode.name;
+  document.getElementById("mdesc").textContent=mode.desc;
+  budgetEl.textContent="of "+fmt(mode.total)+" budget";
+
+  // bands
+  [].slice.call(track.querySelectorAll(".band")).forEach(function(n){n.remove();});
+  var acc=0;
+  mode.bands.forEach(function(b,i){
+    var d=el("div","band b"+Math.min(i,4));
+    d.style.flex=b.s+" 0 0";
+    d.innerHTML='<div class="bn">'+esc(b.n)+'</div><div class="bl">'+esc(b.h)+'</div><div class="bs">'+acc+'–'+(acc+b.s)+'s</div>';
+    d.dataset.i=i;
+    d.addEventListener("click",function(){highlight(i,true);});
+    track.appendChild(d);
+    acc+=b.s;
+  });
+
+  // ticks
+  ticks.innerHTML="";
+  var step = mode.total<=30?10 : mode.total<=90?15 : mode.total<=180?30 : 60;
+  for(var t=0;t<=mode.total;t+=step){
+    var k=el("div","tick","<i></i>"+t+"s");
+    k.style.left=(t/mode.total*100)+"%";
+    ticks.appendChild(k);
+  }
+
+  // detail rows
+  bandDetail.innerHTML=""; acc=0;
+  mode.bands.forEach(function(b,i){
+    var r=el("div","bd");
+    r.dataset.i=i;
+    r.innerHTML='<div class="t">'+acc+'–'+(acc+b.s)+'s<span>'+b.s+' seconds</span></div>'+
+      '<div><h4>'+esc(b.n)+' — '+esc(b.h)+'</h4><div class="say">'+b.say+'</div><div class="no">✕ '+esc(b.no)+'</div></div>';
+    bandDetail.appendChild(r);
+    acc+=b.s;
+  });
+  highlight(-1,false);
+  elapsedEl.textContent="0:00";
+  readout.classList.remove("over");
+}
+
+function highlight(i,manual){
+  [].slice.call(track.querySelectorAll(".band")).forEach(function(n){
+    var idx=+n.dataset.i;
+    n.classList.toggle("active", idx===i);
+    n.classList.toggle("past", running && idx<i);
+  });
+  [].slice.call(bandDetail.children).forEach(function(n){
+    n.classList.toggle("on", +n.dataset.i===i);
+  });
+  if(manual && i>=0){
+    nowline.innerHTML="Selected: <b>"+esc(mode.bands[i].n)+"</b> — "+esc(mode.bands[i].h)+".";
+  }
+}
+
+function bandAt(sec){
+  var acc=0;
+  for(var i=0;i<mode.bands.length;i++){ acc+=mode.bands[i].s; if(sec<acc) return i; }
+  return mode.bands.length-1;
+}
+
+function tick(){
+  var e=(Date.now()-t0)/1000;
+  elapsedEl.textContent=fmt(e);
+  var pct=Math.min(e/mode.total,1)*100;
+  playhead.style.left=pct+"%";
+  if(e>mode.total){
+    readout.classList.add("over");
+    nowline.innerHTML='<b style="color:var(--clay)">Over budget by '+Math.round(e-mode.total)+'s.</b> Cut to the outcome and hand back.';
+    highlight(mode.bands.length-1,false);
+  }else{
+    var i=bandAt(e);
+    highlight(i,false);
+    var b=mode.bands[i];
+    nowline.innerHTML='Now: <b>'+esc(b.n)+'</b> — '+esc(b.h)+'.';
+  }
+  raf=requestAnimationFrame(tick);
+}
+
+function start(){
+  running=true; t0=Date.now(); playhead.style.display="block";
+  startbtn.textContent="Stop"; readout.classList.remove("over");
+  raf=requestAnimationFrame(tick);
+}
+function stop(){
+  running=false; if(raf)cancelAnimationFrame(raf); raf=null;
+  playhead.style.display="none"; startbtn.textContent="Start";
+  nowline.textContent="Not running — click a band to read its guidance.";
+  highlight(-1,false);
+}
+startbtn.addEventListener("click",function(){ running?stop():start(); });
+document.getElementById("resetbtn").addEventListener("click",function(){ stop(); elapsedEl.textContent="0:00"; readout.classList.remove("over"); });
+renderClock();
+
+/* ---------------- personas ---------------- */
+var pw=document.getElementById("personas");
+PERSONAS.forEach(function(p){
+  var c=el("div","card pcard");
+  var use=p.use.map(function(t){return '<span class="tag">'+esc(t)+'</span>';}).join("");
+  var avoid=p.avoid.map(function(t){return '<span class="tag no">'+esc(t)+'</span>';}).join("");
+  c.innerHTML='<h3>'+esc(p.role)+'</h3><div class="owns">Accountable for: '+esc(p.owns)+'</div>'+
+    '<div class="quote"><b>What they\'re really asking</b>'+esc(p.unspoken)+'</div>'+
+    '<dl class="kv"><dt>Lead with</dt><dd>'+esc(p.lead)+'</dd>'+
+    '<dt>Cut</dt><dd>'+esc(p.cut)+'</dd>'+
+    '<dt>Proof that lands</dt><dd>'+esc(p.proof)+'</dd></dl>'+
+    '<div class="tagrow">'+use+avoid+'</div>';
+  pw.appendChild(c);
+});
+
+/* ---------------- questions ---------------- */
+var qlist=document.getElementById("qlist"), qcount=document.getElementById("qcount");
+var curCat="all", curTerm="";
+function renderQ(){
+  qlist.innerHTML="";
+  var shown=0;
+  QUESTIONS.forEach(function(q){
+    if(curCat!=="all" && q.cat!==curCat) return;
+    if(curTerm && (q.q+" "+q.need+" "+q.cat).toLowerCase().indexOf(curTerm)<0) return;
+    shown++;
+    var d=el("details","qcard");
+    var skel=q.skel.map(function(s){return '<div><span>'+esc(s[0])+'</span><div>'+esc(s[1])+'</div></div>';}).join("");
+    d.innerHTML='<summary><span class="cat">'+esc(q.cat)+'</span><span class="qt">'+esc(q.q)+'</span><span class="caret">+</span></summary>'+
+      '<div class="qbody">'+
+      '<div class="row"><div class="lbl">What they actually need to know</div>'+esc(q.need)+'</div>'+
+      '<div class="row"><div class="lbl">Usual failure</div><span style="color:var(--clay)">'+esc(q.fail)+'</span></div>'+
+      '<div class="row"><div class="lbl">Timed skeleton</div><div class="skel">'+skel+'</div></div>'+
+      '<div class="row"><div class="lbl">The detail that makes it land</div>'+esc(q.bridge)+'</div>'+
+      '<div class="locker"><div class="lbl2">Your headline — the first sentence, written out</div>'+
+      '<textarea data-q="'+q.id+'" data-f="head"></textarea>'+
+      '<div class="lbl2" style="margin-top:10px">Your proof — the example, and the number it ends on</div>'+
+      '<textarea data-q="'+q.id+'" data-f="proof"></textarea>'+
+      '<div class="saved" data-s="'+q.id+'"></div></div>'+
+      '</div>';
+    qlist.appendChild(d);
+  });
+  qlist.querySelectorAll("textarea").forEach(function(ta){
+    var id=ta.dataset.q,f=ta.dataset.f;
+    ta.value=(store.notes&&store.notes[id]&&store.notes[id][f])||"";
+    ta.addEventListener("input",function(){
+      store.notes=store.notes||{}; store.notes[id]=store.notes[id]||{};
+      store.notes[id][f]=ta.value; save();
+      var s=qlist.querySelector('[data-s="'+id+'"]');
+      if(s){ s.textContent="Saved"; clearTimeout(s._t); s._t=setTimeout(function(){s.textContent="";},1400); }
+    });
+  });
+  qcount.textContent=shown+" of "+QUESTIONS.length+" questions";
+}
+document.querySelectorAll(".filters .chip").forEach(function(b){
+  b.addEventListener("click",function(){
+    document.querySelectorAll(".filters .chip").forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});
+    curCat=b.dataset.cat; renderQ();
+  });
+});
+document.getElementById("qsearch").addEventListener("input",function(e){
+  curTerm=e.target.value.toLowerCase().trim(); renderQ();
+});
+renderQ();
+
+/* ---------------- cues + repairs ---------------- */
+var cb=document.getElementById("cues");
+CUES.forEach(function(c){
+  var tr=el("tr");
+  tr.innerHTML='<td class="sig">'+c[0]+'</td><td>'+esc(c[1])+'</td><td class="mv">'+esc(c[2])+'</td>';
+  cb.appendChild(tr);
+});
+var rw=document.getElementById("repairs");
+REPAIRS.forEach(function(r){
+  var c=el("div","card");
+  c.innerHTML='<h4>'+esc(r[0])+'</h4><p style="margin-top:6px;color:var(--slate)">'+esc(r[1])+'</p>';
+  rw.appendChild(c);
+});
+
+/* ---------------- locker ---------------- */
+function renderLocker(){
+  var v=document.getElementById("lockerview");
+  v.innerHTML="";
+  if(store.spine){
+    var s=el("div","card");
+    s.innerHTML='<div class="lbl" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--petrol-mid);margin-bottom:5px">Narrative spine</div><div style="font-size:16px;font-weight:600">'+esc(store.spine)+'</div>';
+    v.appendChild(s);
+  }
+  var any=false;
+  QUESTIONS.forEach(function(q){
+    var n=store.notes&&store.notes[q.id];
+    if(!n||(!n.head&&!n.proof))return;
+    any=true;
+    var c=el("div","card");
+    c.innerHTML='<div style="font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--petrol-mid)">'+esc(q.cat)+'</div>'+
+      '<h4 style="margin:5px 0 10px">'+esc(q.q)+'</h4>'+
+      (n.head?'<div style="font-size:15px;font-weight:600;margin-bottom:8px">'+esc(n.head)+'</div>':'')+
+      (n.proof?'<div style="color:var(--slate)">'+esc(n.proof)+'</div>':'');
+    v.appendChild(c);
+  });
+  if(!any){
+    var e2=el("div","card","<h4>Nothing saved yet</h4><p style=\"margin-top:6px;color:var(--slate)\">Open the question decoder and write a headline for the three questions you're most likely to be asked. Those three carry most of the interview.</p>");
+    v.appendChild(e2);
+  }
+}
+document.getElementById("exportbtn").addEventListener("click",function(){
+  var out=["INTERVIEW PREP","=============",""];
+  if(store.spine) out.push("NARRATIVE SPINE: "+store.spine,"");
+  QUESTIONS.forEach(function(q){
+    var n=store.notes&&store.notes[q.id];
+    if(!n||(!n.head&&!n.proof))return;
+    out.push("["+q.cat+"] "+q.q);
+    if(n.head) out.push("  Headline: "+n.head);
+    if(n.proof) out.push("  Proof:    "+n.proof);
+    out.push("");
+  });
+  var blob=new Blob([out.join("\n")],{type:"text/plain"});
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="interview-prep.txt";
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);
+});
+document.getElementById("clearbtn").addEventListener("click",function(){
+  if(!confirm("Delete all saved notes and your narrative spine from this browser?"))return;
+  store={}; save(); spineInput.value=""; renderQ(); renderLocker();
+});
+
+})();
+</script>
+</body>
+</html>
