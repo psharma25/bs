@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reading the room above you &mdash; a leadership style workbench</title>
+<style>
+:root{
+  --petrol:#1b4965;
+  --petrol-dk:#12324a;
+  --petrol-lt:#2f6b8f;
+  --ink:#1c2529;
+  --body:#3d4a52;
+  --muted:#6b7880;
+  --muted2:#6b7880;
+  --line:#dde4e9;
+  --line-soft:#eaeff2;
+  --paper:#f6f8f9;
+  --card:#ffffff;
+  --c-comm:#1b4965;
+  --c-inter:#256d63;
+  --c-tech:#9c5324;
+  --c-ctrl:#65406b;
+  --ok:#2b7a4b;
+  --warn:#a8641b;
+  --risk:#9c3b3b;
+  --radius:6px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:Inter,Calibri,"Segoe UI",Helvetica,Arial,sans-serif;
+  background:var(--paper);
+  color:var(--body);
+  font-size:15px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{color:var(--ink);font-weight:600;margin:0}
+a{color:var(--petrol-lt)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+
+/* ---------- masthead ---------- */
+header.mast{background:var(--petrol);color:#eaf1f5;padding:26px 0 22px;border-bottom:3px solid var(--petrol-dk)}
+header.mast h1{color:#fff;font-size:25px;letter-spacing:-.2px;line-height:1.25}
+header.mast .kicker{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#9fc2d6;margin-bottom:7px}
+header.mast p.sub{margin:8px 0 0;max-width:74ch;color:#cfe0ea;font-size:14px}
+.mast-row{display:flex;gap:20px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
+.mast-actions{display:flex;gap:8px;flex-wrap:wrap}
+button{font-family:inherit;font-size:13px;cursor:pointer;border-radius:var(--radius);transition:background .12s,border-color .12s,color .12s}
+button:focus-visible,[tabindex]:focus-visible{outline:2px solid #f0b429;outline-offset:2px}
+.btn-ghost{background:transparent;border:1px solid #4f7f9d;color:#dce9f0;padding:7px 13px}
+.btn-ghost:hover{background:#24587a;border-color:#7aa7bf}
+.btn{background:var(--petrol);border:1px solid var(--petrol);color:#fff;padding:8px 14px}
+.btn:hover{background:var(--petrol-dk)}
+.btn-sec{background:#fff;border:1px solid var(--line);color:var(--petrol);padding:8px 14px}
+.btn-sec:hover{border-color:var(--petrol-lt)}
+
+/* ---------- section frame ---------- */
+section{padding:26px 0 6px}
+.sec-head{display:flex;align-items:baseline;gap:14px;border:0;border-bottom:1px solid var(--line);padding:0 0 9px;margin-bottom:18px;width:100%;background:none;text-align:left;cursor:pointer;border-radius:0;font-family:inherit}
+.sec-head:hover{border-bottom-color:var(--petrol-lt)}
+.sec-head:hover h2{color:var(--petrol)}
+.sec-head h2{font-size:19px;flex:1}
+.sec-head .n{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2);white-space:nowrap}
+.sec-head .chev{flex:none;color:var(--muted2);font-size:11px;letter-spacing:.09em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.sec-head .chev::after{content:"";width:7px;height:7px;border-right:1.5px solid var(--muted2);border-bottom:1.5px solid var(--muted2);transform:rotate(45deg) translateY(-2px);transition:transform .15s}
+.sec-head[aria-expanded="false"] .chev::after{transform:rotate(-45deg) translateY(1px)}
+.sec-head[aria-expanded="false"]{margin-bottom:0}
+.sec-body[hidden]{display:none}
+.lede{max-width:82ch;margin:0 0 18px;font-size:14.5px}
+
+/* ---------- matrix ---------- */
+.matrix{display:grid;grid-template-columns:158px repeat(4,1fr);gap:9px;align-items:stretch}
+.axis-note{grid-column:2 / -1;display:flex;align-items:center;gap:10px;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted2);padding-bottom:2px}
+.axis-note .rule{flex:1;height:1px;background:linear-gradient(to right,var(--line-soft),var(--petrol-lt))}
+.dim-label{padding:12px 12px 12px 0;border-right:2px solid var(--line);display:flex;flex-direction:column;justify-content:center}
+.dim-label .dl-t{font-weight:600;color:var(--ink);font-size:14px;line-height:1.25}
+.dim-label .dl-s{font-size:11.5px;color:var(--muted2);margin-top:4px;line-height:1.35}
+.dim-label .dl-conf{margin-top:8px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2)}
+.cell{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--line);border-radius:var(--radius);padding:11px 12px 12px;text-align:left;width:100%;position:relative;min-height:84px}
+.cell:hover{border-color:#b9c8d2;background:#fcfdfe}
+.cell .c-name{font-weight:600;color:var(--ink);font-size:14px;display:block;line-height:1.3}
+.cell .c-tag{display:block;font-size:12px;color:var(--muted2);margin-top:3px;line-height:1.35}
+.cell .c-pos{position:absolute;top:8px;right:10px;font-size:10px;color:#c3ced6;letter-spacing:.06em}
+.cell[aria-pressed="true"]{background:#f3f8fb;border-color:currentColor}
+.cell[aria-pressed="true"] .c-name{color:inherit}
+.cell[aria-pressed="true"]::after{content:"selected";position:absolute;bottom:7px;right:10px;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.72}
+.r-comm .cell[aria-pressed="true"]{color:var(--c-comm);border-top-color:var(--c-comm)}
+.r-inter .cell[aria-pressed="true"]{color:var(--c-inter);border-top-color:var(--c-inter)}
+.r-tech .cell[aria-pressed="true"]{color:var(--c-tech);border-top-color:var(--c-tech)}
+.r-ctrl .cell[aria-pressed="true"]{color:var(--c-ctrl);border-top-color:var(--c-ctrl)}
+.row-band{display:contents}
+
+.stress{grid-column:2 / -1;margin-top:2px;display:flex;align-items:center;gap:12px;font-size:12px;color:var(--muted2);border-top:1px dashed var(--line);padding-top:9px}
+.stress .arrow{flex:1;height:0;border-top:1px solid #c3ced6;position:relative}
+.stress .arrow::before{content:"";position:absolute;left:0;top:-4px;border:4px solid transparent;border-right-color:#8fa3b0;border-left:0}
+
+/* ---------- detail ---------- */
+.detail-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;margin-top:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius)}
+.card-h{padding:12px 16px;border-bottom:1px solid var(--line-soft);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.card-h h3{font-size:15.5px}
+.card-h .eyebrow{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted2)}
+.card-b{padding:14px 16px 17px}
+.detail-cols{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.detail-col{padding:14px 16px 16px}
+.detail-col + .detail-col{border-left:1px solid var(--line-soft)}
+.block-h{font-size:11px;letter-spacing:.11em;text-transform:uppercase;font-weight:600;margin:0 0 8px;display:flex;align-items:center;gap:7px}
+.block-h .dot{width:7px;height:7px;border-radius:50%;flex:none}
+.h-spot{color:var(--petrol)} .h-spot .dot{background:var(--petrol)}
+.h-do{color:var(--ok)} .h-do .dot{background:var(--ok)}
+.h-dont{color:var(--risk)} .h-dont .dot{background:var(--risk)}
+ul.tight{margin:0;padding-left:17px}
+ul.tight li{margin-bottom:6px;font-size:13.5px;line-height:1.5}
+.script{background:#f4f7f9;border-left:3px solid var(--petrol-lt);padding:10px 13px;margin-top:14px;font-size:13.5px;color:var(--ink);border-radius:0 var(--radius) var(--radius) 0}
+.script .sl{display:block;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted2);margin-bottom:4px;font-weight:600}
+.empty{color:var(--muted2);font-size:13.5px;padding:22px 16px;text-align:center}
+
+/* ---------- brief ---------- */
+.brief-line{display:flex;gap:10px;align-items:baseline;padding:8px 0;border-bottom:1px dotted var(--line)}
+.brief-line:last-of-type{border-bottom:0}
+.brief-line .bl{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted2);width:96px;flex:none}
+.brief-line .bv{font-size:13.5px;color:var(--ink)}
+.brief-line .bv em{font-style:normal;color:var(--muted2)}
+.flag{border:1px solid #e6d3c2;background:#fdf7f1;border-left:3px solid var(--warn);border-radius:0 var(--radius) var(--radius) 0;padding:10px 13px;margin-top:11px}
+.flag h4{font-size:13.5px;color:#7a4a13;margin-bottom:4px}
+.flag p{margin:0;font-size:13px;line-height:1.5}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.chip{font-size:11.5px;border:1px solid var(--line);background:#f8fafb;border-radius:20px;padding:3px 10px;color:var(--body)}
+
+/* ---------- evidence ---------- */
+.ev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+label.fl{display:block;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted2);margin-bottom:5px;font-weight:600}
+input[type=text],textarea,select{width:100%;font-family:inherit;font-size:13.5px;color:var(--ink);border:1px solid var(--line);border-radius:var(--radius);padding:8px 10px;background:#fff}
+textarea{resize:vertical;min-height:64px;line-height:1.5}
+input[type=text]:focus,textarea:focus,select:focus{outline:none;border-color:var(--petrol-lt);box-shadow:0 0 0 2px rgba(47,107,143,.14)}
+.ev-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-top:10px}
+.ev-row > div{flex:1;min-width:140px}
+.ev-list{list-style:none;margin:14px 0 0;padding:0}
+.ev-item{border:1px solid var(--line);border-left:3px solid var(--muted2);border-radius:0 var(--radius) var(--radius) 0;padding:9px 11px;margin-bottom:8px;background:#fff;display:flex;gap:11px;align-items:flex-start}
+.ev-item.confirmed{border-left-color:var(--ok)}
+.ev-item.inferred{border-left-color:var(--warn)}
+.ev-item .ev-body{flex:1}
+.ev-item .ev-meta{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);margin-bottom:3px}
+.ev-item .ev-txt{font-size:13.5px;color:var(--ink);line-height:1.5}
+.x{background:none;border:0;color:#a9b6bf;font-size:16px;line-height:1;padding:2px 4px}
+.x:hover{color:var(--risk)}
+.conf-bar{height:5px;background:var(--line-soft);border-radius:3px;overflow:hidden;margin-top:6px}
+.conf-bar i{display:block;height:100%;background:var(--petrol-lt)}
+
+/* ---------- contract ---------- */
+.contract{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.contract .band{border:1px solid var(--line);border-radius:var(--radius);padding:12px 13px;background:#fff}
+.contract .band h4{font-size:13.5px;margin-bottom:2px}
+.contract .band p.hint{font-size:12px;color:var(--muted2);margin:0 0 8px}
+.tier-1{border-top:3px solid #2b7a4b}
+.tier-2{border-top:3px solid #4a86a8}
+.tier-3{border-top:3px solid #a8641b}
+.tier-4{border-top:3px solid #9c3b3b}
+
+/* ---------- combos reference ---------- */
+.combo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.combo{border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;background:#fff}
+.combo h4{font-size:13.5px;margin-bottom:5px}
+.combo .pair{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);margin-bottom:6px}
+.combo p{margin:0;font-size:13px;line-height:1.5}
+.combo.hot{border-color:#e0c8b4;background:#fdf8f3}
+
+footer{margin-top:40px;border-top:1px solid var(--line);padding:18px 0 34px;font-size:12px;color:var(--muted2)}
+.saved{font-size:11.5px;color:#9fc2d6}
+
+@media (max-width:900px){
+  .detail-grid{grid-template-columns:1fr}
+  .matrix{grid-template-columns:1fr 1fr;gap:8px}
+  .dim-label{grid-column:1 / -1;border-right:0;border-bottom:1px solid var(--line);padding:14px 0 8px}
+  .axis-note,.stress{grid-column:1 / -1}
+  .ev-grid,.contract,.combo-grid,.detail-cols{grid-template-columns:1fr}
+  .detail-col + .detail-col{border-left:0;border-top:1px solid var(--line-soft)}
+}
+@media print{
+  header.mast{background:#fff;color:#000;border-bottom:2px solid #000}
+  header.mast h1,header.mast p.sub,.kicker{color:#000}
+  .mast-actions,.x,.ev-row button{display:none}
+  body{background:#fff}
+  .cell,.card,.combo{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="wrap mast-row">
+    <div>
+      <div class="kicker">Managing upward &middot; working workbench</div>
+      <h1>Reading the room above you</h1>
+      <p class="sub">Four dimensions of a leader's operating style, four archetypes each. Pick the cell that matches what you have actually observed &mdash; not what the org chart implies &mdash; and the brief below assembles itself.</p>
+    </div>
+    <div class="mast-actions">
+      <button class="btn-ghost" id="btn-collapse">Collapse all</button>
+      <button class="btn-ghost" id="btn-export">Download brief</button>
+      <button class="btn-ghost" id="btn-print">Print</button>
+      <button class="btn-ghost" id="btn-reset">Clear all</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section id="s-matrix">
+  <button class="sec-head" type="button" aria-expanded="true"><span class="n">Step one</span><h2>The matrix</h2><span class="chev">Hide</span></button>
+  <p class="lede">Rank the rows by cost of error, not by how interesting they are. Getting decision control wrong ends careers; getting communication style wrong only wastes effort. Left to right, each row runs from wanting less of your reasoning to wanting more &mdash; loosely, in the case of control.</p>
+  <div class="matrix" id="matrix"></div>
+</section>
+
+<section id="s-detail">
+  <button class="sec-head" type="button" aria-expanded="true"><span class="n">Step two</span><h2>How to spot it, how to work with it</h2><span class="chev">Hide</span></button>
+  <div class="detail-grid">
+    <div class="card" id="detail-card">
+      <div class="card-h"><h3 id="d-title">Nothing selected yet</h3><span class="eyebrow" id="d-dim">&mdash;</span></div>
+      <div class="empty" id="d-empty">Choose a cell above to see its tells, its plays, and the mistakes that cost the most.</div>
+      <div class="detail-cols" id="d-cols" style="display:none">
+        <div class="detail-col">
+          <div class="block-h h-spot"><span class="dot"></span>How to spot it</div>
+          <ul class="tight" id="d-spot"></ul>
+        </div>
+        <div class="detail-col">
+          <div class="block-h h-do"><span class="dot"></span>What works</div>
+          <ul class="tight" id="d-do"></ul>
+          <div class="block-h h-dont" style="margin-top:16px"><span class="dot"></span>What costs you</div>
+          <ul class="tight" id="d-dont"></ul>
+        </div>
+      </div>
+      <div style="padding:0 16px 16px" id="d-script-wrap"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><h3>Your operating brief</h3><span class="eyebrow" id="brief-count">0 of 4</span></div>
+      <div class="card-b" id="brief"></div>
+    </div>
+  </div>
+</section>
+
+<section id="s-evidence">
+  <button class="sec-head" type="button" aria-expanded="true"><span class="n">Step three</span><h2>Evidence log</h2><span class="chev">Hide</span></button>
+  <p class="lede">A read you cannot cite is a guess. Log what you actually observed and mark it confirmed or inferred, the same discipline you would apply to a finding. Confidence rises with confirmed observations and stalls on inference alone.</p>
+  <div class="ev-grid" id="evidence"></div>
+</section>
+
+<section id="s-contract">
+  <button class="sec-head" type="button" aria-expanded="true"><span class="n">Step four</span><h2>The escalation contract</h2><span class="chev">Hide</span></button>
+  <p class="lede">The most durable artefact of managing upward is a short written agreement on decision rights. Draft it yourself and hand it over &mdash; most leaders will happily edit a straw man and never author one. Revisit it after the first thing goes wrong, because that is when you find out where the real line was.</p>
+  <div class="contract" id="contract"></div>
+</section>
+
+<section id="s-combos">
+  <button class="sec-head" type="button" aria-expanded="true"><span class="n">Reference</span><h2>Composite profiles worth knowing</h2><span class="chev">Hide</span></button>
+  <p class="lede">Single cells rarely explain a relationship; pairings do. The ones below are highlighted automatically when your selections match.</p>
+  <div class="combo-grid" id="combos"></div>
+</section>
+
+<footer class="wrap">
+  Everything you enter stays in this browser (local storage only) and travels with the file. Nothing is transmitted.
+  <span class="saved" id="saved-note"></span>
+</footer>
+
+</div>
+
+<script>
+"use strict";
+
+var DIMS = [
+  {
+    id:"comm", cls:"r-comm", label:"Communication style",
+    note:"Where they stop reading",
+    axis:["Compressed","Expansive"],
+    stress:"Under load, expansive types compress. The stressed version is the real preference.",
+    arch:[
+      { id:"bottomline", name:"Bottom line", tag:"Answer first",
+        spot:["Replies to your first line and never mentions the rest.","Their edits cut your caveats, not your facts.","Asks &ldquo;so what do you want me to do?&rdquo; before you finish.","Forwards your one-liner, never the deck."],
+        pro:["Ask, consequence, one line of why &mdash; in that order.","Keep the appendix you know they will not read. It is your defence when the decision is revisited.","One page, one decision."],
+        con:["Building toward a conclusion. They stopped reading three paragraphs ago.","Three options with no recommendation."],
+        script:"Recommendation: X. Cost of not doing it: Y. Detail below if you want it."
+      },
+      { id:"data", name:"Data-first", tag:"Show the numbers",
+        spot:["Replies to a figure buried on page four.","Asks for the source before the implication.","Their own material is tables, not story."],
+        pro:["Lead with the metric and its denominator.","Never show a number you cannot source in ten seconds.","Give the trend, not the snapshot."],
+        con:["Adjectives as evidence &mdash; significant, material, high risk.","Rounding without saying you rounded."],
+        script:"Four of nineteen findings are reachable from the internet. Here is the derivation."
+      },
+      { id:"narrative", name:"Narrative", tag:"Wants the story",
+        spot:["Asks how we got here before asking what we do now.","Retells your update to peers in their own words.","Opens meetings with context, not status."],
+        pro:["Give the arc: where we were, what changed, what it means now.","Write the version they will retell. You are arming a messenger.","Name the turning point out loud."],
+        con:["A findings list with no through-line.","Starting mid-story because you have been living in it for a month."],
+        script:"Six months ago we had no SBOM. Then the deficiency letter landed. Here is where that leaves the submission."
+      },
+      { id:"socratic", name:"Socratic", tag:"Tests by asking",
+        spot:["Answers your question with a question.","The second question is sharper than the first &mdash; that is the real one.","Probes the edge of your claim, not the middle."],
+        pro:["Bring the reasoning, not only the conclusion.","Say &ldquo;I do not know yet, and here is how I would find out.&rdquo; It scores higher than a confident guess.","Run the pre-mortem on your own recommendation before they do."],
+        con:["Bluffing at the edge. One bluff found costs a year of credibility.","Reading the questioning as disagreement. Usually it is not."],
+        script:"Here is my call and the two assumptions under it. The second one is the weak one."
+      }
+    ]
+  },
+  {
+    id:"inter", cls:"r-inter", label:"Interpersonal style",
+    note:"What they do with unstructured time",
+    axis:["Low touch","High touch"],
+    stress:"Under load, warmth withdraws first. Do not read that withdrawal as a verdict on you.",
+    arch:[
+      { id:"reserved", name:"Reserved", tag:"Low touch",
+        spot:["Cancels a one-to-one when the agenda is thin.","Replies in fragments, sometimes a single word.","No small talk at either end of the call."],
+        pro:["Fewer, denser touchpoints.","Read silence as neutral, not negative.","Put the ask in writing so it can be answered asynchronously."],
+        con:["Scheduling time to &ldquo;connect&rdquo;.","Reading coolness as trouble and escalating your own tone to match."],
+        script:"Three items, no meeting needed unless you want one."
+      },
+      { id:"transactional", name:"Transactional", tag:"Tasks over people",
+        spot:["Opens with the status list.","Ends the call the second it is done.","Asks about deliverables, not about people."],
+        pro:["A running list with closed items visibly closed.","Report against commitments in their words, not yours.","Track their commitments to you the same way you track yours."],
+        con:["Long preamble.","Quietly reopening a closed item without flagging that you reopened it."],
+        script:"Closed since last time: one and two. Open: three. Needs you: four."
+      },
+      { id:"political", name:"Political", tag:"Reads the room",
+        spot:["Asks who else has seen it before commenting on it. Near-conclusive.","Wants to know what a specific peer said.","Edits your framing more than your facts."],
+        pro:["Pre-socialise everything. Never let a peer see a finding before they do.","Tell them who is aligned and who is not.","Give them something forwardable that makes them look prepared."],
+        con:["Surprising them in a room with their peers. This is the unrecoverable error.","Assuming the org chart is the influence map."],
+        script:"Before this goes anywhere: here is the finding, and here is exactly who else knows."
+      },
+      { id:"relational", name:"Relational", tag:"Trust first",
+        spot:["Keeps the one-to-one even with nothing on the agenda.","Asks about your team, your weekend, your bandwidth.","Decides partly on who they trust, and will say so."],
+        pro:["Spend the non-work five minutes. It is the channel bad news travels through later.","Bring people context, not only status.","Say when you are stretched. They will act on it."],
+        con:["Treating rapport as overhead to be optimised away.","Going quiet during a hard stretch, which reads as something being wrong."],
+        script:"Two updates and one thing I am worried about &mdash; can I think out loud for a minute?"
+      }
+    ]
+  },
+  {
+    id:"tech", cls:"r-tech", label:"Technical depth",
+    note:"Vocabulary precision under no pressure",
+    axis:["Outcomes","Internals"],
+    stress:"Under load, everyone drops an abstraction level. Have the shorter version ready before you need it.",
+    arch:[
+      { id:"outcome", name:"Outcome buyer", tag:"Wants results",
+        spot:["Skips the mechanism and asks when it is done.","Uses the right words in slightly wrong places.","Asks what it costs before asking what it is."],
+        pro:["Lead with the business consequence: clearance, audit, revenue, breach.","Label confirmed versus inferred explicitly. An unlabelled inference gets repeated to a board as fact and you own it.","Turn every finding into a decision they can actually make."],
+        con:["Correcting their terminology in public.","Control identifiers, CVE numbers or clause references in the headline."],
+        script:"This blocks the submission. Two weeks of work, or we file with a known gap and disclose it."
+      },
+      { id:"translator", name:"Translator", tag:"Bridges to the business",
+        spot:["Reaches immediately for the business analogue.","Asks &ldquo;so it is like&hellip;?&rdquo;","Fluent in one adjacent domain, not in yours."],
+        pro:["Hand them the analogy pre-built so they do not invent a worse one.","Give them the single slide they will reuse.","Check the analogy back: does that map to how you would describe it?"],
+        con:["Letting a rough analogy harden. It will be quoted for a year.","Two levels of abstraction inside one sentence."],
+        script:"Closest equivalent in your world is X. Here is precisely where the analogy breaks."
+      },
+      { id:"generalist", name:"Generalist", tag:"Informed, broad",
+        spot:["Uses the terms correctly but asks about implication, not method.","Knows the landscape, not the internals.","Good second questions, no third ones."],
+        pro:["Implication first; hold the mechanism for the follow-up.","Name the standard that applies and why it matters here specifically.","Offer depth as an option rather than forcing it."],
+        con:["Over-explaining basics they already have.","Assuming breadth equals depth on the one thing that actually matters."],
+        script:"Short version: we fail this control. Longer version if you want the mechanism."
+      },
+      { id:"expert", name:"Deep expert", tag:"Peer-level",
+        spot:["Asks about method, sampling and coverage.","Uses terms narrowly and notices when you do not.","Spots the gap in your evidence before you flag it."],
+        pro:["Bring method and uncertainty, not only the result.","State scope, and state what you did not test.","Disagree, with reasoning attached. They will respect it."],
+        con:["Simplifying for them. It reads as condescension or as thin work.","Presenting a scan as an assessment."],
+        script:"Scope was X, method Y, and here is what that method structurally cannot see."
+      }
+    ]
+  },
+  {
+    id:"ctrl", cls:"r-ctrl", label:"Decision control",
+    note:"What happens when you decide without asking",
+    axis:["They decide","The room decides"],
+    stress:"Under load, consultative becomes directive. Expect the thresholds to tighten without being renegotiated.",
+    arch:[
+      { id:"directive", name:"Directive", tag:"Decides, tells",
+        spot:["Reverses the call you made without asking.","Gives instructions rather than goals.","The meeting ends when they have decided, not when the room has."],
+        pro:["Set tight escalation thresholds early and widen them as trust accrues.","Bring the decision framed, with your recommendation last.","Move fast once they decide. Speed is what buys autonomy."],
+        con:["Deciding quietly and hoping it holds.","Reopening a settled decision without new facts."],
+        script:"Two options, my recommendation, and what I need from you by Thursday."
+      },
+      { id:"delegative", name:"Delegative", tag:"Sets the goal",
+        spot:["Does not notice the call you made without asking.","Sets an outcome and disappears.","Asks for the result, never the route."],
+        pro:["Self-report on a fixed cadence even when they do not ask.","Escalate the few things that genuinely need them, loudly.","Define done in writing so it cannot drift."],
+        con:["Mistaking absence for endorsement.","Going dark and then surfacing with a problem."],
+        script:"On track. One decision I have taken that you may want to reverse &mdash; flagging it now, not later."
+      },
+      { id:"consultative", name:"Consultative", tag:"Wants options",
+        spot:["Asks why you did not check first.","Wants options with trade-offs attached.","Thinks out loud before landing anywhere."],
+        pro:["Bring two or three real options with a recommendation, not a menu of straw men.","Show what you give up in each.","Leave room for them to add one. They often will, and then it is theirs."],
+        con:["Arriving with a single fait accompli.","Fake options built to make one look obvious. They can tell."],
+        script:"Three ways to go. I would take the second. Here is what it costs us."
+      },
+      { id:"consensus", name:"Consensus", tag:"Needs the room",
+        spot:["Asks who else agreed.","Defers the call until a specific peer weighs in.","Counts the room before speaking."],
+        pro:["Build alignment before the meeting. The meeting ratifies; it does not decide.","Name your supporters and your holdouts by name.","Bring a decision that is already eighty percent carried."],
+        con:["Bringing a contested item in cold.","Treating their private yes as a decision."],
+        script:"Engineering and Quality are aligned. Regulatory has one objection. I think we can close it this week."
+      }
+    ]
+  }
+];
+
+var COMBOS = [
+  { keys:{tech:"outcome",ctrl:"consensus"}, title:"Approves, then cannot defend it",
+    text:"They will accept your recommendation and then lose it the moment a peer pushes back. Your real job is arming them for a conversation you will not be in: one page, in their language, with the counterargument already answered." },
+  { keys:{ctrl:"directive",inter:"reserved"}, title:"Thin signal, hard reversals",
+    text:"Few cues on the way in, firm corrections on the way out. Over-document decisions in writing and confirm them in the channel they actually read, because you will not get a second warning." },
+  { keys:{comm:"socratic",ctrl:"directive"}, title:"Interrogation, then a verdict",
+    text:"Bring the reasoning, but arrive at a recommendation. Open-ended exploration will be ended for you, and whatever you happened to be saying at that moment becomes the position." },
+  { keys:{inter:"political",ctrl:"delegative"}, title:"Autonomy with a trapdoor",
+    text:"You own the work but not the narrative. Cadence updates are not optional here &mdash; they are what keeps the narrative yours when someone else starts telling it." },
+  { keys:{tech:"expert",ctrl:"consultative"}, title:"Deepest engagement, slowest decisions",
+    text:"The best environment for quality and the worst for pace. Timebox the options conversation and set the decision date before you open it, or it reopens indefinitely." },
+  { keys:{comm:"bottomline",tech:"expert"}, title:"Compressed ask, deep scrutiny",
+    text:"One-line ask at the top, rigorous method in an appendix they will actually open. Both, not either &mdash; this is the one profile where the appendix is load-bearing." },
+  { keys:{inter:"relational",ctrl:"directive"}, title:"Warm room, firm line",
+    text:"Rapport will not move a decision here. Use the relationship for early warning and context, not as leverage in the moment &mdash; spending it that way costs more than the decision is worth." },
+  { keys:{comm:"narrative",ctrl:"consensus"}, title:"The story is the alignment tool",
+    text:"What circulates before the meeting decides the meeting. Give them a retellable version early and let it do the work while you are not in the room." }
+];
+
+var TIERS = [
+  { id:"t1", cls:"tier-1", h:"I decide and tell you later", hint:"Routine calls inside agreed scope. Widen this band as trust accrues.", ph:"e.g. tool selection, sequencing inside the workplan, low-severity findings" },
+  { id:"t2", cls:"tier-2", h:"I decide and tell you today", hint:"Reversible but visible. Anything a peer of theirs might hear about.", ph:"e.g. a finding shared with a client team, a schedule slip inside the quarter" },
+  { id:"t3", cls:"tier-3", h:"I bring it before deciding", hint:"Commitments, spend, and anything that sets a precedent.", ph:"e.g. accepting a residual risk, a commitment to an external party" },
+  { id:"t4", cls:"tier-4", h:"Same-day call, whatever the hour", hint:"The list of things they must never learn about from someone else.", ph:"e.g. confirmed compromise, regulatory contact, a finding that touches patient safety" }
+];
+
+var KEY = "boss-style-workbench-v1";
+var state = { sel:{}, ev:{}, contract:{}, name:"", open:{} };
+
+function save(){
+  try{
+    localStorage.setItem(KEY, JSON.stringify(state));
+    var n = document.getElementById("saved-note");
+    n.textContent = " \u00b7 saved " + new Date().toLocaleTimeString();
+  }catch(e){}
+}
+function load(){
+  try{
+    var raw = localStorage.getItem(KEY);
+    if(raw){ var p = JSON.parse(raw); if(p && typeof p==="object"){ state = Object.assign(state, p); } }
+  }catch(e){}
+  if(!state.sel) state.sel = {};
+  if(!state.ev) state.ev = {};
+  if(!state.contract) state.contract = {};
+  if(!state.open) state.open = {};
+}
+function dim(id){ for(var i=0;i<DIMS.length;i++){ if(DIMS[i].id===id) return DIMS[i]; } return null; }
+function arch(dimId, archId){
+  var d = dim(dimId); if(!d) return null;
+  for(var i=0;i<d.arch.length;i++){ if(d.arch[i].id===archId) return d.arch[i]; }
+  return null;
+}
+function el(tag, cls, html){
+  var e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(html !== undefined && html !== null) e.innerHTML = html;
+  return e;
+}
+
+/* ---------- matrix ---------- */
+var focused = null;
+
+function buildMatrix(){
+  var m = document.getElementById("matrix");
+  m.innerHTML = "";
+  var spacer = el("div"); m.appendChild(spacer);
+  var axis = el("div","axis-note");
+  axis.appendChild(el("span",null,"Less of your reasoning wanted"));
+  axis.appendChild(el("span","rule"));
+  axis.appendChild(el("span",null,"More"));
+  m.appendChild(axis);
+
+  DIMS.forEach(function(d){
+    var band = el("div","row-band " + d.cls);
+    var lab = el("div","dim-label");
+    lab.appendChild(el("div","dl-t", d.label));
+    lab.appendChild(el("div","dl-s", d.note));
+    var conf = el("div","dl-conf"); conf.id = "conf-" + d.id;
+    lab.appendChild(conf);
+    var bar = el("div","conf-bar"); bar.appendChild(el("i")); bar.id = "bar-" + d.id;
+    lab.appendChild(bar);
+    band.appendChild(lab);
+
+    d.arch.forEach(function(a, idx){
+      var b = document.createElement("button");
+      b.className = "cell";
+      b.type = "button";
+      b.setAttribute("aria-pressed", state.sel[d.id] === a.id ? "true" : "false");
+      b.dataset.dim = d.id; b.dataset.arch = a.id;
+      b.innerHTML = '<span class="c-pos">' + (idx+1) + '</span>' +
+                    '<span class="c-name">' + a.name + '</span>' +
+                    '<span class="c-tag">' + a.tag + '</span>';
+      b.addEventListener("click", function(){ pick(d.id, a.id); });
+      band.appendChild(b);
+    });
+
+    var st = el("div","stress");
+    st.appendChild(el("span",null,"Under stress"));
+    st.appendChild(el("span","arrow"));
+    st.appendChild(el("span",null,d.stress));
+    band.appendChild(st);
+    m.appendChild(band);
+  });
+}
+
+function pick(dimId, archId){
+  if(state.sel[dimId] === archId){ delete state.sel[dimId]; focused = null; }
+  else { state.sel[dimId] = archId; focused = { d:dimId, a:archId }; }
+  save(); refresh();
+}
+
+function refresh(){
+  var cells = document.querySelectorAll(".cell");
+  for(var i=0;i<cells.length;i++){
+    var c = cells[i];
+    c.setAttribute("aria-pressed", state.sel[c.dataset.dim] === c.dataset.arch ? "true" : "false");
+  }
+  renderDetail(); renderBrief(); renderCombos(); renderConfidence();
+}
+
+/* ---------- detail ---------- */
+function renderDetail(){
+  var f = focused;
+  if(!f){
+    for(var i=0;i<DIMS.length;i++){
+      if(state.sel[DIMS[i].id]){ f = { d:DIMS[i].id, a:state.sel[DIMS[i].id] }; break; }
+    }
+  }
+  var empty = document.getElementById("d-empty");
+  var cols = document.getElementById("d-cols");
+  var wrap = document.getElementById("d-script-wrap");
+  if(!f){
+    empty.style.display = ""; cols.style.display = "none"; wrap.innerHTML = "";
+    document.getElementById("d-title").textContent = "Nothing selected yet";
+    document.getElementById("d-dim").innerHTML = "&mdash;";
+    return;
+  }
+  var d = dim(f.d), a = arch(f.d, f.a);
+  if(!a){ return; }
+  empty.style.display = "none"; cols.style.display = "";
+  document.getElementById("d-title").textContent = a.name + " \u2014 " + a.tag;
+  document.getElementById("d-dim").textContent = d.label;
+  fillList("d-spot", a.spot);
+  fillList("d-do", a.pro);
+  fillList("d-dont", a.con);
+  wrap.innerHTML = '<div class="script"><span class="sl">Opening move</span>&ldquo;' + a.script + '&rdquo;</div>';
+}
+function fillList(id, items){
+  var ul = document.getElementById(id);
+  ul.innerHTML = "";
+  items.forEach(function(t){ ul.appendChild(el("li", null, t)); });
+}
+
+/* ---------- brief ---------- */
+function renderBrief(){
+  var b = document.getElementById("brief");
+  b.innerHTML = "";
+  var n = 0;
+  DIMS.forEach(function(d){ if(state.sel[d.id]) n++; });
+  document.getElementById("brief-count").textContent = n + " of 4";
+
+  if(n === 0){
+    b.appendChild(el("p","empty","Your brief assembles here as you select. Start with decision control &mdash; it is the row where a wrong read is most expensive."));
+    return;
+  }
+
+  DIMS.forEach(function(d){
+    var a = arch(d.id, state.sel[d.id]);
+    var line = el("div","brief-line");
+    line.appendChild(el("span","bl", d.label.split(" ")[0]));
+    line.appendChild(el("span","bv", a ? "<strong>"+a.name+"</strong> &mdash; " + a.script.replace(/&mdash;/g,"\u2014") : "<em>not yet read</em>"));
+    b.appendChild(line);
+  });
+
+  var chips = el("div","chips");
+  chips.style.marginTop = "12px";
+  var cadence = deriveCadence();
+  cadence.forEach(function(c){ chips.appendChild(el("span","chip", c)); });
+  b.appendChild(chips);
+
+  var hits = matchedCombos();
+  hits.forEach(function(c){
+    var f = el("div","flag");
+    f.appendChild(el("h4", null, c.title));
+    f.appendChild(el("p", null, c.text));
+    b.appendChild(f);
+  });
+
+  if(n < 4){
+    b.appendChild(el("p","",'<span style="font-size:12.5px;color:#6b7880">' + (4-n) + ' row(s) still unread. An unread row is where the surprise comes from.</span>'));
+  }
+}
+
+function deriveCadence(){
+  var out = [];
+  var c = state.sel.comm, i = state.sel.inter, t = state.sel.tech, k = state.sel.ctrl;
+  if(c === "bottomline" || c === "data") out.push("Format: one page, ask on line one");
+  if(c === "narrative") out.push("Format: arc, then status");
+  if(c === "socratic") out.push("Format: reasoning exposed, assumptions named");
+  if(i === "reserved") out.push("Cadence: written, low frequency");
+  if(i === "transactional") out.push("Cadence: standing list, closed items shown");
+  if(i === "political") out.push("Cadence: pre-brief before every room");
+  if(i === "relational") out.push("Cadence: keep the live conversation");
+  if(t === "outcome" || t === "translator") out.push("Depth: consequence first, mechanism on request");
+  if(t === "expert") out.push("Depth: method and scope stated up front");
+  if(k === "directive") out.push("Rights: narrow bands, widen with trust");
+  if(k === "delegative") out.push("Rights: wide bands, self-imposed reporting");
+  if(k === "consultative") out.push("Rights: options with a recommendation");
+  if(k === "consensus") out.push("Rights: align before, ratify in the room");
+  return out;
+}
+
+function matchedCombos(){
+  return COMBOS.filter(function(c){
+    var keys = Object.keys(c.keys), ok = true;
+    keys.forEach(function(k){ if(state.sel[k] !== c.keys[k]) ok = false; });
+    return ok;
+  });
+}
+
+function renderCombos(){
+  var g = document.getElementById("combos");
+  g.innerHTML = "";
+  var hot = matchedCombos();
+  COMBOS.forEach(function(c){
+    var isHot = hot.indexOf(c) > -1;
+    var box = el("div","combo" + (isHot ? " hot" : ""));
+    var names = Object.keys(c.keys).map(function(k){
+      var a = arch(k, c.keys[k]); return a ? a.name : k;
+    }).join(" + ");
+    box.appendChild(el("div","pair", names + (isHot ? " \u00b7 matches your read" : "")));
+    box.appendChild(el("h4", null, c.title));
+    box.appendChild(el("p", null, c.text));
+    g.appendChild(box);
+  });
+}
+
+/* ---------- evidence ---------- */
+function buildEvidence(){
+  var g = document.getElementById("evidence");
+  g.innerHTML = "";
+  DIMS.forEach(function(d){
+    var card = el("div","card");
+    var h = el("div","card-h");
+    h.appendChild(el("h3", null, d.label));
+    h.appendChild(el("span","eyebrow", d.note));
+    card.appendChild(h);
+    var body = el("div","card-b");
+
+    var row = el("div","ev-row");
+    var tw = el("div");
+    tw.appendChild(el("label","fl","What you observed"));
+    var input = document.createElement("input");
+    input.type = "text"; input.id = "ev-in-" + d.id;
+    input.placeholder = "e.g. asked who else had seen the memo before commenting";
+    tw.appendChild(input);
+    row.appendChild(tw);
+
+    var sw = el("div"); sw.style.flex = "0 0 130px";
+    sw.appendChild(el("label","fl","Basis"));
+    var sel = document.createElement("select");
+    sel.id = "ev-sel-" + d.id;
+    ["confirmed","inferred"].forEach(function(v){
+      var o = document.createElement("option"); o.value = v;
+      o.textContent = v.charAt(0).toUpperCase() + v.slice(1);
+      sel.appendChild(o);
+    });
+    sw.appendChild(sel);
+    row.appendChild(sw);
+
+    var bw = el("div"); bw.style.flex = "0 0 auto";
+    var btn = document.createElement("button");
+    btn.className = "btn-sec"; btn.type = "button"; btn.textContent = "Log it";
+    btn.addEventListener("click", function(){ addEv(d.id); });
+    bw.appendChild(btn);
+    row.appendChild(bw);
+    body.appendChild(row);
+
+    input.addEventListener("keydown", function(e){ if(e.key === "Enter"){ addEv(d.id); } });
+
+    var list = el("ul","ev-list"); list.id = "ev-list-" + d.id;
+    body.appendChild(list);
+    card.appendChild(body);
+    g.appendChild(card);
+  });
+  renderEvidence();
+}
+
+function addEv(dimId){
+  var input = document.getElementById("ev-in-" + dimId);
+  var sel = document.getElementById("ev-sel-" + dimId);
+  var txt = (input.value || "").trim();
+  if(!txt) { input.focus(); return; }
+  if(!state.ev[dimId]) state.ev[dimId] = [];
+  state.ev[dimId].push({ t:txt, b:sel.value, d:new Date().toLocaleDateString() });
+  input.value = "";
+  save(); renderEvidence(); renderConfidence();
+  input.focus();
+}
+function delEv(dimId, i){
+  if(state.ev[dimId]) state.ev[dimId].splice(i,1);
+  save(); renderEvidence(); renderConfidence();
+}
+function renderEvidence(){
+  DIMS.forEach(function(d){
+    var list = document.getElementById("ev-list-" + d.id);
+    if(!list) return;
+    list.innerHTML = "";
+    var items = state.ev[d.id] || [];
+    if(items.length === 0){
+      var li = el("li","");
+      li.innerHTML = '<span style="font-size:12.5px;color:#6b7880">No observations logged. A read without evidence is a guess about a person, which is the expensive kind.</span>';
+      list.appendChild(li);
+      return;
+    }
+    items.forEach(function(it, i){
+      var li = el("li","ev-item " + it.b);
+      var body = el("div","ev-body");
+      body.appendChild(el("div","ev-meta", it.b + " \u00b7 " + it.d));
+      var p = el("div","ev-txt"); p.textContent = it.t;
+      body.appendChild(p);
+      li.appendChild(body);
+      var x = document.createElement("button");
+      x.className = "x"; x.type = "button"; x.innerHTML = "&times;";
+      x.setAttribute("aria-label","Remove observation");
+      x.addEventListener("click", function(){ delEv(d.id, i); });
+      li.appendChild(x);
+      list.appendChild(li);
+    });
+  });
+}
+function renderConfidence(){
+  DIMS.forEach(function(d){
+    var items = state.ev[d.id] || [];
+    var confirmed = items.filter(function(x){ return x.b === "confirmed"; }).length;
+    var inferred = items.length - confirmed;
+    var score = Math.min(100, confirmed * 30 + inferred * 10);
+    var label;
+    if(items.length === 0) label = "no evidence";
+    else if(confirmed === 0) label = "inference only";
+    else if(score >= 80) label = "well evidenced";
+    else label = "partial";
+    var c = document.getElementById("conf-" + d.id);
+    var b = document.getElementById("bar-" + d.id);
+    if(c) c.textContent = label + " \u00b7 " + confirmed + "c / " + inferred + "i";
+    if(b) b.firstChild.style.width = score + "%";
+  });
+}
+
+/* ---------- contract ---------- */
+function buildContract(){
+  var g = document.getElementById("contract");
+  g.innerHTML = "";
+  TIERS.forEach(function(t){
+    var band = el("div","band " + t.cls);
+    band.appendChild(el("h4", null, t.h));
+    band.appendChild(el("p","hint", t.hint));
+    var ta = document.createElement("textarea");
+    ta.id = "ct-" + t.id;
+    ta.placeholder = t.ph;
+    ta.value = state.contract[t.id] || "";
+    ta.addEventListener("input", function(){ state.contract[t.id] = ta.value; save(); });
+    band.appendChild(ta);
+    g.appendChild(band);
+  });
+}
+
+/* ---------- export ---------- */
+function strip(s){ return String(s).replace(/&mdash;/g,"\u2014").replace(/&ldquo;|&rdquo;/g,'"').replace(/&hellip;/g,"\u2026").replace(/&amp;/g,"&"); }
+
+function buildMarkdown(){
+  var L = [];
+  L.push("# Managing upward \u2014 working brief");
+  L.push("");
+  L.push("Generated " + new Date().toLocaleString());
+  L.push("");
+  L.push("## Read");
+  DIMS.forEach(function(d){
+    var a = arch(d.id, state.sel[d.id]);
+    L.push("- **" + d.label + ":** " + (a ? a.name + " (" + strip(a.tag) + ")" : "not yet read"));
+  });
+  L.push("");
+  var cad = deriveCadence();
+  if(cad.length){
+    L.push("## Operating rules");
+    cad.forEach(function(c){ L.push("- " + c); });
+    L.push("");
+  }
+  DIMS.forEach(function(d){
+    var a = arch(d.id, state.sel[d.id]);
+    if(!a) return;
+    L.push("## " + d.label + ": " + a.name);
+    L.push("");
+    L.push("**Tells**");
+    a.spot.forEach(function(x){ L.push("- " + strip(x)); });
+    L.push("");
+    L.push("**What works**");
+    a.pro.forEach(function(x){ L.push("- " + strip(x)); });
+    L.push("");
+    L.push("**What costs you**");
+    a.con.forEach(function(x){ L.push("- " + strip(x)); });
+    L.push("");
+    L.push("> Opening move: \u201c" + strip(a.script) + "\u201d");
+    L.push("");
+  });
+  var hits = matchedCombos();
+  if(hits.length){
+    L.push("## Composite flags");
+    hits.forEach(function(c){ L.push("### " + c.title); L.push(strip(c.text)); L.push(""); });
+  }
+  var anyEv = DIMS.some(function(d){ return (state.ev[d.id]||[]).length > 0; });
+  if(anyEv){
+    L.push("## Evidence log");
+    DIMS.forEach(function(d){
+      var items = state.ev[d.id] || [];
+      if(!items.length) return;
+      L.push("### " + d.label);
+      items.forEach(function(it){ L.push("- [" + it.b + "] " + it.t + " (" + it.d + ")"); });
+      L.push("");
+    });
+  }
+  var anyCt = TIERS.some(function(t){ return (state.contract[t.id]||"").trim(); });
+  if(anyCt){
+    L.push("## Escalation contract");
+    TIERS.forEach(function(t){
+      var v = (state.contract[t.id]||"").trim();
+      if(!v) return;
+      L.push("**" + t.h + "**");
+      L.push(v);
+      L.push("");
+    });
+  }
+  return L.join("\n");
+}
+
+function download(){
+  var md = buildMarkdown();
+  var blob = new Blob([md], { type:"text/markdown;charset=utf-8" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url; a.download = "managing-upward-brief.md";
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+}
+
+/* ---------- collapse ---------- */
+function buildCollapse(){
+  var secs = document.querySelectorAll("section");
+  for(var i=0;i<secs.length;i++){
+    (function(sec){
+      var head = sec.querySelector(".sec-head");
+      if(!head) return;
+      var body = document.createElement("div");
+      body.className = "sec-body";
+      body.id = "body-" + sec.id;
+      while(head.nextSibling){ body.appendChild(head.nextSibling); }
+      sec.appendChild(body);
+      head.setAttribute("aria-controls", body.id);
+      head.addEventListener("click", function(){ setOpen(sec.id, !isOpen(sec.id)); save(); });
+      applyOpen(sec.id);
+    })(secs[i]);
+  }
+  syncCollapseBtn();
+}
+function isOpen(secId){
+  if(!state.open) state.open = {};
+  return state.open[secId] !== false;
+}
+function setOpen(secId, val){
+  if(!state.open) state.open = {};
+  state.open[secId] = !!val;
+  applyOpen(secId);
+  syncCollapseBtn();
+}
+function applyOpen(secId){
+  var sec = document.getElementById(secId);
+  if(!sec) return;
+  var head = sec.querySelector(".sec-head");
+  var body = sec.querySelector(".sec-body");
+  var open = isOpen(secId);
+  if(head){
+    head.setAttribute("aria-expanded", open ? "true" : "false");
+    var chev = head.querySelector(".chev");
+    if(chev) chev.textContent = open ? "Hide" : "Show";
+  }
+  if(body){ if(open) body.removeAttribute("hidden"); else body.setAttribute("hidden",""); }
+}
+function allSectionIds(){
+  return Array.prototype.map.call(document.querySelectorAll("section"), function(s){ return s.id; });
+}
+function syncCollapseBtn(){
+  var btn = document.getElementById("btn-collapse");
+  if(!btn) return;
+  var anyOpen = allSectionIds().some(isOpen);
+  btn.textContent = anyOpen ? "Collapse all" : "Expand all";
+}
+function toggleAll(){
+  var anyOpen = allSectionIds().some(isOpen);
+  allSectionIds().forEach(function(id){ setOpen(id, !anyOpen); });
+  save();
+}
+
+/* ---------- boot ---------- */
+function boot(){
+  load();
+  buildMatrix();
+  buildEvidence();
+  buildContract();
+  buildCollapse();
+  refresh();
+  document.getElementById("btn-collapse").addEventListener("click", toggleAll);
+  document.getElementById("btn-export").addEventListener("click", download);
+  document.getElementById("btn-print").addEventListener("click", function(){ window.print(); });
+  document.getElementById("btn-reset").addEventListener("click", function(){
+    if(!window.confirm("Clear every selection, observation and contract line in this browser?")) return;
+    var keepOpen = state.open || {};
+    state = { sel:{}, ev:{}, contract:{}, name:"", open:keepOpen };
+    try{ localStorage.removeItem(KEY); }catch(e){}
+    focused = null;
+    buildMatrix(); buildEvidence(); buildContract(); refresh();
+    allSectionIds().forEach(applyOpen);
+  });
+}
+if(document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", boot); } else { boot(); }
+</script>
+</body>
+</html>
