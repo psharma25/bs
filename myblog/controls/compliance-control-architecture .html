@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One Control Substrate, Seven Assertions — Implementation Guide</title>
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  --petrol:#1b4965;
+  --petrol-deep:#0f2e42;
+  --petrol-mid:#2a6f97;
+  --petrol-wash:#e8eff4;
+  --slate:#5a7184;
+  --slate-light:#8598a7;
+  --paper:#f6f8f9;
+  --card:#ffffff;
+  --rule:#d9e1e7;
+  --rule-soft:#eaf0f4;
+  --ink:#16232c;
+
+  /* regime colour semantics — used consistently in every view */
+  --r-sox:#8c5a2b;
+  --r-gxp:#1b7a5a;
+  --r-psec:#9b2c4f;
+  --r-isms:#2a6f97;
+  --r-priv:#6b4f9e;
+  --r-ot:#b06f1a;
+  --r-glba:#4c6b2a;
+
+  --ok:#1b7a5a;
+  --warn:#b06f1a;
+  --bad:#9b2c4f;
+
+  --sans:"Inter","Segoe UI",Calibri,system-ui,-apple-system,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular","Cascadia Mono","Consolas",monospace;
+
+  --maxw:1120px;
+  --r:3px;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}
+}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:15.5px;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ============================================================
+   MASTHEAD
+   ============================================================ */
+.masthead{
+  background:var(--petrol-deep);
+  color:#fff;
+  padding:52px 24px 0;
+  position:relative;
+  overflow:hidden;
+}
+.masthead::after{
+  content:"";
+  position:absolute;left:0;right:0;bottom:0;height:5px;
+  background:linear-gradient(90deg,
+    var(--r-sox) 0 14.28%, var(--r-gxp) 14.28% 28.56%, var(--r-psec) 28.56% 42.84%,
+    var(--r-isms) 42.84% 57.12%, var(--r-priv) 57.12% 71.4%, var(--r-ot) 71.4% 85.68%,
+    var(--r-glba) 85.68% 100%);
+}
+.mast-inner{max-width:var(--maxw);margin:0 auto;padding-bottom:44px}
+.eyebrow{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:#8fb8cf;
+  margin:0 0 18px;
+}
+.masthead h1{
+  font-size:clamp(30px,5.2vw,52px);
+  line-height:1.08;
+  letter-spacing:-.025em;
+  font-weight:700;
+  margin:0 0 18px;
+  max-width:19ch;
+}
+.masthead h1 em{font-style:normal;color:#7fc4e8}
+.standfirst{
+  font-size:clamp(16px,2vw,18.5px);
+  color:#c6d8e3;
+  max-width:62ch;
+  margin:0 0 28px;
+  line-height:1.55;
+}
+.profile-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.chip{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  border:1px solid rgba(255,255,255,.26);
+  color:#d8e8f0;
+  padding:5px 10px;
+  border-radius:var(--r);
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px 90px}
+.lede{
+  background:var(--card);
+  border:1px solid var(--rule);
+  border-left:4px solid var(--petrol);
+  padding:24px 26px;
+  margin:34px 0 30px;
+  border-radius:var(--r);
+}
+.lede p{margin:0 0 12px}
+.lede p:last-child{margin-bottom:0}
+.lede strong{color:var(--petrol-deep)}
+
+/* toolbar */
+.toolbar{
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+  margin:0 0 26px;
+  padding:12px 14px;
+  background:var(--petrol-wash);
+  border:1px solid var(--rule);
+  border-radius:var(--r);
+}
+.toolbar .tl-label{
+  font-family:var(--mono);font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--petrol);margin-right:4px;
+}
+.btn{
+  font-family:var(--sans);font-size:12.5px;font-weight:600;
+  background:var(--card);color:var(--petrol);
+  border:1px solid var(--rule);border-radius:var(--r);
+  padding:6px 12px;cursor:pointer;transition:background .15s,border-color .15s;
+}
+.btn:hover{background:var(--petrol);color:#fff;border-color:var(--petrol)}
+.btn:focus-visible{outline:2px solid var(--petrol-mid);outline-offset:2px}
+
+/* ============================================================
+   ACCORDION SECTIONS
+   ============================================================ */
+.sec{
+  background:var(--card);
+  border:1px solid var(--rule);
+  border-radius:var(--r);
+  margin:0 0 12px;
+  overflow:hidden;
+}
+.sec-head{
+  width:100%;
+  display:flex;align-items:flex-start;gap:16px;
+  background:none;border:0;
+  padding:20px 22px;
+  text-align:left;cursor:pointer;
+  font-family:var(--sans);
+  border-left:3px solid transparent;
+  transition:background .15s,border-color .15s;
+}
+.sec-head:hover{background:var(--petrol-wash)}
+.sec-head:focus-visible{outline:2px solid var(--petrol-mid);outline-offset:-2px}
+.sec[data-open="true"] > .sec-head{border-left-color:var(--petrol);background:var(--petrol-wash)}
+.sec-num{
+  font-family:var(--mono);font-size:12px;font-weight:600;
+  color:var(--petrol-mid);letter-spacing:.06em;
+  padding-top:4px;min-width:26px;
+}
+.sec-title{flex:1}
+.sec-title h2{
+  margin:0;font-size:19px;font-weight:650;letter-spacing:-.012em;
+  color:var(--petrol-deep);line-height:1.3;
+}
+.sec-title p{margin:5px 0 0;font-size:13.5px;color:var(--slate);line-height:1.5}
+.caret{
+  flex-shrink:0;width:16px;height:16px;margin-top:6px;
+  border-right:2px solid var(--petrol-mid);
+  border-bottom:2px solid var(--petrol-mid);
+  transform:rotate(45deg);transition:transform .2s ease;
+}
+.sec[data-open="true"] .caret{transform:rotate(-135deg)}
+.sec-body{display:none;padding:4px 26px 30px;border-top:1px solid var(--rule-soft)}
+.sec[data-open="true"] .sec-body{display:block}
+
+/* ============================================================
+   CONTENT ELEMENTS
+   ============================================================ */
+.sec-body h3{
+  font-size:15px;font-weight:650;color:var(--petrol-deep);
+  margin:28px 0 10px;letter-spacing:-.005em;
+  padding-bottom:6px;border-bottom:1px solid var(--rule-soft);
+}
+.sec-body h4{font-size:13.5px;font-weight:650;color:var(--petrol);margin:20px 0 8px;text-transform:none}
+.sec-body p{margin:0 0 13px}
+.sec-body ul,.sec-body ol{margin:0 0 14px;padding-left:20px}
+.sec-body li{margin-bottom:7px}
+.sec-body strong{color:var(--petrol-deep);font-weight:650}
+code{
+  font-family:var(--mono);font-size:.87em;
+  background:var(--petrol-wash);color:var(--petrol-deep);
+  padding:1px 5px;border-radius:2px;
+}
+
+.callout{
+  border:1px solid var(--rule);
+  border-left:3px solid var(--petrol-mid);
+  background:var(--paper);
+  padding:15px 18px;margin:18px 0;
+  border-radius:var(--r);
+  font-size:14.5px;
+}
+.callout .co-tag{
+  display:block;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.13em;text-transform:uppercase;
+  color:var(--petrol-mid);margin-bottom:6px;
+}
+.callout p:last-child{margin-bottom:0}
+.callout.warn{border-left-color:var(--warn)}
+.callout.warn .co-tag{color:var(--warn)}
+.callout.bad{border-left-color:var(--bad)}
+.callout.bad .co-tag{color:var(--bad)}
+
+/* tables */
+.tbl-scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--rule);border-radius:var(--r)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:620px;background:var(--card)}
+caption{
+  caption-side:top;text-align:left;
+  font-family:var(--mono);font-size:11px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--slate);
+  padding:10px 12px;background:var(--paper);border-bottom:1px solid var(--rule);
+}
+th,td{padding:9px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--rule-soft)}
+thead th{
+  background:var(--petrol-deep);color:#fff;font-weight:600;font-size:12px;
+  letter-spacing:.03em;position:sticky;top:0;
+}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:nth-child(even){background:#fbfcfd}
+td.rowlbl,th[scope="row"]{font-weight:600;color:var(--petrol-deep);background:var(--paper)}
+
+/* regime dot */
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:baseline}
+.d-sox{background:var(--r-sox)} .d-gxp{background:var(--r-gxp)} .d-psec{background:var(--r-psec)}
+.d-isms{background:var(--r-isms)} .d-priv{background:var(--r-priv)} .d-ot{background:var(--r-ot)}
+.d-glba{background:var(--r-glba)}
+
+/* ============================================================
+   SIGNATURE: SUBSTRATE MAP
+   ============================================================ */
+.substrate{
+  border:1px solid var(--rule);border-radius:var(--r);
+  background:var(--card);padding:20px;margin:18px 0 8px;
+}
+.regime-picker{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px}
+.rbtn{
+  font-family:var(--sans);font-size:12.5px;font-weight:600;
+  border:1px solid var(--rule);background:var(--card);
+  border-radius:var(--r);padding:7px 12px;cursor:pointer;
+  color:var(--slate);display:flex;align-items:center;gap:7px;
+  transition:all .15s;
+}
+.rbtn .swatch{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.rbtn:hover{border-color:var(--slate-light)}
+.rbtn:focus-visible{outline:2px solid var(--petrol-mid);outline-offset:2px}
+.rbtn[aria-pressed="true"]{color:#fff;border-color:transparent}
+.rbtn[data-regime="sox"][aria-pressed="true"]{background:var(--r-sox)}
+.rbtn[data-regime="gxp"][aria-pressed="true"]{background:var(--r-gxp)}
+.rbtn[data-regime="psec"][aria-pressed="true"]{background:var(--r-psec)}
+.rbtn[data-regime="isms"][aria-pressed="true"]{background:var(--r-isms)}
+.rbtn[data-regime="priv"][aria-pressed="true"]{background:var(--r-priv)}
+.rbtn[data-regime="ot"][aria-pressed="true"]{background:var(--r-ot)}
+.rbtn[data-regime="glba"][aria-pressed="true"]{background:var(--r-glba)}
+
+.substrate-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:10px}
+.ctrl-card{
+  border:1px solid var(--rule);border-radius:var(--r);
+  padding:12px 13px;background:var(--paper);
+  transition:opacity .2s,border-color .2s,background .2s;
+}
+.ctrl-card.dim{opacity:.3}
+.ctrl-card.hit{background:var(--card);border-color:var(--petrol-mid);box-shadow:0 1px 4px rgba(27,73,101,.1)}
+.ctrl-card h5{
+  margin:0 0 4px;font-size:13.5px;font-weight:650;color:var(--petrol-deep);
+}
+.ctrl-card .cc-id{
+  font-family:var(--mono);font-size:10px;letter-spacing:.09em;
+  color:var(--slate-light);display:block;margin-bottom:5px;
+}
+.ctrl-card .cc-note{font-size:12.5px;color:var(--slate);line-height:1.45;margin:0}
+.cc-flags{display:flex;gap:4px;margin-top:9px;flex-wrap:wrap}
+.flag{width:11px;height:11px;border-radius:2px;opacity:.28}
+.flag.on{opacity:1}
+.f-sox{background:var(--r-sox)} .f-gxp{background:var(--r-gxp)} .f-psec{background:var(--r-psec)}
+.f-isms{background:var(--r-isms)} .f-priv{background:var(--r-priv)} .f-ot{background:var(--r-ot)}
+.f-glba{background:var(--r-glba)}
+.sub-status{
+  font-size:13px;color:var(--slate);margin:14px 0 0;
+  padding-top:12px;border-top:1px solid var(--rule-soft);
+}
+.sub-status strong{color:var(--petrol-deep)}
+
+/* ============================================================
+   FIGURES / SVG
+   ============================================================ */
+figure{margin:22px 0;border:1px solid var(--rule);border-radius:var(--r);background:var(--card);padding:18px}
+figure svg{display:block;width:100%;height:auto}
+figcaption{
+  font-size:12.5px;color:var(--slate);margin-top:12px;
+  padding-top:10px;border-top:1px solid var(--rule-soft);line-height:1.5;
+}
+figcaption b{color:var(--petrol-deep)}
+.svg-t{font-family:var(--sans);fill:var(--ink)}
+.svg-m{font-family:var(--mono);fill:var(--slate)}
+
+/* ============================================================
+   MATURITY PLOTTER
+   ============================================================ */
+.mat-wrap{display:grid;grid-template-columns:1fr;gap:20px;margin:18px 0}
+@media(min-width:900px){.mat-wrap{grid-template-columns:1.15fr .85fr}}
+.mat-panel{border:1px solid var(--rule);border-radius:var(--r);background:var(--card);padding:16px}
+.mat-panel h4{margin-top:0}
+.score-row{
+  display:grid;grid-template-columns:1fr 62px 62px;gap:8px;align-items:center;
+  padding:7px 0;border-bottom:1px solid var(--rule-soft);
+}
+.score-row:last-of-type{border-bottom:0}
+.score-row .sr-name{font-size:13px;line-height:1.35}
+.score-row .sr-name span{
+  display:block;font-family:var(--mono);font-size:9.5px;
+  color:var(--slate-light);letter-spacing:.08em;
+}
+.score-row select{
+  font-family:var(--mono);font-size:12.5px;
+  padding:4px 5px;border:1px solid var(--rule);border-radius:2px;
+  background:var(--paper);color:var(--petrol-deep);width:100%;
+}
+.score-row select:focus-visible{outline:2px solid var(--petrol-mid);outline-offset:1px}
+.score-hdr{
+  display:grid;grid-template-columns:1fr 62px 62px;gap:8px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--slate);
+  padding-bottom:8px;border-bottom:1px solid var(--rule);margin-bottom:4px;
+}
+.readout{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.stat{background:var(--paper);border:1px solid var(--rule);border-radius:var(--r);padding:11px 12px}
+.stat .st-k{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--slate);display:block;margin-bottom:3px;
+}
+.stat .st-v{font-size:22px;font-weight:700;color:var(--petrol-deep);line-height:1.1;letter-spacing:-.02em}
+.stat .st-v.warn{color:var(--warn)} .stat .st-v.bad{color:var(--bad)} .stat .st-v.ok{color:var(--ok)}
+.stat .st-sub{font-size:11.5px;color:var(--slate);margin-top:2px;display:block}
+.verdict{
+  margin-top:14px;padding:12px 14px;border-radius:var(--r);
+  font-size:13.5px;line-height:1.5;
+  background:var(--petrol-wash);border-left:3px solid var(--petrol);
+}
+
+/* cadence table marks */
+.mk{
+  display:inline-block;width:15px;height:15px;line-height:15px;
+  border-radius:2px;font-family:var(--mono);font-size:9px;
+  text-align:center;color:#fff;background:var(--petrol-mid);
+}
+.mk.q{background:var(--r-isms)} .mk.a{background:var(--r-sox)}
+.mk.m{background:var(--slate-light)} .mk.c{background:var(--r-gxp)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--slate);margin:10px 0 18px}
+.legend span{display:flex;align-items:center;gap:6px}
+
+/* footer */
+.foot{
+  border-top:1px solid var(--rule);margin-top:44px;padding-top:22px;
+  font-size:12.5px;color:var(--slate);
+}
+.foot .fbrand{font-weight:650;color:var(--petrol-deep)}
+
+@media print{
+  .toolbar,.regime-picker,.btn{display:none}
+  .sec-body{display:block!important}
+  .sec{break-inside:avoid;border-color:#bbb}
+  .masthead{background:#fff;color:#000}
+  .masthead h1,.standfirst,.eyebrow{color:#000}
+  body{background:#fff;font-size:11pt}
+}
+@media(max-width:620px){
+  .sec-body{padding:4px 16px 24px}
+  .sec-head{padding:16px 14px;gap:11px}
+  .readout{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="mast-inner">
+    <p class="eyebrow">Control Architecture · Global Medical Device Manufacturer</p>
+    <h1>One control substrate,<br><em>seven assertions</em></h1>
+    <p class="standfirst">SOX, GxP, FDA product security, ISO 27001, privacy, GLBA and OT are not seven programmes. They are seven different things you must be able to <em>prove</em> about the same access reviews, the same change tickets, the same logs. This is how to build the substrate once, evidence it to the highest bar in the stack, and run it on a calendar that survives a global footprint.</p>
+    <div class="profile-chips">
+      <span class="chip">SEC registrant</span>
+      <span class="chip">FDA-regulated device</span>
+      <span class="chip">Multi-site manufacturing</span>
+      <span class="chip">EU / APAC presence</span>
+      <span class="chip">OT + IT convergence</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="lede">
+    <p><strong>The thesis.</strong> Every failed compliance programme in a regulated manufacturer fails the same way: each regime gets its own owner, its own spreadsheet, its own evidence request, and its own calendar. The same system owner is asked for the same user list five times a year in five formats, and quality degrades to whatever gets the auditor out of the room fastest.</p>
+    <p>The fix is not a single framework. It is a single <strong>control substrate</strong> — one set of controls, executed once — with an <strong>evidence package built to the strictest regime that touches it</strong>, and a mapping layer that lets any regime draw the evidence it needs without re-testing.</p>
+    <p><strong>Build to GxP evidence discipline and SOX, ISO 27001, SOC 2 and GLBA come along free. Build to SOX and retrofit GxP, and you will rebuild.</strong> That single sequencing decision is worth more than any tooling choice in this document.</p>
+  </div>
+
+  <div class="toolbar">
+    <span class="tl-label">Sections</span>
+    <button class="btn" id="expandAll" type="button">Open all</button>
+    <button class="btn" id="collapseAll" type="button">Close all</button>
+    <button class="btn" id="printBtn" type="button">Print / save PDF</button>
+    <button class="btn" id="resetBtn" type="button">Reset scores</button>
+  </div>
+
+  <!-- ========================================================
+       01 — THE SEVEN REGIMES
+       ======================================================== -->
+  <section class="sec" data-open="true" data-id="s1">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="sec-num">01</span>
+      <span class="sec-title">
+        <h2>The seven regimes and what each actually asserts</h2>
+        <p>Start here. Every scoping argument downstream is settled by the assertion column.</p>
+      </span>
+      <span class="caret" aria-hidden="true"></span>
+    </button>
+    <div class="sec-body">
+      <p>A control regime is defined by its <strong>assertion</strong> — the statement someone signs. Not by its control list. Two regimes can demand an identical quarterly access review and still be satisfied by completely different evidence, because they are proving different things to different audiences with different consequences for being wrong.</p>
+
+      <div class="tbl-scroll">
+        <table>
+          <caption>Regime comparison — assertion, harm, enforcement, evidence bar</caption>
+          <thead>
+            <tr><th>Regime</th><th>Assertion signed</th><th>Harm prevented</th><th>Enforcer</th><th>Evidence bar</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="rowlbl"><span class="dot d-sox"></span>SOX §404<br><small style="color:var(--slate);font-weight:400">COSO 2013 / COBIT</small></td>
+              <td>Internal control over financial reporting is effective <em>as of fiscal year-end</em></td>
+              <td>Material misstatement of financial statements</td>
+              <td>External auditor, PCAOB, SEC</td>
+              <td>Sample-based test of operating effectiveness across the period, rolled forward to year-end</td>
+            </tr>
+            <tr>
+              <td class="rowlbl"><span class="dot d-gxp"></span>GxP<br><small style="color:var(--slate);font-weight:400">21 CFR 11 / 820→QMSR / Annex 11 / GAMP 5 2e</small></td>
+              <td>Systems are validated for intended use; records are attributable, legible, contemporaneous, original, accurate (ALCOA+)</td>
+              <td>Patient harm from defective product or unreliable records</td>
+              <td>FDA (483, Warning Letter, consent decree), Notified Body, PMDA, NMPA</td>
+              <td><strong>Highest in the stack.</strong> Full validation lifecycle documentation plus immutable audit trail. If it is not documented, it did not happen.</td>
+            </tr>
+            <tr>
+              <td class="rowlbl"><span class="dot d-psec"></span>Product security<br><small style="color:var(--slate);font-weight:400">FD&amp;C §524B, IEC 81001-5-1, AAMI TIR57</small></td>
+              <td>The device is secure by design and maintainable across the total product lifecycle</td>
+              <td>Patient harm from an exploited device</td>
+              <td>FDA premarket review (refuse-to-accept hold), Notified Body under MDR</td>
+              <td>SBOM, threat model, architecture views, vulnerability management plan, CVD process, postmarket surveillance evidence</td>
+            </tr>
+            <tr>
+              <td class="rowlbl"><span class="dot d-isms"></span>ISMS<br><small style="color:var(--slate);font-weight:400">ISO 27001, SOC 2, NIST CSF 2.0</small></td>
+              <td>Stated security commitments are designed and operating effectively</td>
+              <td>Loss of confidentiality, integrity or availability; loss of customer trust</td>
+              <td>Certification body; service auditor; increasingly, customer procurement</td>
+              <td>Certificate plus Statement of Applicability; SOC 2 Type II opinion over a stated period</td>
+            </tr>
+            <tr>
+              <td class="rowlbl"><span class="dot d-priv"></span>Privacy<br><small style="color:var(--slate);font-weight:400">GDPR Art. 32, HIPAA Security Rule, US state laws</small></td>
+              <td>Appropriate technical and organisational measures protect personal data</td>
+              <td>Harm to individuals from misuse or exposure of their data</td>
+              <td>Data protection authorities, HHS OCR, state attorneys general</td>
+              <td>Records of processing, DPIAs, risk analysis, transfer mechanisms, breach register</td>
+            </tr>
+            <tr>
+              <td class="rowlbl"><span class="dot d-ot"></span>OT / plant<br><small style="color:var(--slate);font-weight:400">IEC 62443, NIST 800-82r3, NIS2</small></td>
+              <td>The production environment is segmented, monitored and recoverable</td>
+              <td>Production stoppage, product quality deviation, safety event</td>
+              <td>Internally quality and operations; in the EU, NIS2 competent authorities</td>
+              <td>Zone and conduit model, complete asset inventory, target security level vs achieved security level per zone</td>
+            </tr>
+            <tr>
+              <td class="rowlbl"><span class="dot d-glba"></span>GLBA<br><small style="color:var(--slate);font-weight:400">16 CFR 314 Safeguards Rule</small></td>
+              <td>A written, risk-based programme protects customer non-public personal information — <em>continuously</em></td>
+              <td>Consumer financial harm</td>
+              <td>FTC; banking regulators; SEC via Reg S-P</td>
+              <td>Qualified Individual's annual written report to the board; annual penetration test; semi-annual vulnerability assessment</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <span class="co-tag">Does GLBA apply to you?</span>
+        <p>Usually not to a device manufacturer directly — but check three places before ruling it out: a <strong>captive finance or leasing subsidiary</strong>, an <strong>equipment financing programme</strong> offered to hospital customers, and any <strong>patient payment plan</strong> administered in-house. In the first two, you are a financial institution. In a partnership model you are typically a <em>service provider</em> under §314.4(f) and inherit the obligations contractually rather than by statute — which means they arrive through the master services agreement, not through your compliance calendar, and are therefore usually missed.</p>
+      </div>
+
+      <h3>The three properties that drive every downstream design decision</h3>
+      <ol>
+        <li><strong>GxP has the strictest evidence bar.</strong> Approver identity, timestamp, meaning of signature, and tamper-evident audit trail are regulatory records in their own right — not artefacts describing a control. Design evidence to this bar and every other regime is satisfied by a subset.</li>
+        <li><strong>SOX has a point-in-time assertion; GLBA, GxP and ISMS do not.</strong> SOX opines on effectiveness at fiscal year-end. The others require a continuously operating programme with no snapshot to test to. This changes evidence architecture: period samples for SOX, continuous artefacts for everything else.</li>
+        <li><strong>Product security is the only regime that can block revenue directly.</strong> A §524B deficiency produces a refuse-to-accept hold on a submission. Every other regime here produces a finding, a fine or an opinion — after the fact. Weight your remediation queue accordingly.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       02 — SIGNATURE: THE SUBSTRATE
+       ======================================================== -->
+  <section class="sec" data-open="true" data-id="s2">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="sec-num">02</span>
+      <span class="sec-title">
+        <h2>The shared substrate — select a regime to see what it claims</h2>
+        <p>Fourteen controls carry all seven regimes. Click through and watch how little is unique.</p>
+      </span>
+      <span class="caret" aria-hidden="true"></span>
+    </button>
+    <div class="sec-body">
+      <p>Below is the full control substrate for an organisation of this shape. Select one or more regimes to highlight the controls each one claims. The point of the exercise is what you will see immediately: <strong>the overlap is near-total, and the differences are almost entirely in evidence and scope, not in the control itself.</strong></p>
+
+      <div class="substrate">
+        <div class="regime-picker" role="group" aria-label="Filter substrate by regime">
+          <button class="rbtn" type="button" data-regime="sox" aria-pressed="false"><span class="swatch" style="background:var(--r-sox)"></span>SOX</button>
+          <button class="rbtn" type="button" data-regime="gxp" aria-pressed="false"><span class="swatch" style="background:var(--r-gxp)"></span>GxP</button>
+          <button class="rbtn" type="button" data-regime="psec" aria-pressed="false"><span class="swatch" style="background:var(--r-psec)"></span>Product security</button>
+          <button class="rbtn" type="button" data-regime="isms" aria-pressed="false"><span class="swatch" style="background:var(--r-isms)"></span>ISMS</button>
+          <button class="rbtn" type="button" data-regime="priv" aria-pressed="false"><span class="swatch" style="background:var(--r-priv)"></span>Privacy</button>
+          <button class="rbtn" type="button" data-regime="ot" aria-pressed="false"><span class="swatch" style="background:var(--r-ot)"></span>OT</button>
+          <button class="rbtn" type="button" data-regime="glba" aria-pressed="false"><span class="swatch" style="background:var(--r-glba)"></span>GLBA</button>
+        </div>
+        <div class="substrate-grid" id="substrateGrid"></div>
+        <p class="sub-status" id="subStatus">No regime selected — showing all 14 controls. Colour blocks on each card show which regimes claim it.</p>
+      </div>
+
+      <figure>
+        <svg viewBox="0 0 900 300" role="img" aria-label="Layered diagram: seven regime assertions resting on one shared control substrate, which rests on a single evidence layer">
+          <rect x="0" y="0" width="900" height="300" fill="#fff"/>
+          <!-- assertions -->
+          <text class="svg-m" x="14" y="20" font-size="10" letter-spacing="1.6">ASSERTION LAYER — SEVEN SIGNATURES, SEVEN AUDIENCES</text>
+          <g font-size="10.5" text-anchor="middle">
+            <rect x="14" y="30" width="118" height="42" rx="3" fill="#8c5a2b"/><text class="svg-t" x="73" y="49" fill="#fff" font-weight="600">SOX §404</text><text class="svg-t" x="73" y="63" fill="#e8d5c4" font-size="9">ICFR effective</text>
+            <rect x="140" y="30" width="118" height="42" rx="3" fill="#1b7a5a"/><text class="svg-t" x="199" y="49" fill="#fff" font-weight="600">GxP</text><text class="svg-t" x="199" y="63" fill="#c7e5da" font-size="9">validated · ALCOA+</text>
+            <rect x="266" y="30" width="118" height="42" rx="3" fill="#9b2c4f"/><text class="svg-t" x="325" y="49" fill="#fff" font-weight="600">§524B</text><text class="svg-t" x="325" y="63" fill="#eccdd7" font-size="9">secure by design</text>
+            <rect x="392" y="30" width="118" height="42" rx="3" fill="#2a6f97"/><text class="svg-t" x="451" y="49" fill="#fff" font-weight="600">ISO 27001</text><text class="svg-t" x="451" y="63" fill="#cbe0ec" font-size="9">commitments met</text>
+            <rect x="518" y="30" width="118" height="42" rx="3" fill="#6b4f9e"/><text class="svg-t" x="577" y="49" fill="#fff" font-weight="600">Privacy</text><text class="svg-t" x="577" y="63" fill="#ddd3ef" font-size="9">Art. 32 measures</text>
+            <rect x="644" y="30" width="118" height="42" rx="3" fill="#b06f1a"/><text class="svg-t" x="703" y="49" fill="#fff" font-weight="600">IEC 62443</text><text class="svg-t" x="703" y="63" fill="#f0dcc0" font-size="9">SL-A ≥ SL-T</text>
+            <rect x="770" y="30" width="116" height="42" rx="3" fill="#4c6b2a"/><text class="svg-t" x="828" y="49" fill="#fff" font-weight="600">GLBA</text><text class="svg-t" x="828" y="63" fill="#d8e5c8" font-size="9">written programme</text>
+          </g>
+          <!-- arrows down -->
+          <g stroke="#8598a7" stroke-width="1" stroke-dasharray="3 3">
+            <line x1="73" y1="76" x2="73" y2="104"/><line x1="199" y1="76" x2="199" y2="104"/>
+            <line x1="325" y1="76" x2="325" y2="104"/><line x1="451" y1="76" x2="451" y2="104"/>
+            <line x1="577" y1="76" x2="577" y2="104"/><line x1="703" y1="76" x2="703" y2="104"/>
+            <line x1="828" y1="76" x2="828" y2="104"/>
+          </g>
+          <!-- substrate -->
+          <rect x="14" y="108" width="872" height="86" rx="3" fill="#e8eff4" stroke="#1b4965" stroke-width="1.5"/>
+          <text class="svg-m" x="26" y="127" font-size="10" letter-spacing="1.6" fill="#1b4965">CONTROL SUBSTRATE — EXECUTED ONCE</text>
+          <g font-size="10" text-anchor="middle">
+            <rect x="26" y="136" width="128" height="24" rx="2" fill="#fff" stroke="#c3d3de"/><text class="svg-t" x="90" y="152">Identity &amp; access</text>
+            <rect x="162" y="136" width="128" height="24" rx="2" fill="#fff" stroke="#c3d3de"/><text class="svg-t" x="226" y="152">Change control</text>
+            <rect x="298" y="136" width="128" height="24" rx="2" fill="#fff" stroke="#c3d3de"/><text class="svg-t" x="362" y="152">Logging &amp; audit trail</text>
+            <rect x="434" y="136" width="128" height="24" rx="2" fill="#fff" stroke="#c3d3de"/><text class="svg-t" x="498" y="152">Backup &amp; recovery</text>
+            <rect x="570" y="136" width="128" height="24" rx="2" fill="#fff" stroke="#c3d3de"/><text class="svg-t" x="634" y="152">Third-party oversight</text>
+            <rect x="706" y="136" width="168" height="24" rx="2" fill="#fff" stroke="#c3d3de"/><text class="svg-t" x="790" y="152">Segregation of duties</text>
+            <rect x="26" y="164" width="128" height="24" rx="2" fill="#fff" stroke="#c3d3de"/><text class="svg-t" x="90" y="180">Encryption</text>
+            <rect x="162" y="164" width="128" height="24" rx="2" fill="#fff" stroke="#c3d3de"/><text class="svg-t" x="226" y="180">Vulnerability mgmt</text>
+            <rect x="298" y="164" width="128" height="24" rx="2" fill="#fff" stroke="#c3d3de"/><text class="svg-t" x="362" y="180">Incident response</text>
+            <rect x="434" y="164" width="128" height="24" rx="2" fill="#fff" stroke="#c3d3de"/><text class="svg-t" x="498" y="180">Asset inventory</text>
+            <rect x="570" y="164" width="128" height="24" rx="2" fill="#fff" stroke="#c3d3de"/><text class="svg-t" x="634" y="180">Segmentation</text>
+            <rect x="706" y="164" width="168" height="24" rx="2" fill="#fff" stroke="#c3d3de"/><text class="svg-t" x="790" y="180">Training &amp; awareness</text>
+          </g>
+          <!-- evidence -->
+          <line x1="450" y1="196" x2="450" y2="222" stroke="#1b4965" stroke-width="1.5"/>
+          <polygon points="450,228 445,220 455,220" fill="#1b4965"/>
+          <rect x="14" y="232" width="872" height="52" rx="3" fill="#0f2e42"/>
+          <text class="svg-m" x="26" y="251" font-size="10" letter-spacing="1.6" fill="#8fb8cf">EVIDENCE LAYER — BUILT TO THE HIGHEST BAR THAT TOUCHES THE CONTROL</text>
+          <text class="svg-t" x="26" y="271" font-size="11.5" fill="#fff">Approver identity · timestamp · meaning of signature · tamper-evident trail · defined retention · system-generated wherever possible</text>
+        </svg>
+        <figcaption><b>Read it top-down for scoping, bottom-up for building.</b> Seven assertions draw from one substrate. The substrate draws from one evidence layer. If the evidence layer is built to GxP discipline, no regime above it needs a separate evidence pipeline — only a mapping and a scope filter.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       03 — SCOPING
+       ======================================================== -->
+  <section class="sec" data-id="s3">
+    <button class="sec-head" type="button" aria-expanded="false">
+      <span class="sec-num">03</span>
+      <span class="sec-title">
+        <h2>Scoping — the step that determines whether the rest works</h2>
+        <p>Most programmes are not under-controlled. They are mis-scoped, then over-tested in the wrong places.</p>
+      </span>
+      <span class="caret" aria-hidden="true"></span>
+    </button>
+    <div class="sec-body">
+      <p>Scope is not a list of systems. It is a list of <strong>system-plus-regime pairs</strong>, each with a criticality tier. The same MES may be GxP-critical, SOX-relevant through inventory valuation, OT-adjacent through the historian, and out of scope for privacy entirely. One row per pair.</p>
+
+      <figure>
+        <svg viewBox="0 0 900 340" role="img" aria-label="Decision tree for assigning a system to compliance regimes">
+          <rect x="0" y="0" width="900" height="340" fill="#fff"/>
+          <g font-size="11" class="svg-t">
+            <rect x="330" y="12" width="240" height="34" rx="3" fill="#1b4965"/>
+            <text x="450" y="34" text-anchor="middle" fill="#fff" font-weight="600" font-size="12">System enters the estate</text>
+
+            <line x1="450" y1="46" x2="450" y2="64" stroke="#8598a7"/>
+            <rect x="300" y="64" width="300" height="30" rx="3" fill="#e8eff4" stroke="#1b4965"/>
+            <text x="450" y="84" text-anchor="middle" font-weight="600">Six questions, asked in this order</text>
+
+            <!-- branches -->
+            <line x1="450" y1="94" x2="450" y2="112" stroke="#8598a7"/>
+            <line x1="70" y1="112" x2="830" y2="112" stroke="#8598a7"/>
+            <line x1="70" y1="112" x2="70" y2="128" stroke="#8598a7"/>
+            <line x1="222" y1="112" x2="222" y2="128" stroke="#8598a7"/>
+            <line x1="374" y1="112" x2="374" y2="128" stroke="#8598a7"/>
+            <line x1="526" y1="112" x2="526" y2="128" stroke="#8598a7"/>
+            <line x1="678" y1="112" x2="678" y2="128" stroke="#8598a7"/>
+            <line x1="830" y1="112" x2="830" y2="128" stroke="#8598a7"/>
+          </g>
+          <g font-size="9.6" text-anchor="middle">
+            <rect x="14" y="128" width="112" height="76" rx="3" fill="#fff" stroke="#8c5a2b" stroke-width="1.5"/>
+            <text class="svg-t" x="70" y="146" font-weight="600" fill="#8c5a2b">SOX</text>
+            <text class="svg-t" x="70" y="163">Feeds, calculates or</text><text class="svg-t" x="70" y="176">stores data that hits</text><text class="svg-t" x="70" y="189">the general ledger?</text>
+
+            <rect x="166" y="128" width="112" height="76" rx="3" fill="#fff" stroke="#1b7a5a" stroke-width="1.5"/>
+            <text class="svg-t" x="222" y="146" font-weight="600" fill="#1b7a5a">GxP</text>
+            <text class="svg-t" x="222" y="163">Creates or holds a</text><text class="svg-t" x="222" y="176">predicate-rule record,</text><text class="svg-t" x="222" y="189">or controls product?</text>
+
+            <rect x="318" y="128" width="112" height="76" rx="3" fill="#fff" stroke="#9b2c4f" stroke-width="1.5"/>
+            <text class="svg-t" x="374" y="146" font-weight="600" fill="#9b2c4f">Product sec.</text>
+            <text class="svg-t" x="374" y="163">Ships in, builds, or</text><text class="svg-t" x="374" y="176">signs the device</text><text class="svg-t" x="374" y="189">software?</text>
+
+            <rect x="470" y="128" width="112" height="76" rx="3" fill="#fff" stroke="#6b4f9e" stroke-width="1.5"/>
+            <text class="svg-t" x="526" y="146" font-weight="600" fill="#6b4f9e">Privacy</text>
+            <text class="svg-t" x="526" y="163">Holds personal data,</text><text class="svg-t" x="526" y="176">PHI, or clinical</text><text class="svg-t" x="526" y="189">subject data?</text>
+
+            <rect x="622" y="128" width="112" height="76" rx="3" fill="#fff" stroke="#b06f1a" stroke-width="1.5"/>
+            <text class="svg-t" x="678" y="146" font-weight="600" fill="#b06f1a">OT</text>
+            <text class="svg-t" x="678" y="163">Sits in a plant zone</text><text class="svg-t" x="678" y="176">or connects to one</text><text class="svg-t" x="678" y="189">through a conduit?</text>
+
+            <rect x="774" y="128" width="112" height="76" rx="3" fill="#fff" stroke="#4c6b2a" stroke-width="1.5"/>
+            <text class="svg-t" x="830" y="146" font-weight="600" fill="#4c6b2a">GLBA</text>
+            <text class="svg-t" x="830" y="163">Holds NPI from a</text><text class="svg-t" x="830" y="176">financing, leasing or</text><text class="svg-t" x="830" y="189">payment programme?</text>
+          </g>
+          <g>
+            <line x1="70" y1="204" x2="70" y2="228" stroke="#8598a7"/><line x1="222" y1="204" x2="222" y2="228" stroke="#8598a7"/>
+            <line x1="374" y1="204" x2="374" y2="228" stroke="#8598a7"/><line x1="526" y1="204" x2="526" y2="228" stroke="#8598a7"/>
+            <line x1="678" y1="204" x2="678" y2="228" stroke="#8598a7"/><line x1="830" y1="204" x2="830" y2="228" stroke="#8598a7"/>
+            <line x1="70" y1="228" x2="830" y2="228" stroke="#8598a7"/>
+            <line x1="450" y1="228" x2="450" y2="246" stroke="#8598a7"/>
+            <polygon points="450,252 445,244 455,244" fill="#1b4965"/>
+          </g>
+          <rect x="180" y="256" width="540" height="34" rx="3" fill="#e8eff4" stroke="#1b4965"/>
+          <text class="svg-t" x="450" y="277" text-anchor="middle" font-size="11.5" font-weight="600">Assign criticality tier: 1 (product / ledger / patient) · 2 (supporting) · 3 (peripheral)</text>
+          <rect x="180" y="298" width="540" height="30" rx="3" fill="#0f2e42"/>
+          <text class="svg-t" x="450" y="318" text-anchor="middle" font-size="11" fill="#fff">One row per system × regime × tier — this register is the programme</text>
+        </svg>
+        <figcaption><b>Answer all six every time, even when the answer is obviously no.</b> The register of explicit "no" answers is what defends your scope when an auditor asks why a system was excluded. Undocumented exclusion is indistinguishable from oversight.</figcaption>
+      </figure>
+
+      <h3>How to run the scoping exercise</h3>
+      <ol>
+        <li><strong>Pull the authoritative system inventory from three sources, not one.</strong> The CMDB, the finance application list used for the last SOX walkthrough, and the QA validated-systems register. They will disagree. The delta is your first finding.</li>
+        <li><strong>Run the six questions with the owners in the room.</strong> Finance answers the SOX question, QA answers the GxP question, product security answers §524B, privacy answers Art. 32, OT engineering answers the zone question, and legal answers GLBA. Do not let IT answer on their behalf — IT does not know which report the controller actually relies on.</li>
+        <li><strong>Tier by consequence, not by cost or user count.</strong> Tier 1 is anything where failure reaches product, patient, or the ledger. A twelve-user batch release system outranks a two-thousand-user collaboration platform.</li>
+        <li><strong>Record the rationale in one sentence per exclusion.</strong> "Excluded from SOX: outputs are used for operational reporting only; no interface to ERP; confirmed with Controller, [date]."</li>
+        <li><strong>Refresh annually and on trigger.</strong> Triggers below.</li>
+      </ol>
+
+      <div class="callout warn">
+        <span class="co-tag">Scoping traps specific to this profile</span>
+        <p><strong>Assuming SOX scope covers everything.</strong> SOX pulls in ERP, consolidation, subledgers. It does not pull in the CRM, the complaint handling system, the LIMS, or the historian — all of which carry heavier obligations under other regimes.</p>
+        <p><strong>Treating a validated system as automatically SOX-compliant.</strong> Validation proves fitness for intended use. It does not test segregation of duties in the financial workflow.</p>
+        <p><strong>Leaving OT out because "it isn't IT."</strong> The historian feeds yield and scrap numbers into inventory valuation. That is a financially relevant data flow with an OT-resident source.</p>
+        <p><strong>Site-level shadow systems.</strong> Every plant has a spreadsheet or an Access database doing something material. Find them during scoping, not during testing.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       04 — RECONCILIATION
+       ======================================================== -->
+  <section class="sec" data-id="s4">
+    <button class="sec-head" type="button" aria-expanded="false">
+      <span class="sec-num">04</span>
+      <span class="sec-title">
+        <h2>Control-by-control reconciliation</h2>
+        <p>What each regime wants from the same control, and how to build it once.</p>
+      </span>
+      <span class="caret" aria-hidden="true"></span>
+    </button>
+    <div class="sec-body">
+      <p>This is the working table. For each shared control, the middle columns state what each regime demands; the final column states the single design that satisfies all of them. <strong>Build the final column.</strong></p>
+
+      <div class="tbl-scroll">
+        <table>
+          <caption>Reconciliation — one control, multiple demands, one design</caption>
+          <thead>
+            <tr><th style="min-width:130px">Control</th><th>SOX wants</th><th>GxP wants</th><th>ISMS / privacy wants</th><th>OT reality</th><th style="min-width:190px">Build this</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="rowlbl">User access review</td>
+              <td>Quarterly, financially relevant apps, evidence of reviewer and action taken</td>
+              <td>Periodic, all GxP systems, QA approval of the review itself</td>
+              <td>Annual review of access rights; least privilege demonstrable</td>
+              <td>Shared HMI accounts; named accounts often technically impossible</td>
+              <td>Quarterly global process, one workflow. QA co-signs GxP scope. OT shared accounts documented as a compensating control with physical access log and shift roster.</td>
+            </tr>
+            <tr>
+              <td class="rowlbl">Joiner / mover / leaver</td>
+              <td>Timely deprovisioning; transfers do not accumulate rights</td>
+              <td>Training completion gates access to GxP systems</td>
+              <td>Documented provisioning process, revocation SLA</td>
+              <td>Contractor and vendor remote access dominate the risk</td>
+              <td>HR-triggered automation with a hard SLA. Training status as a provisioning precondition. Vendor access time-boxed and brokered, never standing.</td>
+            </tr>
+            <tr>
+              <td class="rowlbl">Privileged access</td>
+              <td>Restricted, monitored; firefighter access reviewed after use</td>
+              <td>Admin cannot alter records or audit trail without trace</td>
+              <td>PAM, MFA, session recording for critical systems</td>
+              <td>Engineering workstations with local admin as standard</td>
+              <td>PAM with checkout, justification, session capture. Database-level admin separated from application admin. Audit trail write access held by nobody.</td>
+            </tr>
+            <tr>
+              <td class="rowlbl">Change management</td>
+              <td>Approval, testing, SoD in migration to production</td>
+              <td>Validation impact assessment; revalidation trigger; CAPA linkage</td>
+              <td>Documented, risk-assessed change process</td>
+              <td>Change windows constrained by production schedule and campaign</td>
+              <td>One CAB, one ticket type. GxP systems get an added impact-assessment gate before approval. OT changes carry a production-window field and a rollback plan.</td>
+            </tr>
+            <tr>
+              <td class="rowlbl">Audit logging</td>
+              <td>Detective control over privileged activity</td>
+              <td><strong>The audit trail is itself a regulatory record</strong> — cannot be disabled, must be reviewed, retained for the record retention period</td>
+              <td>Log collection, protection, retention, monitoring</td>
+              <td>Historian integrity; limited logging capability on legacy PLCs</td>
+              <td>Design to GxP. Audit trail immutable and independently retained. Review documented per SOP. Legacy OT compensated by network-level capture at the conduit.</td>
+            </tr>
+            <tr>
+              <td class="rowlbl">Backup &amp; restore</td>
+              <td>Restore testing evidence</td>
+              <td>Record retention across the full statutory period, often ten years or more</td>
+              <td>Continuity objectives, RTO/RPO</td>
+              <td>Recipe and golden-image recovery; plant restart sequence</td>
+              <td>Common technology, differentiated retention schedules and restore-test evidence per regime. Test restores of GxP records annually with QA witness.</td>
+            </tr>
+            <tr>
+              <td class="rowlbl">Segregation of duties</td>
+              <td>Prevents fraudulent transaction flows</td>
+              <td>Prevents self-approval of records and batch release</td>
+              <td>Least privilege</td>
+              <td>Operator versus engineer role split</td>
+              <td>One SoD ruleset with two rationale columns — financial and quality. Enforce in-system, not by policy statement.</td>
+            </tr>
+            <tr>
+              <td class="rowlbl">Third-party oversight</td>
+              <td>SOC 1 Type II plus mapped complementary user entity controls</td>
+              <td>Supplier qualification, quality agreement, right to audit</td>
+              <td>SOC 2 Type II / ISO certificate; DPA and transfer mechanism</td>
+              <td>Vendor remote access to plant equipment</td>
+              <td>One TPRM intake, three evidence tracks and one criticality tier. Unmet CUECs raised as findings, not filed.</td>
+            </tr>
+            <tr>
+              <td class="rowlbl">Incident response</td>
+              <td>Not directly asserted</td>
+              <td>Deviation and CAPA process; possible MDR reporting</td>
+              <td>IR plan; GDPR 72-hour notification; SEC 8-K Item 1.05 materiality clock</td>
+              <td>NIS2 24-hour early warning for in-scope EU sites</td>
+              <td><strong>Build to the fastest clock in the stack, not the average.</strong> One intake, parallel regulatory assessment tracks running from the same triage.</td>
+            </tr>
+            <tr>
+              <td class="rowlbl">Vulnerability management</td>
+              <td>Only where patching evidences change control</td>
+              <td>Patch requires impact assessment on validated state</td>
+              <td>Defined SLAs by severity; annual pen test</td>
+              <td>Patching often impossible; compensating controls are the answer</td>
+              <td>Risk-based SLA tiers. Validated systems get an assessment gate. OT gets virtual patching and segmentation with documented residual risk accepted by name.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout bad">
+        <span class="co-tag">The dependency nobody diagrams</span>
+        <p>Broken ITGCs invalidate reliance on every automated control beneath them. If change management fails, the auditor cannot rely on a single automated calculation, tolerance check, or three-way match in the ERP — and the population reverts to full substantive testing. One ITGC deficiency can convert a clean automated-control strategy into thousands of hours of manual sampling. This is the argument that funds the programme.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       05 — MATURITY
+       ======================================================== -->
+  <section class="sec" data-id="s5">
+    <button class="sec-head" type="button" aria-expanded="false">
+      <span class="sec-num">05</span>
+      <span class="sec-title">
+        <h2>Measuring maturity — two axes, never one</h2>
+        <p>Score design and evidence separately. The gap between them is the only actionable number.</p>
+      </span>
+      <span class="caret" aria-hidden="true"></span>
+    </button>
+    <div class="sec-body">
+      <p>The most common measurement error is a single 1–5 score per control. It hides the failure mode that actually hurts you: a control that is beautifully designed and cannot be proven. Score two axes independently.</p>
+
+      <div class="tbl-scroll">
+        <table>
+          <caption>Axis 1 — design maturity</caption>
+          <thead><tr><th style="width:150px">Level</th><th>Definition</th><th>Objective test — no judgement required</th></tr></thead>
+          <tbody>
+            <tr><td class="rowlbl">0 · Absent</td><td>No control exists</td><td>—</td></tr>
+            <tr><td class="rowlbl">1 · Initial</td><td>Performed ad hoc, dependent on an individual</td><td>Someone does it; no written procedure exists</td></tr>
+            <tr><td class="rowlbl">2 · Repeatable</td><td>Documented, local scope only</td><td>An approved SOP exists at one site</td></tr>
+            <tr><td class="rowlbl">3 · Defined</td><td>Standardised globally, named owner, applies to all in-scope systems</td><td>Global SOP + RACI + scope register entry</td></tr>
+            <tr><td class="rowlbl">4 · Managed</td><td>Quantitatively measured with thresholds and escalation</td><td>A metric exists with a defined threshold and a named owner of the breach</td></tr>
+            <tr><td class="rowlbl">5 · Optimising</td><td>Automated, continuous, self-correcting with drift detection</td><td>Tooling enforces the control; exceptions route automatically</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tbl-scroll">
+        <table>
+          <caption>Axis 2 — evidence maturity: can it be proven without a fire drill?</caption>
+          <thead><tr><th style="width:150px">Level</th><th>Test</th><th>What an auditor experiences</th></tr></thead>
+          <tbody>
+            <tr><td class="rowlbl">0</td><td>No evidence retained</td><td>Finding on the spot</td></tr>
+            <tr><td class="rowlbl">1</td><td>Evidence must be reconstructed on request</td><td>Two weeks of scrambling; reconstructed evidence is challenged</td></tr>
+            <tr><td class="rowlbl">2</td><td>Retained per procedure, manual retrieval</td><td>Email threads and screenshots; IPE questions follow</td></tr>
+            <tr><td class="rowlbl">3</td><td>Retained in a controlled repository with defined retention</td><td>Requests fulfilled in days</td></tr>
+            <tr><td class="rowlbl">4</td><td>Generated as a by-product of the control; system-generated, IPE-validated</td><td>Requests fulfilled from the system, not from people</td></tr>
+            <tr><td class="rowlbl">5</td><td>Continuously available, timestamped, tamper-evident</td><td>Read-only auditor access; sampling becomes negotiable</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <span class="co-tag">How to read the pair</span>
+        <p><strong>Design 5 / Evidence 2</strong> passes a management review and fails an FDA inspection. <strong>Design 2 / Evidence 4</strong> passes SOX and fails ISO 27001 certification. <strong>Design 4 / Evidence 4</strong> with a target of 4 is done — stop investing and move the money to the control scoring 2.</p>
+      </div>
+
+      <h3>Score it here</h3>
+      <p>Set design and evidence levels for the substrate controls. The readout weights by criticality tier — never take a flat average, or a tier-1 MES at 2.0 gets cancelled out by an HR system at 4.5.</p>
+
+      <div class="mat-wrap">
+        <div class="mat-panel">
+          <h4>Control scores</h4>
+          <div class="score-hdr"><span>Control &amp; tier weight</span><span>Design</span><span>Evid.</span></div>
+          <div id="scoreList"></div>
+        </div>
+        <div class="mat-panel">
+          <h4>Readout</h4>
+          <div class="readout">
+            <div class="stat"><span class="st-k">Weighted design</span><span class="st-v" id="wDesign">—</span><span class="st-sub">target 4.0 for tier 1</span></div>
+            <div class="stat"><span class="st-k">Weighted evidence</span><span class="st-v" id="wEvid">—</span><span class="st-sub">target 4.0 for tier 1</span></div>
+            <div class="stat"><span class="st-k">Provability gap</span><span class="st-v" id="wGap">—</span><span class="st-sub">design minus evidence</span></div>
+            <div class="stat"><span class="st-k">Below floor</span><span class="st-v" id="wBelow">—</span><span class="st-sub">controls scoring under 3</span></div>
+          </div>
+          <div class="verdict" id="verdict">Set scores to see the readout.</div>
+          <h4 style="margin-top:22px">Reporting rule</h4>
+          <p style="font-size:13.5px">Report the weighted score <em>and</em> the count of tier-1 controls below the floor. The second number is what a board acts on; the first is what makes the deck look tidy. A programme at 3.8 weighted with four tier-1 controls under 3 is in worse shape than one at 3.2 with none.</p>
+        </div>
+      </div>
+
+      <h3>Setting targets</h3>
+      <p>Do not target 5 everywhere — it is not economically defensible and it signals to auditors that you cannot prioritise. Practical targets for this profile:</p>
+      <ul>
+        <li><strong>Tier 1 (GxP-critical, financially relevant, device-connected): design 4, evidence 4.</strong></li>
+        <li><strong>Tier 2: design 3, evidence 3.</strong></li>
+        <li><strong>Tier 3: design 3, evidence 2</strong> — with the honest acknowledgement that this is a conscious risk acceptance, recorded with a name against it.</li>
+        <li><strong>Hard floor of 3 on both axes</strong> for access, change and audit trail on <em>any</em> system touching product or the ledger, regardless of tier.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       06 — CADENCE
+       ======================================================== -->
+  <section class="sec" data-id="s6">
+    <button class="sec-head" type="button" aria-expanded="false">
+      <span class="sec-num">06</span>
+      <span class="sec-title">
+        <h2>Cadence — the operating calendar</h2>
+        <p>Sequencing matters more than frequency. Two ordering decisions determine whether the year works.</p>
+      </span>
+      <span class="caret" aria-hidden="true"></span>
+    </button>
+    <div class="sec-body">
+      <div class="legend">
+        <span><span class="mk m">C</span> Continuous / monthly</span>
+        <span><span class="mk q">Q</span> Quarterly</span>
+        <span><span class="mk c">S</span> Semi-annual</span>
+        <span><span class="mk a">A</span> Annual</span>
+      </div>
+
+      <div class="tbl-scroll">
+        <table>
+          <caption>Annual operating calendar — assumes a December fiscal year-end</caption>
+          <thead>
+            <tr><th style="min-width:210px">Activity</th><th>Owner</th>
+            <th style="width:32px">J</th><th style="width:32px">F</th><th style="width:32px">M</th><th style="width:32px">A</th><th style="width:32px">M</th><th style="width:32px">J</th>
+            <th style="width:32px">J</th><th style="width:32px">A</th><th style="width:32px">S</th><th style="width:32px">O</th><th style="width:32px">N</th><th style="width:32px">D</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="rowlbl">Config drift &amp; access monitoring</td><td>Security Ops</td>
+              <td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td></tr>
+            <tr><td class="rowlbl">Privileged access recert</td><td>IAM + system owner</td>
+              <td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td></tr>
+            <tr><td class="rowlbl">GxP audit trail review</td><td>Process owner + QA</td>
+              <td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td><td><span class="mk m">·</span></td></tr>
+            <tr><td class="rowlbl">Standard user access review</td><td>System owner, QA co-sign</td>
+              <td></td><td></td><td><span class="mk q">Q</span></td><td></td><td></td><td><span class="mk q">Q</span></td><td></td><td></td><td><span class="mk q">Q</span></td><td></td><td></td><td><span class="mk q">Q</span></td></tr>
+            <tr><td class="rowlbl">Control self-assessment (rotating families)</td><td>Site IT lead</td>
+              <td></td><td><span class="mk q">Q</span></td><td></td><td></td><td><span class="mk q">Q</span></td><td></td><td></td><td><span class="mk q">Q</span></td><td></td><td></td><td><span class="mk q">Q</span></td><td></td></tr>
+            <tr><td class="rowlbl">Maturity assessment — enterprise</td><td>IT Compliance</td>
+              <td></td><td></td><td></td><td><span class="mk a">A</span></td><td><span class="mk a">A</span></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td class="rowlbl">Maturity re-assessment — sites below target</td><td>IT Compliance</td>
+              <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><span class="mk c">S</span></td><td></td><td></td></tr>
+            <tr><td class="rowlbl">SOX scoping refresh</td><td>Finance + IT</td>
+              <td></td><td></td><td></td><td></td><td><span class="mk a">A</span></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td class="rowlbl">SOX interim testing</td><td>Internal Audit</td>
+              <td></td><td></td><td></td><td></td><td></td><td></td><td><span class="mk a">A</span></td><td><span class="mk a">A</span></td><td><span class="mk a">A</span></td><td></td><td></td><td></td></tr>
+            <tr><td class="rowlbl">SOX roll-forward &amp; year-end</td><td>Internal Audit + external</td>
+              <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><span class="mk a">A</span></td><td><span class="mk a">A</span></td></tr>
+            <tr><td class="rowlbl">Vulnerability assessment</td><td>Security</td>
+              <td></td><td></td><td><span class="mk c">S</span></td><td></td><td></td><td></td><td></td><td></td><td><span class="mk c">S</span></td><td></td><td></td><td></td></tr>
+            <tr><td class="rowlbl">Penetration test</td><td>Security + external</td>
+              <td></td><td></td><td></td><td></td><td><span class="mk a">A</span></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td class="rowlbl">Periodic review of validated systems</td><td>System owner + QA</td>
+              <td><span class="mk a">A</span></td><td></td><td></td><td><span class="mk a">A</span></td><td></td><td></td><td><span class="mk a">A</span></td><td></td><td></td><td><span class="mk a">A</span></td><td></td><td></td></tr>
+            <tr><td class="rowlbl">OT plant assessment — tier 1 sites</td><td>OT Security</td>
+              <td></td><td></td><td></td><td></td><td></td><td><span class="mk a">A</span></td><td></td><td><span class="mk a">A</span></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td class="rowlbl">Third-party SOC 1 / SOC 2 review + CUEC mapping</td><td>TPRM</td>
+              <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><span class="mk a">A</span></td><td><span class="mk a">A</span></td><td></td></tr>
+            <tr><td class="rowlbl">DR / BCP exercise</td><td>IT Ops</td>
+              <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><span class="mk a">A</span></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td class="rowlbl">Product security postmarket reporting</td><td>PSIRT</td>
+              <td></td><td></td><td><span class="mk q">Q</span></td><td></td><td></td><td><span class="mk q">Q</span></td><td></td><td></td><td><span class="mk q">Q</span></td><td></td><td></td><td><span class="mk q">Q</span></td></tr>
+            <tr><td class="rowlbl">Risk assessment refresh (all regimes, harmonised)</td><td>Respective owners</td>
+              <td></td><td><span class="mk a">A</span></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td class="rowlbl">Audit committee reporting</td><td>CFO / CISO / CQO</td>
+              <td></td><td><span class="mk q">Q</span></td><td></td><td></td><td><span class="mk q">Q</span></td><td></td><td></td><td><span class="mk q">Q</span></td><td></td><td></td><td><span class="mk q">Q</span></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>The two sequencing decisions that make or break the year</h3>
+      <ol>
+        <li><strong>Run the enterprise maturity assessment in Q2, ahead of SOX interim testing in Q3.</strong> Remediation needs a full quarter to land and to generate a testable population before the auditor arrives. Assessing in Q4 tells you what you already know and gives you nowhere to put the answer.</li>
+        <li><strong>Stagger site assessments regionally; never assess all sites in one quarter.</strong> A simultaneous global assessment guarantees shallow evidence, burns out site IT, and produces a scorecard nobody believes. Three regional waves across the year, same instrument, same scorer discipline.</li>
+      </ol>
+
+      <div class="callout warn">
+        <span class="co-tag">Event triggers that override the calendar</span>
+        <p>ERP or MES implementation · site acquisition or divestiture · cloud migration of an in-scope system · receipt of a 483 or Warning Letter · identification of a significant deficiency · material change in a critical vendor · entry into a new regulatory jurisdiction · a device recall with a software root cause.</p>
+      </div>
+
+      <div class="callout bad">
+        <span class="co-tag">Build the incident clock to the fastest hand</span>
+        <p>NIS2 requires a 24-hour early warning for in-scope EU sites. GDPR gives 72 hours. The SEC materiality determination must be made without unreasonable delay. FDA MDR timelines run separately. GLBA, where applicable, requires FTC notification within 30 days at 500+ consumers. <strong>One intake, one triage, parallel assessment tracks — and the process designed against 24 hours, not against the average of all of them.</strong></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       07 — ROADMAP
+       ======================================================== -->
+  <section class="sec" data-id="s7">
+    <button class="sec-head" type="button" aria-expanded="false">
+      <span class="sec-num">07</span>
+      <span class="sec-title">
+        <h2>Implementation — eighteen months, four phases</h2>
+        <p>What to do in what order, and what "done" looks like at each gate.</p>
+      </span>
+      <span class="caret" aria-hidden="true"></span>
+    </button>
+    <div class="sec-body">
+      <figure>
+        <svg viewBox="0 0 900 250" role="img" aria-label="Eighteen-month implementation roadmap across four phases and six quarters">
+          <rect x="0" y="0" width="900" height="250" fill="#fff"/>
+          <g class="svg-m" font-size="10" letter-spacing="1.2">
+            <text x="176" y="18">Q1</text><text x="292" y="18">Q2</text><text x="408" y="18">Q3</text>
+            <text x="524" y="18">Q4</text><text x="640" y="18">Q5</text><text x="756" y="18">Q6</text>
+          </g>
+          <g stroke="#eaf0f4">
+            <line x1="170" y1="24" x2="170" y2="230"/><line x1="286" y1="24" x2="286" y2="230"/>
+            <line x1="402" y1="24" x2="402" y2="230"/><line x1="518" y1="24" x2="518" y2="230"/>
+            <line x1="634" y1="24" x2="634" y2="230"/><line x1="750" y1="24" x2="750" y2="230"/>
+            <line x1="866" y1="24" x2="866" y2="230"/>
+          </g>
+          <g font-size="11" class="svg-t">
+            <text x="14" y="46" font-weight="600" fill="#1b4965">Establish</text>
+            <rect x="170" y="34" width="232" height="18" rx="2" fill="#1b4965"/>
+            <text x="180" y="47" fill="#fff" font-size="9.5">Scope register · unified control set · RACI</text>
+
+            <text x="14" y="72" font-weight="600" fill="#1b4965">Baseline</text>
+            <rect x="228" y="60" width="232" height="18" rx="2" fill="#2a6f97"/>
+            <text x="238" y="73" fill="#fff" font-size="9.5">Dual-axis maturity assessment, all sites</text>
+
+            <text x="14" y="98" font-weight="600" fill="#1b4965">Evidence</text>
+            <rect x="286" y="86" width="348" height="18" rx="2" fill="#1b7a5a"/>
+            <text x="296" y="99" fill="#fff" font-size="9.5">Evidence layer to GxP bar · IPE remediation · repository</text>
+
+            <text x="14" y="124" font-weight="600" fill="#1b4965">Access</text>
+            <rect x="286" y="112" width="290" height="18" rx="2" fill="#2a6f97"/>
+            <text x="296" y="125" fill="#fff" font-size="9.5">IAM consolidation · PAM · quarterly recert live</text>
+
+            <text x="14" y="150" font-weight="600" fill="#1b4965">Change</text>
+            <rect x="402" y="138" width="290" height="18" rx="2" fill="#2a6f97"/>
+            <text x="412" y="151" fill="#fff" font-size="9.5">Single CAB · GxP impact gate · SoD ruleset in-system</text>
+
+            <text x="14" y="176" font-weight="600" fill="#1b4965">OT</text>
+            <rect x="460" y="164" width="290" height="18" rx="2" fill="#b06f1a"/>
+            <text x="470" y="177" fill="#fff" font-size="9.5">Asset inventory · zone &amp; conduit model · segmentation</text>
+
+            <text x="14" y="202" font-weight="600" fill="#1b4965">Automate</text>
+            <rect x="576" y="190" width="290" height="18" rx="2" fill="#6b4f9e"/>
+            <text x="586" y="203" fill="#fff" font-size="9.5">Continuous control monitoring · auditor read-only access</text>
+
+            <text x="14" y="228" font-weight="600" fill="#1b4965">Assure</text>
+            <rect x="692" y="216" width="174" height="18" rx="2" fill="#9b2c4f"/>
+            <text x="702" y="229" fill="#fff" font-size="9.5">External attestation cycle</text>
+          </g>
+        </svg>
+        <figcaption><b>Evidence before automation, always.</b> Automating a control whose evidence is not yet trustworthy produces trustworthy-looking untrustworthy evidence at scale — the single most expensive failure mode in this programme.</figcaption>
+      </figure>
+
+      <h3>Phase 1 · Months 1–4 — Establish</h3>
+      <ul>
+        <li>Build the scope register: one row per system × regime × tier, with rationale for every exclusion.</li>
+        <li>Consolidate to a single control set with one control ID per control, mapped outward to COBIT, NIST 800-53 Rev 5, NIST 800-171, ISO 27001 Annex A, CIS v8, IEC 62443 and the SOC 2 trust services criteria. <strong>One ID, many mappings — never many IDs for one control.</strong></li>
+        <li>Name a single accountable owner per control family and a single evidence owner per system. Two names, not a committee.</li>
+        <li>Agree the harmonised risk assessment calendar with Finance, QA, Privacy and Security in one meeting. This is a governance act, not an IT task.</li>
+      </ul>
+      <p><strong>Gate:</strong> the scope register is signed by Finance, QA and Security, and no system appears in it without a named owner.</p>
+
+      <h3>Phase 2 · Months 3–8 — Baseline and evidence</h3>
+      <ul>
+        <li>Run the dual-axis assessment across all sites in three regional waves with one instrument and one calibration session per wave.</li>
+        <li>Stand up the evidence repository with retention schedules driven by the longest applicable requirement per record type.</li>
+        <li>Remediate IPE first. Every report used in the operation of a control needs documented completeness and accuracy validation, plus parameter capture at run time. This is the highest-volume deficiency area in every programme of this shape.</li>
+        <li>Inventory end-user computing. Lock, version, and validate every spreadsheet feeding the close or a quality decision — or eliminate it.</li>
+      </ul>
+      <p><strong>Gate:</strong> every tier-1 control has evidence at level 3 or above, and no tier-1 control depends on an unvalidated spreadsheet.</p>
+
+      <h3>Phase 3 · Months 7–14 — Access, change, OT</h3>
+      <ul>
+        <li>Consolidate identity, deploy PAM for tier-1 systems, run the first two quarterly recertification cycles to completion including remediation of exceptions.</li>
+        <li>Move to one CAB and one ticket type with a conditional GxP impact-assessment gate. Enforce SoD in-system with a single ruleset carrying financial and quality rationale columns.</li>
+        <li>Complete OT asset inventory per site, define zones and conduits, set target security levels, and segment. Accept residual risk explicitly with a named accepter where patching is impossible.</li>
+      </ul>
+      <p><strong>Gate:</strong> deprovisioning SLA met for two consecutive quarters; zero standing vendor access; every tier-1 plant has a documented zone model.</p>
+
+      <h3>Phase 4 · Months 13–18 — Automate and assure</h3>
+      <ul>
+        <li>Deploy continuous control monitoring where the control is deterministic — configuration, access drift, log integrity, backup success.</li>
+        <li>Provide read-only auditor access to the evidence repository. This is the moment sampling becomes negotiable and the annual burden drops.</li>
+        <li>Run the external attestation cycle: SOC 2 Type II, ISO 27001 certification or surveillance, SOX opinion, and any regulatory inspection readiness review.</li>
+      </ul>
+      <p><strong>Gate:</strong> the weighted maturity score meets target, no tier-1 control sits below the floor, and evidence for any control can be produced in under one business day without a person reconstructing it.</p>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       08 — METRICS & FAILURE MODES
+       ======================================================== -->
+  <section class="sec" data-id="s8">
+    <button class="sec-head" type="button" aria-expanded="false">
+      <span class="sec-num">08</span>
+      <span class="sec-title">
+        <h2>Metrics that lead, and failure modes that recur</h2>
+        <p>What to put on the board slide, and what quietly destroys programmes of this shape.</p>
+      </span>
+      <span class="caret" aria-hidden="true"></span>
+    </button>
+    <div class="sec-body">
+      <h3>Leading indicators worth tracking</h3>
+      <div class="tbl-scroll">
+        <table>
+          <caption>Metric set — leading, not lagging</caption>
+          <thead><tr><th>Metric</th><th>Why it leads</th><th>Threshold to escalate</th></tr></thead>
+          <tbody>
+            <tr><td class="rowlbl">Deprovisioning SLA (termination → access revoked, hours)</td><td>Predicts the most common access finding across every regime</td><td>Any tier-1 system beyond 24 hours</td></tr>
+            <tr><td class="rowlbl">Privileged accounts with a named human owner (%)</td><td>Orphaned privilege is where both fraud and audit trail tampering live</td><td>Below 100% on tier 1</td></tr>
+            <tr><td class="rowlbl">Emergency changes as % of total changes</td><td>A rising rate means the standard process is being bypassed, not that emergencies increased</td><td>Above 5%</td></tr>
+            <tr><td class="rowlbl">Audit trail review backlog (days)</td><td>The GxP finding that turns into a Warning Letter observation</td><td>Beyond the SOP interval</td></tr>
+            <tr><td class="rowlbl">Controls with system-generated evidence (%)</td><td>Direct proxy for next year's audit cost</td><td>Below 60% on tier 1</td></tr>
+            <tr><td class="rowlbl">OT asset inventory completeness by site (%)</td><td>You cannot segment or patch what is not inventoried</td><td>Below 95% at a tier-1 plant</td></tr>
+            <tr><td class="rowlbl">Mean time to close audit and inspection observations (days)</td><td>Repeat findings are treated far more severely than new ones</td><td>Beyond commitment date</td></tr>
+            <tr><td class="rowlbl">Unmapped CUECs from critical vendor reports (count)</td><td>Inherited deficiencies surface at year-end when nothing can be done</td><td>Any, on a critical vendor</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Failure modes, in order of how often they appear</h3>
+      <ol>
+        <li><strong>IPE.</strong> Reports used to operate controls, never validated for completeness and accuracy, parameters not captured. Highest-volume deficiency in every programme of this shape.</li>
+        <li><strong>End-user computing.</strong> Unlocked, unversioned spreadsheets feeding the close or a batch release decision.</li>
+        <li><strong>Evidence built to the wrong bar.</strong> SOX-grade evidence presented at an FDA inspection. Rework is total, not incremental.</li>
+        <li><strong>Scope drift.</strong> A cloud migration or ERP module go-live that never re-entered the scope register.</li>
+        <li><strong>Segregation of duties enforced by policy rather than by system.</strong> A stated rule with technical capability to violate it is not a control.</li>
+        <li><strong>Vendor reports filed rather than read.</strong> Qualified opinions and unmet CUECs discovered in Q4.</li>
+        <li><strong>Flat-averaged maturity scoring.</strong> A tidy 3.9 hiding four tier-1 controls at 2.</li>
+        <li><strong>Site assessment fatigue.</strong> All sites assessed in one quarter, producing a scorecard the sites themselves do not believe and will not act on.</li>
+      </ol>
+
+      <div class="callout">
+        <span class="co-tag">The one-sentence version</span>
+        <p>Scope once by system × regime × tier, control once against a single control set, evidence once at the strictest bar that touches the control, assess on two axes weighted by tier, and sequence the calendar so remediation lands before testing rather than after it.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p><span class="fbrand">Control architecture reference</span> — prepared for a global, FDA-regulated, multi-site manufacturing organisation. Regime characterisations reflect requirements as generally understood and should be confirmed against current regulatory text and your external auditor's and notified body's expectations before adoption. Not legal advice.</p>
+    <p style="font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--slate-light)">SECTION STATE AND SCORES PERSIST LOCALLY IN THIS BROWSER · SINGLE FILE · NO EXTERNAL DEPENDENCIES</p>
+  </footer>
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- storage wrapper: degrades to memory ---------- */
+  var mem = {};
+  var store = {
+    get: function(k){
+      try { var v = window.localStorage.getItem(k); return v === null ? (k in mem ? mem[k] : null) : v; }
+      catch(e){ return (k in mem) ? mem[k] : null; }
+    },
+    set: function(k,v){
+      mem[k] = v;
+      try { window.localStorage.setItem(k,v); } catch(e){ /* memory only */ }
+    },
+    del: function(k){
+      delete mem[k];
+      try { window.localStorage.removeItem(k); } catch(e){}
+    }
+  };
+  var NS = "ctrlarch.v1.";
+
+  /* ---------- accordion ---------- */
+  var secs = Array.prototype.slice.call(document.querySelectorAll(".sec"));
+  secs.forEach(function(sec){
+    var id = sec.getAttribute("data-id");
+    var head = sec.querySelector(".sec-head");
+    var saved = store.get(NS + "open." + id);
+    if (saved !== null){
+      sec.setAttribute("data-open", saved);
+      head.setAttribute("aria-expanded", saved);
+    }
+    head.addEventListener("click", function(){
+      var open = sec.getAttribute("data-open") === "true";
+      var next = open ? "false" : "true";
+      sec.setAttribute("data-open", next);
+      head.setAttribute("aria-expanded", next);
+      store.set(NS + "open." + id, next);
+    });
+  });
+
+  function setAll(state){
+    secs.forEach(function(sec){
+      var id = sec.getAttribute("data-id");
+      sec.setAttribute("data-open", state);
+      sec.querySelector(".sec-head").setAttribute("aria-expanded", state);
+      store.set(NS + "open." + id, state);
+    });
+  }
+  document.getElementById("expandAll").addEventListener("click", function(){ setAll("true"); });
+  document.getElementById("collapseAll").addEventListener("click", function(){ setAll("false"); });
+  document.getElementById("printBtn").addEventListener("click", function(){ window.print(); });
+
+  /* ---------- substrate data ---------- */
+  var REGIMES = ["sox","gxp","psec","isms","priv","ot","glba"];
+  var RNAME = {sox:"SOX", gxp:"GxP", psec:"Product security", isms:"ISMS", priv:"Privacy", ot:"OT", glba:"GLBA"};
+
+  var CONTROLS = [
+    {id:"AC-01", name:"Identity lifecycle", tier:1, note:"Joiner, mover, leaver with HR trigger and revocation SLA.", r:["sox","gxp","isms","priv","ot","glba"]},
+    {id:"AC-02", name:"Access recertification", tier:1, note:"Periodic review of entitlements with documented action.", r:["sox","gxp","isms","priv","glba"]},
+    {id:"AC-03", name:"Privileged access", tier:1, note:"Checkout, justification, session capture, no standing admin.", r:["sox","gxp","psec","isms","ot","glba"]},
+    {id:"AC-04", name:"Segregation of duties", tier:1, note:"Enforced in-system; financial and quality rationale.", r:["sox","gxp","isms","ot"]},
+    {id:"AC-05", name:"Authentication &amp; MFA", tier:1, note:"MFA for all access to regulated or customer data.", r:["gxp","isms","priv","glba","ot"]},
+    {id:"CM-01", name:"Change control", tier:1, note:"Approval, testing, migration SoD, rollback plan.", r:["sox","gxp","psec","isms","ot"]},
+    {id:"CM-02", name:"Validation impact assessment", tier:1, note:"Gate before change approval on validated systems.", r:["gxp","psec"]},
+    {id:"CM-03", name:"Secure development", tier:1, note:"SDLC controls, code review, SBOM generation at build.", r:["psec","isms","glba","sox"]},
+    {id:"AU-01", name:"Audit trail integrity", tier:1, note:"Immutable, undisableable, independently retained.", r:["sox","gxp","psec","isms","priv","glba"]},
+    {id:"AU-02", name:"Log monitoring &amp; review", tier:2, note:"Documented review per SOP; alerting on integrity events.", r:["gxp","isms","priv","ot","glba"]},
+    {id:"CP-01", name:"Backup &amp; restore", tier:1, note:"Differentiated retention; witnessed restore testing.", r:["sox","gxp","isms","ot"]},
+    {id:"SI-01", name:"Vulnerability management", tier:2, note:"Risk-based SLA; compensating controls where patching is barred.", r:["psec","isms","ot","glba"]},
+    {id:"IR-01", name:"Incident response", tier:1, note:"One intake, parallel regulatory clocks, fastest-hand design.", r:["gxp","psec","isms","priv","ot","glba"]},
+    {id:"SR-01", name:"Third-party oversight", tier:2, note:"One intake, three evidence tracks, CUECs mapped.", r:["sox","gxp","psec","isms","priv","glba"]}
+  ];
+
+  /* ---------- render substrate ---------- */
+  var grid = document.getElementById("substrateGrid");
+  var status = document.getElementById("subStatus");
+
+  CONTROLS.forEach(function(c){
+    var card = document.createElement("div");
+    card.className = "ctrl-card";
+    card.setAttribute("data-regimes", c.r.join(" "));
+    var flags = REGIMES.map(function(r){
+      return '<span class="flag f-' + r + (c.r.indexOf(r) > -1 ? " on" : "") + '" title="' + RNAME[r] + '"></span>';
+    }).join("");
+    card.innerHTML =
+      '<span class="cc-id">' + c.id + ' · TIER ' + c.tier + '</span>' +
+      '<h5>' + c.name + '</h5>' +
+      '<p class="cc-note">' + c.note + '</p>' +
+      '<div class="cc-flags">' + flags + '</div>';
+    grid.appendChild(card);
+  });
+
+  var selected = [];
+  var rbtns = Array.prototype.slice.call(document.querySelectorAll(".rbtn"));
+
+  function paintSubstrate(){
+    var cards = Array.prototype.slice.call(grid.children);
+    if (selected.length === 0){
+      cards.forEach(function(el){ el.classList.remove("dim","hit"); });
+      status.innerHTML = "No regime selected — showing all 14 controls. Colour blocks on each card show which regimes claim it.";
+      return;
+    }
+    var hits = 0;
+    cards.forEach(function(el){
+      var rs = el.getAttribute("data-regimes").split(" ");
+      var match = selected.every(function(s){ return rs.indexOf(s) > -1; });
+      el.classList.toggle("hit", match);
+      el.classList.toggle("dim", !match);
+      if (match) hits++;
+    });
+    var names = selected.map(function(s){ return RNAME[s]; }).join(" + ");
+    var pct = Math.round(hits / CONTROLS.length * 100);
+    status.innerHTML = "<strong>" + names + "</strong> claims <strong>" + hits + " of " + CONTROLS.length +
+      "</strong> substrate controls (" + pct + "%). " +
+      (selected.length > 1
+        ? "These are the controls you must build once and evidence to the strictest of the selected regimes."
+        : "Nothing here is unique to this regime alone — the difference is scope and evidence bar, not control design.");
+  }
+
+  rbtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var r = btn.getAttribute("data-regime");
+      var i = selected.indexOf(r);
+      if (i > -1){ selected.splice(i,1); btn.setAttribute("aria-pressed","false"); }
+      else { selected.push(r); btn.setAttribute("aria-pressed","true"); }
+      paintSubstrate();
+    });
+  });
+  paintSubstrate();
+
+  /* ---------- maturity plotter ---------- */
+  var WEIGHT = {1:3, 2:2, 3:1};
+  var list = document.getElementById("scoreList");
+
+  function opts(sel){
+    var s = "";
+    for (var i = 0; i <= 5; i++){
+      s += '<option value="' + i + '"' + (i === sel ? " selected" : "") + ">" + i + "</option>";
+    }
+    return s;
+  }
+
+  CONTROLS.forEach(function(c){
+    var d = parseInt(store.get(NS + "d." + c.id) || "0", 10);
+    var e = parseInt(store.get(NS + "e." + c.id) || "0", 10);
+    var row = document.createElement("div");
+    row.className = "score-row";
+    row.innerHTML =
+      '<label class="sr-name" for="d-' + c.id + '">' + c.name +
+      '<span>' + c.id + ' · TIER ' + c.tier + ' · WEIGHT ' + WEIGHT[c.tier] + '</span></label>' +
+      '<select id="d-' + c.id + '" data-k="d" data-id="' + c.id + '" data-tier="' + c.tier + '" aria-label="Design maturity for ' + c.name + '">' + opts(d) + '</select>' +
+      '<select id="e-' + c.id + '" data-k="e" data-id="' + c.id + '" data-tier="' + c.tier + '" aria-label="Evidence maturity for ' + c.name + '">' + opts(e) + '</select>';
+    list.appendChild(row);
+  });
+
+  var elD = document.getElementById("wDesign"),
+      elE = document.getElementById("wEvid"),
+      elG = document.getElementById("wGap"),
+      elB = document.getElementById("wBelow"),
+      elV = document.getElementById("verdict");
+
+  function band(el, v, target){
+    el.classList.remove("ok","warn","bad");
+    if (v >= target) el.classList.add("ok");
+    else if (v >= target - 1) el.classList.add("warn");
+    else el.classList.add("bad");
+  }
+
+  function recompute(){
+    var sd = 0, se = 0, w = 0, below = 0, t1below = 0, any = false;
+    CONTROLS.forEach(function(c){
+      var d = parseInt(document.getElementById("d-" + c.id).value, 10);
+      var e = parseInt(document.getElementById("e-" + c.id).value, 10);
+      var wt = WEIGHT[c.tier];
+      sd += d * wt; se += e * wt; w += wt;
+      if (d > 0 || e > 0) any = true;
+      if (d < 3 || e < 3){ below++; if (c.tier === 1) t1below++; }
+    });
+    if (!any){
+      elD.textContent = "—"; elE.textContent = "—"; elG.textContent = "—"; elB.textContent = "—";
+      elD.className = "st-v"; elE.className = "st-v"; elG.className = "st-v"; elB.className = "st-v";
+      elV.textContent = "Set scores to see the readout.";
+      return;
+    }
+    var wd = sd / w, we = se / w, gap = wd - we;
+    elD.textContent = wd.toFixed(2);
+    elE.textContent = we.toFixed(2);
+    elG.textContent = (gap >= 0 ? "+" : "") + gap.toFixed(2);
+    elB.textContent = below + " / " + CONTROLS.length;
+
+    band(elD, wd, 4); band(elE, we, 4);
+    elG.classList.remove("ok","warn","bad");
+    elG.classList.add(Math.abs(gap) < 0.5 ? "ok" : (Math.abs(gap) < 1.2 ? "warn" : "bad"));
+    elB.classList.remove("ok","warn","bad");
+    elB.classList.add(t1below === 0 ? "ok" : (t1below <= 2 ? "warn" : "bad"));
+
+    var msg;
+    if (t1below > 0){
+      msg = "<strong>" + t1below + " tier-1 control" + (t1below > 1 ? "s sit" : " sits") +
+            " below the floor of 3.</strong> This is the number that goes to the audit committee. " +
+            "Weighted averages are secondary until it reaches zero.";
+    } else if (gap > 1.2){
+      msg = "<strong>Design outruns evidence by " + gap.toFixed(1) + " levels.</strong> " +
+            "Controls are well designed and hard to prove — the profile that passes a management review and fails an inspection. " +
+            "Stop designing; invest the next two quarters entirely in the evidence layer.";
+    } else if (gap < -1.2){
+      msg = "<strong>Evidence outruns design by " + Math.abs(gap).toFixed(1) + " levels.</strong> " +
+            "You are collecting artefacts for controls that are not yet standardised globally. " +
+            "Fix the SOPs and scope register before adding more tooling.";
+    } else if (wd >= 4 && we >= 4){
+      msg = "<strong>At target on both axes with no floor breaches.</strong> Shift spend from remediation to continuous monitoring and auditor read-only access — that is where the annual burden actually drops.";
+    } else {
+      msg = "<strong>Balanced but below target.</strong> Design and evidence are moving together, which is the right shape. " +
+            "Prioritise by tier weight: a tier-1 control at 3 is worth three tier-3 controls at 3.";
+    }
+    elV.innerHTML = msg;
+  }
+
+  list.addEventListener("change", function(ev){
+    var t = ev.target;
+    if (t && t.tagName === "SELECT"){
+      store.set(NS + t.getAttribute("data-k") + "." + t.getAttribute("data-id"), t.value);
+      recompute();
+    }
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", function(){
+    CONTROLS.forEach(function(c){
+      store.del(NS + "d." + c.id); store.del(NS + "e." + c.id);
+      document.getElementById("d-" + c.id).value = "0";
+      document.getElementById("e-" + c.id).value = "0";
+    });
+    recompute();
+  });
+
+  recompute();
+})();
+</script>
+</body>
+</html>
