@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Good GRC Program — FDA-Regulated Digital Manufacturing</title>
+<style>
+  :root{
+    --petrol:#1b4965;--petrol-deep:#12334a;--petrol-tint:#e8eff4;
+    --ink:#1a1d21;--ink-soft:#4a5560;--rule:#d5dee5;--paper:#fbfcfd;
+    --ok:#2f7a5e;--mid:#5b8db8;--bad:#a8433a;--warn:#b8863a;--plum:#7a5a86;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:Inter,Calibri,"Segoe UI",system-ui,-apple-system,sans-serif;
+    font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:940px;margin:0 auto;padding:0 28px 90px}
+
+  header{border-bottom:3px solid var(--petrol);padding:52px 0 24px}
+  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--petrol);font-weight:600;margin:0 0 14px}
+  h1{font-size:clamp(27px,4.6vw,42px);line-height:1.1;margin:0 0 14px;font-weight:700;letter-spacing:-.02em;color:var(--petrol-deep)}
+  .standfirst{font-size:18px;line-height:1.55;color:var(--ink-soft);margin:0;max-width:64ch}
+
+  .thesis{background:var(--petrol);color:#fff;padding:32px 32px 28px;margin:0 0 40px;border-bottom:6px solid var(--warn)}
+  .thesis .eyebrow{color:#9dc4dc;margin-bottom:10px}
+  .thesis .q{font-size:clamp(19px,3vw,26px);line-height:1.32;font-weight:650;margin:0 0 14px;letter-spacing:-.01em}
+  .thesis p{color:#d7e5ee;margin:0;font-size:15.5px;max-width:74ch}
+  .thesis .three{display:flex;gap:0;margin:22px 0 0;border-top:1px solid rgba(255,255,255,.22)}
+  .thesis .three div{flex:1;padding:16px 18px 0 0;font-size:13.5px;color:#d7e5ee}
+  .thesis .three b{display:block;font-size:11px;letter-spacing:.13em;text-transform:uppercase;margin-bottom:5px;color:#a9d3ee}
+
+  h2{font-size:13px;letter-spacing:.13em;text-transform:uppercase;color:var(--petrol);font-weight:700;margin:52px 0 6px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+  h3{font-size:19px;margin:28px 0 10px;font-weight:650;color:var(--petrol-deep);letter-spacing:-.01em}
+  p{margin:0 0 15px;max-width:74ch}
+  strong{font-weight:650}
+  code{font-family:"Cascadia Mono",Consolas,monospace;font-size:13px;background:var(--petrol-tint);padding:1px 5px;color:var(--petrol-deep)}
+
+  .pull{border-left:4px solid var(--petrol);background:var(--petrol-tint);padding:16px 22px;margin:24px 0;font-size:17px;line-height:1.5;color:var(--petrol-deep);font-weight:550}
+  .flag{border-left:4px solid var(--bad);background:#fbf1f0;padding:14px 20px;margin:22px 0;font-size:15px;color:#6e2f28}
+  .flag b{color:var(--bad)}
+
+  figure{margin:28px 0 32px}
+  figure svg{width:100%;height:auto;display:block}
+  figcaption{font-size:13px;color:var(--ink-soft);margin-top:10px;padding-left:12px;border-left:2px solid var(--rule)}
+
+  table{width:100%;border-collapse:collapse;margin:18px 0 24px;font-size:14px}
+  th{text-align:left;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--petrol);border-bottom:2px solid var(--petrol);padding:0 10px 8px;font-weight:700}
+  td{padding:10px;border-bottom:1px solid var(--rule);vertical-align:top}
+  tbody tr:hover{background:#f4f8fa}
+  .num{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:650}
+  .g{color:var(--ok)}.r{color:var(--bad)}.y{color:var(--warn)}
+
+  details{border:1px solid var(--rule);background:#fff;margin:12px 0;border-left:4px solid var(--petrol)}
+  details.fail{border-left-color:var(--bad)}
+  details.win{border-left-color:var(--ok)}
+  summary{cursor:pointer;list-style:none;padding:13px 20px 13px 44px;position:relative;font-weight:650;font-size:16.5px;color:var(--petrol-deep)}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"+";position:absolute;left:18px;top:50%;transform:translateY(-50%);font-size:19px;font-weight:400;color:var(--petrol);line-height:1}
+  details[open]>summary::before{content:"\2013"}
+  details.fail>summary::before{color:var(--bad)}
+  details.win>summary::before{color:var(--ok)}
+  summary:hover{background:var(--petrol-tint)}
+  summary:focus-visible{outline:2px solid var(--petrol);outline-offset:-2px}
+  summary .sub{display:block;font-weight:400;font-size:13px;color:var(--ink-soft);margin-top:2px;letter-spacing:0}
+  .dbody{padding:2px 22px 10px;border-top:1px solid var(--rule)}
+  .dbody>:first-child{margin-top:14px}
+
+  .toolbar{display:flex;gap:10px;margin:6px 0 4px}
+  .toolbar button{font:inherit;font-size:12px;letter-spacing:.06em;text-transform:uppercase;font-weight:650;background:none;border:1px solid var(--rule);color:var(--petrol);padding:6px 12px;cursor:pointer}
+  .toolbar button:hover{background:var(--petrol-tint);border-color:var(--petrol)}
+
+  ul.plain{padding-left:20px;margin:0 0 16px;max-width:74ch}
+  ul.plain li{margin-bottom:7px}
+  .tick{list-style:none;padding:0;margin:0 0 16px}
+  .tick li{position:relative;padding:5px 0 5px 24px;font-size:15px;border-bottom:1px dotted var(--rule)}
+  .tick li:last-child{border-bottom:none}
+  .tick li::before{content:"\25B8";position:absolute;left:4px;color:var(--petrol);font-size:12px;top:9px}
+  .tick.no li::before{content:"\00D7";color:var(--bad);font-weight:700;left:5px;top:6px;font-size:14px}
+
+  .kpi{display:flex;flex-wrap:wrap;gap:1px;background:var(--rule);margin:20px 0 26px;border:1px solid var(--rule)}
+  .kpi div{flex:1 1 168px;background:#fff;padding:14px 16px}
+  .kpi b{display:block;font-size:23px;font-weight:700;color:var(--petrol-deep);font-variant-numeric:tabular-nums;line-height:1.1}
+  .kpi span{display:block;font-size:12px;color:var(--ink-soft);margin-top:5px;line-height:1.35}
+
+  .close{border-top:3px solid var(--petrol);margin-top:50px;padding-top:24px}
+  @media(max-width:640px){
+    .wrap{padding:0 16px 60px}
+    .thesis{padding:24px 20px}.thesis .three{flex-direction:column}
+    table{font-size:13px}td{padding:8px 6px}
+    summary{font-size:15.5px;padding-left:38px}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">Program Design · Regulated Medical Device Manufacturing</p>
+  <h1>What a Good GRC Program Looks Like</h1>
+  <p class="standfirst">An FDA-regulated manufacturer with connected products, a plant floor, and a cloud back end — three regulatory worlds that most programs run as three disconnected bureaucracies. Architecture, evidence model, metrics, and the ten ways it fails.</p>
+</header>
+
+<section class="thesis">
+  <p class="eyebrow">The Measure of the Program</p>
+  <p class="q">A GRC program is good if it shortens time-to-clearance and time-to-patch. Everything else is overhead wearing a compliance costume.</p>
+  <p>Policy count, control-mapping breadth, and framework logos are inputs. The program earns its budget in exactly two currencies: how fast a compliant product reaches market, and how fast a vulnerability in the field gets closed without a field action. If neither number improves, the program is a tax.</p>
+  <div class="three">
+    <div><b>Premarket</b>Cybersecurity documentation is generated by engineering as a by-product of building, not assembled by regulatory in the final six weeks.</div>
+    <div><b>Postmarket</b>A CVE lands, reachability is determined in days, and the disposition — VEX, patch, correction, report — follows a decision rule, not a debate.</div>
+    <div><b>Plant &amp; Enterprise</b>Production and QMS software, OT networks, and cloud infrastructure sit in one risk model with the product, not in a separate IT silo.</div>
+  </div>
+</section>
+
+<p>Sections below are collapsed. The regulatory surface, architecture, metrics and failure modes are the load-bearing parts; open the rest as needed.</p>
+
+<div class="toolbar">
+  <button type="button" id="openAll">Expand all</button>
+  <button type="button" id="closeAll">Collapse all</button>
+</div>
+
+<h2>1 · The Regulatory Surface</h2>
+
+<p>Scope first, because most programs are mis-scoped from day one. A digital-manufacturing medtech company is simultaneously three regulated entities: a <strong>device manufacturer</strong> (quality system, design controls, premarket submissions), a <strong>production operation</strong> (automated equipment, MES, historians, plant OT), and a <strong>digital business</strong> (cloud services, customer data, enterprise IT). Each has its own regulator, auditor, and failure mode.</p>
+
+<p>The 2026 alignment matters here. <strong>QMSR</strong> took effect 2 February 2026, incorporating ISO 13485:2016 by reference into 21 CFR Part 820. FDA re-issued both the premarket cybersecurity guidance and the Computer Software Assurance guidance on 3 February 2026 to align terminology with it. A program still built around the old QSR vocabulary will produce evidence that no longer maps cleanly to how a current investigator or reviewer reads it.</p>
+
+<table>
+  <thead><tr><th style="width:24%">Domain</th><th style="width:38%">Binding / authoritative</th><th>What it actually demands of the program</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Quality system</strong></td><td>21 CFR 820 (QMSR, eff. 2 Feb 2026) · ISO 13485:2016 by reference · Part 11 · Part 803 MDR · Part 806</td><td>Design controls, DHF/DMR, CAPA, supplier controls, records integrity. Security work must land <em>inside</em> these objects or it has no regulatory standing.</td></tr>
+    <tr><td><strong>Product cybersecurity</strong></td><td>FD&amp;C Act §524B (eff. 29 Mar 2023) · FDA premarket cyber guidance, final 3 Feb 2026 (supersedes Jun 2025 and Sep 2023) · postmarket guidance 2016</td><td>SPDF tied into the QMS, AAMI SW96-aligned security risk file, threat model, machine-readable SBOM, VEX, vulnerability management plan, CVD policy, demonstrated patchability, scoped penetration test.</td></tr>
+    <tr><td><strong>Security risk</strong></td><td>ISO 14971 (safety) · AAMI TIR57 / AAMI SW96 (security) · IEC 81001-5-1 · IEC 62304</td><td>Two linked but distinct risk processes. Security risk is expressed in <em>exploitability</em>; safety risk in <em>harm</em>. The bridge between them is the single most-audited artifact.</td></tr>
+    <tr><td><strong>Production &amp; QMS software</strong></td><td>820.70(i) · CSA guidance (final Sep 2025, re-issued 3 Feb 2026) · GPSV (Sec. 6 superseded) · Part 11</td><td>Risk-based assurance by intended use and process risk — not blanket validation. This is what makes patching plant systems possible on a sane cadence.</td></tr>
+    <tr><td><strong>OT / plant floor</strong></td><td>IEC 62443 · NIST SP 800-82</td><td>Zones and conduits, asset inventory, segmentation from enterprise, change control that coexists with production schedules.</td></tr>
+    <tr><td><strong>Enterprise &amp; cloud</strong></td><td>NIST CSF 2.0 · ISO/IEC 27001 · SOC 2 · HIPAA where PHI flows · state privacy law</td><td>Customer assurance and the control backbone everything else inherits.</td></tr>
+    <tr><td><strong>Ex-US</strong></td><td>EU MDR · MDCG 2019-16 · NIS2 · EU Cyber Resilience Act · UK, Health Canada, TGA, PMDA</td><td>Largely the same evidence, different packaging. Build once, express many — or you will build it three times.</td></tr>
+    <tr><td><strong>AI/ML functions</strong></td><td>PCCP guidance · NIST AI RMF · ISO/IEC 42001 · EU AI Act</td><td>Change control for models, data lineage, drift monitoring, and a predetermined change plan so retraining isn't a new submission each time.</td></tr>
+  </tbody>
+</table>
+
+<div class="flag"><b>Scoping error that costs the most:</b> treating "cyber device" narrowly. §524B reaches devices with software that connect to the internet — but the premarket guidance addresses devices with cybersecurity risk generally. Programs that scope to "connected products only" discover mid-submission that a USB-serviceable pump, a Bluetooth wearable, or a device whose only network path is the clinician's laptop all carry documentation expectations.</div>
+
+<h2>2 · Program Architecture</h2>
+
+<p>The organising principle: <strong>one control set, three operating domains, one evidence store</strong>. Most failures are architectural rather than technical — the same control gets implemented three times, evidenced three ways, and audited three times, and nobody can answer a simple cross-domain question like "which fielded products contain this component."</p>
+
+<figure>
+<svg viewBox="0 0 900 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Layered GRC program architecture with governance spine, three operating domains, and shared evidence services">
+  <g font-family="Inter,Calibri,sans-serif">
+    <!-- Governance spine -->
+    <rect x="30" y="30" width="840" height="62" fill="#1b4965"/>
+    <text x="46" y="56" font-size="11" font-weight="700" fill="#9dc4dc" letter-spacing="1.3">GOVERNANCE — SINGLE ACCOUNTABLE EXECUTIVE</text>
+    <text x="46" y="78" font-size="13.5" fill="#fff">Risk appetite · policy set · exception authority · board &amp; audit-committee reporting · budget</text>
+    <text x="854" y="78" text-anchor="end" font-size="12" fill="#9dc4dc">CPSO / CISO</text>
+
+    <!-- Three domains -->
+    <g>
+      <rect x="30" y="112" width="270" height="184" fill="#fff" stroke="#2f7a5e" stroke-width="2"/>
+      <rect x="30" y="112" width="270" height="26" fill="#2f7a5e"/>
+      <text x="44" y="130" font-size="11" font-weight="700" fill="#fff" letter-spacing="1.2">PRODUCT SECURITY</text>
+      <g font-size="12.5" fill="#1a1d21">
+        <text x="44" y="158">Threat modelling · SPDF gates</text>
+        <text x="44" y="180">Security risk file (SW96)</text>
+        <text x="44" y="202">SBOM generation &amp; VEX</text>
+        <text x="44" y="224">Premarket documentation</text>
+        <text x="44" y="246">PSIRT · CVD · advisories</text>
+        <text x="44" y="268">Legacy &amp; EOL fleet policy</text>
+      </g>
+      <text x="44" y="288" font-size="11" fill="#2f7a5e" font-weight="650">Owner: Engineering + Product Security</text>
+    </g>
+    <g>
+      <rect x="315" y="112" width="270" height="184" fill="#fff" stroke="#b8863a" stroke-width="2"/>
+      <rect x="315" y="112" width="270" height="26" fill="#b8863a"/>
+      <text x="329" y="130" font-size="11" font-weight="700" fill="#fff" letter-spacing="1.2">MANUFACTURING &amp; OT</text>
+      <g font-size="12.5" fill="#1a1d21">
+        <text x="329" y="158">OT asset inventory · zones/conduits</text>
+        <text x="329" y="180">CSA for production &amp; QMS software</text>
+        <text x="329" y="202">Part 11 records &amp; audit trails</text>
+        <text x="329" y="224">Patch windows vs. production</text>
+        <text x="329" y="246">Supplier &amp; contract-manufacturer</text>
+        <text x="329" y="268">Line-down / ransomware continuity</text>
+      </g>
+      <text x="329" y="288" font-size="11" fill="#8a6a2e" font-weight="650">Owner: Operations + Quality</text>
+    </g>
+    <g>
+      <rect x="600" y="112" width="270" height="184" fill="#fff" stroke="#5b8db8" stroke-width="2"/>
+      <rect x="600" y="112" width="270" height="26" fill="#5b8db8"/>
+      <text x="614" y="130" font-size="11" font-weight="700" fill="#fff" letter-spacing="1.2">ENTERPRISE &amp; CLOUD</text>
+      <g font-size="12.5" fill="#1a1d21">
+        <text x="614" y="158">Identity · endpoint · network</text>
+        <text x="614" y="180">Cloud posture · IaC controls</text>
+        <text x="614" y="202">SOC 2 / ISO 27001 attestation</text>
+        <text x="614" y="224">PHI handling · privacy</text>
+        <text x="614" y="246">Third-party risk</text>
+        <text x="614" y="268">IR &amp; breach notification</text>
+      </g>
+      <text x="614" y="288" font-size="11" fill="#3d6d90" font-weight="650">Owner: IT + Security Operations</text>
+    </g>
+
+    <!-- connectors down -->
+    <g stroke="#4a5560" stroke-width="1.4" fill="none" stroke-dasharray="3 3">
+      <path d="M165,296 L165,330"/><path d="M450,296 L450,330"/><path d="M735,296 L735,330"/>
+    </g>
+
+    <!-- Shared services -->
+    <rect x="30" y="332" width="840" height="106" fill="#e8eff4" stroke="#1b4965"/>
+    <text x="46" y="354" font-size="11" font-weight="700" fill="#1b4965" letter-spacing="1.3">SHARED SERVICES — BUILT ONCE, CONSUMED BY ALL THREE</text>
+    <g font-size="12.5" fill="#12334a">
+      <text x="46" y="380">Unified control framework</text>
+      <text x="46" y="400">one control, many mappings</text>
+      <text x="250" y="380">Evidence store</text>
+      <text x="250" y="400">automated collection, versioned</text>
+      <text x="440" y="380">Risk register bridge</text>
+      <text x="440" y="400">security exploitability &#8594; safety harm</text>
+      <text x="672" y="380">CAPA &amp; change control</text>
+      <text x="672" y="400">the only route to a closed finding</text>
+    </g>
+    <text x="46" y="426" font-size="12" font-style="italic" fill="#4a5560">If any of these four exists in triplicate, the program is already failing — the symptom is that no one can answer a cross-domain question.</text>
+  </g>
+</svg>
+<figcaption>The four shared services are what separates a program from three coexisting bureaucracies. They are also the hardest to fund, because none of them is visible to an auditor as a deliverable.</figcaption>
+</figure>
+
+<details class="win">
+  <summary>The unified control framework — one control, many mappings<span class="sub">Why the mapping direction matters more than the mapping itself</span></summary>
+  <div class="dbody">
+    <p>The common failure is building a spreadsheet that maps NIST CSF to ISO 27001 to SOC 2 to 800-171 and calling it a control framework. That is a <em>crosswalk</em>, and it operates nothing.</p>
+    <p>A control framework has controls as the primary object: each has an owner, an implementation, a test procedure, an evidence artifact, and a frequency. Frameworks map <em>to</em> the control, never the reverse. Add a framework and you add mapping columns, not new controls — unless a genuine gap appears, which is the useful signal the structure produces.</p>
+    <table>
+      <thead><tr><th style="width:16%">Field</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td>Control</td><td>Third-party components are inventoried per build with provenance and support status.</td></tr>
+        <tr><td>Owner</td><td>Release Engineering (accountable), Product Security (assuring)</td></tr>
+        <tr><td>Implementation</td><td>CycloneDX generated in CI on every build; fails the pipeline on unresolvable provenance</td></tr>
+        <tr><td>Evidence</td><td>Signed SBOM artifact + pipeline log, retained per DHF retention rule</td></tr>
+        <tr><td>Test</td><td>Quarterly: sample 5 releases, confirm SBOM hash matches shipped binary</td></tr>
+        <tr><td>Maps to</td><td>§524B(b)(3) · FDA premarket guidance SBOM element · 820.50 supplier controls · SOC 2 CC3.2 · ISO 27001 A.8.8 · CSF ID.AM-02 · 800-171 3.4.1</td></tr>
+      </tbody>
+    </table>
+    <p><strong>The test of whether you have one:</strong> add a new framework obligation and count how many new controls you write. In a healthy framework the answer is usually zero to three. If it is thirty, you are running crosswalks, not controls.</p>
+  </div>
+</details>
+
+<h2>3 · Lifecycle Integration — The Load-Bearing Design</h2>
+
+<p>This is where good and bad programs actually separate. Security either lives inside design controls, with defined gates and defined evidence, or it lives beside them as a review that happens too late to change anything.</p>
+
+<figure>
+<svg viewBox="0 0 920 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Product lifecycle showing design control phases, security gates, premarket submission, and the postmarket loop">
+  <defs>
+    <marker id="fa" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#1b4965"/></marker>
+    <marker id="fr" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#a8433a"/></marker>
+  </defs>
+  <g font-family="Inter,Calibri,sans-serif">
+    <!-- phase band -->
+    <text x="24" y="28" font-size="10.5" font-weight="700" fill="#1b4965" letter-spacing="1.3">DESIGN CONTROLS (21 CFR 820.30 / ISO 13485 CL.7.3)</text>
+    <g>
+      <rect x="24" y="38" width="156" height="40" fill="#1b4965"/><text x="102" y="63" text-anchor="middle" font-size="12.5" font-weight="650" fill="#fff">Planning &amp; Inputs</text>
+      <rect x="184" y="38" width="156" height="40" fill="#25597a"/><text x="262" y="63" text-anchor="middle" font-size="12.5" font-weight="650" fill="#fff">Design &amp; Development</text>
+      <rect x="344" y="38" width="156" height="40" fill="#33698c"/><text x="422" y="63" text-anchor="middle" font-size="12.5" font-weight="650" fill="#fff">Verification</text>
+      <rect x="504" y="38" width="156" height="40" fill="#42799e"/><text x="582" y="63" text-anchor="middle" font-size="12.5" font-weight="650" fill="#fff">Validation &amp; Transfer</text>
+      <rect x="664" y="38" width="232" height="40" fill="#5b8db8"/><text x="780" y="63" text-anchor="middle" font-size="12.5" font-weight="650" fill="#fff">Submission &amp; Market</text>
+    </g>
+
+    <!-- gates -->
+    <g>
+      <circle cx="102" cy="106" r="12" fill="#fff" stroke="#2f7a5e" stroke-width="2.4"/><text x="102" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#2f7a5e">G1</text>
+      <circle cx="262" cy="106" r="12" fill="#fff" stroke="#2f7a5e" stroke-width="2.4"/><text x="262" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#2f7a5e">G2</text>
+      <circle cx="422" cy="106" r="12" fill="#fff" stroke="#2f7a5e" stroke-width="2.4"/><text x="422" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#2f7a5e">G3</text>
+      <circle cx="582" cy="106" r="12" fill="#fff" stroke="#2f7a5e" stroke-width="2.4"/><text x="582" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#2f7a5e">G4</text>
+      <circle cx="780" cy="106" r="12" fill="#fff" stroke="#2f7a5e" stroke-width="2.4"/><text x="780" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#2f7a5e">G5</text>
+      <line x1="24" y1="106" x2="90" y2="106" stroke="#d5dee5" stroke-width="2"/>
+      <line x1="114" y1="106" x2="250" y2="106" stroke="#d5dee5" stroke-width="2"/>
+      <line x1="274" y1="106" x2="410" y2="106" stroke="#d5dee5" stroke-width="2"/>
+      <line x1="434" y1="106" x2="570" y2="106" stroke="#d5dee5" stroke-width="2"/>
+      <line x1="594" y1="106" x2="768" y2="106" stroke="#d5dee5" stroke-width="2"/>
+    </g>
+
+    <!-- gate contents -->
+    <g font-size="11.5" fill="#1a1d21">
+      <text x="24" y="146" font-weight="650" fill="#2f7a5e">G1 · Security plan</text>
+      <text x="24" y="164">Cyber-device determination</text>
+      <text x="24" y="180">Security requirements as</text><text x="24" y="196">design inputs, not "non-functional"</text>
+      <text x="24" y="212">Regulatory pathway + SPDF tailoring</text>
+
+      <text x="184" y="146" font-weight="650" fill="#2f7a5e">G2 · Threat model</text>
+      <text x="184" y="164">STRIDE / attack trees, before</text><text x="184" y="180">architecture freeze</text>
+      <text x="184" y="196">Security risk file opened</text>
+      <text x="184" y="212">SBOM generating in CI</text>
+
+      <text x="344" y="146" font-weight="650" fill="#2f7a5e">G3 · Verification</text>
+      <text x="344" y="164">Every security requirement</text><text x="344" y="180">traced to a test result</text>
+      <text x="344" y="196">SAST/DAST/fuzz on interfaces</text>
+      <text x="344" y="212">Residual risk dispositioned</text>
+
+      <text x="504" y="146" font-weight="650" fill="#2f7a5e">G4 · Independence</text>
+      <text x="504" y="164">Pen test scoped to real</text><text x="504" y="180">external interfaces</text>
+      <text x="504" y="196">Patchability demonstrated</text>
+      <text x="504" y="212">Manufacturing transfer &amp; provisioning</text>
+
+      <text x="664" y="146" font-weight="650" fill="#2f7a5e">G5 · Submission-ready</text>
+      <text x="664" y="164">Documentation assembled from</text><text x="664" y="180">artifacts already produced</text>
+      <text x="664" y="196">Labelling / security disclosures</text>
+      <text x="664" y="212">CVD policy live before first ship</text>
+    </g>
+
+    <line x1="24" y1="236" x2="896" y2="236" stroke="#d5dee5"/>
+
+    <!-- postmarket loop -->
+    <text x="24" y="264" font-size="10.5" font-weight="700" fill="#a8433a" letter-spacing="1.3">POSTMARKET — THE LOOP THAT FEEDS BACK INTO DESIGN</text>
+    <g>
+      <rect x="24" y="278" width="150" height="52" fill="#fff" stroke="#a8433a" stroke-width="1.6"/><text x="99" y="300" text-anchor="middle" font-size="12" font-weight="650" fill="#1a1d21">Intake</text><text x="99" y="318" text-anchor="middle" font-size="10.5" fill="#4a5560">CVD · feeds · researcher</text>
+      <rect x="204" y="278" width="150" height="52" fill="#fff" stroke="#a8433a" stroke-width="1.6"/><text x="279" y="300" text-anchor="middle" font-size="12" font-weight="650" fill="#1a1d21">Reachability</text><text x="279" y="318" text-anchor="middle" font-size="10.5" fill="#4a5560">SBOM &#8594; affected fleet</text>
+      <rect x="384" y="278" width="150" height="52" fill="#fff" stroke="#a8433a" stroke-width="1.6"/><text x="459" y="300" text-anchor="middle" font-size="12" font-weight="650" fill="#1a1d21">Safety impact</text><text x="459" y="318" text-anchor="middle" font-size="10.5" fill="#4a5560">14971 risk re-assessment</text>
+      <rect x="564" y="278" width="150" height="52" fill="#fff" stroke="#a8433a" stroke-width="1.6"/><text x="639" y="300" text-anchor="middle" font-size="12" font-weight="650" fill="#1a1d21">Disposition</text><text x="639" y="318" text-anchor="middle" font-size="10.5" fill="#4a5560">VEX · patch · 806 · 803</text>
+      <rect x="744" y="278" width="152" height="52" fill="#fff" stroke="#a8433a" stroke-width="1.6"/><text x="820" y="300" text-anchor="middle" font-size="12" font-weight="650" fill="#1a1d21">Advisory &amp; deploy</text><text x="820" y="318" text-anchor="middle" font-size="10.5" fill="#4a5560">CSAF · adoption tracking</text>
+      <g stroke="#a8433a" stroke-width="1.6" fill="none" marker-end="url(#fr)">
+        <path d="M174,304 L198,304"/><path d="M354,304 L378,304"/><path d="M534,304 L558,304"/><path d="M714,304 L738,304"/>
+      </g>
+    </g>
+    <!-- feedback arrow -->
+    <path d="M820,336 L820,368 L262,368 L262,124" stroke="#1b4965" stroke-width="1.8" fill="none" stroke-dasharray="5 4" marker-end="url(#fa)"/>
+    <text x="540" y="362" text-anchor="middle" font-size="11.5" font-style="italic" fill="#1b4965">Field vulnerability classes become threat-model inputs on the next programme — or you ship the same defect again</text>
+
+    <!-- CAPA bar -->
+    <rect x="24" y="392" width="872" height="46" fill="#e8eff4" stroke="#1b4965"/>
+    <text x="40" y="412" font-size="11" font-weight="700" fill="#1b4965" letter-spacing="1.2">CAPA &amp; DESIGN CHANGE CONTROL</text>
+    <text x="40" y="430" font-size="12" fill="#12334a">Every gate failure, audit finding, and field security event terminates here — with an owner, a due date, and effectiveness verification. No parallel "security backlog."</text>
+  </g>
+</svg>
+<figcaption>Five gates, each producing an artifact that a submission consumes unchanged. The dashed return path is the part almost every program omits: field vulnerability classes feeding the next program's threat model.</figcaption>
+</figure>
+
+<div class="pull">If the premarket cybersecurity package is <em>assembled</em> in the last six weeks rather than <em>collected</em> from work already done, the program has failed regardless of whether the submission clears.</div>
+
+<details>
+  <summary>Linking the two risk registers<span class="sub">The bridge from exploitability to patient harm — the most-audited artifact you own</span></summary>
+  <div class="dbody">
+    <p>Safety risk (ISO 14971) and security risk (AAMI SW96 / TIR57) use different currencies. Safety asks how likely a hazardous situation leads to harm. Security cannot use probability the same way — an adversary is not a random failure, and historical rates don't predict attacker behaviour. So security scores <em>exploitability</em>, then hands off to the safety process at a defined join.</p>
+    <figure>
+    <svg viewBox="0 0 900 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Chain linking threat, vulnerability, exploitability, compromise, hazardous situation and harm across security and safety risk processes">
+      <defs><marker id="ch" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#4a5560"/></marker></defs>
+      <g font-family="Inter,Calibri,sans-serif">
+        <rect x="20" y="52" width="416" height="118" fill="#7a5a86" opacity="0.07"/>
+        <rect x="452" y="52" width="428" height="118" fill="#2f7a5e" opacity="0.07"/>
+        <text x="28" y="40" font-size="11" font-weight="700" fill="#7a5a86" letter-spacing="1.2">SECURITY RISK — AAMI SW96 · scored on EXPLOITABILITY</text>
+        <text x="460" y="40" font-size="11" font-weight="700" fill="#2f7a5e" letter-spacing="1.2">SAFETY RISK — ISO 14971 · scored on HARM</text>
+        <g font-size="12" fill="#1a1d21" text-anchor="middle">
+          <rect x="32" y="86" width="118" height="50" fill="#fff" stroke="#7a5a86" stroke-width="1.6"/><text x="91" y="107">Threat</text><text x="91" y="124" font-size="10.5" fill="#4a5560">actor &amp; capability</text>
+          <rect x="172" y="86" width="118" height="50" fill="#fff" stroke="#7a5a86" stroke-width="1.6"/><text x="231" y="107">Vulnerability</text><text x="231" y="124" font-size="10.5" fill="#4a5560">CVE or design flaw</text>
+          <rect x="312" y="86" width="112" height="50" fill="#fff" stroke="#7a5a86" stroke-width="1.6"/><text x="368" y="107">Exploit path</text><text x="368" y="124" font-size="10.5" fill="#4a5560">reachable?</text>
+          <rect x="464" y="86" width="122" height="50" fill="#fff" stroke="#2f7a5e" stroke-width="1.6"/><text x="525" y="107">Compromise</text><text x="525" y="124" font-size="10.5" fill="#4a5560">device state change</text>
+          <rect x="608" y="86" width="130" height="50" fill="#fff" stroke="#2f7a5e" stroke-width="1.6"/><text x="673" y="107">Hazardous situation</text><text x="673" y="124" font-size="10.5" fill="#4a5560">clinical exposure</text>
+          <rect x="760" y="86" width="112" height="50" fill="#fff" stroke="#2f7a5e" stroke-width="2.2"/><text x="816" y="107" font-weight="650">Harm</text><text x="816" y="124" font-size="10.5" fill="#4a5560">to patient/user</text>
+        </g>
+        <g stroke="#4a5560" stroke-width="1.5" fill="none" marker-end="url(#ch)">
+          <path d="M150,111 L166,111"/><path d="M290,111 L306,111"/><path d="M424,111 L458,111"/><path d="M586,111 L602,111"/><path d="M738,111 L754,111"/>
+        </g>
+        <line x1="444" y1="56" x2="444" y2="166" stroke="#1b4965" stroke-width="2" stroke-dasharray="5 4"/>
+        <text x="444" y="192" text-anchor="middle" font-size="12" font-weight="700" fill="#1b4965">THE JOIN</text>
+        <text x="444" y="210" text-anchor="middle" font-size="11.5" fill="#4a5560">Security hands over a credible compromise scenario;</text>
+        <text x="444" y="226" text-anchor="middle" font-size="11.5" fill="#4a5560">safety assesses it as a hazardous situation using 14971 severity.</text>
+      </g>
+    </svg>
+    </figure>
+    <p><strong>What auditors and reviewers probe:</strong> whether the join is real. Two registers, no traceability between them, is the most common finding. The test is simple — pick a controlled entry in the security risk file and ask which safety risk file entry it maps to, and who assessed severity. If the answer is a person rather than a record, it fails.</p>
+    <p><strong>The scoring trap:</strong> raw CVSS as a security risk score. CVSS describes a vulnerability in the abstract; it says nothing about whether the component is reachable in your architecture, whether compensating controls exist, or what the clinical consequence is. Use CVSS as an input, layer reachability and exploitability, and let the safety process own severity.</p>
+  </div>
+</details>
+
+<h2>4 · Postmarket — Where the Program Is Actually Tested</h2>
+
+<p>Premarket is a finite project with a deadline. Postmarket runs forever, on a fleet you no longer control, with components you did not write, against a clock set by whoever publishes the CVE. This is the capability that separates a real program from a documentation exercise.</p>
+
+<figure>
+<svg viewBox="0 0 900 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Decision tree for triaging a newly published vulnerability through to regulatory disposition">
+  <defs><marker id="dt" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#4a5560"/></marker></defs>
+  <g font-family="Inter,Calibri,sans-serif" font-size="12">
+    <rect x="336" y="20" width="228" height="44" fill="#1b4965"/><text x="450" y="40" text-anchor="middle" font-size="12.5" font-weight="650" fill="#fff">New vulnerability disclosed</text><text x="450" y="56" text-anchor="middle" font-size="10.5" fill="#9dc4dc">CVE feed · researcher · internal test</text>
+
+      <path d="M450,64 L450,96" stroke="#4a5560" stroke-width="1.5" marker-end="url(#dt)" fill="none"/>
+    <rect x="316" y="98" width="268" height="42" fill="#fff" stroke="#1b4965" stroke-width="1.8"/><text x="450" y="118" text-anchor="middle" font-weight="650">In any product SBOM?</text><text x="450" y="133" text-anchor="middle" font-size="10.5" fill="#4a5560">answerable in minutes, or the program has a gap here</text>
+
+      <path d="M316,119 L206,119 L206,166" stroke="#4a5560" stroke-width="1.5" marker-end="url(#dt)" fill="none"/>
+      <text x="252" y="112" font-size="11" font-weight="650" fill="#2f7a5e">no</text>
+    <rect x="106" y="168" width="200" height="40" fill="#fff" stroke="#2f7a5e" stroke-width="1.6"/><text x="206" y="193" text-anchor="middle" font-size="12">Record &amp; close · no action</text>
+
+      <path d="M450,140 L450,166" stroke="#4a5560" stroke-width="1.5" marker-end="url(#dt)" fill="none"/>
+      <text x="464" y="158" font-size="11" font-weight="650" fill="#a8433a">yes</text>
+    <rect x="316" y="168" width="268" height="42" fill="#fff" stroke="#1b4965" stroke-width="1.8"/><text x="450" y="188" text-anchor="middle" font-weight="650">Reachable in our architecture?</text><text x="450" y="203" text-anchor="middle" font-size="10.5" fill="#4a5560">code path · interface exposure · compensating control</text>
+
+      <path d="M584,189 L694,189 L694,236" stroke="#4a5560" stroke-width="1.5" marker-end="url(#dt)" fill="none"/>
+      <text x="628" y="182" font-size="11" font-weight="650" fill="#b8863a">not affected</text>
+    <rect x="594" y="238" width="200" height="52" fill="#fff" stroke="#b8863a" stroke-width="1.6"/><text x="694" y="258" text-anchor="middle" font-size="12" font-weight="650">Publish VEX statement</text><text x="694" y="275" text-anchor="middle" font-size="10.5" fill="#4a5560">with justification — silence reads as unaware</text>
+
+      <path d="M450,210 L450,236" stroke="#4a5560" stroke-width="1.5" marker-end="url(#dt)" fill="none"/>
+      <text x="464" y="228" font-size="11" font-weight="650" fill="#a8433a">yes</text>
+    <rect x="316" y="238" width="268" height="42" fill="#fff" stroke="#1b4965" stroke-width="1.8"/><text x="450" y="258" text-anchor="middle" font-weight="650">Safety impact under 14971?</text><text x="450" y="273" text-anchor="middle" font-size="10.5" fill="#4a5560">re-run the risk assessment — do not skip to patching</text>
+
+      <path d="M316,259 L186,259 L186,306" stroke="#4a5560" stroke-width="1.5" marker-end="url(#dt)" fill="none"/>
+      <text x="228" y="252" font-size="11" font-weight="650" fill="#5b8db8">controlled risk</text>
+    <rect x="86" y="308" width="200" height="56" fill="#fff" stroke="#5b8db8" stroke-width="1.6"/><text x="186" y="329" text-anchor="middle" font-size="12" font-weight="650">Routine remediation</text><text x="186" y="346" text-anchor="middle" font-size="10.5" fill="#4a5560">next release · advisory · SLA clock</text>
+
+      <path d="M450,280 L450,306" stroke="#4a5560" stroke-width="1.5" marker-end="url(#dt)" fill="none"/>
+      <text x="464" y="298" font-size="11" font-weight="650" fill="#a8433a">uncontrolled</text>
+    <rect x="316" y="308" width="268" height="56" fill="#fbf1f0" stroke="#a8433a" stroke-width="2"/><text x="450" y="329" text-anchor="middle" font-size="12.5" font-weight="700" fill="#a8433a">Regulatory decision point</text><text x="450" y="347" text-anchor="middle" font-size="10.5" fill="#6e2f28">quality + regulatory + security, on a defined clock</text>
+
+      <g stroke="#4a5560" stroke-width="1.5" fill="none" marker-end="url(#dt)">
+        <path d="M380,364 L380,392"/><path d="M450,364 L450,392"/><path d="M520,364 L520,392"/>
+      </g>
+    <g>
+      <rect x="196" y="394" width="176" height="52" fill="#fff" stroke="#a8433a" stroke-width="1.4"/><text x="284" y="414" text-anchor="middle" font-size="11.5" font-weight="650">Part 806</text><text x="284" y="431" text-anchor="middle" font-size="10.5" fill="#4a5560">correction / removal report</text>
+      <rect x="386" y="394" width="128" height="52" fill="#fff" stroke="#a8433a" stroke-width="1.4"/><text x="450" y="414" text-anchor="middle" font-size="11.5" font-weight="650">Part 803</text><text x="450" y="431" text-anchor="middle" font-size="10.5" fill="#4a5560">MDR if harm criteria met</text>
+      <rect x="528" y="394" width="176" height="52" fill="#fff" stroke="#a8433a" stroke-width="1.4"/><text x="616" y="414" text-anchor="middle" font-size="11.5" font-weight="650">Coordinated disclosure</text><text x="616" y="431" text-anchor="middle" font-size="10.5" fill="#4a5560">CSAF advisory · ISAC · CISA</text>
+    </g>
+    <text x="20" y="466" font-size="11.5" font-style="italic" fill="#4a5560">The 2016 postmarket guidance's practical effect: controlled residual risk with timely remediation generally avoids reporting; uncontrolled risk does not. That determination is a record, not a conversation.</text>
+  </g>
+</svg>
+<figcaption>Every branch is a written decision rule with an owner and a clock. Programs that debate this fresh each time produce inconsistent regulatory outcomes and cannot defend them later.</figcaption>
+</figure>
+
+<details>
+  <summary>PSIRT and coordinated disclosure — the operational minimum<span class="sub">What has to exist before a researcher emails you, not after</span></summary>
+  <div class="dbody">
+    <ul class="tick">
+      <li><strong>A published intake path</strong> that does not route to legal first. <code>security.txt</code>, a monitored address, and a named human. Researchers who cannot find a path go to the press or the ISAC.</li>
+      <li><strong>An acknowledgement SLA</strong> — 48–72 hours, tracked. Non-response is the single most reliable trigger for uncoordinated public disclosure.</li>
+      <li><strong>Fleet queryability.</strong> Given a component and version, which shipped products, which software versions, which customers, which are still supported. If this takes two weeks, everything downstream is already late.</li>
+      <li><strong>A patch delivery mechanism you have actually exercised</strong> on the deployed fleet — not a design intention. §524B's patchability expectation is about demonstrated capability.</li>
+      <li><strong>Advisory tooling</strong> that produces machine-readable output (CSAF) alongside the human-readable version. Hospital security teams increasingly ingest it directly.</li>
+      <li><strong>A legacy and end-of-support policy</strong> published <em>before</em> you need it, with dates. Announcing end-of-support in the same advisory as an unpatchable critical vulnerability is how a technical problem becomes a customer-trust problem.</li>
+    </ul>
+    <div class="flag"><b>The pattern that damages companies most:</b> a researcher reports responsibly, gets a legal reply, waits, publishes, and the resulting story is not about the vulnerability — it is about the response. The vulnerability was survivable. The response is what customers remember and what regulators note.</div>
+  </div>
+</details>
+
+<details>
+  <summary>The manufacturing layer — the half of scope most programs drop<span class="sub">CSA, Part 11, OT segmentation, and the patch-window problem</span></summary>
+  <div class="dbody">
+    <p>Product security gets attention because FDA asks about it in a submission. The plant floor gets attention after a ransomware event stops a line. The programs that handle this well treat production and QMS software as in-scope assets with the same control set and a different risk profile.</p>
+    <p><strong>CSA is a security enabler, not just a quality efficiency.</strong> The historical pattern — treat every production and QMS system as requiring exhaustive validation on every change — makes security patching so expensive that systems stay unpatched for years, which is itself the larger risk. The risk-based approach (assurance proportional to intended use and process risk, leveraging vendor evidence and system-generated records rather than screenshot binders) is what makes a monthly patch cadence achievable on validated systems. Programs that have not re-baselined their validation approach against the current CSA guidance are usually carrying a large, invisible, self-inflicted vulnerability backlog.</p>
+    <table>
+      <thead><tr><th style="width:30%">Plant-floor issue</th><th>What good looks like</th></tr></thead>
+      <tbody>
+        <tr><td>Asset inventory</td><td>Passive discovery on OT segments; every PLC, HMI, historian, and test fixture in the same CMDB as enterprise assets, flagged by zone.</td></tr>
+        <tr><td>Segmentation</td><td>62443 zones and conduits with documented data flows; enterprise compromise cannot reach production directly, and vendor remote access is brokered and recorded.</td></tr>
+        <tr><td>Patch cadence</td><td>Pre-agreed maintenance windows tied to the production calendar, with a risk-based exception route — not ad hoc negotiation per patch.</td></tr>
+        <tr><td>Part 11 records</td><td>Audit trails, e-signature integrity, and retention treated as security controls, since record tampering is both a data-integrity and a security event.</td></tr>
+        <tr><td>Continuity</td><td>Line-down scenario exercised, including "we cannot trust the MES." Recovery time objective agreed with operations, not assumed.</td></tr>
+        <tr><td>Contract manufacturers</td><td>820.50 supplier controls extended to security: right to audit, incident notification clock, SBOM obligations flowed down in contract.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</details>
+
+<h2>5 · Metrics That Mean Something</h2>
+
+<p>Most GRC dashboards measure activity — policies published, training completed, controls mapped, vulnerabilities found. All of those go up when the program is busy and none of them go down when the program is failing. Useful metrics come in two classes, and both are needed: <strong>leading</strong> indicators that predict a submission or field outcome, and <strong>lagging</strong> indicators that confirm it.</p>
+
+<figure>
+<svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Chart contrasting vanity metrics with leading and lagging indicators by predictive value">
+  <g font-family="Inter,Calibri,sans-serif">
+    <rect x="60" y="34" width="820" height="286" fill="#fff" stroke="#d5dee5"/>
+    <line x1="470" y1="34" x2="470" y2="320" stroke="#d5dee5"/>
+    <line x1="60" y1="177" x2="880" y2="177" stroke="#d5dee5"/>
+    <rect x="470" y="34" width="410" height="143" fill="#2f7a5e" opacity="0.06"/>
+    <rect x="60" y="177" width="410" height="143" fill="#a8433a" opacity="0.05"/>
+    <text x="470" y="352" text-anchor="middle" font-size="12" font-weight="700" fill="#1b4965" letter-spacing="1.3">TELLS YOU SOMETHING WILL GO WRONG &#8594;</text>
+    <text x="0" y="0" transform="translate(30,177) rotate(-90)" text-anchor="middle" font-size="12" font-weight="700" fill="#1b4965" letter-spacing="1.3">COSTLY TO GAME &#8594;</text>
+
+    <text x="76" y="54" font-size="10.5" fill="#4a5560" letter-spacing="1.1">HONEST BUT BACKWARD-LOOKING</text>
+    <text x="864" y="54" text-anchor="end" font-size="10.5" fill="#2f7a5e" letter-spacing="1.1">THE ONES TO REPORT UPWARD</text>
+    <text x="76" y="312" font-size="10.5" fill="#a8433a" letter-spacing="1.1">VANITY</text>
+    <text x="864" y="312" text-anchor="end" font-size="10.5" fill="#4a5560" letter-spacing="1.1">USEFUL, EASILY MASSAGED</text>
+
+    <g font-size="12" fill="#1a1d21">
+      <circle cx="640" cy="72" r="6" fill="#2f7a5e"/><text x="654" y="76">% releases with threat model before architecture freeze</text>
+      <circle cx="720" cy="104" r="6" fill="#2f7a5e"/><text x="734" y="108">Days: CVE published &#8594; reachability determined</text>
+      <circle cx="596" cy="136" r="6" fill="#2f7a5e"/><text x="610" y="140">Repeat audit findings</text>
+      <circle cx="806" cy="160" r="6" fill="#2f7a5e"/><text x="792" y="164" text-anchor="end">% fielded fleet on a supported version</text>
+
+      <circle cx="196" cy="86" r="6" fill="#5b8db8"/><text x="210" y="90">Submission cycle-time added by security review</text>
+      <circle cx="286" cy="128" r="6" fill="#5b8db8"/><text x="300" y="132">AI letters citing cybersecurity deficiencies</text>
+      <circle cx="150" cy="152" r="6" fill="#5b8db8"/><text x="164" y="156">Field actions traceable to a security defect</text>
+
+      <circle cx="560" cy="216" r="6" fill="#b8863a"/><text x="574" y="220">Mean time to remediate, by severity</text>
+      <circle cx="666" cy="252" r="6" fill="#b8863a"/><text x="680" y="256">Control test pass rate</text>
+      <circle cx="520" cy="286" r="6" fill="#b8863a"/><text x="534" y="290">Training completion</text>
+
+      <circle cx="196" cy="220" r="6" fill="#a8433a"/><text x="210" y="224">Number of policies published</text>
+      <circle cx="140" cy="256" r="6" fill="#a8433a"/><text x="154" y="260">Controls mapped across frameworks</text>
+      <circle cx="250" cy="292" r="6" fill="#a8433a"/><text x="264" y="296">Vulnerabilities found</text>
+    </g>
+    <text x="60" y="384" font-size="11.5" font-style="italic" fill="#4a5560">"Vulnerabilities found" rewards scanning. "Vulnerabilities found that were reachable, and how long they stayed open" rewards fixing.</text>
+  </g>
+</svg>
+<figcaption>Position on the vertical axis is how expensive the metric is to game. Repeat audit findings sits high because there is no way to improve it except by actually fixing root causes.</figcaption>
+</figure>
+
+<div class="kpi">
+  <div><b>100%</b><span>Releases with a threat model completed before architecture freeze</span></div>
+  <div><b>&lt;5 d</b><span>CVE publication to reachability determination across the fielded portfolio</span></div>
+  <div><b>0</b><span>Repeat findings from the prior internal or notified-body audit</span></div>
+  <div><b>&le;48 h</b><span>Acknowledgement to an external vulnerability reporter</span></div>
+  <div><b>&gt;90%</b><span>Fielded units on a supported software version at 12 months</span></div>
+  <div><b>0</b><span>Additional-information letters citing cybersecurity deficiencies</span></div>
+</div>
+
+<details>
+  <summary>The full metric set, with why each one is chosen<span class="sub">Leading, lagging, and the anti-metrics to stop reporting</span></summary>
+  <div class="dbody">
+    <h3>Leading — predicts the outcome while you can still change it</h3>
+    <table>
+      <thead><tr><th style="width:38%">Metric</th><th style="width:14%">Target</th><th>Why this one</th></tr></thead>
+      <tbody>
+        <tr><td>Threat model complete before architecture freeze</td><td class="num g">100%</td><td>After freeze, findings become change requests nobody funds. This single metric predicts most premarket friction.</td></tr>
+        <tr><td>Security requirements traced to verification evidence</td><td class="num g">100%</td><td>Traceability is what a reviewer and an investigator both actually check. Untraced requirements are aspirations.</td></tr>
+        <tr><td>SBOM regenerated per build, hash-matched to shipped binary</td><td class="num g">100%</td><td>A submission-time SBOM is stale the moment it ships and useless for postmarket triage.</td></tr>
+        <tr><td>Components with an active upstream maintainer</td><td class="num g">&gt;95%</td><td>Unmaintained dependencies are unpatchable by definition — this is a leading indicator of a future field action.</td></tr>
+        <tr><td>CVE publication &#8594; reachability determination</td><td class="num g">&lt;5 days</td><td>Measures whether the SBOM-to-fleet query actually works. Most programs discover here that it doesn't.</td></tr>
+        <tr><td>Fielded units capable of receiving a patch without a service visit</td><td class="num g">trend up</td><td>Determines whether remediation is a software task or a logistics project.</td></tr>
+        <tr><td>Production/QMS systems on a current patch baseline</td><td class="num g">&gt;90%</td><td>Directly reflects whether the CSA re-baseline actually happened.</td></tr>
+        <tr><td>Security CAPAs open past due date</td><td class="num g">0</td><td>The earliest visible sign that findings are being parked rather than closed.</td></tr>
+      </tbody>
+    </table>
+    <h3>Lagging — confirms it, too late to change it</h3>
+    <table>
+      <thead><tr><th style="width:38%">Metric</th><th style="width:14%">Target</th><th>Why this one</th></tr></thead>
+      <tbody>
+        <tr><td>Additional-information letters citing cybersecurity</td><td class="num g">0</td><td>Each one is roughly a quarter of schedule. The most expensive lagging metric in the set.</td></tr>
+        <tr><td>Submission cycle time attributable to security review</td><td class="num g">&lt;10 days</td><td>If the program is working, security is not on the critical path.</td></tr>
+        <tr><td>Repeat audit or inspection findings</td><td class="num g">0</td><td>Non-repeat findings are normal. Repeats say the CAPA process does not work, which is a far larger finding than the original.</td></tr>
+        <tr><td>Field corrections traceable to a security defect</td><td class="num g">0</td><td>The outcome the whole program exists to prevent.</td></tr>
+        <tr><td>Uncoordinated public disclosures</td><td class="num g">0</td><td>Measures the CVD process end-to-end, including tone.</td></tr>
+        <tr><td>Customer security questionnaires requiring bespoke response</td><td class="num g">trend down</td><td>A proxy for whether the trust package answers questions before they're asked.</td></tr>
+      </tbody>
+    </table>
+    <h3>Anti-metrics — stop reporting these upward</h3>
+    <ul class="tick no">
+      <li><strong>Policies published.</strong> Measures writing, not operating.</li>
+      <li><strong>Controls mapped across frameworks.</strong> Measures spreadsheet width.</li>
+      <li><strong>Vulnerabilities found.</strong> Goes up when you buy a scanner; says nothing about exposure.</li>
+      <li><strong>Vulnerabilities closed</strong> without a reachability determination — closure by fatigue looks identical to closure by fix.</li>
+      <li><strong>Training completion percentage.</strong> Necessary, never sufficient, and it always reads 97%.</li>
+      <li><strong>Average CVSS of open findings.</strong> An average of context-free scores is a context-free number.</li>
+    </ul>
+  </div>
+</details>
+
+<h2>6 · How These Programs Fail</h2>
+
+<p>Ten failure modes, roughly in order of how often they are the actual root cause. Most are structural, and most look like adequate programs from the outside until a submission or an event tests them.</p>
+
+<details class="fail">
+  <summary>1 — Two risk registers that never meet<span class="sub">Security risk in a security tool, safety risk in the QMS, no traceability</span></summary>
+  <div class="dbody">
+    <p>Security keeps a vulnerability register scored on CVSS; quality keeps the 14971 risk file. Neither references the other. The program looks complete from either side and cannot answer the only question that matters — <em>what could this vulnerability do to a patient</em>.</p>
+    <p><strong>How it surfaces:</strong> an audit or reviewer asks for traceability from a security control to the hazard it mitigates, and the answer is a subject-matter expert's recollection.</p>
+    <p><strong>Fix:</strong> make the join an artifact with a controlled identifier, not a meeting. Every entry in the security risk file names its safety risk file counterpart or explicitly records why there is none.</p>
+  </div>
+</details>
+
+<details class="fail">
+  <summary>2 — Security engaged at design freeze<span class="sub">Reviewing what can no longer be changed</span></summary>
+  <div class="dbody">
+    <p>Security is invited once the architecture is set, finds real problems, and every finding becomes a change request competing against launch date. Predictably, most are deferred with a risk acceptance, and the accepted risks accumulate across releases into a portfolio nobody has ever totalled.</p>
+    <p><strong>How it surfaces:</strong> a risk-acceptance register that only grows; or an submission cycle where cybersecurity questions add months.</p>
+    <p><strong>Fix:</strong> gate G1/G2 with security requirements as design <em>inputs</em>. A design input has regulatory standing; a security recommendation does not.</p>
+  </div>
+</details>
+
+<details class="fail">
+  <summary>3 — SBOM as a submission artifact rather than a build artifact<span class="sub">Generated once, by hand, for the filing</span></summary>
+  <div class="dbody">
+    <p>Someone assembles a component list for the submission. It clears. Eighteen months later a critical CVE lands in a widely-used library and the question "are we affected" takes three weeks, because the only SBOM describes a build that no longer exists.</p>
+    <p><strong>How it surfaces:</strong> the first serious postmarket event. Nothing before that reveals it.</p>
+    <p><strong>Fix:</strong> SBOM generation in CI, machine-readable, versioned with the binary, retained alongside the DHF, and queryable across the fielded portfolio in one operation.</p>
+  </div>
+</details>
+
+<details class="fail">
+  <summary>4 — The CAPA graveyard<span class="sub">Findings routed into a process that cannot absorb them</span></summary>
+  <div class="dbody">
+    <p>Security findings are correctly routed into CAPA, which is then overwhelmed by volume it was never designed for. CAPAs age, extensions accumulate, effectiveness checks become perfunctory. The process meant to demonstrate control becomes the primary evidence of its absence.</p>
+    <p><strong>How it surfaces:</strong> ageing CAPA metrics, repeat findings, and eventually an inspectional observation about the CAPA system itself — a much worse outcome than the original finding.</p>
+    <p><strong>Fix:</strong> triage criteria that distinguish a systemic finding (CAPA) from routine remediation (tracked in engineering with an SLA). Not everything is a CAPA; and separately, nothing that <em>is</em> a CAPA gets a parallel informal backlog.</p>
+  </div>
+</details>
+
+<details class="fail">
+  <summary>5 — Validation burden makes patching impossible<span class="sub">A quality practice producing a security outcome</span></summary>
+  <div class="dbody">
+    <p>Production and QMS systems are held to a validation approach where any change triggers extensive revalidation. Patching becomes prohibitively expensive, so it stops. Years later the plant runs unsupported operating systems on systems that cannot be taken down, and the risk register does not reflect it because nobody scored it.</p>
+    <p><strong>How it surfaces:</strong> ransomware, or an OT assessment that finds decade-old software on the line.</p>
+    <p><strong>Fix:</strong> re-baseline against the current CSA guidance — assurance proportional to intended use and process risk, leveraging vendor evidence and system-generated records instead of manual documentation. This is one of the few places where the compliance-and-security interests point the same direction, and it is routinely left on the table.</p>
+  </div>
+</details>
+
+<details class="fail">
+  <summary>6 — OT and the plant floor left out of scope<span class="sub">The program stops at the products and the laptops</span></summary>
+  <div class="dbody">
+    <p>Product security is funded because FDA asks. Enterprise IT is funded because customers ask. Nobody asks about the historian, so the historian is unowned, unpatched, flat-networked to the business, and running a vendor remote-access tool with a shared credential.</p>
+    <p><strong>How it surfaces:</strong> a production outage, usually not targeted — commodity ransomware that reached the line through a flat network.</p>
+    <p><strong>Fix:</strong> one asset inventory covering enterprise, OT, and test infrastructure; 62443 zones with documented conduits; and operations co-owning the risk with a named accountable leader.</p>
+  </div>
+</details>
+
+<details class="fail">
+  <summary>7 — Legacy fleet with no support policy<span class="sub">Devices that outlive their software support, in the field, with no plan</span></summary>
+  <div class="dbody">
+    <p>Devices are in clinical use for a decade or more. Software support horizons are rarely stated at launch. When a vulnerability lands on a platform that can no longer be patched, the company has no pre-agreed position, and the announcement of end-of-support arrives in the same communication as the vulnerability.</p>
+    <p><strong>How it surfaces:</strong> customer escalation, sometimes an ISAC advisory, occasionally a field action driven by inability to remediate.</p>
+    <p><strong>Fix:</strong> published support lifecycle at launch with dates; a defined process for compensating controls where patching is impossible; and end-of-support communication decoupled from vulnerability disclosure.</p>
+  </div>
+</details>
+
+<details class="fail">
+  <summary>8 — Legal-first response to security researchers<span class="sub">Converting a survivable technical issue into a reputational one</span></summary>
+  <div class="dbody">
+    <p>A researcher reports responsibly. The reply comes from counsel, references terms of service, and asks about testing authorisation. The researcher waits, then publishes. The resulting coverage is about the response, not the flaw.</p>
+    <p><strong>How it surfaces:</strong> once, publicly, in a way that is permanently searchable.</p>
+    <p><strong>Fix:</strong> a published CVD policy with safe-harbour language, technical first response within 48–72 hours, and legal in an advisory rather than a front-line role. Credit researchers in advisories; it costs nothing and changes the relationship.</p>
+  </div>
+</details>
+
+<details class="fail">
+  <summary>9 — Framework sprawl and mapping theatre<span class="sub">Breadth of coverage substituted for depth of operation</span></summary>
+  <div class="dbody">
+    <p>The program adds frameworks — CSF, 27001, SOC 2, 800-171, 62443, AI RMF — each with its own artefacts, each mapped to the others, none operated to the point of producing reliable evidence. Effort goes into the map, and the map is not the territory.</p>
+    <p><strong>How it surfaces:</strong> an audit where controls exist on paper and evidence collection is a scramble; or a customer questionnaire that takes four weeks.</p>
+    <p><strong>Fix:</strong> one control set with mapping columns. Adopting a new framework should add columns, not controls. Measure evidence automation percentage, not mapping coverage.</p>
+  </div>
+</details>
+
+<details class="fail">
+  <summary>10 — Diffuse ownership<span class="sub">Three functions each reasonably believing another owns it</span></summary>
+  <div class="dbody">
+    <p>Quality owns the QMS, IT owns infrastructure, engineering owns the product. Product security sits in the seam. Every function is behaving reasonably, and the gap is invisible until something falls through it — typically a postmarket vulnerability where nobody owns the regulatory reporting determination.</p>
+    <p><strong>How it surfaces:</strong> slowly, then all at once, during an incident where the first two hours are spent establishing who decides.</p>
+    <p><strong>Fix:</strong> one accountable executive for product security with authority over the gates and the postmarket decision rule, and a documented decision-rights matrix. The title matters less than whether that person can stop a release.</p>
+  </div>
+</details>
+
+<h2>7 · Maturity and Sequence</h2>
+
+<figure>
+<svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Five-stage maturity ladder from reactive to anticipatory">
+  <g font-family="Inter,Calibri,sans-serif">
+    <g>
+      <rect x="20" y="196" width="164" height="72" fill="#a8433a" opacity="0.9"/><text x="34" y="220" font-size="12.5" font-weight="700" fill="#fff">1 · REACTIVE</text><text x="34" y="240" font-size="11" fill="#fff">Submission-driven.</text><text x="34" y="256" font-size="11" fill="#fff">Evidence assembled late.</text>
+      <rect x="192" y="158" width="164" height="110" fill="#b8863a" opacity="0.9"/><text x="206" y="182" font-size="12.5" font-weight="700" fill="#fff">2 · DOCUMENTED</text><text x="206" y="202" font-size="11" fill="#fff">Policies exist.</text><text x="206" y="218" font-size="11" fill="#fff">Controls inconsistent.</text><text x="206" y="234" font-size="11" fill="#fff">Two risk registers.</text>
+      <rect x="364" y="118" width="164" height="150" fill="#5b8db8" opacity="0.9"/><text x="378" y="142" font-size="12.5" font-weight="700" fill="#fff">3 · INTEGRATED</text><text x="378" y="162" font-size="11" fill="#fff">Gates in design controls.</text><text x="378" y="178" font-size="11" fill="#fff">SBOM in CI.</text><text x="378" y="194" font-size="11" fill="#fff">CVD live.</text><text x="378" y="210" font-size="11" fill="#fff">Risk registers joined.</text>
+      <rect x="536" y="76" width="164" height="192" fill="#3d7d97" opacity="0.92"/><text x="550" y="100" font-size="12.5" font-weight="700" fill="#fff">4 · MEASURED</text><text x="550" y="120" font-size="11" fill="#fff">Evidence automated.</text><text x="550" y="136" font-size="11" fill="#fff">Leading metrics drive</text><text x="550" y="152" font-size="11" fill="#fff">decisions.</text><text x="550" y="168" font-size="11" fill="#fff">Reachability in days.</text>
+      <rect x="708" y="34" width="172" height="234" fill="#2f7a5e"/><text x="722" y="58" font-size="12.5" font-weight="700" fill="#fff">5 · ANTICIPATORY</text><text x="722" y="78" font-size="11" fill="#fff">Field vuln classes feed</text><text x="722" y="94" font-size="11" fill="#fff">next-gen threat models.</text><text x="722" y="110" font-size="11" fill="#fff">Security shortens</text><text x="722" y="126" font-size="11" fill="#fff">time-to-market.</text><text x="722" y="148" font-size="11" fill="#8fe0be">Competitive, not compliant.</text>
+    </g>
+    <line x1="20" y1="276" x2="880" y2="276" stroke="#1b4965" stroke-width="1.5"/>
+    <text x="20" y="296" font-size="11.5" fill="#4a5560">Most regulated manufacturers sit at 2. The jump from 2 to 3 is organisational, not technical — and it is the only jump that changes outcomes.</text>
+    <text x="880" y="296" text-anchor="end" font-size="11.5" font-style="italic" fill="#2f7a5e">Stage 5 is where the program starts paying for itself.</text>
+  </g>
+</svg>
+<figcaption>Stage 2 is stable and comfortable and produces most of the failures above. Nothing about stage 2 looks broken until a submission or an incident tests it.</figcaption>
+</figure>
+
+<details class="win">
+  <summary>A defensible 180-day sequence<span class="sub">What to do first when inheriting a stage-2 program</span></summary>
+  <div class="dbody">
+    <h3>Days 1–30 — Establish ground truth</h3>
+    <ul class="tick">
+      <li>Portfolio inventory: every product, its regulatory status, its software support state, whether a current SBOM exists.</li>
+      <li>Determine which products meet the cyber-device definition and which carry cybersecurity documentation expectations regardless.</li>
+      <li>Locate both risk registers and test whether any traceability exists between them.</li>
+      <li>Time-box the exercise: given a named component, how long to identify affected fielded products. Record the real answer.</li>
+    </ul>
+    <h3>Days 31–90 — Close the two gaps that block everything else</h3>
+    <ul class="tick">
+      <li>SBOM generation into CI for products in active development; a best-effort reconstruction for the top fielded revenue products.</li>
+      <li>Publish the CVD policy and stand up intake with an acknowledgement SLA. This is low-cost and removes the highest-variance risk.</li>
+      <li>Define the postmarket disposition decision rule (the tree above) and get quality, regulatory and legal to sign it while nothing is on fire.</li>
+      <li>Name the single accountable executive and document decision rights, including who can stop a release.</li>
+    </ul>
+    <h3>Days 91–180 — Make it structural</h3>
+    <ul class="tick">
+      <li>Insert G1–G5 into the design control procedure so the gates are QMS objects with evidence requirements, not a security checklist.</li>
+      <li>Build the risk-register bridge and retrofit the two or three highest-risk products.</li>
+      <li>Re-baseline production/QMS software validation against the current CSA guidance to unblock patching.</li>
+      <li>Stand up the unified control framework with automated evidence for the ten highest-frequency controls.</li>
+      <li>Start reporting leading metrics to the board or audit committee — three of them, monthly, unchanged for a year.</li>
+    </ul>
+    <div class="pull">Sequence matters: CVD and SBOM first, because they are cheap and they cap the worst-case outcome. Framework and control work later, because it is expensive and it caps nothing on its own.</div>
+  </div>
+</details>
+
+<div class="close">
+  <p class="eyebrow">Back to the Measure</p>
+  <p style="font-size:18.5px;line-height:1.5;color:var(--petrol-deep);font-weight:600;max-width:64ch">Two numbers decide whether the program is real: how long a compliant product takes to reach market, and how long a reachable vulnerability stays open in the field.</p>
+  <p style="color:var(--ink-soft)">Every artifact described above — the gates, the joined risk registers, the CI-generated SBOM, the disposition tree, the unified control set — exists to move one of those two numbers. Anything in the program that moves neither is overhead, and in a regulated manufacturer overhead is not neutral: it consumes the credibility the program needs on the day it asks engineering to stop a release.</p>
+</div>
+
+</div>
+<script>
+(function(){
+  var all=function(){return Array.prototype.slice.call(document.querySelectorAll('details'));};
+  var o=document.getElementById('openAll'),c=document.getElementById('closeAll');
+  if(o)o.addEventListener('click',function(){all().forEach(function(d){d.open=true;});});
+  if(c)c.addEventListener('click',function(){all().forEach(function(d){d.open=false;});});
+})();
+</script>
+</body>
+</html>
