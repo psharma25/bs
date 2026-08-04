@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vendor Risk Assessment &mdash; Secureframe, Inc.</title>
+<style>
+:root{
+  --petrol:#1b4965; --petrol-dark:#12334a; --petrol-light:#2d6a8f;
+  --wash:#eef3f7; --wash-2:#f7f9fb;
+  --ink:#14212b; --ink-2:#41545f; --ink-3:#75868f;
+  --line:#d7e0e7; --line-strong:#b6c5d0; --paper:#fff;
+  /* Pastel bands: 75% and above green, 50-74% yellow, below 50% red.
+     Fills are pastel; ink tones stay saturated so text remains legible. */
+  --green:#1d6b4f; --green-fill:#a3d9b8; --green-bg:#e4f3ea; --green-line:#a3d9b8;
+  --amber:#8a5b00; --amber-fill:#f6d98f; --amber-bg:#fdf4e0; --amber-line:#f6d98f;
+  --red:#9b2226;   --red-fill:#f2aba9;   --red-bg:#fceceb;   --red-line:#f2aba9;
+  --shadow:0 1px 2px rgba(20,33,43,.06),0 4px 14px rgba(20,33,43,.05);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Calibri,"Segoe UI",system-ui,-apple-system,sans-serif;
+  background:var(--wash-2);color:var(--ink);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+header.app{background:var(--petrol);color:#fff;padding:16px 26px;display:flex;gap:18px;
+  align-items:center;flex-wrap:wrap;position:sticky;top:0;z-index:60;box-shadow:0 1px 0 rgba(0,0,0,.15)}
+header.app h1{font-size:17px;margin:0;font-weight:600;letter-spacing:.2px}
+header.app .sub{font-size:12px;opacity:.75;margin-top:2px}
+header.app .spacer{flex:1}
+button{font-family:inherit;font-size:13px;cursor:pointer;border:1px solid var(--line-strong);
+  background:var(--paper);color:var(--ink);padding:6px 12px;border-radius:6px}
+button:hover{background:var(--wash)}
+button.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.4)}
+button.ghost:hover{background:rgba(255,255,255,.12)}
+button.mini{padding:4px 10px;font-size:12px}
+button.on{background:var(--petrol);color:#fff;border-color:var(--petrol)}
+.layout{display:flex;max-width:1260px;margin:0 auto;align-items:flex-start}
+nav.side{width:216px;flex:0 0 216px;padding:20px 12px 60px;position:sticky;top:64px}
+nav.side a{display:block;padding:7px 10px;border-radius:6px;color:var(--ink-2);font-size:13.5px;
+  text-decoration:none;cursor:pointer;border-left:3px solid transparent;margin-bottom:1px}
+nav.side a:hover{background:var(--wash)}
+nav.side a.on{background:var(--wash);color:var(--petrol);font-weight:600;border-left-color:var(--petrol)}
+nav.side .n{color:var(--ink-3);font-size:11.5px;margin-right:8px;font-variant-numeric:tabular-nums}
+main{flex:1;min-width:0;padding:20px 26px 90px}
+h2.sec{font-size:20px;font-weight:600;color:var(--petrol-dark);margin:2px 0 4px}
+p.lede{color:var(--ink-2);max-width:76ch;margin:0 0 18px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:18px 20px;
+  margin-bottom:16px;box-shadow:var(--shadow)}
+.card h3{font-size:15px;margin:0 0 3px;color:var(--petrol-dark);font-weight:600}
+.card .hint{font-size:12.5px;color:var(--ink-3);margin:0 0 12px;max-width:80ch}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--ink-3);
+  font-weight:600;padding:7px 8px;border-bottom:1px solid var(--line-strong);vertical-align:bottom}
+td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:hover td{background:var(--wash-2)}
+.tag{display:inline-block;font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:20px;
+  background:var(--wash);color:var(--petrol);border:1px solid var(--line);white-space:nowrap}
+.tag.c{background:var(--green-fill);color:var(--green);border-color:var(--green-line)}
+.tag.i{background:var(--amber-fill);color:var(--amber);border-color:var(--amber-line)}
+.tag.u{background:var(--red-fill);color:var(--red);border-color:var(--red-line)}
+.tag.t1{background:var(--red-bg);color:var(--red);border-color:var(--red-line)}
+.callout{border-left:3px solid var(--petrol);background:var(--wash);padding:12px 15px;
+  border-radius:0 6px 6px 0;margin:14px 0;font-size:13.5px}
+.callout.warn{border-left-color:var(--amber);background:var(--amber-bg)}
+.callout.bad{border-left-color:var(--red);background:var(--red-bg)}
+.callout.good{border-left-color:var(--green);background:var(--green-bg)}
+.hero{display:flex;gap:30px;align-items:center;flex-wrap:wrap}
+.hero .grade{font-size:64px;font-weight:600;line-height:1}
+.hero .sc{font-size:30px;font-weight:600;color:var(--petrol);font-variant-numeric:tabular-nums}
+.hero .lab{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--ink-3);font-weight:600}
+.catrow{display:grid;grid-template-columns:200px 1fr 48px;gap:12px;align-items:center;margin-bottom:9px}
+.catrow .cl{font-size:13px;font-weight:600;color:var(--ink-2)}
+.catrow .cl small{display:block;font-weight:400;color:var(--ink-3);font-size:11px}
+.catrow .bar{background:var(--wash);border-radius:3px;height:16px;overflow:hidden}
+.catrow .bar span{display:block;height:100%;border-radius:3px}
+.catrow .cp{text-align:right;font-size:12.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+td.num{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-3);white-space:nowrap}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:14px 16px;box-shadow:var(--shadow)}
+.kpi .lab{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--ink-3);font-weight:600}
+.kpi .val{font-size:26px;font-weight:600;color:var(--petrol);line-height:1.15;margin-top:3px;font-variant-numeric:tabular-nums}
+.kpi .val.red{color:var(--red)} .kpi .val.amber{color:var(--amber)} .kpi .val.green{color:var(--green)}
+.kpi .note{font-size:12px;color:var(--ink-3);margin-top:2px}
+ul.tight{margin:6px 0;padding-left:20px} ul.tight li{margin-bottom:5px}
+dl.kv{margin:0;display:grid;grid-template-columns:190px 1fr;gap:2px 14px;font-size:13.5px}
+dl.kv dt{color:var(--ink-3);font-size:12.5px;padding:4px 0}
+dl.kv dd{margin:0;padding:4px 0;border-bottom:1px solid var(--line)}
+dl.kv dt{border-bottom:1px solid var(--line)}
+.filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.filters .lab{font-size:12px;color:var(--ink-3);margin-right:2px}
+.qrow td:first-child{font-variant-numeric:tabular-nums;color:var(--ink-3);width:32px}
+.src{font-size:11.5px;color:var(--ink-3);display:block;margin-top:3px}
+.kicker{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.sev{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:baseline}
+.sev{border:1px solid rgba(20,33,43,.18)}
+.sev.h{background:#f2aba9} .sev.m{background:#f6d98f} .sev.l{background:#dfe6eb}
+@media (max-width:920px){
+  .grid2,.grid3{grid-template-columns:1fr}
+  dl.kv{grid-template-columns:1fr}
+  nav.side{position:static;width:100%;flex:1 1 100%;display:flex;flex-wrap:wrap;gap:4px;padding:10px 16px}
+  nav.side a{border-left:none;border-bottom:3px solid transparent}
+  nav.side a.on{border-left-color:transparent;border-bottom-color:var(--petrol)}
+  .layout{flex-wrap:wrap}
+}
+@media print{
+  header.app,nav.side,.filters,.no-print{display:none!important}
+  body{background:#fff} main{padding:0}
+  .card{break-inside:avoid;box-shadow:none}
+  section{display:block!important}
+}
+section.panel{display:none} section.panel.on{display:block}
+</style>
+</head>
+<body>
+
+<header class="app">
+  <div>
+    <h1>Vendor Risk Assessment &mdash; Secureframe, Inc.</h1>
+    <div class="sub">BitSense, LLC &middot; Prepared by Praveen Sharma &middot; Passive OSINT, pre-engagement</div>
+  </div>
+  <div class="spacer"></div>
+  <button class="ghost" onclick="window.print()">Print / PDF</button>
+  <button class="ghost" onclick="showAll()">Expand all</button>
+</header>
+
+<div class="layout">
+<nav class="side" id="nav"></nav>
+<main>
+
+<!-- ===== SUMMARY ===== -->
+<section class="panel on" id="p-summary">
+  <div class="kicker">Section 1</div>
+  <h2 class="sec">Assessment summary</h2>
+  <p class="lede">Passive open-source assessment of Secureframe, Inc. as a prospective Tier&nbsp;1 vendor. No active scanning, no contact with the vendor. All findings are drawn from the vendor's own published trust center, corporate filings and aggregators, and third-party availability monitors. Every claim below is marked <span class="tag c">Confirmed</span> where a primary source was read directly, <span class="tag i">Inferred</span> where reasoned from adjacent facts, and <span class="tag u">Unknown</span> where the source could not be reached.</p>
+
+  <div class="grid2" style="grid-template-columns:repeat(2,1fr)">
+    <div class="kpi"><div class="lab">Grade</div><div class="val amber">B+</div><div class="note">Some risks &mdash; proceed with conditions. See Section 2.</div></div>
+    <div class="kpi"><div class="lab">Recommended tier</div><div class="val red">Tier 1</div><div class="note">Broad authenticated read access across the customer estate</div></div>
+    <div class="kpi"><div class="lab">Questions answered without contact</div><div class="val green" id="kAnswered">&mdash;</div><div class="note">of 30 in the standard Tier 1 set</div></div>
+    <div class="kpi"><div class="lab">Findings</div><div class="val amber" id="kFindings">&mdash;</div><div class="note" id="kFindingsNote">&mdash;</div></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>Position</h3>
+    <p class="hint">Read this before the detail.</p>
+    <p style="margin:0 0 10px">Secureframe presents an unusually strong published compliance posture for a company of its size &mdash; SOC&nbsp;2 Type&nbsp;II, ISO/IEC 27001:2022, CMMC Level&nbsp;2 certification, TX-RAMP, and a FedRAMP 20x Low authorization, with the FedRAMP POA&amp;M and control test results published for public download. That last point is materially more transparent than the market norm and should be credited.</p>
+    <p style="margin:0 0 10px">The concerns are not about control design. They are about <strong>currency of evidence</strong> and <strong>concentration of access</strong>. The publicly advertised SOC&nbsp;2 report period ended more than a year before this assessment date, and the FedRAMP authorization letter is within days of its stated validity end. Separately, a compliance automation platform necessarily holds broad authenticated read access into the identity provider, cloud accounts, code repositories, and HR system of every customer &mdash; a wider view of the environment than almost any other vendor in a typical stack. That access profile, not the control maturity, is what drives the Tier&nbsp;1 recommendation.</p>
+    <div class="callout warn"><strong>Two items to resolve before contract.</strong> The current SOC&nbsp;2 Type&nbsp;II report covering the period after 30&nbsp;June&nbsp;2025, or a bridge letter; and written confirmation of the FedRAMP 20x authorization status past its stated letter expiry. Neither is likely to be a problem &mdash; both are almost certainly a publication lag rather than a lapse &mdash; but both must be evidenced rather than assumed.</div>
+  </div>
+
+  <div class="card">
+    <h3>What this assessment could not cover</h3>
+    <p class="hint">Stated plainly so the gaps are not mistaken for clean results.</p>
+    <ul class="tight">
+      <li><strong>No active technical observation.</strong> TLS configuration, certificate chain, HSTS, security headers, SPF/DKIM/DMARC records, certificate transparency logs, and subdomain enumeration were all out of reach from the assessment environment. Each is a ten-minute check from an unrestricted workstation and should be completed before sign-off.</li>
+      <li><strong>No gated documents.</strong> The SOC&nbsp;2 report, ISO certificate, pen test summary, CMMC certificate, and shared responsibility matrix all sit behind a request-and-NDA workflow. Their existence is confirmed; their contents are not.</li>
+      <li><strong>No OAuth scope review.</strong> The single most informative available check &mdash; what permissions the Secureframe application actually requests in your identity provider &mdash; requires access to your own tenant, not theirs.</li>
+      <li><strong>No contract or DPA review.</strong> Notification SLAs, liability, and subprocessor change terms are unassessed.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== RATING ===== -->
+<section class="panel" id="p-rating">
+  <div class="kicker">Section 2</div>
+  <h2 class="sec">Rating</h2>
+  <p class="lede">A single grade against a three-point scale, with the reasoning that produced it. The grade describes <em>the evidence available to a passive assessment</em>, not the company. That distinction is load-bearing and is restated at the end of this section.</p>
+
+  <div class="card">
+    <div style="display:flex;gap:34px;align-items:center;flex-wrap:wrap">
+      <div>
+        <div class="lab" style="font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--ink-3);font-weight:600">Assigned grade</div>
+        <div style="font-size:64px;font-weight:600;color:var(--amber);line-height:1">B<span style="font-size:34px">+</span></div>
+      </div>
+      <div style="flex:1;min-width:300px">
+        <table style="font-size:13px">
+          <tbody>
+            <tr><td style="width:34px"><strong>A</strong></td><td style="color:var(--ink-3)">Secure. Can safeguard our data.</td><td style="width:80px"></td></tr>
+            <tr style="background:var(--amber-fill)"><td><strong>B</strong></td><td><strong>Some risks. Proceed with conditions.</strong></td><td><span class="tag i">Assigned</span></td></tr>
+            <tr><td><strong>C</strong></td><td style="color:var(--ink-3)">Bad. Do not proceed on current evidence.</td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Why not A</h3>
+      <p class="hint">Three items unverified rather than verified-bad, plus one structural ceiling.</p>
+      <ul class="tight">
+        <li><strong>SOC 2 is stale on its face.</strong> The advertised period ended thirteen months before assessment date. The independent attestation is the strongest single input to an A grade and it cannot be confirmed as current. Almost certainly a publication lag &mdash; but "almost certainly" is not an A.</li>
+        <li><strong>No published terms on the two AI subprocessors.</strong> OpenAI and Twilio sit in the chain with no stated data location, while the platform ingests the customer's policy library, control evidence and personnel records. Training use, retention and residency are all blank.</li>
+        <li><strong>No encryption-at-rest control in the public catalogue.</strong> In-transit is published; at-rest is not. It almost certainly exists and is simply unpublished, but an assessor cannot grade what is not visible.</li>
+        <li><strong>Structural ceiling.</strong> A compliance automation platform holds broader authenticated read access into the customer estate than almost anything else purchased. The Vanta precedent (Section&nbsp;7) shows that risk materialising in this exact category, via a code change rather than an attacker. This caps the achievable grade for every vendor in the class, not just this one.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Why not C &mdash; and not close</h3>
+      <p class="hint">The control programme is demonstrably strong and better evidenced than most peers at this size.</p>
+      <ul class="tight">
+        <li>SOC 2 Type II, ISO/IEC 27001:2022, CMMC Level 2 via Cyber AB with C3PAO Redspin valid to September 2028, FedRAMP 20x Low, and TX-RAMP Level 1.</li>
+        <li>A dedicated CISO with over four years in seat who took a prior company through FedRAMP authorization. Security ownership is unambiguous and not a part-time CTO responsibility.</li>
+        <li><strong>They publish their own POA&amp;M.</strong> The open findings list, the 3PAO assessment methodology, and machine-readable control test results are all open download with no NDA. This is the opposite of a company concealing its weak points, and it is rare enough to be worth weighting.</li>
+        <li>No breach disclosure, no regulatory enforcement, no attributed CVE.</li>
+        <li>A published control catalogue with named, testable controls across access, change, availability, incident response and risk &mdash; not marketing language.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What moves the grade</h3>
+    <table>
+      <thead><tr><th style="width:12%">Direction</th><th style="width:44%">Trigger</th><th style="width:44%">Assessment</th></tr></thead>
+      <tbody>
+        <tr><td><span class="tag c">To A</span></td><td>Current SOC 2 Type II or bridge letter; written confirmation that customer data is not used for model training with a contractual opt-out; encryption at rest confirmed; credible answer on tenant isolation architecture and testing.</td><td>All four are routine asks. A competent vendor should clear them inside a week. Failure to do so quickly is itself informative.</td></tr>
+        <tr><td><span class="tag u">To C</span></td><td>Discovery that the SOC 2 lapsed rather than lagged; or that AI subprocessor terms permit training on customer data with no opt-out; or a non-answer on tenant isolation.</td><td>Any one of these alone is sufficient to drop the grade. They are not cumulative.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Recommendation</h3>
+    <p style="margin:0 0 10px">Proceed to contract, <strong>conditional on the four A-grade items closing before signature rather than after</strong>. Conditions to carry into the agreement:</p>
+    <ul class="tight">
+      <li>Tier 1 treatment with annual reassessment</li>
+      <li>Named business owner on the risk acceptance &mdash; not security</li>
+      <li>Incident notification SLA written into the security exhibit, measured from discovery, rather than left to standard terms</li>
+      <li>Subprocessor change notification with a defined objection window</li>
+      <li>Attestation expiry tracked as a monitored date, given that the current lapse is what produced finding F-01</li>
+    </ul>
+    <div class="callout warn" style="margin-bottom:0"><strong>Framing note for client presentation.</strong> This is a B on the evidence available to a passive assessment, not a B on the company. Most of what holds it off an A is one document request away. If the residual questions in Section&nbsp;10 return fast and specific answers, expect to re-grade upward &mdash; and say so when presenting, so the grade is not mistaken for a verdict on the vendor's competence.</div>
+  </div>
+</section>
+
+<!-- ===== PROFILE ===== -->
+<section class="panel" id="p-profile">
+  <div class="kicker">Section 3</div>
+  <h2 class="sec">Company profile</h2>
+  <p class="lede">Corporate facts carry lower confidence than the trust-center material, because aggregator sources lag and disagree with each other. Where they conflict, both figures are shown rather than averaged.</p>
+
+  <div class="card">
+    <h3>Entity</h3>
+    <dl class="kv">
+      <dt>Legal name</dt><dd>Secureframe, Inc. <span class="tag c">Confirmed</span></dd>
+      <dt>Founded</dt><dd>2020 <span class="tag c">Confirmed</span></dd>
+      <dt>Founders</dt><dd>Shrav Mehta (CEO), Natasja Nielsen <span class="tag c">Confirmed</span></dd>
+      <dt>Ownership</dt><dd>Private, venture-backed. Series&nbsp;B. <span class="tag c">Confirmed</span></dd>
+      <dt>Headquarters</dt><dd><strong>Disputed.</strong> PitchBook and Tracxn both record San Francisco, CA. Wellfound lists Austin, Denver and New York City among seven locations, and current in-office postings are New York City. The CEO's public profile location is the New York metropolitan area. <span class="tag i">Inferred</span> &mdash; likely a distributed company with a centre of gravity that has shifted east; confirm the contracting entity address on the order form.</dd>
+      <dt>Headcount</dt><dd><strong>Disputed.</strong> Tracxn records 130 as of June 2026; PitchBook records 200; Wellfound shows a 51&ndash;200 band; a 2024 profile cited 142. <span class="tag i">Inferred</span> &mdash; most likely 130&ndash;200, i.e. flat to modestly down from 2024. Ask directly.</dd>
+      <dt>Total funding</dt><dd>$78.5M&ndash;$79M across three rounds <span class="tag c">Confirmed</span></dd>
+      <dt>Last round</dt><dd>$56M Series B, February 2022 <span class="tag c">Confirmed</span></dd>
+      <dt>Investors</dt><dd>Kleiner Perkins, Accomplice, Gradient Ventures, Base10, Contrary, Alumni Ventures, Calm Ventures <span class="tag c">Confirmed</span></dd>
+      <dt>Named customers</dt><dd>AngelList, Ramp, Remote, Coda <span class="tag c">Confirmed</span> (vendor-published)</dd>
+      <dt>Revenue</dt><dd><span class="tag u">Unreliable</span> &mdash; one aggregator cites roughly $6M ARR in 2024; a 2022 press profile cited a $20M projection. These cannot both be right and neither is a primary source. Treat as unknown.</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <h3>Financial and continuity observations</h3>
+    <div class="callout warn"><strong>No disclosed funding round since February 2022</strong> &mdash; approximately four and a half years at the assessment date. For a Series&nbsp;B company in a competitive category, this is worth noting. It is not by itself evidence of distress: the company may be at or near default-alive, and a compliance platform with recurring revenue is a plausible candidate for that. But combined with flat-to-declining headcount signals it warrants a continuity question rather than silence. <span class="tag i">Inferred</span></div>
+    <p style="margin:0">Competitive position is strong on the federal side. Secureframe is among a small number of compliance automation providers holding both a FedRAMP 20x authorization and CMMC Level&nbsp;2 certification, which is a genuine moat against Vanta and Drata for public-sector and defence-adjacent buyers. <span class="tag c">Confirmed</span></p>
+  </div>
+</section>
+
+<!-- ===== LEADERSHIP ===== -->
+<section class="panel" id="p-leadership">
+  <div class="kicker">Section 4</div>
+  <h2 class="sec">Security ownership</h2>
+  <p class="lede">Answering the question directly: yes, they have a CISO, and he has been in the seat a long time by startup standards.</p>
+
+  <div class="card">
+    <h3>Drew Daniels &mdash; Chief Information Security Officer</h3>
+    <dl class="kv">
+      <dt>Appointed</dt><dd>Announced 4 May 2022 <span class="tag c">Confirmed</span></dd>
+      <dt>Tenure at assessment date</dt><dd id="tenure">&mdash;</dd>
+      <dt>Title variants</dt><dd>Announced as CISO; some aggregator profiles record "VP and Chief Information Security Officer" <span class="tag i">Inferred</span> &mdash; may indicate a VP-level rather than C-suite reporting line. Worth clarifying who he reports to.</dd>
+      <dt>Prior roles</dt><dd>CIO and CISO at Druva; CIO and CISO at Qubole; Senior Director Security, Compliance &amp; Privacy at ClearSlide; Chief Security Architect and CISO at Shutterfly. Earlier security roles at Oracle, Microsoft and NetSuite. <span class="tag c">Confirmed</span></dd>
+      <dt>Relevant track record</dt><dd>Led Druva's security programme through FedRAMP authorization and grew the team threefold; at Qubole defined the programme from scratch and oversaw SOC&nbsp;2, HIPAA, GDPR and ISO&nbsp;27001 across four clouds. <span class="tag c">Confirmed</span></dd>
+      <dt>Outside activity</dt><dd>Angel investor with Silicon Valley CISO Investments; published author; board member and advisor. <span class="tag c">Confirmed</span></dd>
+      <dt>Currency of this record</dt><dd><span class="tag i">Inferred</span> &mdash; the appointment is confirmed and no departure announcement was found, but the most recent primary sources naming him in the role predate this assessment by some time. Verify he is still in seat before relying on it.</dd>
+    </dl>
+    <div class="callout good" style="margin-bottom:0"><strong>Assessment.</strong> A four-year CISO tenure at a company of this size and stage is a positive signal, and prior FedRAMP delivery experience is directly relevant to what Secureframe has since achieved. Security ownership is clearly established and not a part-time CTO responsibility. This is stronger than the norm for a vendor at this scale.</div>
+  </div>
+
+  <div class="card">
+    <h3>Other relevant leadership</h3>
+    <dl class="kv">
+      <dt>CEO</dt><dd>Shrav Mehta, co-founder <span class="tag c">Confirmed</span></dd>
+      <dt>Co-founder</dt><dd>Natasja Nielsen <span class="tag c">Confirmed</span></dd>
+      <dt>VP Engineering</dt><dd>Cory Thomas, announced May 2022 <span class="tag i">Inferred</span> &mdash; no confirmation of current status</dd>
+      <dt>Board</dt><dd>Includes Mike Viscuso and Patrick Morley, both from Carbon Black <span class="tag i">Inferred</span> &mdash; sourced from aggregator and 2022 reporting</dd>
+      <dt>Governance control</dt><dd>Vendor publishes a control stating senior management and/or board meet at least annually on security, and that an independent advisor sits on the board or equivalent body <span class="tag c">Confirmed</span></dd>
+    </dl>
+  </div>
+</section>
+
+<!-- ===== ATTESTATIONS ===== -->
+<section class="panel" id="p-attest">
+  <div class="kicker">Section 5</div>
+  <h2 class="sec">Attestations and certifications</h2>
+  <p class="lede">All items below are advertised on the vendor's public trust center. Document contents were not reviewed &mdash; each sits behind a request-and-NDA workflow. Validity countdowns are computed live against today's date.</p>
+
+  <div class="card">
+    <table>
+      <thead><tr><th style="width:20%">Attestation</th><th style="width:26%">Scope / detail</th><th style="width:20%">Validity</th><th style="width:14%">Status</th><th style="width:20%">Action</th></tr></thead>
+      <tbody id="attBody"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Notable transparency</h3>
+    <p class="hint">Worth crediting, because it is rare.</p>
+    <p style="margin:0 0 10px">Secureframe publishes for open download &mdash; without a request workflow &mdash; its FedRAMP 20x POA&amp;M, KSI implementation summaries, the Coalfire 3PAO validated assessment methodology, machine-readable audit reports, and control test results. Publishing a live POA&amp;M is unusual; most vendors treat their open findings list as confidential. <span class="tag c">Confirmed</span></p>
+    <p style="margin:0">The practical consequence for an assessor is that a substantial part of the evidence normally obtained only under NDA is already available. If the client pursues this vendor, the POA&amp;M should be read directly &mdash; it is the closest available proxy for the SOC&nbsp;2 exception list.</p>
+  </div>
+</section>
+
+<!-- ===== SUBPROCESSORS ===== -->
+<section class="panel" id="p-fourth">
+  <div class="kicker">Section 6</div>
+  <h2 class="sec">Fourth-party register</h2>
+  <p class="lede">Published subprocessor list, read directly from the vendor trust center. Three entries lack a stated data location, which is the principal gap in an otherwise well-structured disclosure.</p>
+
+  <div class="card">
+    <table>
+      <thead><tr><th style="width:22%">Subprocessor</th><th style="width:34%">Stated purpose</th><th style="width:22%">Data location</th><th style="width:22%">Observation</th></tr></thead>
+      <tbody id="subBody"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Observations on the chain</h3>
+    <ul class="tight">
+      <li><strong>Two AI providers in the subprocessor chain.</strong> OpenAI is listed for large language model capability and Twilio for AI-powered product features. Neither has a stated data location. Given that the platform ingests customer policy documents, control evidence, and SOC&nbsp;2 reports, the training-use and retention terms for these two are the highest-value questions in the entire assessment. <span class="tag c">Confirmed</span> that they are listed; <span class="tag u">Unknown</span> what terms apply.</li>
+      <li><strong>Retool is listed for customer provisioning and administration.</strong> This implies an internal administrative interface with access to customer records. Worth asking how access to that tool is governed and logged. <span class="tag i">Inferred</span></li>
+      <li><strong>AWS spans United States and London.</strong> Consistent with the vendor's separate published guidance on EU versus US data centres. Confirm which region your tenant would sit in and whether that is contractually fixed. <span class="tag c">Confirmed</span></li>
+      <li><strong>Concentration.</strong> Single cloud provider. For a Tier&nbsp;1 vendor this is normal and not a finding on its own, but it should be recorded against your own concentration view if other Tier&nbsp;1 vendors share the same region.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== THREAT INTELLIGENCE ===== -->
+<section class="panel" id="p-intel">
+  <div class="kicker">Section 7</div>
+  <h2 class="sec">Threat intelligence and incident history</h2>
+  <p class="lede">Passive intelligence only. Active reconnaissance &mdash; Censys, Shodan, certificate transparency enumeration, TLS and header inspection &mdash; was not performed and remains open. Commercial security ratings were not available. What follows is drawn from vulnerability databases, breach and enforcement reporting, security press, and independent availability monitors.</p>
+
+  <div class="grid3">
+    <div class="kpi"><div class="lab">CVEs attributed</div><div class="val green">0</div><div class="note">Expected for hosted SaaS &mdash; see caveat</div></div>
+    <div class="kpi"><div class="lab">Breach disclosures</div><div class="val green">0</div><div class="note">None found in reporting or enforcement</div></div>
+    <div class="kpi"><div class="lab">Sector precedent</div><div class="val amber">1</div><div class="note">Direct competitor, cross-tenant exposure</div></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>Vulnerability databases &mdash; and why the null result means little</h3>
+    <p style="margin:0 0 10px">No CVE is attributed to Secureframe in the National Vulnerability Database, and no vendor security advisory was found. <span class="tag c">Confirmed</span></p>
+    <div class="callout warn"><strong>Do not read this as a clean result.</strong> CVE identifiers attach to distributable software and hardware, not to hosted services. A pure multi-tenant SaaS with no on-premises agent or downloadable component will accumulate essentially no CVEs regardless of how many vulnerabilities it has actually had, because there is no versioned artefact for a CVE to describe. The same is true of every competitor in this category. The absence of CVEs carries close to zero signal and must not be presented to a client as evidence of a strong posture.</div>
+    <p style="margin:0">The meaningful proxy in this category is the vendor's own published FedRAMP POA&amp;M, which is available for open download and lists actual open findings. That document should be read directly before any award decision.</p>
+  </div>
+
+  <div class="card">
+    <h3>Breach, enforcement and disclosure history</h3>
+    <p style="margin:0 0 8px">No breach disclosure, regulatory enforcement action, or security press coverage of an incident involving Secureframe was found. <span class="tag c">Confirmed</span> as a search result; <span class="tag i">Inferred</span> as a conclusion.</p>
+    <p style="margin:0">Qualification: the company is private and therefore has no periodic disclosure obligation. State breach notification thresholds can be met without generating press coverage. This is absence of evidence rather than evidence of absence, and it should be paired with a direct question in the residual set.</p>
+  </div>
+
+  <div class="card">
+    <h3>Sector precedent &mdash; Vanta cross-tenant data exposure, May 2025</h3>
+    <p class="hint">The most instructive item in this assessment. A direct competitor, same product category, same architecture class.</p>
+    <dl class="kv">
+      <dt>Identified</dt><dd>26 May 2025</dd>
+      <dt>Remediation complete</dt><dd>4 June 2025 &mdash; nine days</dd>
+      <dt>Root cause</dt><dd>A product code change. Confirmed by the vendor as <strong>not</strong> an intrusion, stolen credentials, or external compromise.</dd>
+      <dt>Scope</dt><dd>A subset of data from fewer than 20% of third-party integrations exposed to other customers; fewer than 4% of the customer base affected</dd>
+      <dt>Nature of exposed data</dt><dd>Employee account data surfaced from one customer instance into another. Reporting indicates role information and configuration data about security tooling were included, extending to multi-factor authentication configuration.</dd>
+      <dt>Response</dt><dd>All affected customers individually notified; public statement attributed to a named executive</dd>
+    </dl>
+    <div class="callout bad"><strong>Why this matters more than any finding about Secureframe specifically.</strong> The exposed material was not customer personal data. It was the security configuration of the customer's own environment &mdash; precisely the artefact a compliance automation platform exists to collect. A party holding another organisation's MFA configuration and security tooling inventory holds a targeting map. This is the concentration risk in Section&nbsp;1 and finding F-03 moving from theory to documented event.</div>
+    <ul class="tight" style="margin-bottom:0">
+      <li><strong>The realistic threat model for this vendor class is a tenant-isolation defect, not a breach.</strong> No attacker was involved. Assessment effort should therefore weight multi-tenancy architecture and isolation testing far above perimeter controls, which is the opposite of how most questionnaires are weighted.</li>
+      <li><strong>The response is the benchmark.</strong> Nine days to remediation, individual notification, named executive accountability. Any vendor in this category should be held to that standard, and it is a fair thing to say out loud in a diligence call.</li>
+      <li><strong>No equivalent event is known for Secureframe.</strong> That is a genuine distinction, but the base rate for the category is now non-zero and the architecture is comparable.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Product capability limitation &mdash; vulnerability management module</h3>
+    <p class="hint">Not a security weakness in the vendor. A material limitation if the platform is intended to serve as the vulnerability management control of record.</p>
+    <ul class="tight">
+      <li>Vulnerability data is sourced only from the customer's connected scanners &mdash; AWS Inspector, Tenable, Qualys, Wiz, Dependabot and similar. The platform <strong>does not independently query</strong> NVD, CVE.org, OSV, or the GitHub Advisory Database. Coverage is therefore only as good as the scanners connected, with no independent cross-check. <span class="tag c">Confirmed</span> from vendor documentation.</li>
+      <li>False positives cannot be closed or dismissed within the platform; they must be addressed in the source system. A second version of the module is described as in development. <span class="tag c">Confirmed</span></li>
+      <li>Severity uses standard CVSS tiers only; alternative classification frameworks are not supported. <span class="tag c">Confirmed</span></li>
+    </ul>
+    <div class="callout" style="margin-bottom:0">Consequence for the engagement: if a client intends to rely on this module to evidence a vulnerability management control, the evidence chain runs through the connected scanners, not through the platform. Design the control and its evidence accordingly, and do not describe the platform as the scanning capability in an SSP or system description.</div>
+  </div>
+
+  <div class="card">
+    <h3>Availability history &mdash; independent monitors</h3>
+    <p style="margin:0 0 8px">Two independent monitoring services have tracked the vendor's public status page since 2022 and 2023 respectively. Between them they record on the order of 52 to 70 incidents, averaging roughly 1.4 per month, with a median resolution time near five hours. Acknowledged outages continue into 2026. <span class="tag c">Confirmed</span></p>
+    <p style="margin:0">Assessed against no published RTO or RPO. This is the reality check on any availability assertion in a questionnaire response, and it is independently sourced rather than vendor-supplied, which places it higher on the reliability hierarchy than most of this report.</p>
+  </div>
+
+  <div class="card">
+    <h3>Reconnaissance still outstanding</h3>
+    <p class="hint">Each is fast and free. Complete before sign-off.</p>
+    <ul class="tight" style="margin-bottom:0">
+      <li><strong>Certificate transparency logs (crt.sh)</strong> &mdash; highest yield of the outstanding checks. Reveals every subdomain a certificate has been issued for, exposing forgotten staging environments, internal tooling and acquisitions. No account required.</li>
+      <li><strong>TLS and header inspection</strong> &mdash; cipher suites, protocol versions, HSTS, CSP, cookie flags.</li>
+      <li><strong>Email authentication</strong> &mdash; SPF, DKIM and DMARC records. A permissive or absent DMARC policy on a security vendor is informative.</li>
+      <li><strong>Censys or Shodan</strong> &mdash; internet-facing asset inventory. Expect a thin result for a CDN-fronted single-cloud SaaS; the value is in spotting forgotten assets rather than in the main estate.</li>
+      <li><strong>Commercial ratings</strong> &mdash; useful only as change detection on a Tier&nbsp;1 vendor. These infer from outside-in signal and misattribute assets routinely. A rating must never be presented to a client as an assessment.</li>
+      <li><strong>OAuth scope review in the client's own identity provider</strong> &mdash; the single most informative check available, and it requires the client's tenant rather than the vendor's cooperation.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== EXTERNAL POSTURE SCAN ===== -->
+<section class="panel" id="p-scan">
+  <div class="kicker">Section 8</div>
+  <h2 class="sec">External posture scan</h2>
+  <p class="lede">Externally observable hygiene, scored on a weighted 100-point model producing a letter grade &mdash; the same shape as a commercial ratings service, but with the check catalogue and weighting fully disclosed rather than proprietary. Collection is strictly passive: DNS queries, one TLS handshake, one HTTPS GET, and public certificate transparency logs.</p>
+
+  <div class="callout warn"><strong>Status: not yet run against this vendor.</strong> The scan was authored for this assessment but the collection environment had no egress to the target. The model, weights and check catalogue are published below so the result is reproducible and disputable. Run <code>vendorscan.py</code> from an unrestricted network and paste the JSON output into the panel below to populate this section.</div>
+
+  <div class="card">
+    <h3>Scoring model</h3>
+    <p class="hint">Six categories, weights summing to 100. Bar length is the category's contribution to the total score.</p>
+    <div id="weightChart"></div>
+  </div>
+
+  <div class="card no-print">
+    <h3>Load scan results</h3>
+    <p class="hint">Paste the contents of the <code>--json</code> output file. Nothing leaves this page; parsing is local.</p>
+    <textarea id="scanJson" rows="4" style="width:100%;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;border:1px solid var(--line-strong);border-radius:6px;padding:9px" placeholder='{"scanner":"vendorscan","grade":"B","score":78.5,"categories":{...},"findings":[...]}'></textarea>
+    <div style="margin-top:9px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button class="mini" onclick="loadScan()">Render results</button>
+      <button class="mini" onclick="clearScan()">Clear</button>
+      <span id="scanMsg" style="font-size:12.5px;color:var(--ink-3)"></span>
+    </div>
+  </div>
+
+  <div id="scanOut"></div>
+
+  <div class="card">
+    <h3>Check catalogue</h3>
+    <p class="hint">Every check, its point value, and the criterion applied. Disclosed so a vendor can dispute a score on its merits &mdash; which a commercial rating does not permit.</p>
+    <table>
+      <thead><tr><th style="width:15%">Category</th><th style="width:15%">Check</th><th style="width:6%">Points</th><th style="width:36%">Full-credit criterion</th><th style="width:28%">Partial credit</th></tr></thead>
+      <tbody id="catalogueBody"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Scan methodology</h3>
+    <p style="margin:0 0 10px"><strong>Collection.</strong> DNS record lookups (TXT, CAA, NS, DNSKEY, and DKIM selector probes against fourteen common selector names); a single TLS handshake on port 443 recording protocol, cipher, chain and certificate validity; a single HTTPS GET of the root path recording response headers and cookie flags; requests to <code>/.well-known/security.txt</code> and <code>/security.txt</code>; and a query to public certificate transparency logs for issued hostnames.</p>
+    <p style="margin:0 0 10px"><strong>Explicitly not performed.</strong> Port scanning, service enumeration, vulnerability probing, credential testing, or any request to an endpoint the target has not published. Everything collected is what a browser and <code>dig</code> already do. No authorisation from the target is required and the tool should not be extended into active testing without written permission.</p>
+    <p style="margin:0 0 10px"><strong>Scoring rules.</strong> Each check awards points against a possible value. Category score is the percentage earned within that category; the total is the weighted sum. Grade bands are A at 90 and above, B at 80, C at 70, D at 60, F below.</p>
+    <ul class="tight">
+      <li><strong>Unknown results award half credit.</strong> A collection failure should neither reward nor penalise the target. Unknowns are counted and displayed separately so a degraded scan cannot masquerade as a clean one.</li>
+      <li><strong>Negative results are scored as observed, not as inferred.</strong> A missing DKIM selector is scored at partial credit with an explicit note that selectors are arbitrary strings and absence proves nothing.</li>
+      <li><strong>TLS interception is detected and flagged.</strong> If the certificate chain is issued by an entity not on the recognised public CA list, the scan writes an error stating that all transport findings describe the intercepting middlebox rather than the target. This failure mode is real: a scan run from a corporate network with TLS inspection will otherwise score the proxy and file the result as vendor evidence.</li>
+      <li><strong>Certificate transparency is treated as surface inventory, not vulnerability.</strong> A large footprint or the presence of non-production hostnames reduces score because it indicates inventory and decommissioning weakness, not because those hosts are known to be exploitable.</li>
+    </ul>
+    <div class="callout bad" style="margin-bottom:0"><strong>Interpretation limit &mdash; state this whenever the grade is shown.</strong> This measures externally observable hygiene only. It says nothing about internal controls, data handling, tenant isolation, or incident response &mdash; which, per the sector precedent in Section&nbsp;7, is where the actual risk in this vendor category lives. A grade of A here is entirely compatible with poor internal security. Commercial ratings services measure approximately this same surface plus breach feeds and IP reputation; treat any such score, including this one, as <strong>change detection rather than assessment</strong>.</div>
+  </div>
+</section>
+
+<!-- ===== QUESTIONNAIRE ===== -->
+<section class="panel" id="p-questions">
+  <div class="kicker">Section 9</div>
+  <h2 class="sec">Standard questionnaire &mdash; answered from open sources</h2>
+  <p class="lede">The full 30-question Tier&nbsp;1 set, with each item resolved as far as public evidence allows. The point of this exercise is that most of a questionnaire is answerable before contact, and what remains is a short, credible list that a vendor can turn around quickly.</p>
+
+  <div class="filters no-print">
+    <span class="lab">Filter:</span>
+    <button class="mini on" data-f="all" onclick="filt('all',this)">All</button>
+    <button class="mini" data-f="answered" onclick="filt('answered',this)">Answered</button>
+    <button class="mini" data-f="partial" onclick="filt('partial',this)">Partial</button>
+    <button class="mini" data-f="ask" onclick="filt('ask',this)">Must ask</button>
+  </div>
+
+  <div class="card">
+    <table>
+      <thead><tr><th style="width:30px">#</th><th style="width:26%">Question</th><th style="width:44%">Finding from open sources</th><th style="width:12%">Status</th><th style="width:14%">Confidence</th></tr></thead>
+      <tbody id="qBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===== FINDINGS ===== -->
+<section class="panel" id="p-findings">
+  <div class="kicker">Section 10</div>
+  <h2 class="sec">Findings register</h2>
+  <p class="lede">Rated by exposure to the assessing organisation, not by the vendor's control maturity in the abstract. Every item requires a named owner and a disposition before contract.</p>
+  <div class="card">
+    <table>
+      <thead><tr><th style="width:6%">ID</th><th style="width:9%">Severity</th><th style="width:30%">Finding</th><th style="width:33%">Why it matters</th><th style="width:22%">Disposition sought</th></tr></thead>
+      <tbody id="fBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===== RESIDUAL ===== -->
+<section class="panel" id="p-residual">
+  <div class="kicker">Section 11</div>
+  <h2 class="sec">Residual questions to send</h2>
+  <p class="lede">This is the deliverable that matters. Thirty questions reduced to what open sources genuinely could not answer &mdash; short enough that a vendor returns it in days rather than weeks, and specific enough that the answers are checkable.</p>
+  <div class="card">
+    <ol id="resList" style="margin:0;padding-left:22px"></ol>
+  </div>
+  <div class="callout"><strong>Note on sequencing.</strong> Send this only after requesting the gated documents. Several of these questions may be answered by the SOC&nbsp;2 report or the CMMC shared responsibility matrix, and asking a vendor something already answered in a document they supplied costs credibility that is better spent elsewhere.</div>
+</section>
+
+<!-- ===== METHOD ===== -->
+<section class="panel" id="p-method">
+  <div class="kicker">Section 12</div>
+  <h2 class="sec">Method and evidence standard</h2>
+  <div class="card">
+    <h3>Sources used</h3>
+    <ul class="tight">
+      <li>Vendor trust center, read directly &mdash; controls catalogue, compliance badges, resource library, subprocessor register</li>
+      <li>Vendor newsroom and blog &mdash; leadership announcements</li>
+      <li>Corporate aggregators &mdash; PitchBook, Tracxn, Crunchbase, Wellfound, and press profiles for funding, headcount and location</li>
+      <li>Third-party availability monitors &mdash; independent outage and incident history</li>
+      <li>Public search for breach, enforcement and vulnerability disclosure</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Grading methodology</h3>
+    <p class="hint">How Section 2 was produced, so the grade can be defended or disputed on its reasoning rather than accepted on authority.</p>
+    <p style="margin:0 0 10px"><strong>Scale.</strong> Three points. <strong>A</strong> &mdash; secure; can safeguard our data; proceed. <strong>B</strong> &mdash; some risks; proceed with conditions attached to contract. <strong>C</strong> &mdash; bad; do not proceed on current evidence. Plus and minus modifiers indicate position within a band and carry no independent meaning.</p>
+    <p style="margin:0 0 10px"><strong>Inputs, in descending weight.</strong></p>
+    <table style="margin-bottom:12px">
+      <thead><tr><th style="width:30%">Input</th><th style="width:14%">Weight</th><th style="width:56%">Rationale</th></tr></thead>
+      <tbody>
+        <tr><td>Currency and coverage of independent attestation</td><td>Highest</td><td>An in-period third-party opinion is the only input not supplied by the vendor about itself. Staleness is weighted as heavily as absence, because an expired attestation and no attestation are the same evidentiary position.</td></tr>
+        <tr><td>Blast radius of the relationship</td><td>High</td><td>What compromise of this vendor would yield. Structural, not remediable by controls, and therefore caps the achievable grade rather than reducing it.</td></tr>
+        <tr><td>Unresolved data-handling questions</td><td>High</td><td>Training use, retention, residency and isolation. Weighted higher than a known-bad answer would be weighted, because unknown risk cannot be priced or accepted.</td></tr>
+        <tr><td>Published control programme</td><td>Medium</td><td>Named, testable controls score; marketing language does not. Vendor-published and therefore the weakest reliability class.</td></tr>
+        <tr><td>Voluntary transparency</td><td>Medium</td><td>Publishing an open findings list is costly to the vendor and therefore credible in a way that a certification badge is not. Weighted as a positive signal about culture, with the limits of that inference acknowledged.</td></tr>
+        <tr><td>Incident and enforcement history</td><td>Medium</td><td>Sector base rate is considered alongside vendor-specific history, since a null result for one vendor in a young category means little on its own.</td></tr>
+        <tr><td>Availability record</td><td>Low</td><td>Independently sourced and therefore reliable, but availability is rarely the deciding factor for a Tier 1 compliance dependency.</td></tr>
+        <tr><td>Corporate and financial signal</td><td>Low</td><td>Continuity consideration only. Not weighted heavily on aggregator data that disagrees with itself.</td></tr>
+      </tbody>
+    </table>
+    <p style="margin:0 0 10px"><strong>Rules applied.</strong> An unverified item is scored as unverified, never as satisfied and never as failed &mdash; the grade reflects what is known, and the residual questions exist to convert unknowns. A single sufficient condition can drop a grade without needing corroboration, because one disqualifying answer on data handling is disqualifying regardless of what else is strong. Structural risk inherent to the product category caps the ceiling and is applied equally to every vendor in that category, so a comparison between two compliance platforms is unaffected by it.</p>
+    <p style="margin:0"><strong>What the grade is not.</strong> It is not a security rating in the commercial sense &mdash; no outside-in scanning contributed to it. It is not a statement about the vendor's competence. It is not transferable to a different use case: the same vendor assessed for a relationship with narrower access would grade differently, because blast radius is an input. And it is not durable &mdash; it should be re-issued on any of the reassessment triggers, and in any case at the next annual review.</p>
+  </div>
+  <div class="card">
+    <h3>Evidence standard applied</h3>
+    <p class="hint">The same six properties applied to any control evidence, regardless of regime.</p>
+    <ul class="tight">
+      <li><strong>Traceable to source</strong> &mdash; every claim above can be traced to a named source class</li>
+      <li><strong>Complete for the population</strong> &mdash; not met for headcount, location or revenue, hence the disputed markings</li>
+      <li><strong>Covers the period</strong> &mdash; not met for the SOC&nbsp;2, hence finding F-01</li>
+      <li><strong>Contemporaneous</strong> &mdash; trust center read on the assessment date; aggregator data lags by an unknown interval</li>
+      <li><strong>Integrity-protected</strong> &mdash; not applicable to passive collection</li>
+      <li><strong>Attributable</strong> &mdash; vendor-published material is attributable to the vendor and is therefore the weakest reliability class where it is self-serving; independent monitors rank higher</li>
+    </ul>
+    <div class="callout" style="margin-bottom:0"><strong>Reliability caution.</strong> The bulk of the positive findings in this report derive from the vendor's own published material. Under the standard reliability hierarchy that is the weakest evidence class available, below independently obtained and system-generated evidence. It is appropriate for a pre-engagement screen; it is not sufficient for contract award without the gated documents and the technical checks noted in Section&nbsp;1.</div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+"use strict";
+var TODAY = new Date();
+
+var NAV = [
+  ["summary","Summary"],["rating","Rating"],["profile","Company profile"],["leadership","Security ownership"],
+  ["attest","Attestations"],["fourth","Fourth parties"],["intel","Threat intelligence"],["scan","External posture scan"],
+  ["questions","Questionnaire"],["findings","Findings"],["residual","Residual questions"],["method","Method"]
+];
+
+var ATT = [
+  {n:"SOC 2 Type II", d:"Trust services criteria. Scope and TSC coverage not published.", v:"Period 1 Jul 2024 &ndash; 30 Jun 2025", end:"2025-06-30", kind:"period",
+   act:"Request current report or bridge letter"},
+  {n:"ISO/IEC 27001:2022", d:"Information security management system. Statement of Applicability not published.", v:"Certificate dated January; year not stated", end:null, kind:"unknown",
+   act:"Request certificate and SoA"},
+  {n:"FedRAMP 20x Low", d:"Authorization letter. 3PAO: Coalfire. Marketplace listing published.", v:"Letter valid until 20 Aug 2026", end:"2026-08-20", kind:"expiry",
+   act:"Confirm status past letter expiry"},
+  {n:"CMMC Level 2", d:"Cyber AB certification. C3PAO: Redspin. Summary report and shared responsibility matrix available.", v:"Valid until 9 Sep 2028", end:"2028-09-09", kind:"expiry",
+   act:"Request certificate and SRM"},
+  {n:"TX-RAMP", d:"Level 1 certification for Texas state agency data.", v:"Valid until 6 Mar 2028", end:"2028-03-06", kind:"expiry",
+   act:"Note only; not applicable unless Texas public sector"},
+  {n:"Penetration test", d:"Executive summary available on request. Tester and date not published.", v:"Not stated", end:null, kind:"unknown",
+   act:"Request summary; confirm date and tester"},
+  {n:"GDPR / CPRA", d:"Asserted adherence. Not a certification.", v:"Ongoing assertion", end:null, kind:"assert",
+   act:"Review DPA and SCCs directly"}
+];
+
+var SUBS = [
+  ["AWS","Cloud hosting","United States / London","Primary infrastructure. Confirm tenant region and whether contractually fixed."],
+  ["OpenAI","AI platform and large language model capability","<span class='tag u'>Not stated</span>","Highest-priority question in the assessment. Training use, retention and residency all unknown."],
+  ["Twilio, Inc.","AI-powered product features","<span class='tag u'>Not stated</span>","Second AI provider. Purpose description is vague; ask what data reaches it."],
+  ["Retool","Customer provisioning and administration","<span class='tag u'>Not stated</span>","Implies internal admin tooling with customer record access. Ask how access is governed and logged."],
+  ["Datadog","Cloud monitoring and analytics","United States","Standard. May receive log data containing customer identifiers."],
+  ["Functional Software, Inc. (Sentry)","Error tracking","United States","Error payloads can contain sensitive fragments. Ask about scrubbing."],
+  ["Catamorphic Co. (LaunchDarkly)","Feature flag management","United States","Low exposure."],
+  ["OneSchema","Data import structuring","United States","Handles customer data during import. Moderate exposure."]
+];
+
+var Q = [
+  [1,"Legal entity and jurisdiction","Secureframe, Inc., US-incorporated, founded 2020. Contracting address disputed between San Francisco and New York across sources.","partial","Confirmed / Inferred"],
+  [2,"Services in scope","Compliance automation platform: continuous control monitoring, evidence collection, policy management, vendor risk management, trust center, security training.","answered","Confirmed"],
+  [3,"Headcount and security headcount","Total disputed at 130&ndash;200. Security team size not published.","ask","Inferred"],
+  [4,"Security ownership and reporting line","Drew Daniels, CISO since May 2022. Reporting line not published; some sources record a VP-level title.","partial","Confirmed / Inferred"],
+  [5,"SOC 2 Type II &mdash; scope, TSC, period","Report exists. Advertised period ended 30 Jun 2025. Scope and TSC coverage not published.","ask","Confirmed"],
+  [6,"Bridge letter","Not published. Required given the gap since the advertised period end.","ask","Unknown"],
+  [7,"ISO 27001 certificate and SoA","ISO/IEC 27001:2022 certificate advertised, dated January, year not stated. SoA not published.","partial","Confirmed"],
+  [8,"Other frameworks","FedRAMP 20x Low authorized, CMMC Level 2 certified via Redspin, TX-RAMP Level 1, GDPR and CPRA asserted.","answered","Confirmed"],
+  [9,"Penetration test","Executive summary available on request. Date and tester not published.","ask","Confirmed"],
+  [10,"Data processed on our behalf","Platform necessarily ingests policy documents, control evidence, personnel records, cloud configuration metadata and vendor documentation.","answered","Inferred"],
+  [11,"Storage and processing location","AWS across United States and London. Vendor publishes separate EU versus US data centre guidance.","partial","Confirmed"],
+  [12,"Retention and termination handling","Not published.","ask","Unknown"],
+  [13,"Encryption at rest and in transit","Encryption-in-transit published as a monitored control. An encryption and key management policy is published. <strong>No encryption-at-rest control appears in the public catalogue.</strong>","partial","Confirmed"],
+  [14,"Use of our data for training or analytics","Not published. Two AI subprocessors are listed. This is the critical gap.","ask","Unknown"],
+  [15,"Tenant segregation","Not published.","ask","Unknown"],
+  [16,"Who can access our data","Least privilege in use, administrative access restricted, unique access IDs, and user access reviews are all published as monitored controls.","answered","Confirmed"],
+  [17,"Privileged access governance","Administrative access to production restricted on least privilege. Time-bounding and approval workflow not published.","partial","Confirmed"],
+  [18,"SSO and SCIM support","Not published on the trust center. Platform integrates with major identity providers, which implies SSO support.","ask","Inferred"],
+  [19,"Offshore or contractor personnel","Not published.","ask","Unknown"],
+  [20,"Background checks","Published as a monitored control.","answered","Confirmed"],
+  [21,"Vulnerability management SLAs","A vulnerability and patch management policy is published as the sole control in that category. No severity-based SLAs published.","partial","Confirmed"],
+  [22,"Secure development practices","Secure development policy, software change testing before production deployment, change management policy, environment segregation, and restriction on production data in development and testing all published.","answered","Confirmed"],
+  [23,"Logging and monitoring","Network traffic monitoring, automated alerting for security events, and uptime and availability monitoring published. Log retention period and customer availability of logs not published.","partial","Confirmed"],
+  [24,"Incident response and testing","Incident response plan, incident tracking, lessons-learned process, and periodic tabletop testing all published as monitored controls.","answered","Confirmed"],
+  [25,"Reportable incidents in last 24 months","No public breach disclosure, regulatory action or CVE attributed to the vendor was found. Absence of evidence, not evidence of absence.","partial","Inferred"],
+  [26,"RTO and RPO","Not published. Independent monitors record roughly 52&ndash;70 incidents since 2022&ndash;23, averaging about 1.4 per month, with a median resolution near five hours.","ask","Confirmed"],
+  [27,"Backup and restoration testing","Automated backup process and annual restoration testing to a non-production environment both published as monitored controls.","answered","Confirmed"],
+  [28,"Recent unplanned outage","Independent monitors record acknowledged outages during 2025 and 2026, most recently in February 2026 at the time of the monitor snapshot.","answered","Confirmed"],
+  [29,"Subprocessor list and change notification","Eight subprocessors published with purpose. Three lack a stated data location. Change notification terms not published.","partial","Confirmed"],
+  [30,"Underlying cloud and region","AWS, United States and London.","answered","Confirmed"]
+];
+
+var FIND = [
+  ["F-01","h","Advertised SOC 2 Type II period ended more than twelve months before assessment date","The primary independent attestation is stale on its face. Without a current report or bridge letter there is an unevidenced gap in the control period, which is exactly what an auditor testing your own vendor management control will look for.","Current report covering the subsequent period, or a bridge letter"],
+  ["F-02","h","No published terms on use of customer data by AI subprocessors","Two AI providers sit in the subprocessor chain and the platform ingests policy documents, control evidence and personnel records. Training use, retention window and residency are all unknown.","Written contractual position on training use, retention and residency"],
+  ["F-03","h","Broad authenticated read access across the customer estate &mdash; <em>now evidenced by sector precedent</em>","Inherent to the product rather than a control weakness. A direct competitor exposed customer security-tool and MFA configuration across tenants in May 2025 via a product code change, not an intrusion. The realistic threat model is a tenant-isolation defect. See Section 6.","Tenant isolation architecture and testing evidence; scope review in your own IdP"],
+  ["F-04","m","FedRAMP 20x authorization letter at or near stated validity end","Only material if federal work is in scope, but a lapsed authorization advertised as current is a disclosure hygiene issue regardless.","Written confirmation of current authorization status"],
+  ["F-05","m","No encryption-at-rest control in the public control catalogue","Encryption-in-transit is published; at-rest is not. Almost certainly an omission from the public view rather than an absent control, but it cannot be assumed.","Confirm at-rest encryption and key management approach"],
+  ["F-06","m","Three subprocessors published without a data location","Undermines an otherwise well-structured disclosure and prevents a residency assessment.","Data location for OpenAI, Twilio and Retool"],
+  ["F-07","m","No published vulnerability management SLAs","A policy is published but no severity-based remediation timelines. Cannot assess responsiveness.","Severity-based SLAs and recent adherence data"],
+  ["F-08","m","No disclosed funding round in approximately four and a half years","Continuity consideration for a Tier 1 dependency, particularly one holding compliance evidence you would need during an audit.","Continuity assurance; consider data export and exit terms"],
+  ["F-09","l","Corporate facts inconsistent across sources","Headquarters, headcount and revenue all differ materially between aggregators. Low risk but indicates none of these should be relied upon.","Confirm on the order form and in diligence"],
+  ["F-10","l","Availability history shows recurring incidents","Roughly 1.4 incidents per month with a median resolution near five hours, against no published RTO or RPO.","RTO and RPO commitments; assess against your own tolerance"],
+  ["F-11","m","Vulnerability management module does not query independent CVE feeds","Data is sourced only from connected scanners; the platform does not query NVD, CVE.org, OSV or the GitHub Advisory Database, and false positives cannot be dismissed in-platform. Material if the module is relied upon as the vulnerability management control of record.","Do not describe the platform as the scanning capability; route evidence through the source scanners"]
+];
+
+var RESID = [
+  "Confirm the current SOC 2 Type II report period, or supply a bridge letter covering the interval since 30 June 2025. State the scope and which Trust Services Criteria are covered.",
+  "Are any subservice organizations carved out of the SOC 2 report? If so, which?",
+  "Which complementary user entity controls does the report place on us?",
+  "Is customer data &mdash; including uploaded policies, evidence artefacts and personnel records &mdash; used for training or improvement of any model, by you or by OpenAI or Twilio? Is the opt-out contractual or a configurable setting?",
+  "What is the retention window for data passed to each AI subprocessor, and where is inference performed?",
+  "What data location applies to OpenAI, Twilio and Retool?",
+  "Confirm encryption at rest, the algorithm, and the key management approach including whether customer-managed keys are available.",
+  "What permissions does the Secureframe application request in an identity provider, and is a reduced-scope integration option available?",
+  "How is access to Retool &mdash; described as customer provisioning and administration &mdash; governed, approved and logged?",
+  "What are your vulnerability remediation SLAs by severity, and what was actual adherence over the last two quarters?",
+  "What are the contractual RTO and RPO, and what was measured availability over the last twelve months?",
+  "What is the incident notification SLA, measured from discovery rather than confirmation, and what is the notification path?",
+  "What is the data retention period after termination, and what export and certified destruction options exist?",
+  "How are we notified of subprocessor changes, and what is the objection window?",
+  "Is our tenant logically or physically segregated, and can we fix the AWS region contractually?",
+  "Is the FedRAMP 20x Low authorization current beyond the letter validity date published on your trust center?",
+  "What is the current size of the security team, and does the CISO report to the CEO?",
+  "Date and testing firm for the most recent penetration test, and were any critical or high findings remediated?",
+  "Do you use offshore or contractor personnel for support functions with access to customer data?",
+  "Have you experienced any reportable security incident in the last twenty-four months?",
+  "How is tenant isolation architected, and how is it tested? Is isolation testing explicitly in scope for your penetration test?",
+  "Has any cross-tenant data exposure occurred &mdash; however brief, and regardless of whether it met a notification threshold?",
+  "What controls govern product code changes that could affect data access boundaries, and is there a specific review gate for changes touching tenant isolation?"
+];
+
+function el(id){ return document.getElementById(id); }
+
+function daysBetween(a,b){ return Math.round((b-a)/86400000); }
+function fmtDays(n){ return n.toLocaleString(); }
+
+function buildNav(){
+  var h="";
+  for(var i=0;i<NAV.length;i++){
+    h += '<a data-go="'+NAV[i][0]+'" onclick="go(\''+NAV[i][0]+'\')"><span class="n">'+String(i+1).padStart(2,"0")+'</span>'+NAV[i][1]+'</a>';
+  }
+  el("nav").innerHTML=h;
+  document.querySelector('nav.side a').classList.add('on');
+}
+function go(id){
+  var ps=document.querySelectorAll("section.panel");
+  for(var i=0;i<ps.length;i++) ps[i].classList.remove("on");
+  el("p-"+id).classList.add("on");
+  var as=document.querySelectorAll("nav.side a");
+  for(var j=0;j<as.length;j++) as[j].classList.toggle("on", as[j].getAttribute("data-go")===id);
+  window.scrollTo(0,0);
+}
+function showAll(){
+  var ps=document.querySelectorAll("section.panel");
+  for(var i=0;i<ps.length;i++) ps[i].classList.add("on");
+}
+
+function renderAtt(){
+  var h="";
+  for(var i=0;i<ATT.length;i++){
+    var a=ATT[i], status="", cls="";
+    if(a.kind==="period"){
+      var d=daysBetween(new Date(a.end), TODAY);
+      status = d>90 ? '<span class="tag u">Stale &mdash; '+fmtDays(d)+' days past period end</span>'
+                    : '<span class="tag c">Current</span>';
+    } else if(a.kind==="expiry"){
+      var r=daysBetween(TODAY, new Date(a.end));
+      if(r<0) status='<span class="tag u">Expired '+fmtDays(-r)+' days ago</span>';
+      else if(r<60) status='<span class="tag i">'+fmtDays(r)+' days remaining</span>';
+      else status='<span class="tag c">'+fmtDays(r)+' days remaining</span>';
+    } else if(a.kind==="unknown"){
+      status='<span class="tag u">Not stated</span>';
+    } else {
+      status='<span class="tag i">Assertion</span>';
+    }
+    h += '<tr><td><strong>'+a.n+'</strong></td><td>'+a.d+'</td><td>'+a.v+'</td><td>'+status+'</td><td>'+a.act+'</td></tr>';
+  }
+  el("attBody").innerHTML=h;
+}
+
+function renderSubs(){
+  var h="";
+  for(var i=0;i<SUBS.length;i++){
+    h += '<tr><td><strong>'+SUBS[i][0]+'</strong></td><td>'+SUBS[i][1]+'</td><td>'+SUBS[i][2]+'</td><td>'+SUBS[i][3]+'</td></tr>';
+  }
+  el("subBody").innerHTML=h;
+}
+
+function statusTag(s){
+  if(s==="answered") return '<span class="tag c">Answered</span>';
+  if(s==="partial") return '<span class="tag i">Partial</span>';
+  return '<span class="tag u">Must ask</span>';
+}
+function confTag(c){
+  if(c==="Confirmed") return '<span class="tag c">Confirmed</span>';
+  if(c==="Unknown") return '<span class="tag u">Unknown</span>';
+  if(c==="Inferred") return '<span class="tag i">Inferred</span>';
+  return '<span class="tag c">Confirmed</span> <span class="tag i">Inferred</span>';
+}
+function renderQ(f){
+  var h="", shown=0;
+  for(var i=0;i<Q.length;i++){
+    var q=Q[i];
+    if(f && f!=="all" && q[3]!==f) continue;
+    shown++;
+    h += '<tr class="qrow"><td>'+q[0]+'</td><td><strong>'+q[1]+'</strong></td><td>'+q[2]+'</td><td>'+statusTag(q[3])+'</td><td>'+confTag(q[4])+'</td></tr>';
+  }
+  if(!shown) h='<tr><td colspan="5" style="color:var(--ink-3);font-style:italic;padding:14px 8px">No questions in this category.</td></tr>';
+  el("qBody").innerHTML=h;
+}
+function filt(f, btn){
+  var bs=document.querySelectorAll('.filters button');
+  for(var i=0;i<bs.length;i++) bs[i].classList.remove('on');
+  btn.classList.add('on');
+  renderQ(f);
+}
+
+function renderFind(){
+  var h="";
+  for(var i=0;i<FIND.length;i++){
+    var f=FIND[i];
+    var lab = f[1]==="h"?"High":(f[1]==="m"?"Medium":"Low");
+    var tint = f[1]==="h" ? "var(--red-bg)" : (f[1]==="m" ? "var(--amber-bg)" : "transparent");
+    var edge = f[1]==="h" ? "#f2aba9" : (f[1]==="m" ? "#f6d98f" : "#dfe6eb");
+    var ink  = f[1]==="h" ? "var(--red)" : (f[1]==="m" ? "var(--amber)" : "var(--ink-3)");
+    h += '<tr style="background:'+tint+'"><td style="border-left:3px solid '+edge+'"><strong>'+f[0]+'</strong></td>'
+      +'<td style="color:'+ink+';font-weight:600"><span class="sev '+f[1]+'"></span>'+lab+'</td>'
+      +'<td>'+f[2]+'</td><td>'+f[3]+'</td><td>'+f[4]+'</td></tr>';
+  }
+  el("fBody").innerHTML=h;
+}
+
+function renderResid(){
+  var h="";
+  for(var i=0;i<RESID.length;i++) h+='<li style="margin-bottom:8px">'+RESID[i]+'</li>';
+  el("resList").innerHTML=h;
+}
+
+function renderKpis(){
+  var ans=0, part=0, ask=0;
+  for(var i=0;i<Q.length;i++){
+    if(Q[i][3]==="answered") ans++;
+    else if(Q[i][3]==="partial") part++;
+    else ask++;
+  }
+  el("kAnswered").textContent = ans+"+"+part;
+  el("kAnswered").nextElementSibling.textContent = ans+" fully, "+part+" partially, "+ask+" require contact";
+  var high=0;
+  for(var j=0;j<FIND.length;j++) if(FIND[j][1]==="h") high++;
+  el("kFindings").textContent = FIND.length;
+  el("kFindingsNote").textContent = high+" high, "+(FIND.filter(function(x){return x[1]==="m";}).length)+" medium, "+(FIND.filter(function(x){return x[1]==="l";}).length)+" low";
+
+  var start=new Date("2022-05-04");
+  var yrs=((TODAY-start)/(365.25*86400000));
+  el("tenure").innerHTML = yrs.toFixed(1)+" years <span class='tag c'>Confirmed</span> <span class='tag i'>subject to still being in seat</span>";
+}
+
+
+/* ---------- external posture scan model ---------- */
+var SCAN_CATS = {
+  transport:{label:"Transport security (TLS)", weight:25},
+  headers:{label:"HTTP security headers", weight:20},
+  email:{label:"Email authentication", weight:20},
+  dns:{label:"DNS hygiene", weight:15},
+  surface:{label:"Attack surface", weight:10},
+  disclosure:{label:"Disclosure & transparency", weight:10}
+};
+var CATALOGUE = [
+ ["transport","tls_valid",8,"Chain validates against system trust store and hostname matches","None &mdash; binary"],
+ ["transport","tls_expiry",6,"More than 30 days remaining on the leaf certificate","4 pts under 30 days, 2 pts under 14, 0 if expired"],
+ ["transport","tls_proto",6,"TLS 1.3 negotiated","5 pts for TLS 1.2; 0 for anything below"],
+ ["transport","tls_cipher",5,"256-bit AEAD suite","4 pts at 128-bit; 0 below or unknown"],
+ ["headers","hsts",6,"max-age of at least one year, includeSubDomains and preload","5 pts without preload, 3 pts without includeSubDomains, 2 pts if max-age short"],
+ ["headers","csp",5,"Content-Security-Policy enforced without unsafe-inline or unsafe-eval","3 pts if permissive directives present, 2 pts if report-only"],
+ ["headers","xcto",3,"X-Content-Type-Options set to nosniff","None &mdash; binary"],
+ ["headers","frame",3,"CSP frame-ancestors or X-Frame-Options present","None &mdash; binary"],
+ ["headers","refpol",2,"Referrer-Policy set to strict-origin-when-cross-origin or tighter","1 pt if present but permissive"],
+ ["headers","banner",1,"No version string disclosed in Server or X-Powered-By","None &mdash; binary"],
+ ["email","spf",7,"SPF record present and terminating in -all","5 pts for ~all, 2 pts for ?all or no terminator"],
+ ["email","dmarc",9,"DMARC at p=reject with a rua address for reporting","8 pts reject without rua, 6 pts quarantine, 3 pts p=none"],
+ ["email","dkim",4,"At least one DKIM selector discovered among common names","2 pts if none found &mdash; not conclusive, selectors are arbitrary"],
+ ["dns","caa",6,"CAA records published restricting which CAs may issue","None &mdash; binary"],
+ ["dns","dnssec",5,"Zone signed, DNSKEY present","1 pt if unsigned &mdash; not yet universal practice"],
+ ["dns","ns",4,"Four or more nameservers across two or more providers","3 pts if redundant but single provider, 0 if single nameserver"],
+ ["surface","ct_volume",5,"40 or fewer distinct hostnames in certificate transparency logs","3 pts up to 150, 1 pt above 150"],
+ ["surface","ct_risky",5,"No hostnames matching dev, staging, uat, admin, jenkins, vpn and similar patterns","3 pts for up to three matches, 1 pt for more"],
+ ["disclosure","sectxt",6,"security.txt published per RFC 9116 with Contact plus optional fields","5 pts with Contact only, 0 if absent"],
+ ["disclosure","cookies",4,"No cookies on landing page, or all carry Secure and HttpOnly","1 pt if any cookie lacks a flag"]
+];
+
+/* Pastel fills for the bars, saturated tones for text so labels stay legible.
+   Thresholds: 75% and above green, 50-74% yellow, below 50% red. */
+var PAL={green:{fill:"#a3d9b8",ink:"#1d6b4f"},
+         yellow:{fill:"#f6d98f",ink:"#8a5b00"},
+         red:{fill:"#f2aba9",ink:"#9b2226"}};
+function catBand(pct){ return pct>=75?PAL.green:(pct>=50?PAL.yellow:PAL.red); }
+function catColour(pct){ return catBand(pct).fill; }
+var SCAN_BANDS=[[75,"75%",PAL.green.ink],[50,"50%",PAL.yellow.ink]];
+var SVGFF="Inter,Calibri,'Segoe UI',system-ui,sans-serif";
+
+/* Builds the same chart the standalone scanner emits, so the report and any
+   exported chart look identical. mode "weight" shows the model; "score" shows results. */
+function postureChart(vals, mode){
+  var keys=Object.keys(SCAN_CATS), rowH=38, top=26, pad=210;
+  var W=760, track=W-pad-96, unit=track/100, H=top+keys.length*rowH+34;
+  var p=['<svg width="100%" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Category '+mode+'s" style="max-width:'+W+'px">'];
+  if(mode==="score"){
+    for(var b=0;b<SCAN_BANDS.length;b++){
+      var gx=pad+SCAN_BANDS[b][0]*unit;
+      p.push('<line x1="'+gx.toFixed(1)+'" y1="'+(top-10)+'" x2="'+gx.toFixed(1)+'" y2="'+(top+keys.length*rowH-12)+'" stroke="#dde5eb" stroke-width="1" stroke-dasharray="2,3"/>');
+      p.push('<text x="'+gx.toFixed(1)+'" y="'+(top+keys.length*rowH+4)+'" font-family="'+SVGFF+'" font-size="10" font-weight="600" fill="'+SCAN_BANDS[b][2]+'" text-anchor="middle">'+SCAN_BANDS[b][1]+'</text>');
+    }
+  }
+  for(var i=0;i<keys.length;i++){
+    var k=keys[i], c=SCAN_CATS[k], y=top+i*rowH;
+    var pctv = vals[k]||0;
+    var v = mode==="score" ? pctv : c.weight*4;
+    var col = mode==="score" ? catBand(pctv).fill : CAT_RAMP[i];
+    var ink = mode==="score" ? catBand(pctv).ink : "#41545f";
+    var lbl = mode==="score" ? Math.round(pctv)+"%" : c.weight+" pts";
+    p.push('<text x="'+(pad-12)+'" y="'+(y+14)+'" font-family="'+SVGFF+'" font-size="11.5" fill="#41545f" text-anchor="end">'+c.label.replace(/&/g,"&amp;")+'</text>');
+    p.push('<text x="'+(pad-12)+'" y="'+(y+26)+'" font-family="'+SVGFF+'" font-size="9.5" fill="#98a7b0" text-anchor="end">weight '+c.weight+'%</text>');
+    p.push('<rect x="'+pad+'" y="'+y+'" width="'+track+'" height="20" rx="3" fill="#f2f6f9"/>');
+    p.push('<rect x="'+pad+'" y="'+y+'" width="'+(v*unit).toFixed(1)+'" height="20" rx="3" fill="'+col+'"/>');
+    p.push('<text x="'+(pad+track+10)+'" y="'+(y+14)+'" font-family="'+SVGFF+'" font-size="11.5" font-weight="600" fill="'+ink+'">'+lbl+'</text>');
+  }
+  p.push('</svg>');
+  return p.join("");
+}
+var CAT_RAMP=["#7ba6c0","#8fb4cb","#a2c2d5","#b6d0df","#c9dee9","#dcecf3"];
+
+function drawWeights(){ el("weightChart").innerHTML = postureChart({}, "weight"); }
+
+function renderCatalogue(){
+  var h="";
+  for(var i=0;i<CATALOGUE.length;i++){
+    var r=CATALOGUE[i];
+    h+='<tr><td>'+SCAN_CATS[r[0]].label+'</td><td><code style="font-size:12px">'+r[1]+'</code></td>'
+      +'<td style="text-align:right;font-variant-numeric:tabular-nums">'+r[2]+'</td><td>'+r[3]+'</td>'
+      +'<td style="color:var(--ink-3);font-size:12.5px">'+r[4]+'</td></tr>';
+  }
+  el("catalogueBody").innerHTML=h;
+}
+
+function clearScan(){ el("scanJson").value=""; el("scanOut").innerHTML=""; el("scanMsg").textContent=""; }
+
+function loadScan(){
+  var raw=el("scanJson").value.trim();
+  if(!raw){ el("scanMsg").textContent="Paste the JSON output first."; return; }
+  var d;
+  try { d=JSON.parse(raw); } catch(e){ el("scanMsg").textContent="Could not parse that as JSON."; return; }
+  if(!d.categories || !d.findings){ el("scanMsg").textContent="That JSON does not look like vendorscan output."; return; }
+  el("scanMsg").textContent="Loaded "+(d.domain||"scan")+" \u00b7 "+(d.scanned_utc||"").slice(0,10);
+  renderScan(d);
+}
+
+function renderScan(d){
+  var npass=0,nfail=0,nunk=0;
+  for(var i=0;i<d.findings.length;i++){
+    if(d.findings[i].passed===true) npass++;
+    else if(d.findings[i].passed===false) nfail++;
+    else nunk++;
+  }
+  var gcol = {A:"var(--green)",B:"var(--green)",C:"var(--amber)",D:"var(--amber)",F:"var(--red)"}[d.grade]||"var(--ink-3)";
+
+  // hero
+  var h='<div class="card"><div class="hero">'
+    +'<div><div class="lab">Grade</div><div class="grade" style="color:'+gcol+'">'+d.grade+'</div></div>'
+    +'<div><div class="lab">Weighted score</div><div class="sc">'+d.score+'<span style="font-size:15px;color:var(--ink-3)"> / 100</span></div></div>'
+    +'<div><div class="lab">Checks</div><div class="sc">'+npass+'<span style="font-size:15px;color:var(--ink-3)"> pass</span> &middot; '
+    +nfail+'<span style="font-size:15px;color:var(--ink-3)"> fail</span> &middot; '
+    +nunk+'<span style="font-size:15px;color:var(--ink-3)"> unknown</span></div></div>'
+    +'</div></div>';
+
+  // category breakdown
+  h+='<div class="card"><h3>Category breakdown</h3>'
+    +'<p class="hint">Bar colour reflects the band that category alone would score. '
+    +'Dashed gridlines mark the 50% and 75% colour thresholds.</p>'
+    + postureChart(d.categories, "score")
+    + '<div style="margin-top:10px;font-size:12px;color:var(--ink-3)">'
+    + '<span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:'+PAL.green.fill+';border:1px solid '+PAL.green.ink+'33;margin-right:5px"></span>&ge;75%'
+    + '<span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:'+PAL.yellow.fill+';border:1px solid '+PAL.yellow.ink+'33;margin:0 5px 0 16px"></span>50&ndash;74%'
+    + '<span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:'+PAL.red.fill+';border:1px solid '+PAL.red.ink+'33;margin:0 5px 0 16px"></span>&lt;50%'
+    + '</div></div>';
+
+  // collection errors
+  if(d.errors && d.errors.length){
+    h+='<div class="callout warn"><strong>Collection errors.</strong><ul class="tight">';
+    for(var e=0;e<d.errors.length;e++) h+='<li>'+String(d.errors[e]).replace(/</g,"&lt;")+'</li>';
+    h+='</ul></div>';
+  }
+
+  // findings
+  var sev={critical:0,high:1,medium:2,low:3,info:4};
+  var order=Object.keys(SCAN_CATS);
+  var fs=d.findings.slice().sort(function(a,b){
+    return order.indexOf(a.category)-order.indexOf(b.category) || (sev[a.severity]||9)-(sev[b.severity]||9);
+  });
+  var rows="";
+  for(var j=0;j<fs.length;j++){
+    var f=fs[j], badge;
+    if(f.passed===true) badge='<span class="tag c">Pass</span>';
+    else if(f.passed===null) badge='<span class="tag i">Unknown</span>';
+    else badge='<span class="tag '+((f.severity==="critical"||f.severity==="high")?"u":"i")
+      +'">'+f.severity.charAt(0).toUpperCase()+f.severity.slice(1)+'</span>';
+    rows+='<tr><td>'+SCAN_CATS[f.category].label+'</td>'
+      +'<td><strong>'+f.title+'</strong></td>'
+      +'<td>'+String(f.observed).replace(/</g,"&lt;")+'</td>'
+      +'<td>'+badge+'</td>'
+      +'<td>'+(String(f.recommendation||"").replace(/</g,"&lt;")||"&mdash;")+'</td>'
+      +'<td class="num">'+f.points+' / '+f.possible+'</td></tr>';
+  }
+  h+='<div class="card"><h3>Findings</h3>'
+    +'<p class="hint">Sorted by category, then severity. Points shown are earned against possible.</p>'
+    +'<table><thead><tr><th style="width:15%">Category</th><th style="width:19%">Check</th>'
+    +'<th style="width:24%">Observed</th><th style="width:9%">Result</th>'
+    +'<th style="width:24%">Recommendation</th><th style="width:9%">Points</th></tr></thead>'
+    +'<tbody>'+rows+'</tbody></table></div>';
+
+  el("scanOut").innerHTML=h;
+}
+
+buildNav(); renderAtt(); renderSubs(); renderQ("all"); renderFind(); renderResid(); renderKpis(); drawWeights(); renderCatalogue();
+</script>
+</body>
+</html>
