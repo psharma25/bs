@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vendor Security Questionnaire</title>
+<style>
+:root{
+  --petrol:#1b4965;--petrol-dark:#12334a;--petrol-light:#2d6a8f;
+  --wash:#eef3f7;--wash2:#f7f9fb;--ink:#14212b;--ink2:#41545f;--ink3:#75868f;
+  --line:#d7e0e7;--line2:#b6c5d0;--paper:#fff;
+  --amber:#a15c00;--amber-bg:#fdf3e3;--amber-line:#ecd6ae;
+  --red:#9b2226;--red-bg:#fbecec;--red-line:#e3bfc0;
+  --green:#1d6b4f;--green-bg:#e8f4ee;--green-line:#bcdccb;
+  --shadow:0 1px 2px rgba(20,33,43,.06),0 4px 14px rgba(20,33,43,.05);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Calibri,"Segoe UI",system-ui,-apple-system,sans-serif;
+  background:var(--wash2);color:var(--ink);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+header.app{background:var(--petrol);color:#fff;padding:14px 26px;display:flex;gap:16px;
+  align-items:center;flex-wrap:wrap;position:sticky;top:0;z-index:60}
+header.app h1{font-size:17px;margin:0;font-weight:600}
+header.app .sub{font-size:12px;opacity:.75;margin-top:2px}
+header.app .spacer{flex:1}
+button{font-family:inherit;font-size:13px;cursor:pointer;border:1px solid var(--line2);
+  background:var(--paper);color:var(--ink);padding:7px 13px;border-radius:6px}
+button:hover{background:var(--wash)}
+button.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.4)}
+button.ghost:hover{background:rgba(255,255,255,.14)}
+button.primary{background:#fff;color:var(--petrol);border-color:transparent;font-weight:600}
+button.mini{padding:4px 10px;font-size:12px}
+button:disabled{opacity:.45;cursor:not-allowed}
+.progwrap{width:100%;height:4px;background:rgba(255,255,255,.22);position:sticky;top:57px;z-index:59}
+.progwrap span{display:block;height:100%;background:#8ecfae;transition:width .25s}
+.layout{display:flex;max-width:1180px;margin:0 auto;align-items:flex-start}
+nav.side{width:230px;flex:0 0 230px;padding:20px 12px 60px;position:sticky;top:76px}
+nav.side a{display:flex;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:6px;
+  color:var(--ink2);font-size:13.5px;text-decoration:none;cursor:pointer;
+  border-left:3px solid transparent;margin-bottom:2px}
+nav.side a:hover{background:var(--wash)}
+nav.side a.on{background:var(--wash);color:var(--petrol);font-weight:600;border-left-color:var(--petrol)}
+nav.side a .cnt{font-size:11px;color:var(--ink3);font-variant-numeric:tabular-nums;white-space:nowrap}
+nav.side a.done .cnt{color:var(--green);font-weight:600}
+main{flex:1;min-width:0;padding:20px 26px 90px}
+h2.sec{font-size:20px;font-weight:600;color:var(--petrol-dark);margin:2px 0 4px}
+p.lede{color:var(--ink2);max-width:76ch;margin:0 0 18px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:18px 20px;
+  margin-bottom:14px;box-shadow:var(--shadow)}
+.card h3{font-size:15px;margin:0 0 3px;color:var(--petrol-dark);font-weight:600}
+.card .hint{font-size:12.5px;color:var(--ink3);margin:0 0 12px;max-width:80ch}
+.q{background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--line2);
+  border-radius:6px;padding:15px 18px;margin-bottom:12px;box-shadow:var(--shadow)}
+.q.answered{border-left-color:var(--green)}
+.q .qid{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.6px}
+.q .qt{font-weight:600;margin:2px 0 3px;font-size:14.5px}
+.q .qh{font-size:12.5px;color:var(--ink3);margin-bottom:10px}
+.opts{display:flex;flex-direction:column;gap:6px}
+label.opt{display:flex;gap:9px;align-items:flex-start;padding:8px 11px;border:1px solid var(--line);
+  border-radius:6px;cursor:pointer;font-size:13.5px;background:var(--wash2)}
+label.opt:hover{background:var(--wash)}
+label.opt.sel{background:var(--wash);border-color:var(--petrol-light);box-shadow:inset 0 0 0 1px var(--petrol-light)}
+label.opt input{margin-top:3px;accent-color:var(--petrol)}
+textarea,input[type=text]{width:100%;font-family:inherit;font-size:14px;color:var(--ink);
+  border:1px solid var(--line2);border-radius:6px;padding:9px 11px;background:var(--paper)}
+textarea{resize:vertical;min-height:70px;line-height:1.5}
+.req{color:var(--red);font-weight:700}
+.tag{display:inline-block;font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:20px;
+  background:var(--wash);color:var(--petrol);border:1px solid var(--line);white-space:nowrap}
+.tag.c{background:var(--green-bg);color:var(--green);border-color:var(--green-line)}
+.tag.i{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-line)}
+.tag.u{background:var(--red-bg);color:var(--red);border-color:var(--red-line)}
+.callout{border-left:3px solid var(--petrol);background:var(--wash);padding:12px 15px;
+  border-radius:0 6px 6px 0;margin:14px 0;font-size:13.5px}
+.callout.warn{border-left-color:var(--amber);background:var(--amber-bg)}
+.callout.bad{border-left-color:var(--red);background:var(--red-bg)}
+.callout.good{border-left-color:var(--green);background:var(--green-bg)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--ink3);
+  font-weight:600;padding:7px 8px;border-bottom:1px solid var(--line2)}
+td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+ul.tight{margin:6px 0;padding-left:20px}ul.tight li{margin-bottom:5px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:14px 16px;box-shadow:var(--shadow)}
+.kpi .lab{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--ink3);font-weight:600}
+.kpi .val{font-size:28px;font-weight:600;line-height:1.15;margin-top:3px;font-variant-numeric:tabular-nums;color:var(--petrol)}
+.kpi .note{font-size:12px;color:var(--ink3);margin-top:2px}
+.gradebox{font-size:66px;font-weight:600;line-height:1}
+.navbtns{display:flex;gap:8px;justify-content:space-between;margin-top:18px}
+section.panel{display:none}section.panel.on{display:block}
+@media (max-width:920px){
+  .grid3{grid-template-columns:1fr}
+  .layout{flex-wrap:wrap}
+  nav.side{position:static;width:100%;flex:1 1 100%;display:flex;flex-wrap:wrap;gap:4px;padding:10px 16px}
+  nav.side a{border-left:none;border-bottom:3px solid transparent;flex:0 0 auto}
+  nav.side a.on{border-left-color:transparent;border-bottom-color:var(--petrol)}
+}
+@media print{
+  header.app,nav.side,.progwrap,.no-print,.navbtns{display:none!important}
+  body{background:#fff}main{padding:0}
+  .card{break-inside:avoid;box-shadow:none}
+  section.panel{display:none!important}section.panel#p-report{display:block!important}
+}
+</style>
+</head>
+<body>
+
+<header class="app">
+  <div>
+    <h1 id="hdrTitle">Vendor Security Questionnaire</h1>
+    <div class="sub" id="hdrSub">Loading&hellip;</div>
+  </div>
+  <div class="spacer"></div>
+  <button class="ghost" onclick="exportAnswers()">Save answers</button>
+  <button class="ghost" onclick="document.getElementById('imp').click()">Load answers</button>
+  <input type="file" id="imp" accept="application/json" style="display:none" onchange="importAnswers(this)">
+  <button class="primary" id="btnReport" onclick="go('report')">Generate report</button>
+</header>
+<div class="progwrap"><span id="prog" style="width:0%"></span></div>
+
+<div class="layout">
+<nav class="side" id="nav"></nav>
+<main id="main"></main>
+</div>
+
+<script>
+"use strict";
+
+/* ============================================================ CONFIG */
+var CFG = {
+  vendor: "Secureframe, Inc.",
+  assessor: "BitSense, LLC",
+  contact: "psharma@thebitsense.com",
+  scale: [[85,"A","#1d6b4f","Secure &mdash; can safeguard our data"],
+          [65,"B","#a15c00","Some risks &mdash; proceed with conditions"],
+          [0, "C","#9b2226","Bad &mdash; do not proceed on current evidence"]]
+};
+
+/* Append #vendor to the URL before sending to a vendor. That hides the report
+   tab so they cannot see how answers are scored, which prevents answer-gaming. */
+var VENDOR_MODE = (location.hash || "").toLowerCase().indexOf("vendor") >= 0;
+
+/* ============================================================ MODEL
+   Each scored question: options carry points (of max) and an optional flag that
+   becomes an auto-generated finding. Free-text answers are captured but not
+   scored - they inform the assessor, they do not move the grade. */
+var CATS = [
+  {id:"attest",  label:"Attestations & audit",        weight:20},
+  {id:"data",    label:"Data handling & AI",          weight:25},
+  {id:"isolate", label:"Tenant isolation & change",   weight:20},
+  {id:"access",  label:"Access & identity",           weight:12},
+  {id:"vuln",    label:"Vulnerability & incident",    weight:12},
+  {id:"resil",   label:"Resilience",                  weight:6},
+  {id:"gov",     label:"Governance",                  weight:5}
+];
+
+var Q = [
+  /* ---- respondent (unscored) ---- */
+  {id:"R1", cat:"resp", type:"text", req:true, t:"Your name"},
+  {id:"R2", cat:"resp", type:"text", req:true, t:"Role and team"},
+  {id:"R3", cat:"resp", type:"text", req:true, t:"Email for follow-up"},
+  {id:"R4", cat:"resp", type:"choice", req:true, t:"Are you authorised to answer on behalf of the company in a contractual context?",
+   o:[["Yes",0,0],["Partially &mdash; some answers need Legal or Security review",0,0],["No &mdash; informal answers only",0,0]]},
+
+  /* ---- attestations (20) ---- */
+  {id:"Q1", cat:"attest", max:6, type:"choice", req:true,
+   t:"Currency of your most recent SOC 2 Type II report",
+   h:"Our review found a published report with a period end more than twelve months old.",
+   o:[["Period ended within the last 3 months",6,0],
+      ["Period ended 3&ndash;6 months ago, bridge letter available",5,0],
+      ["Period ended 6&ndash;12 months ago, bridge letter available",3,"medium|SOC 2 period is materially aged; relying on a bridge letter"],
+      ["Period ended more than 12 months ago",0,"high|SOC 2 attestation is stale; no in-period independent opinion available"],
+      ["No SOC 2 Type II",0,"high|No SOC 2 Type II attestation"]]},
+  {id:"Q2", cat:"attest", max:4, type:"choice", req:true,
+   t:"Trust Services Criteria covered by the report",
+   o:[["Security, Availability and Confidentiality or more",4,0],
+      ["Security and Availability",3,0],
+      ["Security (Common Criteria) only",2,"low|SOC 2 scope is Security-only; Availability and Confidentiality not independently tested"],
+      ["Not applicable",0,0]]},
+  {id:"Q3", cat:"attest", max:4, type:"choice", req:true,
+   t:"Subservice organizations in the SOC 2 report",
+   o:[["Inclusive method &mdash; subservice controls tested",4,0],
+      ["Carved out, and we can provide the list",2,"low|Subservice organizations carved out; their controls are not covered by the opinion"],
+      ["Carved out, list not available",0,"medium|Carved-out subservice organizations with no disclosed list"],
+      ["Not applicable",3,0]]},
+  {id:"Q4", cat:"attest", max:3, type:"choice", req:true,
+   t:"Complementary user entity controls (CUECs)",
+   o:[["We publish the CUEC list and can share it now",3,0],
+      ["Available on request in the report",2,0],
+      ["We do not track these separately",0,"medium|CUECs not readily identifiable; customer-side control obligations unclear"]]},
+  {id:"Q5", cat:"attest", max:3, type:"choice", req:true,
+   t:"Most recent third-party penetration test",
+   o:[["Within the last 6 months, summary available",3,0],
+      ["6&ndash;12 months ago, summary available",2,0],
+      ["More than 12 months ago",0,"medium|Penetration test older than twelve months"],
+      ["No third-party penetration test",0,"high|No independent penetration testing"]]},
+  {id:"Q5t", cat:"attest", type:"textarea", req:false,
+   t:"Testing firm, date, and whether any critical or high findings were remediated"},
+
+  /* ---- data & AI (25) ---- */
+  {id:"Q6", cat:"data", max:8, type:"choice", req:true,
+   t:"Is customer data used for training or improvement of any model, by you or any AI subprocessor?",
+   h:"Including uploaded policies, control evidence and personnel records.",
+   o:[["No &mdash; contractual commitment in the DPA or enterprise terms",8,0],
+      ["No &mdash; but it is a configurable setting rather than a contractual term",4,"medium|No-training is a setting rather than a contractual commitment; can be changed unilaterally"],
+      ["Yes &mdash; with a contractual opt-out available",2,"high|Customer data used for model training by default; opt-out required"],
+      ["Yes &mdash; no opt-out",0,"critical|Customer data used for model training with no opt-out available"]]},
+  {id:"Q7", cat:"data", max:5, type:"choice", req:true,
+   t:"Retention window for data passed to AI subprocessors",
+   o:[["Zero retention &mdash; not persisted",5,0],
+      ["30 days or less",4,0],
+      ["31&ndash;90 days",2,"low|Extended retention at AI subprocessor"],
+      ["More than 90 days or indefinite",0,"high|Long or indefinite retention of customer data at AI subprocessor"],
+      ["Not known / varies by provider",0,"high|Retention at AI subprocessors is not known to the vendor"]]},
+  {id:"Q8", cat:"data", max:3, type:"choice", req:true,
+   t:"Does customer data enter an abuse-monitoring or safety-review pipeline at any AI subprocessor?",
+   h:"This often sits outside the main retention policy and is frequently overlooked.",
+   o:[["No",3,0],["Yes, with a disclosed retention period",1,"medium|Data enters an abuse-monitoring pipeline outside the primary retention policy"],
+      ["Yes, retention not disclosed to us",0,"high|Data enters an abuse-monitoring pipeline with undisclosed retention"],
+      ["Not known",0,"high|Vendor cannot say whether data enters abuse-monitoring pipelines"]]},
+  {id:"Q9", cat:"data", max:5, type:"choice", req:true,
+   t:"Encryption at rest for customer data",
+   o:[["Yes, with customer-managed keys available",5,0],
+      ["Yes, provider-managed keys",4,0],
+      ["Partial &mdash; some stores only",1,"high|Encryption at rest not applied uniformly"],
+      ["No",0,"critical|Customer data not encrypted at rest"]]},
+  {id:"Q10", cat:"data", max:2, type:"choice", req:true,
+   t:"Can the hosting region for our tenant be contractually fixed?",
+   o:[["Yes",2,0],["Yes, subject to plan tier",1,0],["No",0,"medium|Data residency cannot be contractually fixed"]]},
+  {id:"Q11", cat:"data", max:2, type:"choice", req:true,
+   t:"Data handling after termination",
+   o:[["Export plus certified destruction within a defined period",2,0],
+      ["Deletion within a defined period, no certification",1,"low|No certified destruction on termination"],
+      ["Retained indefinitely or period undefined",0,"high|No defined data destruction period after termination"]]},
+  {id:"Q11t", cat:"data", type:"textarea", req:false,
+   t:"Data location for each subprocessor that does not publish one, and any detail on the above"},
+
+  /* ---- isolation (20) ---- */
+  {id:"Q12", cat:"isolate", max:6, type:"choice", req:true,
+   t:"How is tenant isolation architected?",
+   h:"A direct competitor in this category disclosed cross-customer exposure in 2025 caused by a code change, not an intrusion. We ask every vendor in this category the same questions.",
+   o:[["Physical or dedicated-infrastructure separation per tenant",6,0],
+      ["Logical separation enforced at the data layer with row/tenant-level policies",5,0],
+      ["Logical separation enforced in application code only",2,"medium|Tenant isolation enforced in application logic alone; a code change can breach the boundary"],
+      ["Shared schema without enforced tenant scoping",0,"critical|No enforced tenant isolation boundary"]]},
+  {id:"Q13", cat:"isolate", max:6, type:"choice", req:true,
+   t:"How is tenant isolation tested?",
+   o:[["Automated regression tests on every build, plus periodic third-party review",6,0],
+      ["Automated regression tests on every build",5,0],
+      ["Periodic manual testing only",2,"medium|Isolation tested periodically rather than continuously; regressions can ship undetected"],
+      ["Not specifically tested",0,"critical|Tenant isolation is not specifically tested"]]},
+  {id:"Q14", cat:"isolate", max:4, type:"choice", req:true,
+   t:"Is tenant isolation explicitly in scope for your penetration test?",
+   o:[["Yes, explicitly scoped",4,0],["Partially",2,"low|Isolation only partially in penetration test scope"],
+      ["No",0,"medium|Tenant isolation not in penetration test scope"]]},
+  {id:"Q15", cat:"isolate", max:4, type:"choice", req:true,
+   t:"Is there a specific review gate for code changes that could affect data access boundaries?",
+   o:[["Yes &mdash; distinct from standard change management, with named reviewers",4,0],
+      ["Covered by standard change management review",2,"medium|No dedicated review gate for changes affecting tenant boundaries"],
+      ["No specific gate",0,"high|No review gate for code changes affecting data access boundaries"]]},
+  {id:"Q16", cat:"isolate", max:0, type:"choice", req:true,
+   t:"Has any cross-tenant data exposure occurred &mdash; however brief, regardless of notification threshold?",
+   o:[["No",0,0],["Yes &mdash; details below",0,"high|Vendor discloses a prior cross-tenant data exposure; assess root cause and remediation"],
+      ["Prefer to discuss under NDA",0,"medium|Vendor declines to answer on prior cross-tenant exposure in writing"]]},
+  {id:"Q16t", cat:"isolate", type:"textarea", req:false,
+   t:"If yes: date identified, duration, scope, root cause and remediation"},
+
+  /* ---- access (12) ---- */
+  {id:"Q17", cat:"access", max:5, type:"choice", req:true,
+   t:"Integration permissions in our identity provider",
+   o:[["Least-privilege scopes, and a reduced-scope option is available",5,0],
+      ["Least-privilege scopes, single fixed profile",4,0],
+      ["Broad read scopes, no reduced option",1,"medium|Integration requires broad read scopes with no reduced-scope alternative"],
+      ["Write or admin scopes required",0,"high|Integration requires write or administrative scopes"]]},
+  {id:"Q18", cat:"access", max:4, type:"choice", req:true,
+   t:"Governance of internal administrative tooling with access to customer records",
+   o:[["Approved, time-bounded, session-logged, and access reviewed",4,0],
+      ["Approved and logged, not time-bounded",2,"low|Administrative access to customer records is not time-bounded"],
+      ["Role-based only, no per-access approval",1,"medium|No per-access approval for administrative access to customer data"],
+      ["Not formally governed",0,"high|Administrative access to customer records is not formally governed"]]},
+  {id:"Q19", cat:"access", max:3, type:"choice", req:true,
+   t:"Offshore personnel or contractors in roles with access to customer data",
+   o:[["None",3,0],["Yes, with equivalent controls and background checks",2,0],
+      ["Yes, controls differ",0,"medium|Offshore or contractor personnel access customer data under differing controls"]]},
+
+  /* ---- vuln & incident (12) ---- */
+  {id:"Q20", cat:"vuln", max:4, type:"choice", req:true,
+   t:"Vulnerability remediation SLAs by severity",
+   o:[["Defined SLAs, and adherence is measured and reported",4,0],
+      ["Defined SLAs, adherence not measured",2,"medium|Remediation SLAs defined but adherence is not measured"],
+      ["No formal SLAs",0,"high|No defined vulnerability remediation SLAs"]]},
+  {id:"Q21", cat:"vuln", max:5, type:"choice", req:true,
+   t:"Customer incident notification SLA",
+   h:"Measured from discovery, not from confirmation.",
+   o:[["24 hours or less from discovery",5,0],["48&ndash;72 hours from discovery",4,0],
+      ["Defined, but measured from confirmation",2,"medium|Notification clock starts at confirmation rather than discovery, which is indefinitely extensible"],
+      ["No defined SLA",0,"high|No defined customer incident notification SLA"]]},
+  {id:"Q22", cat:"vuln", max:3, type:"choice", req:true,
+   t:"Reportable security incidents in the last 24 months",
+   o:[["None",3,0],["Yes, disclosed with post-incident review available",2,0],
+      ["Yes, details not shareable",0,"medium|Vendor confirms an incident but will not share detail"],
+      ["Prefer to discuss under NDA",1,"low|Incident history deferred to an NDA discussion"]]},
+  {id:"Q22t", cat:"vuln", type:"textarea", req:false,
+   t:"If applicable: nature, scope, customer impact and remediation"},
+
+  /* ---- resilience (6) ---- */
+  {id:"Q23", cat:"resil", max:4, type:"choice", req:true,
+   t:"Contractual RTO and RPO",
+   o:[["Both defined contractually, with measured availability reported",4,0],
+      ["Defined but not contractual",2,"low|RTO and RPO are targets rather than contractual commitments"],
+      ["Not defined",0,"medium|No defined RTO or RPO"]]},
+  {id:"Q24", cat:"resil", max:2, type:"choice", req:true,
+   t:"Backup restoration testing",
+   o:[["Tested at least annually to a non-production environment",2,0],
+      ["Backups taken, restoration not tested",0,"high|Backup restoration is never tested"]]},
+
+  /* ---- governance (5) ---- */
+  {id:"Q25", cat:"gov", max:3, type:"choice", req:true,
+   t:"Subprocessor change notification",
+   o:[["Advance notice with a defined objection window",3,0],
+      ["Advance notice, no objection right",2,"low|No contractual right to object to subprocessor changes"],
+      ["Published list only, no notification",0,"medium|No proactive notification of subprocessor changes"]]},
+  {id:"Q26", cat:"gov", max:2, type:"choice", req:true,
+   t:"Security leadership",
+   o:[["Dedicated CISO or equivalent reporting to CEO or board",2,0],
+      ["Dedicated security leader reporting into engineering or IT",1,0],
+      ["Security is a shared responsibility, no dedicated owner",0,"high|No dedicated security leadership"]]},
+  {id:"Q26t", cat:"gov", type:"textarea", req:false,
+   t:"Security team size, and anything you would want to add or correct about our public-source reading"}
+];
+
+var SECTIONS = [
+  {id:"intro",   label:"Introduction", qs:[]},
+  {id:"resp",    label:"Respondent",   qs:["R1","R2","R3","R4"]},
+  {id:"attest",  label:"Attestations & audit",      qs:["Q1","Q2","Q3","Q4","Q5","Q5t"]},
+  {id:"data",    label:"Data handling & AI",        qs:["Q6","Q7","Q8","Q9","Q10","Q11","Q11t"]},
+  {id:"isolate", label:"Tenant isolation & change", qs:["Q12","Q13","Q14","Q15","Q16","Q16t"]},
+  {id:"access",  label:"Access & identity",         qs:["Q17","Q18","Q19"]},
+  {id:"vuln",    label:"Vulnerability & incident",  qs:["Q20","Q21","Q22","Q22t"]},
+  {id:"resil",   label:"Resilience",                qs:["Q23","Q24"]},
+  {id:"gov",     label:"Governance",                qs:["Q25","Q26","Q26t"]},
+  {id:"report",  label:"Report",                    qs:[]}
+];
+
+var ANS = {};
+var QMAP = {}; Q.forEach(function(q){ QMAP[q.id]=q; });
+var CUR = "intro";
+
+function el(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?"":s).replace(/&(?![a-z]+;|#)/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+/* ---------- persistence: try localStorage, degrade silently ---------- */
+var KEY="bitsense.vendorq.v1";
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(ANS)); }catch(e){} }
+function load(){ try{ var r=localStorage.getItem(KEY); if(r) ANS=JSON.parse(r)||{}; }catch(e){} }
+
+/* ---------- scoring ---------- */
+function scoreAll(){
+  var cat={}, findings=[], answered=0, scoredTotal=0, scorable=0;
+  CATS.forEach(function(c){ cat[c.id]={earned:0,possible:0}; });
+  Q.forEach(function(q){
+    var a=ANS[q.id];
+    if(a!==undefined && a!==null && String(a).trim()!=="") answered++;
+    if(q.type!=="choice" || q.cat==="resp") return;
+    if(!q.max && q.max!==0) return;
+    if(q.max>0){ cat[q.cat].possible+=q.max; scorable+=q.max; }
+    if(a===undefined || a===null) return;
+    var opt=q.o[a]; if(!opt) return;
+    if(q.max>0){ cat[q.cat].earned+=opt[1]; scoredTotal+=opt[1]; }
+    if(opt[2]){
+      var parts=String(opt[2]).split("|");
+      findings.push({sev:parts[0], text:parts[1], q:q.id, qt:q.t, answer:opt[0], cat:q.cat});
+    }
+  });
+  var total=0;
+  CATS.forEach(function(c){
+    var s=cat[c.id];
+    var pct = s.possible ? 100*s.earned/s.possible : 0;
+    cat[c.id].pct=pct;
+    total += pct*c.weight/100;
+  });
+  var unanswered = Q.filter(function(q){
+    return q.req && (ANS[q.id]===undefined||ANS[q.id]===null||String(ANS[q.id]).trim()==="");
+  });
+  return {cat:cat, findings:findings, total:Math.round(total*10)/10,
+          answered:answered, totalQ:Q.length, unanswered:unanswered};
+}
+function gradeFor(score){
+  for(var i=0;i<CFG.scale.length;i++) if(score>=CFG.scale[i][0]) return CFG.scale[i];
+  return CFG.scale[CFG.scale.length-1];
+}
+
+/* ---------- nav & progress ---------- */
+function sectionProgress(sec){
+  var qs=sec.qs.map(function(id){return QMAP[id];}).filter(Boolean);
+  var req=qs.filter(function(q){return q.req;});
+  var done=req.filter(function(q){var a=ANS[q.id];return a!==undefined&&a!==null&&String(a).trim()!=="";});
+  return {done:done.length, total:req.length};
+}
+function buildNav(){
+  var h="";
+  SECTIONS.forEach(function(s){
+    if(s.id==="report" && VENDOR_MODE) return;
+    var p=sectionProgress(s);
+    var cnt = s.qs.length ? (p.done+"/"+p.total) : "";
+    var cls = (p.total && p.done===p.total) ? " done" : "";
+    h+='<a data-go="'+s.id+'" class="'+cls+'" onclick="go(\''+s.id+'\')"><span>'+s.label+'</span><span class="cnt">'+cnt+'</span></a>';
+  });
+  el("nav").innerHTML=h;
+  var as=el("nav").querySelectorAll("a");
+  for(var i=0;i<as.length;i++) as[i].classList.toggle("on", as[i].getAttribute("data-go")===CUR);
+  var all=Q.filter(function(q){return q.req;});
+  var done=all.filter(function(q){var a=ANS[q.id];return a!==undefined&&a!==null&&String(a).trim()!=="";});
+  el("prog").style.width = (all.length? 100*done.length/all.length : 0)+"%";
+  el("btnReport").style.display = VENDOR_MODE ? "none" : "";
+}
+
+/* ---------- rendering ---------- */
+function go(id){ CUR=id; render(); window.scrollTo(0,0); }
+
+function render(){
+  buildNav();
+  if(CUR==="intro") return renderIntro();
+  if(CUR==="report") return renderReport();
+  var sec = SECTIONS.filter(function(s){return s.id===CUR;})[0];
+  if(!sec) return renderIntro();
+  var h='<div class="kicker"></div><h2 class="sec">'+sec.label+'</h2>';
+  var lede={
+    resp:"So we know who to follow up with and can attribute answers accurately.",
+    attest:"Independent attestation is the only input to this assessment not supplied by you about yourselves, so currency matters as much as existence.",
+    data:"The highest-weighted section. Your published subprocessor register lists AI providers without a stated data location, and the platform ingests policy documents, control evidence and personnel records.",
+    isolate:"We ask every vendor in this category these questions, following a 2025 cross-customer exposure at a direct competitor caused by a product code change rather than an intrusion.",
+    access:"Your platform holds broad authenticated read access across our environment. This section is about limiting and governing it.",
+    vuln:"",resil:"",gov:""
+  }[sec.id];
+  if(lede) h+='<p class="lede">'+lede+'</p>';
+  sec.qs.forEach(function(qid){ h+=renderQ(QMAP[qid]); });
+  h+=navButtons(sec.id);
+  el("main").innerHTML=h;
+}
+
+function renderQ(q){
+  if(!q) return "";
+  var a=ANS[q.id];
+  var ans = a!==undefined && a!==null && String(a).trim()!=="";
+  var h='<div class="q'+(ans?" answered":"")+'" id="q-'+q.id+'">';
+  h+='<div class="qid">'+q.id+(q.req?' <span class="req">*</span>':'')+'</div>';
+  h+='<div class="qt">'+q.t+'</div>';
+  if(q.h) h+='<div class="qh">'+q.h+'</div>';
+  if(q.type==="choice"){
+    h+='<div class="opts">';
+    q.o.forEach(function(opt,i){
+      var sel = (a===i);
+      h+='<label class="opt'+(sel?" sel":"")+'"><input type="radio" name="'+q.id+'" '
+        +(sel?"checked":"")+' onchange="setAns(\''+q.id+'\','+i+')"><span>'+opt[0]+'</span></label>';
+    });
+    h+='</div>';
+  } else if(q.type==="text"){
+    h+='<input type="text" value="'+esc(a||"")+'" oninput="setAns(\''+q.id+'\',this.value)">';
+  } else {
+    h+='<textarea rows="3" oninput="setAns(\''+q.id+'\',this.value)">'+esc(a||"")+'</textarea>';
+  }
+  h+='</div>';
+  return h;
+}
+
+function navButtons(id){
+  var vis=SECTIONS.filter(function(s){ return !(s.id==="report"&&VENDOR_MODE); });
+  var i=vis.map(function(s){return s.id;}).indexOf(id);
+  var prev=i>0?vis[i-1]:null, next=i<vis.length-1?vis[i+1]:null;
+  var h='<div class="navbtns no-print">';
+  h+= prev?'<button onclick="go(\''+prev.id+'\')">&larr; '+prev.label+'</button>':'<span></span>';
+  h+= next?'<button class="primary" style="border:1px solid var(--line2)" onclick="go(\''+next.id+'\')">'+next.label+' &rarr;</button>':'<span></span>';
+  return h+'</div>';
+}
+
+function setAns(id,val){
+  ANS[id]=val; save();
+  var q=QMAP[id];
+  if(q && q.type==="choice"){ render(); }
+  else { buildNav(); var n=el("q-"+id); if(n) n.classList.toggle("answered", String(val).trim()!==""); }
+}
+
+function renderIntro(){
+  var h='<h2 class="sec">Security assessment questionnaire</h2>';
+  h+='<p class="lede">'+CFG.assessor+' is conducting a third-party security assessment of <strong>'+CFG.vendor+'</strong>. '
+    +'This questionnaire is deliberately short. We have already reviewed your public trust center, control catalogue, '
+    +'subprocessor register and certification listings, and have not repeated anything answered there. What follows is '
+    +'only what we could not determine independently.</p>';
+  h+='<div class="card"><h3>How this works</h3><ul class="tight">'
+    +'<li>Roughly 30 questions across eight short sections. Fifteen to twenty minutes.</li>'
+    +'<li>Answers are held in your browser only. Nothing is transmitted anywhere.</li>'
+    +'<li>Use <strong>Save answers</strong> at any point to download a JSON file, and <strong>Load answers</strong> to resume. '
+    +'Send that file back to <a href="mailto:'+CFG.contact+'">'+CFG.contact+'</a> when complete.</li>'
+    +'<li>Where a document fully answers a question, say so in the free-text field and attach it rather than retyping.</li>'
+    +'</ul></div>';
+  if(!VENDOR_MODE){
+    h+='<div class="callout warn"><strong>Assessor view.</strong> The Report tab scores answers and generates findings automatically. '
+      +'Before sending this file to a vendor, append <code>#vendor</code> to the URL or instruct them to use that link &mdash; '
+      +'it hides the Report tab so the scoring model is not visible while they answer. A visible scoring model invites answer-gaming.</div>';
+  }
+  h+=navButtons("intro");
+  el("main").innerHTML=h;
+}
+
+/* ---------- report ---------- */
+var SEVW={critical:0,high:1,medium:2,low:3};
+function renderReport(){
+  var r=scoreAll(), g=gradeFor(r.total);
+  var conf = Math.round(100*(Q.filter(function(q){return q.req;}).length - r.unanswered.length)
+             / Q.filter(function(q){return q.req;}).length);
+
+  var h='<h2 class="sec">Assessment report &mdash; '+CFG.vendor+'</h2>';
+  h+='<p class="lede">Generated from questionnaire responses. Score is the weighted sum of category scores; '
+    +'findings are produced automatically from answers that indicate risk. Confidence reflects response completeness.</p>';
+
+  h+='<div class="grid3">';
+  h+='<div class="kpi"><div class="lab">Grade</div><div class="gradebox" style="color:'+g[2]+'">'+g[1]+'</div>'
+    +'<div class="note">'+g[3]+'</div></div>';
+  h+='<div class="kpi"><div class="lab">Weighted score</div><div class="val" style="color:'+g[2]+'">'+r.total
+    +'<span style="font-size:15px;color:var(--ink3)"> / 100</span></div>'
+    +'<div class="note">across '+CATS.length+' weighted categories</div></div>';
+  var ccol = conf>=90?"var(--green)":(conf>=70?"var(--amber)":"var(--red)");
+  h+='<div class="kpi"><div class="lab">Confidence</div><div class="val" style="color:'+ccol+'">'+conf+'%</div>'
+    +'<div class="note">'+r.unanswered.length+' required question(s) unanswered</div></div>';
+  h+='</div>';
+
+  if(r.unanswered.length){
+    h+='<div class="callout warn"><strong>Incomplete.</strong> '+r.unanswered.length+' required question(s) not answered: '
+      +r.unanswered.map(function(q){return q.id;}).join(", ")
+      +'. Unanswered scored questions contribute zero, so the grade is a floor rather than an estimate until they are completed.</div>';
+  }
+
+  /* category chart */
+  var W=640,rowH=32,pad=200,track=W-pad-70,H=CATS.length*rowH+46,unit=track/100;
+  var svg='<svg width="100%" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Category scores">';
+  CFG.scale.forEach(function(b){
+    if(b[0]===0) return;
+    var gx=pad+b[0]*unit;
+    svg+='<line x1="'+gx+'" y1="8" x2="'+gx+'" y2="'+(H-26)+'" stroke="#dde5eb" stroke-width="1" stroke-dasharray="2,3"/>';
+    svg+='<text x="'+gx+'" y="'+(H-12)+'" font-size="10" fill="'+b[2]+'" text-anchor="middle" font-weight="600" font-family="Inter,Calibri,sans-serif">'+b[1]+'</text>';
+  });
+  CATS.forEach(function(c,i){
+    var pct=r.cat[c.id].pct, y=14+i*rowH, bd=gradeFor(pct);
+    svg+='<text x="'+(pad-10)+'" y="'+(y+14)+'" font-size="11.5" fill="#41545f" text-anchor="end" font-family="Inter,Calibri,sans-serif">'+c.label.replace(/&/g,"&amp;")+' ('+c.weight+')</text>';
+    svg+='<rect x="'+pad+'" y="'+y+'" width="'+track+'" height="20" rx="3" fill="#f2f6f9"/>';
+    svg+='<rect x="'+pad+'" y="'+y+'" width="'+(pct*unit)+'" height="20" rx="3" fill="'+bd[2]+'"/>';
+    svg+='<text x="'+(pad+track+8)+'" y="'+(y+14)+'" font-size="11.5" fill="'+bd[2]+'" font-weight="600" font-family="Inter,Calibri,sans-serif">'+Math.round(pct)+'%</text>';
+  });
+  svg+='</svg>';
+  h+='<div class="card"><h3>Category scores</h3><p class="hint">Bar colour reflects the band that category alone would score. Weight in brackets.</p>'+svg+'</div>';
+
+  /* findings */
+  var fs=r.findings.slice().sort(function(a,b){return (SEVW[a.sev]||9)-(SEVW[b.sev]||9);});
+  h+='<div class="card"><h3>Findings <span class="tag '+(fs.length?"i":"c")+'">'+fs.length+'</span></h3>';
+  h+='<p class="hint">Generated automatically from responses. Each cites the question and the answer that produced it.</p>';
+  if(!fs.length){
+    h+='<div class="callout good">No risk-indicating answers. Verify against documentation before accepting &mdash; a clean questionnaire is a claim, not evidence.</div>';
+  } else {
+    h+='<table><thead><tr><th style="width:9%">Severity</th><th style="width:34%">Finding</th>'
+      +'<th style="width:8%">Ref</th><th style="width:49%">Answer given</th></tr></thead><tbody>';
+    fs.forEach(function(f){
+      var col={critical:"#9b2226",high:"#9b2226",medium:"#a15c00",low:"#75868f"}[f.sev]||"#75868f";
+      var bg={critical:"#fbecec",high:"#fbecec",medium:"#fdf3e3",low:"#f7f9fb"}[f.sev]||"#fff";
+      h+='<tr style="background:'+bg+'"><td style="border-left:3px solid '+col+';color:'+col+';font-weight:600;text-transform:capitalize">'+f.sev+'</td>'
+        +'<td>'+f.text+'</td><td>'+f.q+'</td><td style="color:var(--ink3)">'+f.answer+'</td></tr>';
+    });
+    h+='</tbody></table>';
+  }
+  h+='</div>';
+
+  /* transcript */
+  h+='<div class="card"><h3>Full response transcript</h3>'
+    +'<table><thead><tr><th style="width:7%">Ref</th><th style="width:38%">Question</th>'
+    +'<th style="width:41%">Response</th><th style="width:14%">Points</th></tr></thead><tbody>';
+  Q.forEach(function(q){
+    var a=ANS[q.id], resp, pts="&mdash;";
+    if(a===undefined||a===null||String(a).trim()===""){
+      resp='<em style="color:var(--ink3)">not answered</em>';
+    } else if(q.type==="choice"){
+      resp=q.o[a]?q.o[a][0]:String(a);
+      if(q.max>0 && q.o[a]) pts=q.o[a][1]+" / "+q.max;
+    } else { resp=esc(a); }
+    h+='<tr><td>'+q.id+'</td><td>'+q.t+'</td><td>'+resp+'</td>'
+      +'<td style="text-align:right;font-variant-numeric:tabular-nums;color:var(--ink3)">'+pts+'</td></tr>';
+  });
+  h+='</tbody></table></div>';
+
+  h+='<div class="card"><h3>Scoring model and limits</h3>'
+    +'<p class="hint">Disclosed so a vendor can dispute a score on its merits.</p>'
+    +'<table><thead><tr><th style="width:40%">Category</th><th style="width:15%">Weight</th><th style="width:45%">Rationale</th></tr></thead><tbody>'
+    +'<tr><td>Data handling &amp; AI</td><td>25</td><td>Highest weight. Unknown or permissive data terms cannot be priced or accepted, and AI subprocessor terms are the least visible part of this vendor class.</td></tr>'
+    +'<tr><td>Attestations &amp; audit</td><td>20</td><td>The only input not supplied by the vendor about itself. Staleness weighted nearly as heavily as absence.</td></tr>'
+    +'<tr><td>Tenant isolation &amp; change</td><td>20</td><td>The documented failure mode for this category is an isolation defect shipped by a code change, not an intrusion.</td></tr>'
+    +'<tr><td>Access &amp; identity</td><td>12</td><td>Determines blast radius of a compromise of the vendor.</td></tr>'
+    +'<tr><td>Vulnerability &amp; incident</td><td>12</td><td>Responsiveness and notification, weighted on commitments rather than claims.</td></tr>'
+    +'<tr><td>Resilience</td><td>6</td><td>Rarely the deciding factor for this dependency type.</td></tr>'
+    +'<tr><td>Governance</td><td>5</td><td>Ownership and change notification.</td></tr>'
+    +'</tbody></table>'
+    +'<div class="callout bad" style="margin-bottom:0"><strong>What this grade is not.</strong> It scores <em>assertions</em>, not evidence. '
+    +'Every answer here is vendor-supplied and therefore sits at the weakest point of the evidence reliability hierarchy. '
+    +'A grade of A means the vendor claims a strong position, not that the position has been verified. Pair this with the '
+    +'attestation review, the external posture scan, and independent incident history before relying on it.</div></div>';
+
+  h+='<div class="navbtns no-print"><button onclick="go(\'gov\')">&larr; Back to questions</button>'
+    +'<span><button onclick="exportAnswers()">Download responses</button> '
+    +'<button onclick="downloadReport()">Download report</button> '
+    +'<button class="primary" style="border:1px solid var(--line2)" onclick="window.print()">Print / PDF</button></span></div>';
+
+  el("main").innerHTML=h;
+}
+
+/* ---------- export ---------- */
+function dl(name,mime,content){
+  var b=new Blob([content],{type:mime}), a=document.createElement("a");
+  a.href=URL.createObjectURL(b); a.download=name;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },400);
+}
+function slug(){ return CFG.vendor.replace(/[^a-z0-9]+/gi,"-").replace(/^-|-$/g,"").toLowerCase(); }
+
+function exportAnswers(){
+  var r=scoreAll();
+  dl(slug()+"-responses.json","application/json", JSON.stringify({
+    schema:"bitsense.vendorq.v1", vendor:CFG.vendor, assessor:CFG.assessor,
+    completed_utc:new Date().toISOString(), answers:ANS,
+    score:r.total, grade:gradeFor(r.total)[1],
+    findings:r.findings, unanswered:r.unanswered.map(function(q){return q.id;})
+  },null,2));
+}
+function importAnswers(input){
+  var f=input.files[0]; if(!f) return;
+  var rd=new FileReader();
+  rd.onload=function(){
+    try{
+      var d=JSON.parse(rd.result);
+      ANS = d.answers || d;
+      save(); render();
+      el("hdrSub").textContent="Loaded responses"+(d.completed_utc?" from "+d.completed_utc.slice(0,10):"");
+    }catch(e){ alert("That file could not be read as questionnaire responses."); }
+  };
+  rd.readAsText(f);
+}
+function downloadReport(){
+  var css=document.querySelector("style").textContent;
+  var body=el("main").innerHTML.replace(/<div class="navbtns no-print">[\s\S]*?<\/div>\s*$/,"");
+  dl(slug()+"-assessment-report.html","text/html",
+    '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">'
+    +'<meta name="viewport" content="width=device-width,initial-scale=1">'
+    +'<title>Assessment report &mdash; '+CFG.vendor+'</title><style>'+css+'</style></head>'
+    +'<body><header class="app"><div><h1>Assessment report &mdash; '+CFG.vendor+'</h1>'
+    +'<div class="sub">'+CFG.assessor+' &middot; generated '+new Date().toISOString().slice(0,16).replace("T"," ")+' UTC</div>'
+    +'</div></header><div class="layout"><main style="padding:22px 26px 60px">'+body+'</main></div></body></html>');
+}
+
+/* ---------- boot ---------- */
+load();
+el("hdrTitle").textContent = "Security Questionnaire \u2014 " + CFG.vendor.replace(/, Inc\.$/,"");
+el("hdrSub").textContent = CFG.assessor + (VENDOR_MODE ? " \u00b7 vendor view" : " \u00b7 assessor view");
+render();
+</script>
+</body>
+</html>
