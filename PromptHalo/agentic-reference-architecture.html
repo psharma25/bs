@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agentic AI Reference Architecture — Build Tracker</title>
+<style>
+ :root{--petrol:#1b4965;--petrol-dk:#123449;--petrol-lt:#5fa8d3;--mist:#cae9ff;--paper:#f6f8fa;
+  --line:#d8dee4;--ink:#1c2530;--ink-soft:#5a6a78;--ctrl:#FFA500;
+  --crit:#9b1c1c;--high:#b45309;--mod:#1b4965;--low:#5a6a78;
+  --done:#2e7d32;--prog:#b26a00;--na:#78868f;}
+ *{box-sizing:border-box}html,body{margin:0;padding:0}
+ body{font-family:'Inter','Calibri','Segoe UI',system-ui,sans-serif;background:var(--paper);color:var(--ink);
+  font-size:14px;line-height:1.5}
+ header{background:var(--petrol);color:#fff;padding:18px 24px 0}
+ .hdr-top{display:flex;flex-wrap:wrap;align-items:flex-start;gap:16px;justify-content:space-between}
+ h1{margin:0;font-size:20px;font-weight:600}
+ .sub{margin:4px 0 0;font-size:12.5px;color:var(--mist);max-width:760px}
+ .editor-chip{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.28);border-radius:6px;
+  padding:8px 12px;font-size:12.5px;display:flex;align-items:center;gap:10px}
+ .editor-chip button{background:transparent;border:1px solid rgba(255,255,255,.45);color:#fff;border-radius:4px;
+  padding:3px 8px;font-size:11.5px;cursor:pointer;font-family:inherit}
+ .meter-wrap{margin:18px 0 0;padding-bottom:16px}
+ .meter-top{display:flex;justify-content:space-between;font-size:12.5px;color:var(--mist)}
+ .meter{height:8px;background:rgba(255,255,255,.18);border-radius:4px;overflow:hidden;margin-top:6px;display:flex}
+ .meter i{display:block;height:100%}
+ .m-done{background:#7ed492}.m-prog{background:#ffcf6b}.m-na{background:rgba(255,255,255,.32)}
+ .legend{display:flex;gap:16px;margin-top:8px;font-size:11.5px;color:var(--mist);flex-wrap:wrap}
+ .legend span{display:flex;align-items:center;gap:6px}
+ .dot{width:9px;height:9px;border-radius:2px;display:inline-block}
+ nav.tabs{background:var(--petrol-dk);padding:0 24px;display:flex;gap:2px;overflow-x:auto}
+ nav.tabs button{background:transparent;border:0;border-bottom:3px solid transparent;color:var(--mist);
+  padding:11px 14px;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap}
+ nav.tabs button[aria-selected="true"]{color:#fff;border-bottom-color:var(--ctrl);font-weight:600}
+ .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:14px 24px;background:#fff;
+  border-bottom:1px solid var(--line)}
+ .toolbar input,.toolbar select{font-family:inherit;font-size:13px;padding:6px 9px;border:1px solid var(--line);
+  border-radius:5px;background:#fff}
+ .toolbar input[type=search]{min-width:220px}
+ .btn{font-family:inherit;font-size:12.5px;padding:6px 11px;border:1px solid var(--line);border-radius:5px;
+  background:#fff;cursor:pointer;color:var(--ink-soft)}
+ .btn:hover{color:var(--petrol);border-color:var(--petrol-lt)}
+ .btn.ghost{border-style:dashed}
+ .btn.primary{background:var(--petrol);color:#fff;border-color:var(--petrol)}
+ .count{margin-left:auto;font-size:12px;color:var(--ink-soft)}
+ main{padding:18px 24px 44px}
+ .grp{background:#fff;border:1px solid var(--line);border-radius:8px;margin-bottom:14px;overflow:hidden}
+ .grp-hd{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;background:#fbfcfd;
+  border-bottom:1px solid var(--line)}
+ .grp-hd:hover{background:#f2f6f9}
+ .grp-hd h3{margin:0;font-size:14.5px;color:var(--petrol);font-weight:600}
+ .grp-hd .gd{font-size:12px;color:var(--ink-soft);margin-top:2px;max-width:660px}
+ .grp-hd .car{color:var(--petrol);font-size:11px;width:12px}
+ .grp-hd .pill{margin-left:auto;display:flex;gap:6px;flex:none;align-items:center}
+ .item{border-bottom:1px solid #eef2f5;padding:12px 16px}
+ .item:last-child{border-bottom:none}
+ .it-top{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+ .seq{background:var(--petrol);color:#fff;border-radius:4px;font-size:11px;font-weight:700;padding:2px 7px;
+  flex:none;margin-top:1px}
+ .it-t{font-weight:600;font-size:13.5px;flex:1;min-width:250px;cursor:pointer}
+ .it-d{font-size:12.5px;color:var(--ink-soft);margin:4px 0 0;font-weight:400}
+ .tag{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:10px;flex:none}
+ .t-crit{background:#f6dcda;color:var(--crit)}.t-high{background:#fae7c8;color:var(--high)}
+ .t-mod{background:#d9e6ef;color:var(--mod)}.t-low{background:#e7ebee;color:var(--low)}
+ .t-auto{background:#d7ece0;color:#1f5c41}.t-semi{background:#fae7c8;color:var(--high)}
+ .t-man{background:#e7ebee;color:var(--low)}.t-hr{background:#eef3f6;color:var(--petrol)}
+ .t-cost{background:#fff3dd;color:#8a5a12}
+ .how{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-top:10px}
+ .how div{background:#fbfcfd;border:1px solid var(--line);border-radius:6px;padding:9px 11px}
+ .how h5{margin:0 0 3px;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-soft)}
+ .how p{margin:0;font-size:12px;line-height:1.45}
+ .fields{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px;padding-top:9px;
+  border-top:1px dashed var(--line)}
+ .fields label{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink-soft)}
+ .fields select,.fields input{font-family:inherit;font-size:12.5px;padding:4px 7px;border:1px solid var(--line);
+  border-radius:5px;background:#fff}
+ .fields input[type=text]{min-width:150px}
+ .pbar{display:inline-block;width:76px;height:7px;border-radius:4px;background:#e7ecef;vertical-align:middle;
+  overflow:hidden;margin-left:2px}
+ .pbar i{display:block;height:7px;background:#7ed492}
+ .pval{font-size:10.5px;color:var(--ink-soft);min-width:30px;display:inline-block}
+ .howtg{font-family:inherit;font-size:11px;padding:2px 8px;border:1px solid var(--line);border-radius:10px;
+  background:#fff;cursor:pointer;color:var(--petrol);flex:none}
+ .howtg:hover{background:#f2f6f9}
+ .who-chip{font-size:11px;color:var(--petrol);background:#eef3f6;border-radius:10px;padding:2px 8px;flex:none}
+ .panel{background:#fff;border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin-bottom:14px}
+ .panel h3{margin:0 0 3px;font-size:14px;color:var(--petrol)}
+ .panel .note{margin:0 0 10px;font-size:12px;color:var(--ink-soft)}
+ .kpis{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+ .kpi{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 16px;min-width:120px}
+ .kpi .n{font-size:22px;font-weight:700;color:var(--petrol);line-height:1.15}
+ .kpi .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-soft)}
+ table{width:100%;border-collapse:collapse;font-size:12.5px}
+ th{text-align:left;background:#f2f6f9;color:var(--petrol);font-size:11px;text-transform:uppercase;
+  padding:8px 10px;border-bottom:1px solid var(--line)}
+ td{padding:7px 10px;border-bottom:1px solid #eef2f5;vertical-align:top}
+ tr.tot td{background:#f2f6f9;font-weight:700}
+ .when{white-space:nowrap;color:var(--ink-soft);font-size:11.5px}
+ .empty{background:#fff;border:1px dashed var(--line);border-radius:8px;padding:26px;text-align:center;
+  color:var(--ink-soft)}
+ .arch{overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px}
+ dialog{border:0;border-radius:10px;padding:0;max-width:430px;width:92%}
+ dialog::backdrop{background:rgba(18,52,73,.45)}
+ .dlg{padding:20px 22px}.dlg h3{margin:0 0 4px;font-size:16px;color:var(--petrol)}
+ .dlg p{margin:0 0 14px;font-size:12.5px;color:var(--ink-soft)}
+ .dlg input{width:100%;font-family:inherit;font-size:13.5px;padding:8px 10px;border:1px solid var(--line);
+  border-radius:5px;margin-bottom:10px}
+ .dlg .row{display:flex;gap:8px;justify-content:flex-end}
+ footer{padding:0 24px 30px;font-size:11.5px;color:var(--ink-soft)}
+</style></head><body>
+<header>
+ <div class="hdr-top">
+  <div><h1>Agentic AI Reference Architecture — Build Tracker</h1>
+  <p class="sub">A secure, functional reference architecture for a 10 to 20 person company running agentic AI, and
+  the 63 tasks that build it. Development, staging and production separated at the account boundary; agents with
+  scoped identities, a tool broker and allow-listed egress; testing wired into CI/CD. Every task carries how to do
+  it, why it matters, criticality, a time estimate and its tool cost.</p></div>
+  <div class="editor-chip"><span id="who">No editor set</span><button id="switchEditor">Change</button></div>
+ </div>
+ <div class="meter-wrap">
+  <div class="meter-top"><span id="meterLabel"></span><span id="meterPct"></span></div>
+  <div class="meter"><i class="m-done" id="barDone"></i><i class="m-prog" id="barProg"></i>
+   <i class="m-na" id="barNa"></i></div>
+  <div class="legend"><span><i class="dot" style="background:#7ed492"></i>Built</span>
+   <span><i class="dot" style="background:#ffcf6b"></i>In progress</span>
+   <span><i class="dot" style="background:rgba(255,255,255,.32)"></i>Not applicable</span>
+   <span><i class="dot" style="background:rgba(255,255,255,.18)"></i>Not started</span></div>
+ </div>
+</header>
+<nav class="tabs">
+ <button data-view="arch" aria-selected="true">Architecture</button>
+ <button data-view="ov1" aria-selected="false">OV-1</button>
+ <button data-view="ov2" aria-selected="false">OV-2</button>
+ <button data-view="flow" aria-selected="false">Data flow</button>
+ <button data-view="ovl" aria-selected="false">Overlays</button>
+ <button data-view="iface" aria-selected="false">Interfaces</button>
+ <button data-view="model" aria-selected="false">Model strategy</button>
+ <button data-view="stores" aria-selected="false">Data stores</button>
+ <button data-view="build" aria-selected="false">Build plan</button>
+ <button data-view="cost" aria-selected="false">Tools and cost</button>
+ <button data-view="seq" aria-selected="false">Sequence</button>
+ <button data-view="log" aria-selected="false">Change log</button>
+</nav>
+<div class="toolbar" id="toolbar" style="display:none">
+ <input type="search" id="q" placeholder="Search task, tool, how-to…">
+ <select id="fStatus"><option value="">All statuses</option><option value="open">Not started</option>
+  <option value="prog">In progress</option><option value="done">Built</option><option value="na">Not applicable</option></select>
+ <select id="fCrit"><option value="">All criticality</option><option value="crit">Critical</option>
+  <option value="high">High</option><option value="mod">Moderate</option><option value="low">Low</option></select>
+ <select id="fEff"><option value="">All effort types</option><option value="auto">Automated</option>
+  <option value="semi">Semi-automated</option><option value="man">Manual</option></select>
+ <select id="sortBy"><option value="seq">Build order</option><option value="crit">Criticality</option>
+  <option value="hrs">Effort</option></select>
+ <button class="btn" id="expandAll">Expand</button><button class="btn" id="collapseAll">Collapse</button>
+ <button class="btn ghost" id="showHow">Expand all how-to</button>
+ <button class="btn" id="exportCsv">CSV</button><button class="btn" id="exportJson">Save JSON</button>
+ <button class="btn" id="importBtn">Load JSON</button><input type="file" id="fileIn" accept="application/json" hidden>
+ <span class="count" id="count"></span>
+</div>
+<main>
+ <section id="viewArch"></section>
+ <section id="viewOv1" hidden></section>
+ <section id="viewOv2" hidden></section>
+ <section id="viewFlow" hidden></section>
+ <section id="viewOvl" hidden></section>
+ <section id="viewIface" hidden></section>
+ <section id="viewModel" hidden></section>
+ <section id="viewStores" hidden></section>
+ <section id="viewBuild" hidden></section>
+ <section id="viewOv1" hidden></section>
+ <section id="viewOv2" hidden></section>
+ <section id="viewFlow" hidden></section>
+ <section id="viewOvl" hidden></section>
+ <section id="viewIface" hidden></section>
+ <section id="viewModel" hidden></section>
+ <section id="viewCost" hidden></section>
+ <section id="viewSeq" hidden></section>
+ <section id="viewLog" hidden></section>
+</main>
+<footer id="foot"></footer>
+<dialog id="editorModal"><form method="dialog" class="dlg">
+ <h3>Who is making these updates?</h3>
+ <p>Stamped against every change so the team can see who built what, and when. Stored in this browser only.</p>
+ <input id="nameIn" placeholder="Name"><input id="roleIn" placeholder="Role">
+ <div class="row"><button class="btn" value="cancel">Cancel</button>
+ <button class="btn primary" value="ok" id="saveEditor">Save</button></div>
+</form></dialog>
+<script>
+"use strict";
+var D={"groups": [{"id": "F", "name": "Foundation \u2014 accounts and environment separation", "desc": "Development, staging and production separated at the AWS account boundary, not by tag or subnet. Everything else inherits from this.", "items": [{"id": "F1", "p": 1, "c": "crit", "eff": "auto", "hrs": 6, "ws": 1, "we": 1, "who": "Platform", "t": "Create the AWS Organization and the account structure", "d": "Six accounts: management, log archive, security tooling, development, staging, production. No workloads in the management account.", "how": "AWS Organizations \u2192 create organization \u2192 create accounts from the console or Control Tower. Enable all features, not consolidated billing only. Name accounts by function and never reuse one.", "why": "Separating by account rather than tag or VPC means audit scope is established structurally. Blast radius, billing, quotas and IAM boundaries all follow the account line for free, and a mistake in dev cannot reach production because there is no path.", "tool": "AWS Organizations", "cost": "$0"}, {"id": "F2", "p": 2, "c": "crit", "eff": "auto", "hrs": 4, "ws": 1, "we": 1, "who": "Platform", "t": "Turn on the organisation-wide guardrails", "d": "Service control policies denying root usage, region restriction to approved regions, disabling of CloudTrail, and deletion of security services.", "how": "Organizations \u2192 Policies \u2192 Service control policies. Start with deny-root, deny-leave-org, deny-cloudtrail-stop, deny-guardduty-disable, and a region allow-list. Attach at the root, exempt nothing.", "why": "An SCP is the only control a compromised account admin cannot remove. Everything else in this architecture can be turned off by someone with enough privilege \u2014 these cannot.", "tool": "AWS SCPs", "cost": "$0"}, {"id": "F3", "p": 3, "c": "crit", "eff": "auto", "hrs": 4, "ws": 1, "we": 2, "who": "Platform", "t": "Centralise logs in the log archive account", "d": "CloudTrail organisation trail, Config, VPC flow logs and application logs delivered to an S3 bucket in the log archive account with object lock.", "how": "CloudTrail \u2192 create organization trail \u2192 destination in log archive account. Apply S3 Object Lock in compliance mode with a 13-month retention. Grant no write access to any other account.", "why": "Logs held in the account that generated them are logs an attacker can delete. Object lock in a separate account with no cross-account write is the difference between an incident you can reconstruct and one you cannot.", "tool": "CloudTrail, S3 Object Lock", "cost": "~$40/mo"}, {"id": "F4", "p": 4, "c": "high", "eff": "auto", "hrs": 6, "ws": 2, "we": 2, "who": "Platform", "t": "Define everything as infrastructure as code", "d": "Terraform or CDK in one repository, one stack per environment, no console changes outside a documented break-glass.", "how": "One repo, three tfvars files, remote state in S3 with DynamoDB locking per environment. Console access to production is read-only for everyone.", "why": "Staging only proves anything if it is the same code as production with different variables. Configuration drift between hand-built environments is why staging passes and production fails.", "tool": "Terraform or AWS CDK", "cost": "$0"}, {"id": "F5", "p": 5, "c": "high", "eff": "auto", "hrs": 4, "ws": 2, "we": 3, "who": "Platform", "t": "Make the three environments genuinely equivalent", "d": "Same modules, same topology, different sizes and different data. Production data never copied downward without de-identification.", "how": "Parameterise instance sizes and counts, not architecture. Add a CI check that fails if the plan for staging and production differ structurally.", "why": "The value of staging is that a change behaving there will behave in production. Every structural difference you allow is a class of bug staging cannot catch.", "tool": "Terraform workspaces", "cost": "$0"}, {"id": "F6", "p": 6, "c": "mod", "eff": "auto", "hrs": 3, "ws": 3, "we": 3, "who": "Platform", "t": "Add drift detection and a break-glass path", "d": "Scheduled plan against each environment alerting on drift, plus a documented emergency console path that alerts on use.", "how": "Nightly `terraform plan -detailed-exitcode` in CI. Break-glass role in each account with a session tag, alerting through EventBridge on assumption.", "why": "Emergency access will be used. The control is not preventing it, it is knowing within minutes and reconciling the change back into code within a day.", "tool": "Terraform, EventBridge", "cost": "$0"}]}, {"id": "I", "name": "Identity and access", "desc": "One identity provider, short-lived credentials everywhere, and no standing access to production for humans or agents.", "items": [{"id": "I1", "p": 7, "c": "crit", "eff": "auto", "hrs": 4, "ws": 1, "we": 2, "who": "Security Officer", "t": "Federate AWS to the identity provider", "d": "IAM Identity Center federated to Google Workspace, permission sets per role per account, no IAM users anywhere.", "how": "IAM Identity Center \u2192 external identity provider \u2192 SAML from Workspace. Delete every IAM user and long-lived access key you find. Permission sets: ReadOnly, Developer, Deployer, BreakGlass.", "why": "IAM users with static keys are the most common cause of a cloud breach at this size. Federation makes departure a single suspension rather than a hunt for keys.", "tool": "IAM Identity Center", "cost": "$0"}, {"id": "I2", "p": 8, "c": "crit", "eff": "auto", "hrs": 3, "ws": 2, "we": 2, "who": "Security Officer", "t": "Enforce phishing-resistant MFA", "d": "Hardware keys or platform passkeys for anyone holding Deployer or BreakGlass. SMS and voice disabled entirely.", "how": "Workspace admin \u2192 Security \u2192 2-step verification \u2192 allow only security keys and passkeys for the privileged group. Two authenticators per person so a lost device is a recovery, not a lockout.", "why": "Push fatigue and SMS interception are how MFA fails in practice. Phishing-resistant factors remove both, and at this headcount the hardware cost is trivial.", "tool": "Workspace + YubiKeys", "cost": "~$50/key once"}, {"id": "I3", "p": 9, "c": "crit", "eff": "auto", "hrs": 5, "ws": 3, "we": 4, "who": "Platform", "t": "Give CI/CD OIDC roles, not keys", "d": "GitHub Actions assumes an AWS role through OIDC with a trust policy scoped to the repository, branch and environment.", "how": "IAM \u2192 identity provider \u2192 token.actions.githubusercontent.com. Trust condition on `sub` pinned to `repo:org/name:environment:production`. Delete every AWS key stored in GitHub secrets.", "why": "A long-lived deployment key in CI is a credential that leaks in a log, survives the person who made it, and grants production access to anyone who can open a pull request against the workflow file.", "tool": "GitHub OIDC + IAM", "cost": "$0"}, {"id": "I4", "p": 10, "c": "high", "eff": "auto", "hrs": 4, "ws": 3, "we": 4, "who": "Platform", "t": "Remove standing human access to production", "d": "Just-in-time elevation with an expiry. Day-to-day roles are read-only in production.", "how": "Identity Center permission set with a session duration of one hour, requested through a ticket or a chat command that records the reason. Nobody holds production write access at rest.", "why": "Standing production access is the permission an attacker inherits when they compromise a laptop. Elevation with an expiry converts a permanent exposure into a recorded, time-boxed one.", "tool": "Identity Center + approval flow", "cost": "$0"}, {"id": "I5", "p": 11, "c": "high", "eff": "semi", "hrs": 4, "ws": 4, "we": 5, "who": "Security Officer", "t": "Inventory and own every non-human identity", "d": "Every service account, agent identity, deploy key and token with a named human owner, a stated scope and a review date.", "how": "Pull from IAM, GitHub and the IdP APIs into one list. Anything without an owner gets disabled, not investigated \u2014 the owner appears within a day if it matters.", "why": "Service accounts accumulate permissions because nobody thinks of them as users. For an agentic company they are the majority of the identities and the highest-consequence ones.", "tool": "Scripted inventory", "cost": "$0"}]}, {"id": "N", "name": "Network and boundary", "desc": "Private by default, no inbound paths, and egress that is enumerated rather than open \u2014 which matters more here than usual because agents make outbound calls.", "items": [{"id": "N1", "p": 12, "c": "crit", "eff": "auto", "hrs": 5, "ws": 2, "we": 3, "who": "Platform", "t": "Put every workload in private subnets", "d": "No public subnets except a load balancer. No public IPs on compute. Administrative ports unreachable from the internet.", "how": "One VPC per environment, private subnets for compute and data, public subnets only for the ALB and NAT. Any security group rule allowing 0.0.0.0/0 to an admin port is a Critical finding.", "why": "Almost every cloud incident at this size begins with something exposed that nobody meant to expose. Private-by-default makes exposure a deliberate act with a code review attached.", "tool": "VPC, security groups", "cost": "~$35/mo NAT"}, {"id": "N2", "p": 13, "c": "crit", "eff": "auto", "hrs": 5, "ws": 3, "we": 4, "who": "Platform", "t": "Restrict and enumerate egress", "d": "Outbound traffic from production restricted to named destinations. Agent egress allow-listed separately and more tightly.", "how": "NAT plus a firewall or proxy with a destination allow-list. Model provider endpoints, package registries and nothing else. Log every denied destination.", "why": "This is the control that distinguishes an agentic architecture from a conventional one. An agent with tool access and open egress is an exfiltration path, and a prompt injection turns it into an active one.", "tool": "AWS Network Firewall or a proxy", "cost": "~$260/mo firewall"}, {"id": "N3", "p": 14, "c": "high", "eff": "auto", "hrs": 3, "ws": 3, "we": 3, "who": "Platform", "t": "Reach AWS services over private endpoints", "d": "VPC interface endpoints for Bedrock, Secrets Manager, S3 and the rest. Model invocation does not traverse the internet.", "how": "VPC \u2192 endpoints \u2192 create interface endpoints per service, with endpoint policies restricting to your account. Bedrock in particular should never be reached over a public path.", "why": "Keeping inference inside the account boundary is the single strongest data-protection argument you can make to a client, and it is a configuration rather than a negotiation.", "tool": "VPC endpoints", "cost": "~$8/endpoint/mo"}, {"id": "N4", "p": 15, "c": "mod", "eff": "auto", "hrs": 4, "ws": 4, "we": 5, "who": "Platform", "t": "Put a WAF in front of anything public", "d": "Managed rule sets deployed in count mode first, then enforcement. Platform DDoS protection on.", "how": "WAF \u2192 managed rules (core, known bad inputs, IP reputation) \u2192 count mode for two weeks \u2192 switch to block once the false positives are tuned out.", "why": "Enforcement from day one on an unfamiliar rule set breaks the application, and the fix people reach for is disabling the WAF. Count mode first is what makes it survive.", "tool": "AWS WAF", "cost": "~$25/mo + requests"}, {"id": "N5", "p": 16, "c": "mod", "eff": "semi", "hrs": 3, "ws": 5, "we": 6, "who": "Platform", "t": "Produce and maintain the network diagram", "d": "Accounts, environments, public entry points and trust boundaries, generated from the infrastructure code.", "how": "Generate from Terraform state rather than drawing it, so it cannot drift. Review annually and on material change.", "why": "It is the first artefact an assessor asks for and the one most often drawn retrospectively and inaccurately. Generating it makes it true by construction.", "tool": "Terraform graph or Cloudcraft", "cost": "$0\u2013$50/mo"}]}, {"id": "A", "name": "The agentic AI plane", "desc": "The part of this architecture that is not conventional. An agent is simultaneously an identity, an actor and a subject requiring monitoring, and it has to appear in all three control sets.", "items": [{"id": "A1", "p": 17, "c": "crit", "eff": "auto", "hrs": 6, "ws": 4, "we": 5, "who": "Platform", "t": "Give each agent a dedicated, scoped identity", "d": "One IAM role per agent, minimum actions, no wildcard resources, never a human's credential, credentials obtained through workload identity.", "how": "IAM role per agent with an inline policy listing named actions on named resources. No `*` in Action or Resource. Assume via IRSA or task role, never an access key.", "why": "The blast radius of a prompt injection is exactly the permission set of the identity the agent runs as. This is the single highest-leverage control in an agentic architecture.", "tool": "IAM, IRSA", "cost": "$0"}, {"id": "A2", "p": 18, "c": "crit", "eff": "man", "hrs": 8, "ws": 5, "we": 6, "who": "Platform", "t": "Build a tool broker with an allow-list", "d": "The agent cannot call arbitrary functions. A broker mediates every tool call against an explicit allow-list and validates arguments.", "how": "A thin service between the model and the tools. Registry of permitted tools with a JSON schema per tool. Reject anything not on the list, log the rejection, alert on repeats.", "why": "Model output reaching a shell, a query or an HTTP client without mediation is the insecure-output-handling failure. The broker is where you enforce that the model proposes and the system disposes.", "tool": "Custom, ~200 lines", "cost": "$0"}, {"id": "A3", "p": 19, "c": "crit", "eff": "man", "hrs": 5, "ws": 5, "we": 6, "who": "Platform", "t": "Put a human approval gate on irreversible actions", "d": "Deleting data, moving funds, communicating externally, changing production, granting access \u2014 all require a person to approve before execution.", "how": "The broker returns a pending state and posts to a channel with the proposed action and its arguments. Approval is logged with approver, action and time.", "why": "Autonomy is a spectrum and the right point on it is decided per action, not per agent. Irreversibility is the dividing line that survives contact with reality.", "tool": "Broker + Slack approval", "cost": "$0"}, {"id": "A4", "p": 20, "c": "crit", "eff": "auto", "hrs": 5, "ws": 6, "we": 7, "who": "Platform", "t": "Treat every model input as untrusted", "d": "Retrieved documents, tool output, web content and user data all carry the same trust level: none. Model-generated code and queries never execute against production unvalidated.", "how": "Content fences around retrieved material, no instruction-following from retrieved text, parameterised queries only, and a sandbox for any generated code.", "why": "Indirect prompt injection arrives inside content the agent was asked to read. There is no reliable way to distinguish instruction from data in a prompt, so the boundary has to be architectural.", "tool": "Guardrails + design review", "cost": "$0"}, {"id": "A5", "p": 21, "c": "crit", "eff": "auto", "hrs": 4, "ws": 6, "we": 7, "who": "Platform", "t": "Log agent activity to a reconstructable standard", "d": "Triggering input, tools invoked, parameters, actions taken, and every approval decision \u2014 enough to reconstruct behaviour after the fact.", "how": "Structured events from the broker to CloudWatch, one stream per agent identity. Alert on tool invocation outside the allow-list, unexpected volume, and any attempt to disable agent logging.", "why": "Without the triggering input recorded, a prompt injection incident cannot be reconstructed at all. You see the action and never learn what caused it.", "tool": "CloudWatch + broker", "cost": "~$30/mo"}, {"id": "A6", "p": 22, "c": "high", "eff": "auto", "hrs": 4, "ws": 7, "we": 8, "who": "Platform", "t": "Bound the agent in cost and in reach", "d": "Rate limits, spend limits and circuit breakers so a looping or manipulated agent is bounded before anyone notices.", "how": "Token budget alarms per agent, request rate caps at the broker, and a kill switch that disables the identity. Test the kill switch and record the test.", "why": "Denial of wallet is a real attack against agentic systems and an even more common self-inflicted outage. A bounded agent fails cheaply.", "tool": "Budgets, broker limits", "cost": "$0"}, {"id": "A7", "p": 23, "c": "high", "eff": "auto", "hrs": 6, "ws": 7, "we": 9, "who": "Engineering", "t": "Enforce entitlements at retrieval time", "d": "Retrieval filters on the requesting user's permissions at query time, indexes partitioned per tenant, deletion propagating to embeddings.", "how": "Filter in the query, not after generation. One index per client. When a source document is deleted or a share revoked, re-evaluate or re-check at query.", "why": "Retrieval inherits none of the application's access control unless you build it in. Filtering after generation is too late \u2014 the content has already crossed the boundary.", "tool": "Vector store with metadata filters", "cost": "varies"}, {"id": "A8", "p": 24, "c": "high", "eff": "auto", "hrs": 6, "ws": 8, "we": 9, "who": "Engineering", "t": "Build the evaluation and adversarial test harness", "d": "Prompt injection, insecure output handling, excessive agency and data leakage tested before release and on significant change.", "how": "promptfoo for the evaluation suite, garak for adversarial probes, both in CI. Fail the build on a regression, not just report it.", "why": "A conventional scanner reports none of this class of weakness. If it is not tested here it is not tested anywhere.", "tool": "promptfoo, garak", "cost": "$0"}, {"id": "A9", "p": 25, "c": "mod", "eff": "semi", "hrs": 3, "ws": 9, "we": 10, "who": "Security Officer", "t": "Pin models and govern the change", "d": "Model versions pinned explicitly. Adopting a replacement is a change requiring assessment, evaluation and approval.", "how": "Pin the version string in configuration, not `latest`. Provider deprecation notices monitored as a change trigger.", "why": "A provider updating a model under you changes system behaviour with no code change and no review. Pinning turns that into a decision you make.", "tool": "Config + change process", "cost": "$0"}]}, {"id": "D", "name": "Data, secrets and encryption", "desc": "Where the data lands, who holds the keys, and how the derived copies that AI creates are governed.", "items": [{"id": "D1", "p": 26, "c": "crit", "eff": "auto", "hrs": 3, "ws": 2, "we": 3, "who": "Platform", "t": "Encrypt everything at rest with customer-managed keys", "d": "Account-level default encryption on S3, EBS, RDS, snapshots and backups. Customer-managed KMS keys for anything Confidential or Restricted.", "how": "S3 \u2192 default encryption with a CMK. EBS \u2192 enable default encryption per region. Separate key use from key administration in the key policy.", "why": "Default encryption at account level means a bucket created in a hurry is still encrypted. Retrofitting encryption to existing data is far more expensive than turning it on before there is any.", "tool": "AWS KMS", "cost": "~$1/key/mo"}, {"id": "D2", "p": 27, "c": "crit", "eff": "auto", "hrs": 4, "ws": 3, "we": 4, "who": "Platform", "t": "Move every secret into a managed store", "d": "Runtime retrieval from Secrets Manager or Parameter Store. No secrets in code, config, images, build logs, prompts or agent configuration.", "how": "Secrets Manager with rotation where the service supports it. Application reads at start-up via the task role. Nothing in environment files committed anywhere.", "why": "POL-ENC-001 \u00a79 names secrets in code as the most common cause of a serious incident at this size, and the prompt case is specific to you \u2014 model inputs may be logged by a provider.", "tool": "AWS Secrets Manager", "cost": "~$0.40/secret/mo"}, {"id": "D3", "p": 28, "c": "crit", "eff": "auto", "hrs": 3, "ws": 3, "we": 3, "who": "Platform", "t": "Block secrets at push time", "d": "gitleaks as a pre-commit hook and a CI job, plus platform secret scanning with push protection.", "how": "Pre-commit hook in the repo template so it is installed by cloning. CI job as the backstop for anyone who skips hooks.", "why": "Detection tells you a secret leaked. Prevention stops it. The pre-commit hook is the difference between a rotation exercise and a non-event.", "tool": "gitleaks", "cost": "$0"}, {"id": "D4", "p": 29, "c": "high", "eff": "auto", "hrs": 4, "ws": 6, "we": 7, "who": "Engineering", "t": "Classify and protect the derived AI data stores", "d": "Prompts, retrieved context, embeddings and outputs are new data stores classified at the level of their source.", "how": "Vector store in your own account, encrypted with a CMK, on the data map and in the asset inventory. Retention set deliberately rather than by default.", "why": "An embedding index is a copy of the source information with none of its access controls. It is the store people forget to classify and the one that breaks a deletion commitment.", "tool": "OpenSearch / pgvector", "cost": "varies"}, {"id": "D5", "p": 30, "c": "high", "eff": "semi", "hrs": 4, "ws": 8, "we": 9, "who": "Security Officer", "t": "Make deletion actually delete", "d": "A deletion request propagates to chunks, embeddings, caches, backups and the model provider.", "how": "Map every derived copy of a source document, then write the deletion path once and test it with a real request.", "why": "A retention or deletion commitment is not met while a derived copy remains, and deleting your own copy does not discharge it where a provider retains prompt content.", "tool": "Scripted deletion path", "cost": "$0"}]}, {"id": "P", "name": "CI/CD and environment promotion", "desc": "The pipeline is the only path to production, and the deployment record is a by-product rather than something assembled afterwards.", "items": [{"id": "P1", "p": 31, "c": "crit", "eff": "auto", "hrs": 4, "ws": 3, "we": 4, "who": "Platform", "t": "Make the pipeline the only path to production", "d": "Branch protection requiring a pull request, one approving review from a non-author, and passing checks. Direct console or CLI changes to production prohibited and alerted.", "how": "GitHub rulesets on the default branch. Deployment through Actions with the OIDC role. Alert on any CloudTrail event where the deployment role was not the actor.", "why": "You are tested on whether the complete population of changes can be produced and each one traced, not on whether changes were approved. An assembled list cannot be shown to be complete.", "tool": "GitHub rulesets + Actions", "cost": "included"}, {"id": "P2", "p": 32, "c": "crit", "eff": "auto", "hrs": 5, "ws": 4, "we": 5, "who": "Platform", "t": "Gate promotion dev \u2192 staging \u2192 production", "d": "The same artefact promoted through environments, with tests and approvals at each gate. No rebuilding between stages.", "how": "Build once, tag by digest, promote the digest. GitHub environments with required reviewers on production. Staging deploys automatically, production does not.", "why": "Rebuilding between stages means what you tested is not what you shipped. Promotion by digest is what makes staging evidence about production.", "tool": "GitHub environments", "cost": "included"}, {"id": "P3", "p": 33, "c": "high", "eff": "auto", "hrs": 4, "ws": 4, "we": 5, "who": "Platform", "t": "Put the security gates in the pipeline", "d": "SAST, dependency scanning, secret scanning, IaC scanning and container scanning on every pull request, failing on new critical findings.", "how": "Semgrep, Trivy and gitleaks as required checks. Fail on new findings, not on the existing backlog, or the gate gets disabled in week two.", "why": "A gate that fails on legacy findings gets bypassed. Failing only on newly introduced issues is the difference between a control and an obstacle.", "tool": "Semgrep, Trivy, gitleaks", "cost": "$0"}, {"id": "P4", "p": 34, "c": "high", "eff": "auto", "hrs": 3, "ws": 5, "we": 5, "who": "Platform", "t": "Scan images in the registry as well as in CI", "d": "ECR enhanced scanning with continuous rescanning of pushed images.", "how": "ECR \u2192 enable enhanced scanning via Inspector. Alert on new critical findings in images already deployed.", "why": "A base image becomes vulnerable after you push it. CI-only scanning never sees that, and the window between disclosure and your next build is the exposure.", "tool": "Amazon Inspector", "cost": "~$0.09/image/mo"}, {"id": "P5", "p": 35, "c": "mod", "eff": "auto", "hrs": 3, "ws": 5, "we": 6, "who": "Platform", "t": "Sign artefacts and verify at deploy", "d": "Build provenance attached at build time, signature verified before deployment.", "how": "Sigstore/cosign in the build job, verification as an admission step. Keyless signing via the OIDC identity.", "why": "Supply chain attacks target the gap between build and deploy. Verification closes it, and at this size it is a day of work rather than a programme.", "tool": "cosign / Sigstore", "cost": "$0"}, {"id": "P6", "p": 36, "c": "mod", "eff": "auto", "hrs": 3, "ws": 6, "we": 6, "who": "Platform", "t": "Export the deployment population", "d": "Every production deployment traceable to an approved change and a non-author approver, exportable for any period.", "how": "One query against the Actions API plus the merge history. Save the export quarterly rather than reconstructing it at audit.", "why": "This is the artefact the change control criterion is actually tested on, and the one most often assembled badly under time pressure.", "tool": "GitHub API", "cost": "$0"}]}, {"id": "S", "name": "Application security testing", "desc": "SAST, SCA, secrets, DAST and the annual penetration test. IAST is deliberately excluded and the reason is in the detail.", "items": [{"id": "S1", "p": 37, "c": "crit", "eff": "auto", "hrs": 4, "ws": 3, "we": 4, "who": "Engineering", "t": "SAST and SCA on every pull request", "d": "Semgrep for static analysis and software composition, with reachability so an unreachable vulnerable function does not stop the build.", "how": "Semgrep CI on pull requests, diff-aware so it only reports what the change introduced. Free tier covers ten contributors.", "why": "Reachability is what makes dependency findings actionable. Without it you triage hundreds of criticals that cannot be reached and the team stops reading the output.", "tool": "Semgrep", "cost": "$0 to 10 contributors"}, {"id": "S2", "p": 38, "c": "high", "eff": "auto", "hrs": 5, "ws": 6, "we": 7, "who": "Engineering", "t": "DAST against staging on a schedule", "d": "Authenticated scanning of the running application and its APIs, nightly against staging and before each production release.", "how": "ZAP baseline in CI for the free route, or StackHawk if authenticated API scanning and OAuth token injection matter \u2014 which for an API-first product they usually do.", "why": "DAST catches what SAST cannot see: misconfiguration, missing headers, exposed admin paths, broken authorisation at runtime. Authenticated scanning is the part most teams skip and where the real findings are.", "tool": "OWASP ZAP or StackHawk", "cost": "$0 or ~$500/dev/yr"}, {"id": "S3", "p": 39, "c": "low", "eff": "auto", "hrs": 2, "ws": 0, "we": 0, "who": "Engineering", "t": "IAST \u2014 decide not to buy it, and record why", "d": "Interactive testing instruments the running application. It is accurate and it is priced for enterprises.", "how": "No action beyond the decision. Revisit if the product grows to several services with a dedicated AppSec engineer to run it.", "why": "The median Contrast contract is around $36,000 a year with a floor near $18,000, there are no maintained open-source alternatives, and Contrast's own community edition covers one Java or .NET application. At 10 to 20 people that money buys a penetration test and a year of every other tool on this list. Record the decision so it is a position rather than an omission.", "tool": "Not purchased", "cost": "$0"}, {"id": "S4", "p": 40, "c": "high", "eff": "man", "hrs": 3, "ws": 15, "we": 18, "who": "Security Officer", "t": "Annual independent penetration test", "d": "External firm, scoped to the application, the API and the agentic paths specifically.", "how": "Book after the free scanners have cleared the easy findings so the engagement is smaller. Ask explicitly for prompt injection and agent abuse in scope \u2014 most scopes omit it.", "why": "It must be independent, so it cannot be self-performed. The agentic scope is the part you have to ask for; a standard web application scope will not cover your actual risk.", "tool": "External provider", "cost": "$8,000\u201325,000"}, {"id": "S5", "p": 41, "c": "mod", "eff": "semi", "hrs": 4, "ws": 8, "we": 9, "who": "Engineering", "t": "Threat model the agentic paths", "d": "One markdown model per component, with the AI paths mapped against MITRE ATLAS.", "how": "Data flow, trust boundaries, what an attacker controls, what the agent can reach. ATLAS Navigator layer for the AI-specific tactics. Half a day per component.", "why": "The agentic failure modes are not in any scanner's rule set. A design review is the only place they get caught before production.", "tool": "ATLAS Navigator, markdown", "cost": "$0"}]}, {"id": "E", "name": "Endpoint and device posture", "desc": "Agentless is the goal and only partly achievable. This section is honest about where the line falls.", "items": [{"id": "E1", "p": 42, "c": "crit", "eff": "auto", "hrs": 4, "ws": 2, "we": 3, "who": "Security Officer", "t": "Condition access on device posture \u2014 the agentless route", "d": "Google Workspace Endpoint Verification supplies device attributes to Context-Aware Access without a management agent.", "how": "Workspace admin \u2192 Devices \u2192 Endpoint verification. Deploy the Chrome extension and native helper. Build access levels on encryption, screen lock, OS version and managed state.", "why": "This is as close to agentless as laptop posture gets. Be clear-eyed: Kolide and 1Password Device Trust are frequently described as agentless and their own documentation requires an agent. Endpoint Verification is lighter, but Context-Aware Access needs the Workspace Enterprise tier.", "tool": "Workspace Endpoint Verification", "cost": "Enterprise tier, quote"}, {"id": "E2", "p": 43, "c": "high", "eff": "auto", "hrs": 5, "ws": 3, "we": 4, "who": "Security Officer", "t": "Enforce the baseline where posture reporting is not enough", "d": "Full-disk encryption, screen lock, OS currency and endpoint detection enforced rather than observed.", "how": "Kandji or Mosyle for a Mac fleet: MDM and EDR in one agent at roughly $67 per device per year. Escrow the FileVault recovery key before enforcing encryption.", "why": "Reporting posture tells you a laptop is non-compliant. Enforcement stops it reaching your data. If the company owns the device there is no good reason to accept the weaker control.", "tool": "Kandji", "cost": "~$5.60/device/mo"}, {"id": "E3", "p": 44, "c": "high", "eff": "auto", "hrs": 3, "ws": 4, "we": 4, "who": "Platform", "t": "Go genuinely agentless where it actually works \u2014 cloud workloads", "d": "Amazon Inspector agentless scanning for EC2 and container images, no per-instance agent.", "how": "Inspector \u2192 enable agentless scanning for EC2. Snapshot-based, no runtime footprint, no performance cost.", "why": "Agentless is a real and better answer for cloud workloads, where snapshot scanning sees everything an agent would without the deployment and maintenance burden. It is a weak answer for laptops. Apply it where it holds.", "tool": "Amazon Inspector", "cost": "usage-based"}, {"id": "E4", "p": 45, "c": "mod", "eff": "semi", "hrs": 3, "ws": 5, "we": 6, "who": "Security Officer", "t": "Reconcile endpoint coverage three ways", "d": "Device management, identity provider and personnel list reconciled quarterly so an unenrolled device is visible.", "how": "Three exports, one join. Any identity with no device, or device with no owner, is investigated.", "why": "A coverage report cannot reveal the laptop that was never enrolled. Only the reconciliation against an authoritative personnel list can.", "tool": "Scripted reconciliation", "cost": "$0"}]}, {"id": "M", "name": "Detection, logging and response", "desc": "What tells you something is wrong, and what you can reconstruct afterwards.", "items": [{"id": "M1", "p": 46, "c": "crit", "eff": "auto", "hrs": 3, "ws": 2, "we": 2, "who": "Platform", "t": "Enable managed threat detection everywhere", "d": "GuardDuty in every region including ones you do not use, Security Hub as the aggregator, Config for baseline drift.", "how": "Enable at the organisation level from the security account so new accounts inherit it. Unused regions matter \u2014 that is where crypto mining lands first.", "why": "Regional enablement gaps are the most common finding in a cloud audit and the cheapest to close. Organisation-level enablement makes it structural.", "tool": "GuardDuty, Security Hub, Config", "cost": "~$90/mo"}, {"id": "M2", "p": 47, "c": "crit", "eff": "auto", "hrs": 3, "ws": 3, "we": 3, "who": "Platform", "t": "Alert on the events that matter", "d": "Logging disabled, root usage, IAM policy changes, public exposure of a data store, break-glass assumption, agent tool-call denials.", "how": "EventBridge rules to a monitored channel that pages for high severity. Six rules, not sixty \u2014 anything that pages and is routinely ignored trains people to ignore it.", "why": "The alert on disabling logging is the one that protects every other detective control here. Configure it first.", "tool": "EventBridge + SNS", "cost": "~$5/mo"}, {"id": "M3", "p": 48, "c": "high", "eff": "semi", "hrs": 4, "ws": 4, "we": 5, "who": "Security Officer", "t": "Set retention so evidence outlasts the audit window", "d": "Thirteen months of security logs with ninety days immediately queryable.", "how": "S3 lifecycle to Glacier after 90 days, Athena over the archive, delete at 13 months. Set it at creation.", "why": "Thirteen months is chosen so retention outlasts a twelve-month observation window. It cannot be applied retrospectively to logs that were never kept.", "tool": "S3 + Athena", "cost": "~$25/mo"}, {"id": "M4", "p": 49, "c": "high", "eff": "man", "hrs": 5, "ws": 6, "we": 8, "who": "Security Officer", "t": "Write the incident runbook including the AI cases", "d": "Severity scale, roles, containment sequence, evidence preservation, notification obligations \u2014 plus the agentic containment step.", "how": "First containment action for an agent incident is to pause or disable it, before investigating. Extract notification obligations from customer agreements in advance.", "why": "AI incidents get handled informally because nobody has said they are incidents. Naming them, and naming the pause mechanism, is what turns improvisation into response.", "tool": "Runbook in the repo", "cost": "$0"}, {"id": "M5", "p": 50, "c": "mod", "eff": "man", "hrs": 4, "ws": 14, "we": 16, "who": "Security Officer", "t": "Exercise the runbook once a year", "d": "One tabletop covering both the incident plan and the continuity plan.", "how": "Use a scenario that tests both: the security lead unavailable during an active incident. Record objective, result and defects found.", "why": "In a year with no incidents the exercise is the only evidence the plan works. A test that finds nothing should be scrutinised before it is accepted.", "tool": "Half a day", "cost": "$0"}]}, {"id": "X", "name": "Edge \u2014 DNS, WAF and load balancing", "desc": "The public path into the product. Six hops, each doing one job, and nothing reachable that does not pass through all of them.", "items": [{"id": "X1", "p": 51, "c": "crit", "eff": "auto", "hrs": 3, "ws": 2, "we": 3, "who": "Platform", "t": "Take control of DNS and lock the zone", "d": "Route 53 as authoritative, DNSSEC signed, registrar lock on, and CAA records naming only your certificate authority.", "how": "Route 53 \u2192 hosted zone \u2192 enable DNSSEC signing \u2192 add CAA records for your issuer. Turn on registrar transfer lock and require MFA on the registrar account. Alert on any NS or MX change.", "why": "Domain takeover is the cheapest full compromise available to an attacker and it bypasses every control below it. A dangling CNAME pointing at a decommissioned bucket is the usual route in.", "tool": "Route 53", "cost": "~$1/zone/mo"}, {"id": "X2", "p": 52, "c": "high", "eff": "auto", "hrs": 2, "ws": 3, "we": 3, "who": "Platform", "t": "Sweep for dangling DNS records", "d": "Every record resolving to something you still own, checked on a schedule rather than once.", "how": "Weekly job enumerating records and confirming each target still resolves to your account. Alert on any that point at an unclaimed cloud resource.", "why": "Records outlive the resources they point at. A subdomain pointing at a deleted S3 bucket can be claimed by anyone and used to serve content under your name and your cookies.", "tool": "Scripted check", "cost": "$0"}, {"id": "X3", "p": 53, "c": "crit", "eff": "auto", "hrs": 4, "ws": 3, "we": 4, "who": "Platform", "t": "Terminate TLS at a CDN with a managed certificate", "d": "CloudFront in front of the origin, TLS 1.2 minimum with 1.3 preferred, HSTS, and automatic certificate renewal.", "how": "ACM certificate in us-east-1 for CloudFront. Security policy TLSv1.2_2021 or later. HSTS with a long max-age once you are confident. Redirect all HTTP to HTTPS at the edge.", "why": "Terminating at the edge gives you certificate automation, DDoS absorption and a single place to enforce transport policy. Expired certificates are a self-inflicted outage that automation removes entirely.", "tool": "CloudFront + ACM", "cost": "~$20/mo + transfer"}, {"id": "X4", "p": 54, "c": "crit", "eff": "auto", "hrs": 4, "ws": 4, "we": 5, "who": "Platform", "t": "WAF in count mode, then enforce", "d": "Managed rule sets plus rate limiting, deployed in count mode for two weeks before switching to block.", "how": "AWS WAF on the CloudFront distribution: core rule set, known bad inputs, IP reputation, and a rate-based rule. Watch the counts, tune the false positives, then flip to block one rule group at a time.", "why": "Enforcement from day one on an unfamiliar rule set breaks the application, and the fix people reach for at 2am is disabling the WAF entirely. Count mode first is what makes it survive contact with production.", "tool": "AWS WAF", "cost": "~$25/mo + requests"}, {"id": "X5", "p": 55, "c": "high", "eff": "auto", "hrs": 3, "ws": 4, "we": 5, "who": "Platform", "t": "Lock the origin so it can only be reached through the edge", "d": "The load balancer accepts traffic only from the CDN, verified by a shared secret header and prefix list.", "how": "Attach the CloudFront managed prefix list to the ALB security group and require a custom header the CDN injects. Reject anything else at the listener rule.", "why": "A WAF you can walk around is decoration. If the origin answers directly, an attacker resolves it once and never sees your edge controls again.", "tool": "ALB + prefix list", "cost": "$0"}, {"id": "X6", "p": 56, "c": "high", "eff": "auto", "hrs": 4, "ws": 5, "we": 6, "who": "Platform", "t": "Load balancer, health checks and per-route rate limits", "d": "ALB with TLS to the target, health checks that fail closed, and stricter rate limits on the agent invocation routes than on the rest of the API.", "how": "Target groups per service, HTTP/2 to targets, access logs to the log archive account. A separate WAF rate rule for the agent endpoints, set well below what a human could generate.", "why": "Agent endpoints are expensive per call and are the denial-of-wallet target. They need a tighter limit than a login page, and a limit that is enforced at the edge rather than in the application.", "tool": "ALB + WAF rate rules", "cost": "~$18/mo"}]}, {"id": "Y", "name": "Data pipeline \u2014 collection, curation, de-identification, reporting", "desc": "How client material enters, what happens to it before an agent sees it, and how it leaves as a report and then leaves for good.", "items": [{"id": "Y1", "p": 57, "c": "crit", "eff": "semi", "hrs": 5, "ws": 4, "we": 5, "who": "Security Officer", "t": "Gate collection on written authorisation", "d": "No collection begins until scope, systems, data types and duration are agreed in writing and recorded in the engagement file.", "how": "Engagement intake checklist: authorised scope, credentials issued by the client rather than shared, named individuals, end date. Access provisioned only after the record exists.", "why": "Everything downstream inherits its lawful basis and its retention clock from this record. Collection without it is unbounded in scope and in time, and it is the finding that ends an engagement badly.", "tool": "Engagement file + intake form", "cost": "$0"}, {"id": "Y2", "p": 58, "c": "crit", "eff": "auto", "hrs": 6, "ws": 5, "we": 6, "who": "Platform", "t": "Build a per-client landing zone", "d": "One S3 prefix per client per engagement, its own customer-managed key, no cross-client read anywhere in the policy.", "how": "Bucket per environment, prefix per engagement, KMS key per client. IAM policies scoped by prefix. Object Lock where the client requires immutability. Deny any principal that is not the collection role or the curation job.", "why": "Tenant separation enforced by key and prefix rather than by application logic means a bug in the application cannot mix two clients' material. It also lets you destroy one client's data by destroying one key.", "tool": "S3 + KMS per client", "cost": "~$1/key/mo"}, {"id": "Y3", "p": 59, "c": "crit", "eff": "auto", "hrs": 6, "ws": 6, "we": 7, "who": "Engineering", "t": "Curate on the way in, not on the way out", "d": "Normalise, classify and tag every artefact at landing with client, engagement, source system, data types present and retention date.", "how": "A curation job that runs on object creation: detect data types, write the tags, reject anything outside the agreed scope back to a quarantine prefix with an alert.", "why": "Classification applied at landing is the only classification that stays accurate. Applied later, it is applied to a corpus nobody fully remembers the shape of.", "tool": "Lambda + Macie or custom", "cost": "~$40/mo"}, {"id": "Y4", "p": 60, "c": "crit", "eff": "auto", "hrs": 8, "ws": 6, "we": 8, "who": "Engineering", "t": "De-identify before anything reaches a model", "d": "Secrets stripped, direct identifiers tokenised, personal data redacted or pseudonymised. The reversal map is held separately with its own key and its own access policy.", "how": "A de-identification stage between the curated store and the agent corpus. Deterministic tokens so correlation survives. The token-to-value map in a separate account, readable only by the report-assembly step, never by the agent.", "why": "This is the boundary the whole architecture is built around. Once material crosses into a model context you have lost the ability to unsend it, and provider retention terms are a contract rather than a control.", "tool": "Custom + Comprehend or Presidio", "cost": "~$60/mo"}, {"id": "Y5", "p": 61, "c": "crit", "eff": "auto", "hrs": 5, "ws": 7, "we": 8, "who": "Engineering", "t": "Give each engagement its own index", "d": "One vector index per client per engagement, entitlements checked at query time, never a shared undivided index.", "how": "Index named for the engagement, metadata filter applied in the query itself rather than after retrieval. Delete the index at engagement close as a first-class step.", "why": "A shared index is a cross-client disclosure waiting for a filter bug. Per-engagement indexes make the blast radius one client, and make deletion a single operation rather than a search.", "tool": "OpenSearch or pgvector", "cost": "varies"}, {"id": "Y6", "p": 62, "c": "crit", "eff": "man", "hrs": 5, "ws": 8, "we": 9, "who": "Security Officer", "t": "Make the finding a human act", "d": "The model drafts, a person verifies against the evidence, and only a verified finding enters a report.", "how": "Every finding carries the artefact it rests on and the name of whoever verified it. Assembly is deterministic \u2014 numbers, counts and control conclusions computed, not generated.", "why": "POL-AI-001 \u00a718 is explicit: where correctness matters, the authoritative result comes from logic rather than inference. For an assessment firm a fabricated finding is the business risk, not just a control failure.", "tool": "Report pipeline + review step", "cost": "$0"}, {"id": "Y7", "p": 63, "c": "high", "eff": "semi", "hrs": 4, "ws": 9, "we": 10, "who": "Engineering", "t": "Re-identify only at assembly, then deliver", "d": "The report step re-identifies from the token map, renders, and delivers over an authenticated channel with a record of what was sent to whom.", "how": "Assembly service holds the only role that can read the token map. Delivery through the client portal or an encrypted link with expiry. Log the recipient, the artefact hash and the time.", "why": "Re-identification at the last possible moment keeps the model-facing corpus clean throughout. The delivery record is what answers 'what exactly did you send us' a year later.", "tool": "Assembly service + portal", "cost": "$0"}, {"id": "Y8", "p": 64, "c": "high", "eff": "auto", "hrs": 5, "ws": 10, "we": 11, "who": "Engineering", "t": "Make deletion reach every copy", "d": "Retention clock per engagement. Deletion propagates to the landing zone, curated store, agent corpus, index, token map, caches, backups and the model provider.", "how": "One deletion path, tested with a real engagement. Enumerate every derived copy first \u2014 the list is always longer than expected. Confirm provider-side deletion where retention applies.", "why": "A deletion commitment is not met while a derived copy remains, and destroying the client's KMS key is the cleanest way to make that provable. Backups are where this quietly fails.", "tool": "Scripted deletion + key destruction", "cost": "$0"}]}, {"id": "Z", "name": "Continuous assurance \u2014 testing and threat modelling that never stops", "desc": "Point-in-time assurance tells you the state on one day. For an agentic product that changes weekly, and a model that changes underneath you, the interval between tests is the exposure.", "items": [{"id": "Z1", "p": 65, "c": "crit", "eff": "semi", "hrs": 6, "ws": 6, "we": 8, "who": "Engineering", "t": "Threat model as code, regenerated on architecture change", "d": "A machine-readable threat model per component, held in the repository, diffed on every pull request that touches architecture.", "how": "One YAML per component: assets, entry points, trust boundaries, threats, mitigations, each threat mapped to MITRE ATLAS or ATT&CK. A CI job fails the build if an architectural change adds an entry point or a tool with no corresponding threat entry. Render the diagram from the same file so the picture cannot drift from the model.", "why": "A threat model in a document is accurate on the day it is written. Holding it as code makes the review a diff rather than a workshop, which is the only way it survives a weekly release cadence.", "tool": "YAML + OWASP pytm or Threat Dragon", "cost": "$0"}, {"id": "Z2", "p": 66, "c": "crit", "eff": "auto", "hrs": 8, "ws": 7, "we": 9, "who": "Engineering", "t": "Agent evaluation on every pull request, not every release", "d": "The evaluation suite runs as a required check. A regression in refusal behaviour, tool selection or output handling fails the build.", "how": "promptfoo suite versioned with the prompts it tests. Assertions on: refusal of out-of-scope tool calls, no secrets in output, no instruction-following from retrieved content, deterministic outputs where correctness matters. Seed the suite from every past incident so nothing regresses twice.", "why": "Prompts are production code and they change more often than the application. Testing them only at release means the window between a prompt edit and its evaluation is the window in which a client-facing agent misbehaves.", "tool": "promptfoo in CI", "cost": "$0"}, {"id": "Z3", "p": 67, "c": "crit", "eff": "auto", "hrs": 7, "ws": 9, "we": 11, "who": "Engineering", "t": "Continuous adversarial testing against staging", "d": "Automated red-team probes run nightly, not annually: prompt injection, indirect injection through retrieved content, tool misuse, excessive agency, data exfiltration through rendered output.", "how": "garak nightly against the staging agent with a corpus that grows over time. Add a poisoned-document fixture to the retrieval index in staging so indirect injection is exercised on a real path, not a synthetic one. Findings open automatically in the plan of action.", "why": "This is the class of weakness no scanner reports and no annual pentest catches at the rate your product changes. Nightly makes the mean time to discovery a day rather than a year.", "tool": "garak + custom fixtures", "cost": "$0"}, {"id": "Z4", "p": 68, "c": "high", "eff": "auto", "hrs": 6, "ws": 10, "we": 12, "who": "Platform", "t": "Detection as code, with a coverage map", "d": "Every detection rule in the repository, tested, and mapped to the ATT&CK and ATLAS techniques it covers so the gaps are visible.", "how": "Rules as code with unit tests using replayed events. A coverage matrix generated from the rule metadata: technique on one axis, rule on the other. Publish the blank cells \u2014 that is the useful output.", "why": "Most teams cannot say what they would fail to detect. A coverage map turns detection from a pile of alerts into a portfolio with known holes, which is what lets you prioritise the next rule instead of guessing.", "tool": "Sigma or native rules + CI", "cost": "$0"}, {"id": "Z5", "p": 69, "c": "high", "eff": "semi", "hrs": 6, "ws": 12, "we": 14, "who": "Security Officer", "t": "Prove the detections fire \u2014 scheduled control validation", "d": "Safe synthetic attacks on a schedule that confirm each critical detection actually alerts, and that someone sees it.", "how": "Quarterly: disable-logging attempt, privilege escalation, public S3 exposure, agent tool call outside the allow-list, break-glass assumption. Record the time from action to alert to acknowledgement. A detection that does not fire is a deficiency, not a tuning task.", "why": "A detection nobody has ever seen fire is an assumption. Validation converts the whole detection estate from something you believe in to something you have evidence for, and it produces the evidence an auditor asks for anyway.", "tool": "Scripted, or Stratus Red Team", "cost": "$0"}, {"id": "Z6", "p": 70, "c": "high", "eff": "auto", "hrs": 5, "ws": 11, "we": 13, "who": "Engineering", "t": "Continuous SBOM and AIBOM with VEX", "d": "A software bill of materials and an AI bill of materials generated on every build, with exploitability statements published rather than a raw vulnerability list.", "how": "syft for the SBOM in CycloneDX. The AIBOM records model identifiers and versions, training-data provenance where known, retrieval sources, tool inventory and guardrail configuration. OpenVEX statements for findings assessed as not affected, with the reasoning.", "why": "Clients increasingly ask what is in the product, and for an AI product the model and its data sources are part of the answer. VEX is what stops you shipping a list of a hundred criticals that are mostly unreachable \u2014 it says which ones matter and why.", "tool": "syft + OpenVEX", "cost": "$0"}, {"id": "Z7", "p": 71, "c": "mod", "eff": "auto", "hrs": 5, "ws": 13, "we": 15, "who": "Platform", "t": "Attack path analysis across identity and network", "d": "Model the graph of who can reach what, and alert when a new path appears between a low-trust entry point and a high-value asset.", "how": "Build the graph from IAM, security groups and the agent tool registry. Query for paths from any internet-reachable component to a data store holding Restricted material. Run it in CI against the plan so a path is refused before it exists.", "why": "Individual permissions look reasonable in isolation and become a path in combination. This is the analysis that finds the three-hop route nobody designed and nobody noticed.", "tool": "Cartography or custom graph", "cost": "$0"}, {"id": "Z8", "p": 72, "c": "mod", "eff": "man", "hrs": 6, "ws": 16, "we": 18, "who": "Security Officer", "t": "Quarterly purple team on one scenario", "d": "One scenario per quarter, run jointly: attempt, detect, respond, then fix what did not work.", "how": "Rotate the scenario \u2014 agent compromise via indirect injection, stolen contractor laptop, leaked deployment credential, malicious dependency. Two hours to run, one hour to write up. Corrective actions into the plan of action.", "why": "A tabletop tests the plan. A purple team tests the controls. At this size it is affordable precisely because it is scoped to one scenario rather than a campaign.", "tool": "Internal, one afternoon", "cost": "$0"}, {"id": "Z9", "p": 73, "c": "high", "eff": "auto", "hrs": 5, "ws": 14, "we": 16, "who": "Security Officer", "t": "Continuous control evidence rather than sampled evidence", "d": "Control tests run on a schedule and write their result to the evidence store, so the observation window is populated continuously rather than reconstructed.", "how": "Every automated test in the compliance platform writes a dated result. Anything manual gets a calendar entry that produces a dated artefact. The question 'was this control operating in March' is answered by a query, not a search.", "why": "Reconstructing evidence at audit is where small programmes lose weeks. Continuous evidence turns the Type II from an exercise in archaeology into an export.", "tool": "Secureframe + scheduled jobs", "cost": "included"}, {"id": "Z10", "p": 74, "c": "crit", "eff": "auto", "hrs": 4, "ws": 9, "we": 10, "who": "Engineering", "t": "Detect model drift underneath you", "d": "Alert when a pinned model version is deprecated, when provider terms change, and when evaluation scores move without a prompt change.", "how": "Pin the version string. Poll the provider model list weekly and diff it. Track evaluation scores over time \u2014 a score change with no prompt change means the model moved, the guardrail moved, or the routing moved. Treat any of those as a change requiring assessment.", "why": "This is the failure mode unique to building on someone else's model. Your code did not change, your tests did not change, and the behaviour did. Without drift detection you find out from a client.", "tool": "Scheduled job + eval history", "cost": "$0"}]}], "costs": [["Cloud platform", "AWS Organizations, SCPs, IAM Identity Center", "$0", "0", "Free. The account separation and guardrails cost nothing and are the highest-value controls here.", "\u2014"], ["Cloud platform", "NAT gateway, VPC endpoints, KMS, logs", "~$150/mo", "1800", "Unavoidable running cost of a private-by-default architecture. NAT is the largest single line.", "Single NAT per environment rather than per AZ halves it, at the cost of an AZ failure mode."], ["Cloud security", "GuardDuty, Security Hub, Config, Inspector", "~$120/mo", "1440", "Native, organisation-wide, and produces the SOC 2 evidence directly.", "Wiz or Orca are better products and carry enterprise minimums far beyond this scale."], ["Egress control", "AWS Network Firewall", "~$260/mo", "3120", "The agent egress allow-list. This is the line that is specific to running agents.", "A squid proxy on a small instance is roughly $15/mo and about a day of work, with more to maintain."], ["SAST + SCA + secrets", "Semgrep", "$0", "0", "Free tier covers 10 contributors with the Pro engine, Supply Chain and Secrets, including reachability.", "GitHub Advanced Security is $49/committer/mo for both products and has no reachability analysis."], ["Secret prevention", "gitleaks", "$0", "0", "Pre-commit plus CI. Prevention rather than detection.", "GitHub Secret Protection at $19/committer/mo buys nicer UX for the same control outcome."], ["Container + IaC", "Trivy, plus ECR enhanced scanning", "~$10/mo", "120", "One tool covers images, IaC, filesystem SCA and secrets. Registry rescanning catches post-push CVEs.", "Snyk Container if you already bought Snyk; otherwise duplicate spend."], ["DAST", "OWASP ZAP in CI", "$0", "0", "Free, CI-native, adequate for a baseline scan on every build.", "StackHawk at roughly $42\u201359 per contributor per month adds authenticated and API scanning, which matters for an API-first product."], ["DAST", "StackHawk (if authenticated API scanning is needed)", "~$500/dev/yr", "4000", "OAuth token injection and multi-step auth recording \u2014 the problem that causes most DAST tools to miss protected state.", "Burp Suite Professional at about $475\u2013499 per user per year for manual testing, not CI."], ["IAST", "Not purchased", "$0", "0", "Median Contrast contract is around $36,000 a year, floor near $18,000. No maintained open-source option exists.", "Revisit at 50+ engineers with a dedicated AppSec owner. Record the decision so it reads as a position, not an omission."], ["Penetration test", "External firm, annual", "$8k\u201325k", "16000", "Required to be independent. Ask explicitly for prompt injection and agent abuse in scope.", "Continuous pentest-as-a-service costs more and suits weekly-changing products."], ["Endpoint", "Kandji MDM + EDR", "~$5.60/device/mo", "1210", "One agent for management, encryption enforcement, key escrow and detection.", "Huntress is $8.99/endpoint/mo with a 50-endpoint minimum \u2014 about $5,400 for 18 devices."], ["Endpoint", "Amazon Inspector agentless (cloud workloads)", "usage", "300", "Genuinely agentless where agentless works: snapshot scanning of EC2 and images.", "An agent-based scanner adds deployment and maintenance for no additional coverage here."], ["Device posture", "Google Workspace Endpoint Verification", "incl. in Enterprise tier", "0", "The closest thing to agentless laptop posture. Needs the Workspace Enterprise tier for Context-Aware Access.", "1Password Device Trust and Kolide are widely described as agentless and require an agent per their own documentation."], ["Identity", "Google Workspace (existing) + hardware keys", "~$50/key once", "900", "Federation, phishing-resistant MFA, and the Workspace tier decision for device conditioning.", "Okta from about $2/user/mo for SSO adds a second directory you do not need at this size."], ["Source control", "GitHub Team or Enterprise", "$4 or $21/user/mo", "5040", "Team gives rulesets and Actions. Enterprise buys SAML SSO and IP allow lists and nothing else you need.", "Staying on Team is defensible below about ten people; above that the SSO gap is the constraint."], ["AI assurance", "promptfoo + garak", "$0", "0", "Evaluation and adversarial probing in CI. The only tools here that test the agentic failure modes.", "Commercial LLM security platforms exist and are priced for enterprises with an AI security team."], ["Compliance", "Secureframe or equivalent", "$7.5k\u201320k/yr", "12000", "Only if you are pursuing SOC 2. Not part of the architecture itself.", "Running the evidence collection manually is free and costs more in hours than the licence."], ["Edge", "Route 53 + DNSSEC", "~$1/zone/mo", "12", "Authoritative DNS with signing and registrar lock. Domain takeover bypasses everything else.", "Cloudflare DNS is free and equally capable; the cost is a second vendor in the path."], ["Edge", "CloudFront + ACM", "~$20/mo + transfer", "240", "TLS termination, certificate automation and DDoS absorption at the edge.", "ALB-only termination works but gives up edge caching, Shield Standard and certificate automation."], ["Edge", "AWS WAF + rate rules", "~$25/mo + requests", "300", "Managed rule sets plus a tighter rate limit on agent routes, which are the denial-of-wallet target.", "Cloudflare WAF is cheaper per request; AWS WAF keeps the control plane in one account."], ["Data pipeline", "KMS key per client", "~$1/key/mo", "240", "Tenant separation by key, so destroying one client's data is destroying one key.", "A single shared key is simpler and removes the strongest deletion argument you have."], ["Data pipeline", "De-identification (Comprehend or Presidio)", "~$60/mo", "720", "The boundary the architecture is built around. Presidio is open source and self-hosted; Comprehend is managed.", "Sending raw client material to a model and relying on provider retention terms \u2014 a contract, not a control."], ["Data pipeline", "Curation and classification at landing", "~$40/mo", "480", "Classification applied at landing is the only classification that stays accurate.", "Macie adds managed discovery at meaningfully higher cost for this volume."]], "flow": [["1", "Engagement authorised", "Customer", "Scope, systems, data types and duration agreed in writing. Client issues named credentials rather than sharing an account.", "Nothing is collected until this record exists. The retention clock and the lawful basis both start here.", "Engagement file, intake checklist"], ["2", "Collection", "Customer \u2192 boundary", "Read-only scoped role, API export or client upload. Every target on an allow-list; the broker refuses anything else.", "Collection runs from a dedicated identity, never a person's. Endpoints hold nothing at rest \u2014 material streams to the landing zone.", "Collection role, tool broker, TLS 1.3"], ["3", "Landing", "PromptHalo", "One S3 prefix per client per engagement, its own KMS key, no cross-client read in any policy.", "Tenant separation by key and prefix rather than application logic. A bug in the app cannot mix two clients.", "S3 + KMS per client"], ["4", "Curation", "PromptHalo", "Normalise, detect data types, tag with client, engagement, source, classification and retention date. Out-of-scope material is quarantined and alerted.", "Classification applied at landing is the only classification that stays accurate.", "Curation job, quarantine prefix"], ["5", "De-identification", "Trust boundary", "Secrets stripped, identifiers tokenised deterministically, personal data redacted. The token map lives in a separate account under its own key.", "This is the line the architecture is built around. Past it, nothing can be unsent \u2014 provider retention is a contract, not a control.", "De-identification stage, token map"], ["6", "Agent analysis", "Agent plane", "The agent reads the de-identified corpus only, through a per-engagement index with entitlements applied in the query.", "The agent never holds a client credential and never sees a real identifier. Its blast radius is one engagement's redacted text.", "Per-engagement index, scoped agent role"], ["7", "Human verification", "PromptHalo", "Every candidate finding is checked against the artefact it rests on, by a named person, before it becomes a finding.", "The model drafts; a person decides. For an assessment firm a fabricated finding is the business risk, not just a control failure.", "Review step, named verifier"], ["8", "Report assembly", "PromptHalo", "Counts, scores and control conclusions computed deterministically. Prose drafted by the model. Re-identification happens here and nowhere earlier.", "Only the assembly service can read the token map. The agent cannot.", "Assembly service, token map role"], ["9", "Delivery", "\u2192 Customer", "Authenticated channel, expiring link or client portal. Recipient, artefact hash and time recorded.", "The delivery record answers 'what exactly did you send us' a year later, which is the question that actually gets asked.", "Portal or encrypted delivery, delivery log"], ["10", "Retention and destruction", "PromptHalo", "Retention clock per engagement. Deletion propagates to landing zone, curated store, corpus, index, token map, caches, backups and the provider.", "Destroying the client's KMS key is the cleanest provable deletion. Backups are where this quietly fails.", "Deletion path, key destruction"]], "never": [["A client credential entering a model context", "Credentials are held in the secrets store and used by the collection role. They are never placed in a prompt, a system instruction or an agent configuration, because provider-side logging may retain them."], ["Raw client material reaching a third-party model", "Everything crosses the de-identification stage first. If a use case genuinely cannot work on redacted text, it runs on a model inside the Company's own account instead."], ["One client's data appearing in another client's index", "Indexes are per engagement. There is no shared undivided index, so a filter bug cannot become a cross-client disclosure."], ["Model output reaching a client unverified", "A finding is a human act. The model drafts and a named person verifies against the artefact before anything leaves."], ["The agent reading the token map", "Re-identification happens only in the assembly step, under a role the agent does not hold."], ["Production client data in development or staging", "Downstream environments get synthetic or de-identified material only. There is no promotion path for data, only for code."]], "stores": [["Landing zone", "Raw client artefacts as collected", "Restricted", "S3, CMK per client, versioned", "Engagement + contractual period", "Collection role (write), curation job (read)"], ["Curated store", "Normalised and tagged artefacts", "Restricted", "S3, same client CMK", "Same as landing", "Curation job, de-identification stage"], ["Quarantine", "Out-of-scope material pending decision", "Restricted", "S3, client CMK, alerting on write", "30 days then destroyed", "Security Officer only"], ["Agent corpus", "De-identified text the agent may read", "Confidential", "S3 or object store, platform CMK", "Engagement close", "De-identification stage (write), agent role (read)"], ["Vector index", "Embeddings of the agent corpus", "Confidential", "OpenSearch or pgvector, encrypted, per engagement", "Deleted at engagement close", "Agent role, scoped to its engagement"], ["Token map", "Token-to-value reversal for re-identification", "Restricted", "Separate account, own CMK, no agent access", "Engagement + contractual period", "Assembly service only"], ["Prompt and completion log", "Agent inputs, tool calls, outputs", "Confidential", "CloudWatch to S3, platform CMK", "13 months", "Security Officer, incident response"], ["Findings and reports", "Verified findings and delivered documents", "Restricted", "S3, client CMK, immutable once delivered", "Contractual, commonly 6 years", "Engagement team, client"], ["Delivery log", "Who received what, when, and its hash", "Confidential", "Append-only, log archive account", "6 years", "Security Officer"], ["Engagement file", "Authorisation, scope, credentials issued, relinquishment", "Confidential", "Document store, access reviewed quarterly", "6 years", "Engagement team"], ["Security logs", "CloudTrail, GuardDuty, WAF, ALB, VPC flow", "Confidential", "Log archive account, Object Lock", "13 months, 90 days queryable", "Security account read-only"]], "zones": [["TZ-0", "Public internet", "Untrusted", "#9b1c1c", "4 2", "Anything arriving here is hostile until proven otherwise. No control assumed."], ["TZ-1", "Edge / DMZ", "Screened", "#b45309", "0", "Route 53, CloudFront, WAF, ALB. Terminates TLS, filters, rate-limits. Holds no data."], ["TZ-2", "Corporate identity", "Trusted, human", "#1b4965", "0", "Workspace, Identity Center, device posture. Issues assertions, never holds client data."], ["TZ-3", "Identified data zone", "Restricted", "#9b1c1c", "0", "Landing, curation, token map. Real client identifiers live only here."], ["TZ-4", "De-identification", "Boundary", "#c99a4a", "7 4", "The one-way valve. Everything to its right is redacted."], ["TZ-5", "Agent zone", "Confidential", "#2e7d32", "0", "Agent runtime, broker, per-engagement index. Sees redacted text only."], ["TZ-6", "Customer environment", "External, client-controlled", "#5a6a78", "5 3", "Client systems. We hold scoped, client-issued credentials and nothing else."], ["TZ-7", "Model providers", "External, third-party", "#5a6a78", "5 3", "Bedrock in-account preferred; third-party providers are subprocessors."], ["TZ-8", "Log archive", "Write-once", "#123449", "0", "Separate account, Object Lock. No principal outside it can write or delete."]], "iface": [["IF-1", "Key management", "AWS KMS API", "kms:GenerateDataKey, Encrypt, Decrypt over TLS 1.3 through a VPC interface endpoint. Envelope encryption \u2014 a fresh data key per object, never reused across clients.", "Symmetric AES-256-GCM customer-managed key, one per client. Key policy separates use (Encrypt, Decrypt, GenerateDataKey) from administration (PutKeyPolicy, ScheduleKeyDeletion) so no single principal holds both. Automatic annual rotation on. S3 Bucket Keys enabled to cut call volume.", "Destroying one client's key is provable destruction of that client's data in a sentence. Splitting use from administration is the clause POL-ENC-001 \u00a78 requires and the one that is hard at two people \u2014 write down who holds which.", "ScheduleKeyDeletion and DisableKey both alarm. Every kms: call is in CloudTrail."], ["IF-2", "Encryption in transit", "TLS", "TLS 1.3 preferred, 1.2 floor. Public edge terminates at CloudFront; ALB re-encrypts to targets; service-to-service inside the VPC is also encrypted.", "Cipher suites restricted to AEAD with forward secrecy: TLS_AES_256_GCM_SHA384, TLS_AES_128_GCM_SHA256, ECDHE-ECDSA-AES256-GCM-SHA384. No TLS 1.0 or 1.1, no CBC modes, no static RSA key exchange. HSTS max-age 31536000 with includeSubDomains. ACM certificate, ECDSA P-256, automatic renewal.", "Network position confers no trust, so internal traffic is encrypted too. Terminating at the edge gives certificate automation, which removes the most common self-inflicted outage there is.", "Transport configuration evaluated continuously rather than asserted once."], ["IF-3", "Agent to broker", "mTLS + signed request", "Mutual TLS between the agent runtime and the tool broker, with a short-lived client certificate issued per agent identity.", "AWS Private CA or SPIFFE/SPIRE issuing certificates with a 24-hour lifetime. Certificate subject carries the agent identity, and the broker authorises on that rather than on a shared secret. Requests carry a nonce and a timestamp to prevent replay.", "The broker is the control point for every tool call. If it authenticated on a bearer token, a leaked token would be a full agent impersonation. A short-lived client certificate bound to the workload identity is not portable in the same way.", "Broker logs the certificate subject with every call, so the trace names the agent."], ["IF-4", "Encryption at rest", "AES-256-GCM", "S3 SSE-KMS with the client CMK; EBS default encryption per region; RDS storage encryption; OpenSearch encryption at rest plus node-to-node.", "Account-level default encryption so a bucket created in a hurry is still encrypted. The vector store and any embedding index use the same CMK as the source material, because an embedding is a copy of the source.", "Retrofitting encryption to existing data is far more expensive than turning it on before there is any. Account-level defaults make it structural rather than a per-resource decision.", "Config rule alarms on any unencrypted resource created."], ["IF-5", "Tokenisation for de-identification", "HMAC-SHA-256", "Deterministic keyed tokenisation of direct identifiers, with the key held in KMS and used only by the de-identification stage.", "HMAC-SHA-256 with a per-engagement key, output truncated to 128 bits and base32-encoded. Deterministic so the same identifier tokenises alike and correlation survives analysis. The token-to-value map is written to a separate account under its own key.", "Do not use a plain hash here. A bare SHA-256 of an email address or a hostname is reversed by a rainbow table in seconds \u2014 the value space is tiny. Keying it with HMAC is what makes the token meaningless without the key.", "The agent role has no kms:Decrypt on the tokenisation key and no read on the map."], ["IF-6", "Integrity and signing", "SHA-256 / ECDSA P-256", "Artefact digests, container image digests, report hashes in the delivery log, and build provenance signatures.", "SHA-256 for all content digests. Container images referenced by digest, never by mutable tag. Sigstore/cosign keyless signing using the CI OIDC identity, with the signature recorded in the Rekor transparency log. Verification is an admission step before deploy.", "Referencing by tag means what you verified is not necessarily what runs. The delivery-log hash is what answers 'is this the document you sent us' a year later.", "Deployment fails closed if signature verification fails."], ["IF-7", "Password and secret hashing", "Argon2id", "Only where a credential must be stored at all \u2014 which, given federation, should be almost nowhere.", "Argon2id with m=64 MiB, t=3, p=1, 128-bit salt. bcrypt cost 12 is an acceptable fallback where Argon2 is unavailable. Never MD5, SHA-1, or unsalted SHA-256. Passwords screened against a breached-corpus list at set time rather than expired on a schedule.", "Federation means the application should hold no passwords. Where one is unavoidable, the parameters matter more than the algorithm name \u2014 an under-parameterised Argon2 is weaker than a well-configured bcrypt.", "POL-PWD-001 \u00a78 sets the policy; this sets the numbers."], ["IF-8", "Human access control", "SAML 2.0 + SCIM 2.0", "Workspace asserts identity to IAM Identity Center over SAML 2.0; SCIM 2.0 provisions and deprovisions.", "Permission sets per role per account with a one-hour maximum session. Conditions on every production policy: aws:MultiFactorAuthPresent true, aws:PrincipalOrgID to block principals outside the organisation, and aws:SourceVpce where the resource is reachable only through an endpoint. No IAM users, no long-lived access keys anywhere.", "SCIM is what makes departure a single action. Without it, deprovisioning is a checklist someone has to remember, and CC6.2-03 is untestable.", "Suspension in the IdP withdraws federated access in one step, with the timestamp retained as evidence."], ["IF-9", "Workload access control", "OIDC + STS", "GitHub Actions and in-cluster workloads assume roles by federated token; no stored credentials.", "sts:AssumeRoleWithWebIdentity, trust policy pinned on the sub claim to repository, branch and environment. IRSA for pods. Session tags carry the client identifier so an ABAC condition can scope S3 access to that client's prefix \u2014 aws:PrincipalTag/client must equal the prefix.", "ABAC by session tag is what lets one agent role serve many engagements without a policy per client, while still making cross-client access impossible.", "Any role assumption from an unexpected sub claim alarms."], ["IF-10", "Tool authorisation", "JSON Schema over the broker", "The broker holds a registry of permitted tools; each has a JSON Schema for its arguments and an authorisation rule.", "Deny by default. Schema validation on every argument before execution \u2014 type, range, and pattern. Actions classified reversible or irreversible; irreversible ones return a pending state and wait for a human decision recorded with approver, action and time.", "This is where model output stops being executable. Schema validation is the cheap control that turns a prompt injection into a rejected call rather than a shell command.", "Every rejection is logged and repeated rejections alarm."], ["IF-11", "Configuration management", "Terraform + Config", "All infrastructure as code, one workspace per environment, state in S3 with DynamoDB locking.", "Terraform 1.6 or later. State encrypted with a CMK and never containing secrets \u2014 read them at runtime instead. Checkov and Trivy config scan the plan before apply. AWS Config with the CIS AWS Foundations conformance pack. Nightly plan with -detailed-exitcode to detect drift; emergency console changes reconciled back into code within one business day.", "Configuration drift between hand-built environments is why staging passes and production fails. Detecting it nightly turns drift from a discovery into a routine.", "Drift raises a finding with an owner and a date, not an email."], ["IF-12", "Model invocation", "Bedrock API over PrivateLink", "Model calls leave the application through a VPC interface endpoint and never traverse the public internet.", "Endpoint policy restricting to the account and to named model IDs. Model version pinned explicitly, never latest. Guardrails configured for denied topics, sensitive-information filters and prompt-attack detection on any client-facing or automated path. Token and spend budgets alarmed.", "Keeping inference inside the account boundary is the strongest data-protection statement you can make to a client, and it is a configuration rather than a negotiation.", "Every invocation logged Company-side; provider-side logging is not relied on as the record."]], "models": [["claude-mythos-5", "Mythos 5", "Limited \u2014 Project Glasswing approval only", "Cyber and bio safeguards lifted for approved parties", "1M context \u00b7 128k output", "$10 / $50 per M tokens", "30-day retention \u00b7 no ZDR", "Do not architect on it. There is no self-serve signup, console toggle or cloud region that grants it \u2014 approval comes through an Anthropic, AWS or Google Cloud account team. If it arrives, it is a model-ID change and nothing else."], ["claude-fable-5", "Fable 5", "Generally available \u2014 API, Bedrock, Google Cloud, Microsoft Foundry", "Same underlying model, plus classifiers for cyber, bio, chemistry and distillation", "1M context \u00b7 128k output", "$10 / $50 per M tokens", "30-day retention \u00b7 no ZDR", "This is the model to build on. Same capability as Mythos 5 for everything except the restricted dual-use domains, and generally available since 9 June 2026."], ["claude-opus-*", "Opus tier", "Generally available", "Standard safeguards", "Large context", "Lower than Mythos-class", "Zero-data-retention available on eligible tiers", "The fallback target when Fable declines, and the right default for anything that does not need frontier reasoning. Cheaper per token by a wide margin."], ["claude-sonnet-*", "Sonnet tier", "Generally available", "Standard safeguards", "Large context", "Lowest of the three", "ZDR available on eligible tiers", "Routine extraction, classification and summarisation. Most of an assessment pipeline's token volume should land here, not on a frontier model."]], "modelnotes": [["Mythos-class carries 30-day retention and cannot be run under zero data retention", "Both Fable 5 and Mythos 5 are designated Covered Models. POL-VM-001 \u00a710 requires zero-retention or no-training evidenced twice \u2014 by the organisation setting and by the contractual clause \u2014 and that setting is not available here. This does not block the design, because the de-identification boundary already means only redacted text reaches a model. But it moves de-identification from a good practice to a precondition, and the gap against \u00a710 needs recording as an exception with a compensating control rather than being discovered at audit."], ["Fable 5 can decline, and your integration has to expect it", "Fable 5 ships cybersecurity classifiers that decline offensive-cyber requests. For a firm whose agents analyse exploit chains, draft detections and reason about attacker behaviour, that will fire on legitimate work. Build refusal handling, a fallback path to another Claude model, and logging of every refusal \u2014 a spike in refusals is a signal about your prompts, not just an annoyance."], ["Route by sensitivity and by need, not by default", "At $10 per million input and $50 per million output, sending an entire assessment corpus through a frontier model is a budget decision as much as a security one. Use Sonnet for extraction and classification, Opus for most reasoning, and Fable only where the long-horizon agentic work genuinely needs it. The router itself becomes a control: it decides what class of data reaches which retention regime."], ["Pin the version and watch for drift", "Never call latest. Pin the model ID, record it in the AIBOM, and treat a provider version change as a change requiring assessment under POL-CM-001 \u00a711. Task Z10 detects the case where behaviour moves without your code moving."], ["Plan for the routing to change under you", "Access to these models was suspended on 12 June 2026 under US export controls and restored on 1 July. Availability of a frontier tier is a supply-chain dependency like any other: keep a second model configured and evaluated, so a suspension is a configuration change rather than an outage."]], "onodes": [["B1", "Client system", "TZ-6", 0, 0], ["B2", "Client recipient", "TZ-6", 0, 2], ["B3", "Edge \u00b7 DNS, CDN, WAF", "TZ-1", 1, 0], ["B4", "Load balancer", "TZ-1", 1, 1], ["B5", "Identity provider", "TZ-2", 1, 2], ["B6", "Collection service", "TZ-3", 2, 0], ["B7", "Landing zone", "TZ-3", 2, 1], ["B8", "Curation", "TZ-3", 2, 2], ["B9", "Token map", "TZ-3", 2, 3], ["B10", "De-identification", "TZ-4", 3, 1], ["B11", "Agent runtime", "TZ-5", 4, 0], ["B12", "Tool broker", "TZ-5", 4, 1], ["B13", "Vector index", "TZ-5", 4, 2], ["B14", "Human verifier", "TZ-5", 4, 3], ["B15", "Model provider", "TZ-7", 5, 0], ["B16", "Report assembly", "TZ-3", 5, 1], ["B17", "Log archive", "TZ-8", 5, 2]], "overlays": [{"id": "cls", "name": "Data classification", "blurb": "What classification of material each component actually holds. The design goal is that Restricted stops at the de-identification boundary.", "legend": [["Restricted", "#E8A9A2"], ["Confidential", "#EFC79A"], ["Internal", "#A9C6D8"], ["None held", "#D8E0E5"]], "cells": {"B1": ["Restricted", "R", "Client production data in the client's own custody"], "B2": ["Restricted", "R", "Receives the finished report, which is re-identified"], "B3": ["None", "N", "Terminates TLS, inspects headers, holds nothing"], "B4": ["None", "N", "Routes only; no persistence"], "B5": ["Internal", "I", "Identity assertions and group membership, no client data"], "B6": ["Restricted", "R", "Raw evidence in transit; holds nothing at rest"], "B7": ["Restricted", "R", "Raw client artefacts, per-client CMK"], "B8": ["Restricted", "R", "Normalised artefacts, still identified"], "B9": ["Restricted", "R", "The only store that can reverse de-identification"], "B10": ["Restricted", "R", "Sees identified input, emits redacted output. The valve."], "B11": ["Confidential", "C", "De-identified text only, per engagement"], "B12": ["Confidential", "C", "Tool arguments derived from redacted text"], "B13": ["Confidential", "C", "Embeddings of redacted text, per-engagement index"], "B14": ["Confidential", "C", "Reviews redacted findings against redacted evidence"], "B15": ["Confidential", "C", "Receives redacted prompts. 30-day retention, no ZDR."], "B16": ["Restricted", "R", "Re-identifies at assembly. Holds the map role."], "B17": ["Confidential", "C", "Traces and access records, not client content"]}}, {"id": "enc", "name": "Encryption and key custody", "blurb": "Where material is encrypted, with which algorithm, and who holds the key. The per-client key is what makes destruction provable.", "legend": [["Client-held CMK", "#E8A9A2"], ["Platform CMK", "#EFC79A"], ["In transit only", "#A9C6D8"], ["Provider-held", "#D8E0E5"]], "cells": {"B1": ["In transit", "T", "TLS 1.3 outbound; at rest is the client's responsibility"], "B2": ["In transit", "T", "TLS 1.3, expiring link, artefact hash logged"], "B3": ["In transit", "T", "TLS 1.3 termination, HSTS, ECDSA P-256 via ACM"], "B4": ["In transit", "T", "Re-encrypts to targets; nothing at rest"], "B5": ["Platform", "P", "SAML assertions signed; no long-lived secrets held"], "B6": ["Client CMK", "K", "Streams to landing; credentials from Secrets Manager"], "B7": ["Client CMK", "K", "S3 SSE-KMS, one CMK per client, bucket keys on"], "B8": ["Client CMK", "K", "Same client key; classification tags written here"], "B9": ["Client CMK", "K", "Separate account, own key, assembly role only"], "B10": ["Client CMK", "K", "HMAC-SHA-256 tokenisation key in KMS, agent has no decrypt"], "B11": ["Platform", "P", "Workload identity, no stored keys, 1h credentials"], "B12": ["Platform", "P", "mTLS with 24h client certificates per agent identity"], "B13": ["Platform", "P", "Encrypted at rest and node to node, platform CMK"], "B14": ["Platform", "P", "Access through federated session only"], "B15": ["Provider", "V", "TLS to a private endpoint; provider holds its own at-rest keys"], "B16": ["Client CMK", "K", "Only role with decrypt on the token map"], "B17": ["Platform", "P", "Object Lock compliance mode, separate account"]}}, {"id": "thr", "name": "Threat overlay \u2014 ATT&CK and ATLAS", "blurb": "The technique most likely to be used against each component. Mapped to MITRE ATT&CK for infrastructure and ATLAS for the agentic path.", "legend": [["Agentic-specific", "#E8A9A2"], ["Cloud technique", "#EFC79A"], ["Identity technique", "#A9C6D8"], ["Lower exposure", "#D8E0E5"]], "cells": {"B1": ["T1078", "I", "Valid accounts \u2014 misuse of the credential the client issued us"], "B2": ["T1566", "I", "Phishing the delivery link; why the link expires and is authenticated"], "B3": ["T1583.001", "C", "Domain acquisition and takeover; DNSSEC and registrar lock answer it"], "B4": ["T1190", "C", "Exploit public-facing application; WAF and origin locking answer it"], "B5": ["T1621", "I", "MFA request generation \u2014 why factors are phishing-resistant"], "B6": ["T1552", "I", "Unsecured credentials; collection creds live in Secrets Manager"], "B7": ["T1530", "C", "Data from cloud storage object; per-client key limits the blast radius"], "B8": ["T1213", "C", "Data from information repositories"], "B9": ["T1555", "I", "Credentials from password stores \u2014 the highest-value single target here"], "B10": ["AML.T0057", "A", "LLM data leakage; the valve is the control that prevents it"], "B11": ["AML.T0053", "A", "Excessive agency \u2014 permissions beyond the task"], "B12": ["AML.T0051", "A", "Prompt injection reaching a tool call; schema validation answers it"], "B13": ["AML.T0070", "A", "RAG poisoning and cross-tenant retrieval"], "B14": ["T1565", "I", "Data manipulation \u2014 the reason a finding is a human act"], "B15": ["AML.T0011", "A", "Model supply chain; version pinning and drift detection answer it"], "B16": ["T1565.001", "I", "Stored data manipulation of a report before delivery"], "B17": ["T1070", "C", "Indicator removal \u2014 why Object Lock and a separate account"]}}, {"id": "ctl", "name": "Control coverage", "blurb": "How many controls from the build plan land on each component, and where coverage is thin. Thin is not always wrong, but it should be deliberate.", "legend": [["Strong \u00b7 4+", "#AED5B9"], ["Adequate \u00b7 2\u20133", "#A9C6D8"], ["Thin \u00b7 1", "#EFC79A"], ["None mapped", "#E8A9A2"]], "cells": {"B1": ["1", "W", "Y1 authorisation gate only. The client controls the rest \u2014 state that in the engagement."], "B2": ["2", "A", "Y7 delivery record, IF-2 transport"], "B3": ["6", "S", "X1\u2013X4 DNS, TLS, WAF, rate limits"], "B4": ["3", "A", "X5 origin lock, X6 health and rate limits, N1 private targets"], "B5": ["5", "S", "I1 federation, I2 MFA, I4 JIT, IF-8 SAML and SCIM"], "B6": ["3", "A", "Y1 authorisation, D2 secrets, IF-9 workload identity"], "B7": ["4", "S", "Y2 per-client zone, D1 CMK, F3 log delivery, Y8 deletion"], "B8": ["2", "A", "Y3 curation, Z6 AIBOM provenance"], "B9": ["3", "A", "Y4 map separation, IF-5 HMAC keying, Y8 key destruction"], "B10": ["4", "S", "Y4 de-identification, IF-5 tokenisation, Z2 evaluation, Z3 adversarial"], "B11": ["6", "S", "A1 identity, A6 bounds, A9 pinning, Z2, Z3, Z10"], "B12": ["5", "S", "A2 broker, A3 human gate, A4 untrusted input, IF-3 mTLS, IF-10 schema"], "B13": ["4", "S", "A7 entitlements, Y5 per-engagement index, D4 classification, Y8 deletion"], "B14": ["2", "A", "Y6 human finding, Z8 purple team"], "B15": ["3", "A", "G4 provider assessment, A9 pinning, Z10 drift"], "B16": ["3", "A", "Y6 verification, Y7 re-identification, IF-6 report hash"], "B17": ["4", "S", "F3 Object Lock, M1 detection, M3 retention, Z9 continuous evidence"]}}, {"id": "tel", "name": "Telemetry and blind spots", "blurb": "What each component emits, and what it does not. The blind spots are the useful part of this overlay.", "legend": [["Full trace", "#AED5B9"], ["Partial", "#EFC79A"], ["Blind spot", "#E8A9A2"], ["Not applicable", "#D8E0E5"]], "cells": {"B1": ["Client-side", "B", "We see our own calls, not what else happens in the client estate. Named limitation."], "B2": ["Delivery log", "F", "Recipient, artefact hash and time"], "B3": ["WAF + CDN logs", "F", "Request logs to the archive; blocked and counted rules"], "B4": ["Access logs", "F", "ALB access logs to the log archive account"], "B5": ["Login events", "F", "Workspace and Identity Center events, MFA outcomes"], "B6": ["CloudTrail", "F", "Every API call under the collection role"], "B7": ["Data events", "P", "S3 data events cost money \u2014 enable on Restricted buckets only, and say so"], "B8": ["App logs", "P", "Curation decisions logged; quarantine writes alarm"], "B9": ["CloudTrail", "F", "Every decrypt on the token map, alarmed"], "B10": ["App logs", "P", "Counts and types redacted; the values themselves are never logged"], "B11": ["Agent trace", "F", "Triggering input, tools, parameters, actions, approvals"], "B12": ["Broker log", "F", "Every call and every rejection, with the certificate subject"], "B13": ["Query log", "P", "Retrieval identity and documents returned; embedding content not logged"], "B14": ["Approval record", "F", "Named verifier, artefact, time"], "B15": ["Our side only", "B", "Provider-side logging is not the Company record. POL-LOG-001 \u00a711 says so."], "B16": ["App + hash", "F", "Assembly events and the artefact hash"], "B17": ["Self", "F", "Object Lock means the archive proves its own integrity"]}}, {"id": "blast", "name": "Blast radius on compromise", "blurb": "What an attacker reaches if this component alone is compromised. Read it as the design's answer to 'what if this one thing fails'.", "legend": [["One engagement", "#AED5B9"], ["One client", "#A9C6D8"], ["Redacted corpus", "#EFC79A"], ["All clients", "#E8A9A2"]], "cells": {"B1": ["Client scope", "O", "Only what that client's credential permits, which is why it is scoped and named"], "B2": ["One report", "O", "A single delivered artefact"], "B3": ["No data", "O", "Edge holds nothing; the damage is availability and traffic manipulation"], "B4": ["No data", "O", "Routing only"], "B5": ["All clients", "X", "Identity compromise is the worst case. Hence phishing-resistant MFA and JIT."], "B6": ["One client", "C", "Scoped to the engagement's credential and prefix"], "B7": ["One client", "C", "Per-client key and prefix; other clients unreachable"], "B8": ["One client", "C", "Same key boundary"], "B9": ["All clients", "X", "The map reverses de-identification. Separate account, own key, one reader."], "B10": ["One engagement", "O", "Holds the engagement key in memory, nothing at rest"], "B11": ["Redacted corpus", "P", "Its IAM role and nothing wider. No client credentials, no identifiers."], "B12": ["Redacted corpus", "P", "Allow-listed tools only; irreversible actions still need a human"], "B13": ["One engagement", "O", "Per-engagement index; no shared index to traverse"], "B14": ["One engagement", "O", "Human session, scoped and time-boxed"], "B15": ["Redacted prompts", "P", "Only what we sent, which is redacted by construction"], "B16": ["All clients", "X", "Holds the map role. The second-highest-value target after B9."], "B17": ["Read only", "O", "Object Lock prevents deletion; disclosure of traces, not content"]}}]},GROUPS=D.groups,COSTS=D.costs,FLOW=D.flow,NEVER=D.never,STORES=D.stores,ZONES=D.zones,IFACE=D.iface,MODELS=D.models,MNOTES=D.modelnotes,ONODES=D.onodes,OVL=D.overlays;
+var KEY="agentic_ref_arch_v1";
+var persistent=(function(){try{localStorage.setItem("__t","1");localStorage.removeItem("__t");return true;}
+ catch(e){return false;}})();
+var pending=null;
+var state={editor:null,items:{},log:[],collapsed:{},open:{},showHow:true};
+(function(){try{var p=JSON.parse(localStorage.getItem(KEY)||"null");if(p){state.editor=p.editor||null;
+ state.items=p.items||{};state.log=p.log||[];state.collapsed=p.collapsed||{};state.open=p.open||{};state.showHow=!!p.showHow;}}catch(e){}})();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+function itm(id){if(!state.items[id])state.items[id]={status:"open",owner:"",assignee:"",pct:"",
+ target:"",notes:""};
+ var it=state.items[id];if(it.assignee===undefined)it.assignee="";if(it.pct===undefined)it.pct="";
+ return it;}
+/* Progress: an explicit percentage if one has been set, otherwise inferred from status so the
+   two never contradict each other on screen. */
+function pctOf(i){var s=itm(i.id);
+ if(s.pct!=="")return +s.pct;
+ return s.status==="done"?100:(s.status==="prog"?25:0);}
+function pctWeighted(list){var h=0,d=0;
+ list.forEach(function(i){if(itm(i.id).status==="na")return;h+=i.hrs;d+=i.hrs*pctOf(i)/100;});
+ return h?Math.round(d/h*100):0;}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){
+ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function all(){var a=[];GROUPS.forEach(function(g){g.items.forEach(function(i){a.push(i);});});return a;}
+var CRIT={crit:"Critical",high:"High",mod:"Moderate",low:"Low"},
+ EFF={auto:"Automated",semi:"Semi-automated",man:"Manual"},
+ STAT={open:"Not started",prog:"In progress",done:"Built",na:"Not applicable"};
+function fmt(t){var d=new Date(t);return d.toLocaleDateString(undefined,{day:"2-digit",month:"short"})+" "+
+ d.toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"});}
+var dlg=document.getElementById("editorModal");
+function askEditor(){document.getElementById("nameIn").value=state.editor?state.editor.name:"";
+ document.getElementById("roleIn").value=state.editor?state.editor.role:"";
+ if(dlg.showModal)dlg.showModal();else{var n=window.prompt("Your name");if(!n)return;
+  state.editor={name:n,role:window.prompt("Your role")||""};save();renderWho();}}
+document.getElementById("saveEditor").addEventListener("click",function(){
+ var n=document.getElementById("nameIn").value.trim();if(!n)return;
+ state.editor={name:n,role:document.getElementById("roleIn").value.trim()};save();renderWho();
+ if(pending){stamp(pending.id,pending.f,pending.v);pending=null;
+  renderMeter();renderBuild();renderSeq();renderLog();}});
+document.getElementById("switchEditor").addEventListener("click",askEditor);
+function renderWho(){document.getElementById("who").textContent=state.editor
+ ?("Editing as "+state.editor.name+(state.editor.role?" · "+state.editor.role:"")):"No editor set";}
+function stamp(id,f,v){var it=itm(id),from=it[f]||"";if(from===v)return;it[f]=v;
+ state.log.unshift({at:Date.now(),by:state.editor?state.editor.name:"unknown",
+  role:state.editor?state.editor.role:"",id:id,field:f,
+  from:(f==="status"?(STAT[from]||"—"):(from||"—")),to:(f==="status"?STAT[v]:(v||"—"))});
+ state.log=state.log.slice(0,600);save();}
+
+
+/* ---------- shared drawing kit: white raised cards, zone-coloured borders, icons ---------- */
+var ZC={};ZONES.forEach(function(z){ZC[z[0]]={name:z[1],cls:z[2],col:z[3],dash:z[4],note:z[5]};});
+/* Pastel of each zone colour, used for the OUTER border only. Inner elements are raised
+   and carry a light neutral border, so elevation rather than colour separates them. */
+var PASTEL={"TZ-0":"#E8A9A2","TZ-1":"#EFC79A","TZ-2":"#A9C6D8","TZ-3":"#E8B4AE","TZ-4":"#E6C68C",
+ "TZ-5":"#AED5B9","TZ-6":"#C4CED5","TZ-7":"#C4CED5","TZ-8":"#9FB6C6"};
+var INNER="#DFE7EC";
+/* Very light tint of each zone, used as the OUTER container fill. No border at all —
+   the colour alone marks the zone, and the raised white inner cards sit on top of it. */
+var TINT={"TZ-0":"#FBEDEB","TZ-1":"#FDF4E8","TZ-2":"#EEF4F8","TZ-3":"#FBEEEC","TZ-4":"#FBF4E6",
+ "TZ-5":"#EEF7F1","TZ-6":"#F2F5F7","TZ-7":"#F2F5F7","TZ-8":"#EEF2F6","TZ-MIX":"#F4F6F8"};
+function defs(){return '<defs>'+
+ '<filter id="rz" x="-14%" y="-14%" width="132%" height="150%">'+
+  '<feGaussianBlur in="SourceAlpha" stdDeviation="1.8"/>'+
+  '<feOffset dy="1.6" result="sh"/>'+
+  '<feComponentTransfer in="sh" result="shd"><feFuncA type="linear" slope="0.22"/></feComponentTransfer>'+
+  '<feMerge><feMergeNode in="shd"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+
+ '<marker id="ar" markerWidth="9" markerHeight="9" refX="8" refY="3.2" orient="auto">'+
+  '<path d="M0,0 L8,3.2 L0,6.4 z" fill="#7fa8c0"/></marker>'+
+ '<marker id="arw" markerWidth="9" markerHeight="9" refX="8" refY="3.2" orient="auto">'+
+  '<path d="M0,0 L8,3.2 L0,6.4 z" fill="#c99a4a"/></marker></defs>';}
+/* OUTER container — pastel border, flat, no elevation */
+function shell(x,y,w,h,zone,title,sub){
+ var t=TINT[zone]||"#F4F6F8";
+ var o='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="10" fill="'+t+'"/>';
+ if(title)o+='<text x="'+(x+13)+'" y="'+(y+20)+'" font-size="12" font-weight="700" fill="#12232b">'+
+  esc(title)+'</text>';
+ if(sub)o+='<text x="'+(x+13)+'" y="'+(y+35)+'" font-size="10" fill="#5a6a78">'+esc(sub)+'</text>';
+ return o;}
+/* INNER element — raised, light neutral border. Elevation is what marks it as inner. */
+function card(x,y,w,h,zone,title,sub){
+ var o='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="8" fill="#ffffff" stroke="'+INNER+
+  '" stroke-width="1.1" filter="url(#rz)"/>';
+ if(title)o+='<text x="'+(x+12)+'" y="'+(y+19)+'" font-size="12" font-weight="700" fill="#12232b">'+
+  esc(title)+'</text>';
+ if(sub)o+='<text x="'+(x+12)+'" y="'+(y+34)+'" font-size="10" fill="#5a6a78">'+esc(sub)+'</text>';
+ return o;}
+/* INNER element that must still show its zone — pastel border plus elevation */
+function cardZ(x,y,w,h,zone,title,sub){
+ var p=PASTEL[zone]||"#C4CED5",z=ZC[zone]||{dash:"0"};
+ var o='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="8" fill="#ffffff" stroke="'+p+
+  '" stroke-width="1.6"'+(z.dash!=="0"?' stroke-dasharray="'+z.dash+'"':'')+' filter="url(#rz)"/>';
+ if(title)o+='<text x="'+(x+12)+'" y="'+(y+19)+'" font-size="12" font-weight="700" fill="#12232b">'+
+  esc(title)+'</text>';
+ if(sub)o+='<text x="'+(x+12)+'" y="'+(y+34)+'" font-size="10" fill="#5a6a78">'+esc(sub)+'</text>';
+ return o;}
+function tile(x,y,w,t,zone,ic){
+ return '<g><rect x="'+x+'" y="'+y+'" width="'+w+'" height="24" rx="6" fill="#fff" stroke="'+INNER+
+  '" stroke-width="1" filter="url(#rz)"/>'+
+  (ic?icon(ic,x+8,y+6):'')+
+  '<text x="'+(x+(ic?26:9))+'" y="'+(y+16)+'" font-size="10" fill="#25333d">'+esc(t)+'</text></g>';}
+function icon(k,x,y){var c="#5a6a78",p={
+ lock:'<path d="M2 5V3.4a2 2 0 0 1 4 0V5" fill="none" stroke="'+c+'" stroke-width="1.1"/>'+
+      '<rect x="0.6" y="5" width="6.8" height="5.4" rx="1" fill="none" stroke="'+c+'" stroke-width="1.1"/>',
+ key:'<circle cx="2.6" cy="5.4" r="2.1" fill="none" stroke="'+c+'" stroke-width="1.1"/>'+
+     '<path d="M4.7 5.4H10M8.4 5.4v2.2" fill="none" stroke="'+c+'" stroke-width="1.1"/>',
+ db:'<ellipse cx="5" cy="2.6" rx="4" ry="1.6" fill="none" stroke="'+c+'" stroke-width="1.1"/>'+
+    '<path d="M1 2.6v6c0 .9 1.8 1.6 4 1.6s4-.7 4-1.6v-6" fill="none" stroke="'+c+'" stroke-width="1.1"/>',
+ bot:'<rect x="1" y="3.2" width="8" height="6.4" rx="1.6" fill="none" stroke="'+c+'" stroke-width="1.1"/>'+
+     '<path d="M5 3.2V1.2M3.2 6h.01M6.8 6h.01" stroke="'+c+'" stroke-width="1.3" stroke-linecap="round"/>',
+ person:'<circle cx="5" cy="3.2" r="2" fill="none" stroke="'+c+'" stroke-width="1.1"/>'+
+        '<path d="M1.4 10.2c0-2.2 1.7-3.6 3.6-3.6s3.6 1.4 3.6 3.6" fill="none" stroke="'+c+'" stroke-width="1.1"/>',
+ shield:'<path d="M5 .8 9 2.4v3.4c0 2.6-1.8 4.2-4 4.8-2.2-.6-4-2.2-4-4.8V2.4z" fill="none" stroke="'+c+
+        '" stroke-width="1.1"/>',
+ cloud:'<path d="M2.6 9.2a2.3 2.3 0 0 1 .3-4.6A3.2 3.2 0 0 1 9 5.2a2 2 0 0 1-.4 4z" fill="none" stroke="'+c+
+       '" stroke-width="1.1"/>',
+ doc:'<path d="M2 .9h4l2.2 2.2v6.9H2z" fill="none" stroke="'+c+'" stroke-width="1.1"/>'+
+     '<path d="M6 .9v2.4h2.2" fill="none" stroke="'+c+'" stroke-width="1.1"/>',
+ globe:'<circle cx="5" cy="5.4" r="4.2" fill="none" stroke="'+c+'" stroke-width="1.1"/>'+
+       '<path d="M.8 5.4h8.4M5 1.2c1.6 1.6 1.6 6.8 0 8.4M5 1.2c-1.6 1.6-1.6 6.8 0 8.4" fill="none" stroke="'+c+
+       '" stroke-width="0.9"/>'};
+ return '<g transform="translate('+x+','+y+')">'+(p[k]||"")+'</g>';}
+function zoneKey(list){return '<div class="lg" style="margin-top:10px">'+list.map(function(id){var z=ZC[id];
+ return '<span><i style="background:'+(TINT[id]||"#F4F6F8")+';border:1px solid '+PASTEL[id]+
+  '"></i><b>'+esc(id)+'</b> '+esc(z.name)+' <span style="color:var(--ink-soft)">— '+esc(z.cls)+
+  '</span></span>';}).join("")+'</div>';}
+
+/* ---------- architecture diagram ---------- */
+function renderArch(){
+ var W=1160,H=880,s='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+
+  '" xmlns="http://www.w3.org/2000/svg">'+defs();
+ /* title and note in one text element so the note can never overrun the title */
+ function band(y,t,note){s+='<text x="14" y="'+y+'" font-size="12" font-weight="700" fill="#1b4965">'+esc(t)+
+  (note?'<tspan font-size="10" font-weight="400" fill="#8a9aa3" dx="10">'+esc(note)+'</tspan>':'')+'</text>';}
+ band(20,"IDENTITY AND DEVICE PLANE","TZ-2 · issues assertions, holds no client data");
+ s+=shell(14,30,1132,74,"TZ-2","","");
+ var idp=[["Workspace IdP · SAML 2.0",188,"person"],["Phishing-resistant MFA",166,"lock"],
+  ["Endpoint Verification · posture",196,"shield"],["Kandji MDM + EDR",148,"shield"],
+  ["Identity Center · 1h sessions",184,"key"],["Just-in-time elevation",162,"key"]];
+ var x=28;idp.forEach(function(t){s+=tile(x,58,t[1],t[0],"TZ-2",t[2]);x+=t[1]+12;});
+ band(130,"EDGE","TZ-1 · the only public entry point, six hops, none skippable");
+ s+=shell(14,140,1132,74,"TZ-1","","");
+ var hops=[["Route 53 · DNSSEC",164,"globe"],["ACM · TLS 1.2 floor",158,"lock"],
+  ["CloudFront · origin locked",186,"cloud"],["WAF · count then block",176,"shield"],
+  ["Rate limit · agents tighter",184,"shield"],["ALB · HTTPS to targets",166,"cloud"]];
+ x=28;hops.forEach(function(t){s+=tile(x,168,t[1],t[0],"TZ-1",t[2]);x+=t[1]+12;});
+ band(240,"SOURCE, PIPELINE AND ORGANISATION","");
+ s+=shell(14,250,552,104,"TZ-2","GitHub organisation","Rulesets, OIDC to AWS, signed artefacts");
+ var gh=[["Rulesets · PR + non-author review",244],["Actions · OIDC, no keys",180]];
+ x=28;gh.forEach(function(t){s+=tile(x,298,t[1],t[0],"TZ-2",null);x+=t[1]+12;});
+ x=28;[["Semgrep",96],["gitleaks",92],["Trivy",78],["ZAP",70],["cosign",84],["evals",72]].forEach(function(t){
+  s+=tile(x,326,t[1],t[0],"TZ-2",null);x+=t[1]+8;});
+ s+=shell(594,250,552,104,"TZ-8","AWS Organization · six accounts","Management · Log archive · Security · Dev · Staging · Prod");
+ /* widths sum to <= 520 so the row stays inside the 552-wide card */
+ x=608;[["SCP guardrails",108,"shield"],["CloudTrail org trail",136,"db"],["Object Lock 13mo",114,"lock"],
+  ["GuardDuty all regions",138,"shield"]].forEach(function(t){s+=tile(x,298,t[1],t[0],"TZ-8",t[2]);x+=t[1]+8;});
+ x=608;[["Config · CIS pack",120,null],["Security Hub",104,null],["Inspector agentless",134,null],
+  ["Athena archive",128,null]].forEach(function(t){s+=tile(x,326,t[1],t[0],"TZ-8",t[2]);x+=t[1]+8;});
+ s+='<path d="M566 302 L594 302" stroke="#7fa8c0" stroke-width="1.8" marker-end="url(#ar)" fill="none"/>';
+ s+='<text x="580" y="296" text-anchor="middle" font-size="9" fill="#5a6a78">OIDC</text>';
+ band(384,"ENVIRONMENTS","separate accounts, identical code, different data");
+ var envs=[["Development","Synthetic data only. Developers write here.",14],
+  ["Staging","De-identified data. DAST runs nightly.",394],
+  ["Production","Real data. Private subnets, no public IPs.",774]];
+ envs.forEach(function(e,idx){var ex=e[2],ew=372;
+  s+=shell(ex,394,ew,178,idx===2?"TZ-3":"TZ-2",e[0],e[1]);
+  s+=tile(ex+12,442,172,"VPC · private subnets","TZ-2","cloud");
+  s+=tile(ex+192,442,168,"Compute · ECS or Lambda","TZ-2",null);
+  s+=tile(ex+12,472,172,"Data · encrypted, CMK","TZ-2","db");
+  s+=tile(ex+192,472,168,"Secrets Manager","TZ-2","key");
+  if(idx===2){s+=tile(ex+12,502,172,"VPC endpoints · Bedrock","TZ-3","lock");
+   s+=tile(ex+192,502,168,"Network Firewall · egress","TZ-3","shield");
+   s+=tile(ex+12,532,348,"Inspector agentless scanning","TZ-3",null);}
+  else{s+=tile(ex+12,502,348,idx===0?"No path to production from here":"Promotion gate · approval required",
+   "TZ-2",null);
+   s+=tile(ex+12,532,348,"Data never promoted, only code","TZ-2",null);}});
+ s+='<path d="M386 484 L394 484" stroke="#7fa8c0" stroke-width="1.8" marker-end="url(#ar)" fill="none"/>';
+ s+='<path d="M766 484 L774 484" stroke="#7fa8c0" stroke-width="1.8" marker-end="url(#ar)" fill="none"/>';
+ s+='<text x="390" y="478" text-anchor="middle" font-size="9" fill="#5a6a78">digest</text>';
+ s+='<text x="770" y="478" text-anchor="middle" font-size="9" fill="#5a6a78">approve</text>';
+ band(602,"AGENTIC PLANE","TZ-5 · inside production, bounded on every axis");
+ var ag=[["Agent runtime","Dedicated IAM role per agent",
+   [["No wildcard actions or resources","bot"],["Short-lived creds · workload identity","key"],
+    ["Kill switch · tested annually","shield"]],14,274],
+  ["Tool broker","Every call mediated and validated",
+   [["Allow-listed tools only","shield"],["JSON Schema on every argument","doc"],
+    ["Human gate · irreversible actions","person"]],302,274],
+  ["Model and retrieval","Private endpoints, no public path",
+   [["Bedrock via PrivateLink · pinned","cloud"],["Per-engagement index","db"],
+    ["Entitlements filtered at query","lock"]],590,274],
+  ["Bounds and observability","What stops it and what proves it",
+   [["Egress allow-list","shield"],["Rate, spend and token caps","shield"],
+    ["Full trace: input, tools, approvals","db"]],878,268]];
+ ag.forEach(function(g){s+=shell(g[3],612,g[4],164,"TZ-5",g[0],g[1]);
+  g[2].forEach(function(t,k){s+=tile(g[3]+12,656+k*30,g[4]-24,t[0],"TZ-5",t[1]);});});
+ s+='<path d="M288 700 L302 700" stroke="#7fa8c0" stroke-width="1.8" marker-end="url(#ar)" fill="none"/>';
+ s+='<path d="M576 700 L590 700" stroke="#7fa8c0" stroke-width="1.8" marker-end="url(#ar)" fill="none"/>';
+ s+='<path d="M864 700 L878 700" stroke="#7fa8c0" stroke-width="1.8" marker-end="url(#ar)" fill="none"/>';
+ band(806,"DETECTION AND EVIDENCE","TZ-8 · write-once, separate account");
+ s+=shell(14,816,1132,52,"TZ-8","","");
+ x=28;[["GuardDuty + Security Hub",178,"shield"],["Config · baseline drift",166,null],
+  ["Six alerts that page",152,null],["13 months, 90 days queryable",192,"db"],
+  ["Athena over the archive",172,"db"],["Incident runbook · AI cases",188,"doc"]]
+  .forEach(function(t){s+=tile(x,830,t[1],t[0],"TZ-8",t[2]);x+=t[1]+12;});
+ s+='</svg>';
+ var h='<div class="panel"><h3>Reference architecture</h3><p class="note">Sized for 10 to 20 people. Trust zones '+
+  'are shown by border rather than fill — solid for zones under our control, dashed for external parties. Every '+
+  'card is white so the borders carry the meaning.</p><div class="arch">'+s+'</div>'+
+  zoneKey(["TZ-1","TZ-2","TZ-3","TZ-5","TZ-8"])+'</div>';
+ h+='<div class="panel"><h3>The five decisions this architecture makes for you</h3>'+
+  '<table><thead><tr><th>Decision</th><th>What it rules out</th></tr></thead><tbody>'+
+  [["Separate dev, staging and production at the AWS account boundary",
+    "A mistake in development reaching production, audit-scope arguments, and shared IAM blast radius. Billing per environment comes free."],
+   ["Nothing enters production except through the pipeline, on an OIDC role",
+    "Long-lived deployment keys, console changes nobody can reconstruct, and a change population assembled by hand at audit."],
+   ["Every agent gets a scoped identity and calls tools through a broker",
+    "A prompt injection inheriting a shared service account, and model output reaching a shell or a query unmediated."],
+   ["Egress is allow-listed, tighter for agents than for the application",
+    "The exfiltration path that opens the moment an agent with tool access reads untrusted content."],
+   ["Logs land in a separate account under Object Lock for thirteen months",
+    "An attacker deleting the evidence, and an observation window that outlasts your retention."]]
+   .map(function(r){return '<tr><td><b>'+esc(r[0])+'</b></td><td>'+esc(r[1])+'</td></tr>';}).join("")+
+  '</tbody></table></div>';
+ document.getElementById("viewArch").innerHTML=h;}
+
+
+function renderFlow(){
+ var COLS=[["TZ-6","Customer environment",14,210],["TZ-3","Identified zone",252,210],
+  ["TZ-4","De-identification",490,166],["TZ-5","Agent zone",684,210],["TZ-3","Assembly and delivery",922,224]];
+ var W=1160,H=430;
+ /* stage index → [x, y, width, zone] */
+ var P=[[28,86,182,"TZ-6"],[28,188,182,"TZ-6"],[266,86,182,"TZ-3"],[266,188,182,"TZ-3"],
+  [504,137,138,"TZ-4"],[698,86,182,"TZ-5"],[698,188,182,"TZ-5"],[936,86,196,"TZ-3"],[936,188,196,"TZ-3"]];
+ var s='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">'+defs();
+ s+='<text x="14" y="19" font-size="12.5" font-weight="700" fill="#1b4965">DATA FLOW — LEFT TO RIGHT ACROSS TRUST ZONES</text>';
+ COLS.forEach(function(c){
+  s+=shell(c[2],56,c[3],212,c[0],"","");
+  s+='<text x="'+(c[2]+10)+'" y="48" font-size="10.5" font-weight="700" fill="'+ZC[c[0]].col+'">'+esc(c[0])+
+   ' · '+esc(c[1])+'</text>';});
+ P.forEach(function(p,k){var f=FLOW[k];
+  s+='<g><title>'+esc(f[1]+" — "+f[3]+" "+f[4])+'</title>'+card(p[0],p[1],p[2],62,p[3],"","")+
+   '<text x="'+(p[0]+11)+'" y="'+(p[1]+21)+'" font-size="11" font-weight="700" fill="#12232b">'+
+   esc(f[0])+". "+esc(f[1])+'</text>'+
+   '<text x="'+(p[0]+11)+'" y="'+(p[1]+38)+'" font-size="9.5" fill="#5a6a78">'+esc(f[2])+'</text>'+
+   '<text x="'+(p[0]+11)+'" y="'+(p[1]+53)+'" font-size="9" fill="'+ZC[p[3]].col+'">'+esc(p[3])+'</text></g>';});
+ function link(i,j,lab,cls){var A=P[i],B=P[j];
+  var col=cls==="R"?"#c0453c":(cls==="B"?ZC["TZ-4"].col:"#7fa8c0"),mk=cls==="B"?"arw":"ar";
+  if(A[0]===B[0]){ /* same column: short vertical hop */
+   var x=A[0]+A[2]/2,y1=A[1]+62,y2=B[1];
+   s+='<path d="M'+x+' '+y1+' L'+x+' '+y2+'" stroke="'+col+'" stroke-width="1.7" fill="none" marker-end="url(#'+
+    mk+')"/>';
+   s+='<text x="'+(x+7)+'" y="'+((y1+y2)/2+4)+'" font-size="9" fill="'+col+'">'+esc(lab)+'</text>';
+  }else{ /* adjacent columns: horizontal with a gentle bend */
+   var x1=A[0]+A[2],y1b=A[1]+31,x2=B[0],y2b=B[1]+31;
+   s+='<path d="M'+x1+' '+y1b+' C'+(x1+22)+' '+y1b+' '+(x2-22)+' '+y2b+' '+x2+' '+y2b+
+    '" stroke="'+col+'" stroke-width="1.7" fill="none" marker-end="url(#'+mk+')"/>';
+   /* label rides vertically in the gap between columns so it never sits on a card */
+   var mx=(x1+x2)/2,my=(y1b+y2b)/2;
+   s+='<text transform="translate('+mx+','+my+') rotate(-90)" text-anchor="middle" font-size="9" fill="'+col+
+    '">'+esc(lab)+'</text>';}}
+ link(0,1,"authorisation","");
+ link(1,2,"raw evidence · Restricted","R");
+ link(2,3,"artefacts · Restricted","R");
+ link(3,4,"identified corpus","B");
+ link(4,5,"redacted text · Confidential","");
+ link(5,6,"draft findings","");
+ link(6,7,"verified findings","");
+ link(7,8,"report · Restricted","R");
+ s+='<line x1="482" y1="52" x2="482" y2="276" stroke="'+ZC["TZ-4"].col+'" stroke-width="2.4" stroke-dasharray="7 4"/>';
+ s+='<line x1="672" y1="52" x2="672" y2="276" stroke="'+ZC["TZ-4"].col+'" stroke-width="2.4" stroke-dasharray="7 4"/>';
+ s+='<text x="577" y="292" text-anchor="middle" font-size="10" font-weight="700" fill="#8a5a12">'+
+  'TZ-4 · nothing crosses right of here identified</text>';
+ s+='<rect x="14" y="310" width="1132" height="36" rx="8" fill="#fff" stroke="#c9d6dd" stroke-width="1.3"'+
+  ' stroke-dasharray="5 3" filter="url(#rz)"/>';
+ s+='<text x="30" y="332" font-size="10.5" font-weight="700" fill="#1b4965">10. '+esc(FLOW[9][1])+
+  '<tspan font-weight="400" fill="#5a6a78"> — runs against every store in every zone above, and is the only '+
+  'stage that touches all of them</tspan></text>';
+ s+='<text x="14" y="372" font-size="10.5" font-weight="700" fill="#1b4965">DATA CARRIED</text>';
+ var leg=[["Restricted — real client identifiers","#c0453c"],
+  ["Confidential — de-identified working material","#7fa8c0"],
+  ["Crossing the de-identification boundary","#c99a4a"]];
+ var lx=14;leg.forEach(function(l){
+  s+='<line x1="'+lx+'" y1="392" x2="'+(lx+26)+'" y2="392" stroke="'+l[1]+'" stroke-width="2.2"/>';
+  s+='<text x="'+(lx+32)+'" y="396" font-size="10" fill="#5a6a78">'+esc(l[0])+'</text>';
+  lx+=l[0].length*5.9+62;});
+ s+='</svg>';
+ var h='<div class="panel"><h3>End-to-end data flow</h3><p class="note">Ten stages, left to right across five '+
+  'trust zones. Every arrow carries a label naming the data and its classification. The amber pair of lines is '+
+  'the de-identification boundary — the one-way valve the whole design turns on.</p><div class="arch">'+s+
+  '</div>'+zoneKey(["TZ-3","TZ-4","TZ-5","TZ-6"])+'</div>';
+ h+='<div class="panel"><h3>Stage by stage</h3><table><thead><tr><th>#</th><th>Stage</th><th>Zone</th>'+
+  '<th>What happens</th><th>Why it is here</th><th>Controls</th></tr></thead><tbody>'+
+  FLOW.map(function(f){return '<tr><td class="when"><b>'+esc(f[0])+'</b></td><td><b>'+esc(f[1])+
+   '</b></td><td class="when">'+esc(f[2])+'</td><td>'+esc(f[3])+'</td><td style="color:var(--ink-soft)">'+
+   esc(f[4])+'</td><td class="when">'+esc(f[5])+'</td></tr>';}).join("")+'</tbody></table></div>';
+ h+='<div class="panel"><h3>What must never cross a boundary</h3><p class="note">Six rules. A design question '+
+  'without an obvious answer is usually one that breaks one of these.</p><table><tbody>'+
+  NEVER.map(function(n){return '<tr><td style="width:300px"><b style="color:var(--crit)">'+esc(n[0])+
+   '</b></td><td>'+esc(n[1])+'</td></tr>';}).join("")+'</tbody></table></div>';
+ document.getElementById("viewFlow").innerHTML=h;}
+
+function renderStores(){
+ var h='<div class="panel"><h3>Every store, and what governs it</h3><p class="note">Eleven stores. Each one has '+
+  'a classification, a key, a retention period and a named reader — and a deletion path that stage 10 exercises. '+
+  'The row that matters most is the token map: it is the only thing that can reverse de-identification, and the '+
+  'agent cannot read it.</p><table><thead><tr><th>Store</th><th>What is in it</th><th>Classification</th>'+
+  '<th>Where and how encrypted</th><th>Retention</th><th>Who can read it</th></tr></thead><tbody>'+
+  STORES.map(function(r){var crit=r[2]==="Restricted";
+   return '<tr><td><b>'+esc(r[0])+'</b></td><td>'+esc(r[1])+'</td><td><span class="tag '+
+   (crit?"t-crit":"t-mod")+'">'+esc(r[2])+'</span></td><td class="when">'+esc(r[3])+'</td>'+
+   '<td class="when">'+esc(r[4])+'</td><td>'+esc(r[5])+'</td></tr>';}).join("")+'</tbody></table></div>';
+ h+='<div class="panel"><h3>Deletion, and why it is the hard one</h3><p class="note">A deletion commitment is '+
+  'not met while a derived copy remains.</p><table><tbody>'+
+  [["Enumerate before you promise","The list of derived copies is always longer than expected: corpus, index, embeddings, caches, prompt logs, backups, snapshots and the provider's retained prompt content."],
+   ["Destroy the key, not just the objects","One customer-managed key per client means destruction is provable in a sentence rather than demonstrated across eleven stores."],
+   ["Backups are where this fails quietly","Backup retention must not exceed the retention of the data inside it, and that has to be stated honestly to the client rather than assumed."],
+   ["The provider is not you","Deleting your copy does not discharge a commitment where a model provider retains prompt content. Trace it through, and evidence zero-retention by both the setting and the contract clause."]]
+   .map(function(r){return '<tr><td style="width:280px"><b>'+esc(r[0])+'</b></td><td>'+esc(r[1])+
+    '</td></tr>';}).join("")+'</tbody></table></div>';
+ document.getElementById("viewStores").innerHTML=h;}
+
+
+/* ---------- OV-1 high-level operational concept ---------- */
+function renderOv1(){
+ var W=1160,H=560,s='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+
+  '" xmlns="http://www.w3.org/2000/svg">'+defs();
+ s+='<text x="14" y="20" font-size="12.5" font-weight="700" fill="#1b4965">OV-1 · HIGH-LEVEL OPERATIONAL CONCEPT</text>';
+ s+='<text x="14" y="38" font-size="10.5" fill="#5a6a78">What the system does, for whom, and across which trust boundaries. Left to right is the mission thread.</text>';
+ s+=shell(14,56,250,196,"TZ-6","Customer","Client-controlled systems and people");
+ s+=tile(28,104,222,"Client systems and evidence sources","TZ-6","cloud");
+ s+=tile(28,134,222,"Client security or compliance lead","TZ-6","person");
+ s+=tile(28,164,222,"Issues scoped, named credentials","TZ-6","key");
+ s+=tile(28,194,222,"Receives the report","TZ-6","doc");
+ s+=tile(28,224,222,"Sets AI restrictions in the engagement","TZ-6","shield");
+ s+=shell(300,56,236,196,"TZ-1","Edge","The only public entry point");
+ s+=tile(314,104,208,"DNS · DNSSEC signed","TZ-1","globe");
+ s+=tile(314,134,208,"CDN · TLS 1.3 termination","TZ-1","lock");
+ s+=tile(314,164,208,"WAF · managed rules","TZ-1","shield");
+ s+=tile(314,194,208,"Rate limits · tighter on agents","TZ-1","shield");
+ s+=tile(314,224,208,"Load balancer · origin locked","TZ-1","cloud");
+ s+=shell(572,56,300,196,"TZ-3","PromptHalo — identified zone","Real identifiers exist only here");
+ s+=tile(586,104,272,"Collection under written authority","TZ-3","key");
+ s+=tile(586,134,272,"Per-client landing zone · own CMK","TZ-3","db");
+ s+=tile(586,164,272,"Curation · classify and tag at landing","TZ-3","doc");
+ s+=tile(586,194,272,"Token map · separate account","TZ-3","key");
+ s+=tile(586,224,272,"Report assembly · re-identifies here","TZ-3","doc");
+ s+=shell(908,56,238,196,"TZ-5","Agent zone","De-identified text only");
+ s+=tile(922,104,210,"Agent runtime · scoped identity","TZ-5","bot");
+ s+=tile(922,134,210,"Tool broker · allow-list","TZ-5","shield");
+ s+=tile(922,164,210,"Per-engagement index","TZ-5","db");
+ s+=tile(922,194,210,"Human approval gate","TZ-5","person");
+ s+=tile(922,224,210,"Evaluation harness","TZ-5","shield");
+ /* boundary marker between identified and agent zones */
+ s+='<line x1="890" y1="50" x2="890" y2="262" stroke="'+ZC["TZ-4"].col+'" stroke-width="2.4" stroke-dasharray="7 4"/>';
+ s+='<text x="890" y="266" text-anchor="middle" font-size="10" font-weight="700" fill="#8a5a12">TZ-4 · nothing crosses identified</text>';
+ s+=shell(14,300,522,110,"TZ-2","Corporate identity and device","Issues assertions; holds no client data");
+ s+=tile(28,346,160,"Workspace IdP · SAML","TZ-2","person");
+ s+=tile(196,346,150,"Phishing-resistant MFA","TZ-2","lock");
+ s+=tile(354,346,168,"Device posture verified","TZ-2","shield");
+ s+=tile(28,376,236,"IAM Identity Center · 1-hour sessions","TZ-2","key");
+ s+=tile(272,376,250,"JIT elevation · no standing prod","TZ-2","key");
+ s+=shell(572,300,300,110,"TZ-7","Model providers","Subprocessors; Bedrock in-account preferred");
+ s+=tile(586,346,272,"Bedrock via PrivateLink · pinned version","TZ-7","cloud");
+ s+=tile(586,376,272,"Zero retention evidenced twice","TZ-7","lock");
+ s+=shell(908,300,238,110,"TZ-8","Log archive","Write-once, separate account");
+ s+=tile(922,346,210,"CloudTrail org trail · Object Lock","TZ-8","db");
+ s+=tile(922,376,210,"13 months · 90 days queryable","TZ-8","db");
+ /* mission thread */
+ s+='<path d="M264 154 L300 154" stroke="#7fa8c0" stroke-width="2" marker-end="url(#ar)" fill="none"/>';
+ s+='<path d="M536 154 L572 154" stroke="#7fa8c0" stroke-width="2" marker-end="url(#ar)" fill="none"/>';
+ s+='<path d="M872 154 L908 154" stroke="'+ZC["TZ-4"].col+'" stroke-width="2" marker-end="url(#arw)" fill="none"/>';
+ /* return path routed under the group boxes so it crosses no card */
+ s+='<path d="M1027 252 L1027 288 L139 288 L139 254" stroke="#7fa8c0" stroke-width="1.6" fill="none" '+
+  'marker-end="url(#ar)" stroke-dasharray="4 3"/>';
+ s+='<rect x="470" y="278" width="226" height="16" fill="#fff"/>';
+ s+='<text x="583" y="290" text-anchor="middle" font-size="9.5" fill="#5a6a78">verified findings return as a report</text>';
+ s+='<text x="14" y="440" font-size="12.5" font-weight="700" fill="#1b4965">MISSION THREAD</text>';
+ var thread=["Client authorises scope","Evidence collected","Landed and classified",
+  "De-identified","Agent analyses","Human verifies","Report assembled","Delivered, then destroyed"];
+ var tx=14;thread.forEach(function(t,k){var w=128;
+  s+=tile(tx,452,w,(k+1)+". "+t,k===3?"TZ-4":(k<3?"TZ-3":(k<6?"TZ-5":"TZ-3")),null);
+  if(k<thread.length-1)s+='<text x="'+(tx+w+3)+'" y="'+469+'" font-size="11" fill="#9ab8ca">›</text>';
+  tx+=w+12;});
+ s+='</svg>';
+ var h='<div class="panel"><h3>OV-1 — high-level operational concept</h3><p class="note">One picture of what the '+
+  'system does and across which boundaries. Trust zones are distinguished by border rather than fill: solid for '+
+  'zones we control, dashed for external parties, amber for the de-identification boundary.</p>'+
+  '<div class="arch">'+s+'</div>'+zoneKey(["TZ-1","TZ-2","TZ-3","TZ-4","TZ-5","TZ-6","TZ-7","TZ-8"])+'</div>';
+ h+='<div class="panel"><h3>Trust zones</h3><table><thead><tr><th>Zone</th><th>Name</th><th>Classification</th>'+
+  '<th>What lives there</th></tr></thead><tbody>'+ZONES.map(function(z){
+  return '<tr><td><b style="color:'+z[3]+'">'+esc(z[0])+'</b></td><td><b>'+esc(z[1])+'</b></td>'+
+   '<td class="when">'+esc(z[2])+'</td><td>'+esc(z[5])+'</td></tr>';}).join("")+'</tbody></table></div>';
+ document.getElementById("viewOv1").innerHTML=h;}
+
+/* ---------- OV-2 operational resource flow ---------- */
+function renderOv2(){
+ var COLS=[["TZ-6","Customer",2],["TZ-2","Identity",1],["TZ-3","Identified zone",5],
+  ["TZ-4","Boundary",5],["TZ-5","Agent zone",3],["TZ-MIX","Provider and archive",2]];
+ var N=[["N1","Client system","TZ-6",0,0,"cloud"],["N12","Client recipient","TZ-6",0,1,"person"],
+  ["N14","Identity provider","TZ-2",1,0,"person"],
+  ["N2","Collection service","TZ-3",2,0,"key"],["N3","Landing zone","TZ-3",2,1,"db"],
+  ["N4","Curation","TZ-3",2,2,"doc"],["N10","Report assembly","TZ-3",2,3,"doc"],
+  ["N11","Token map","TZ-3",2,4,"key"],
+  ["N5","De-identification","TZ-4",3,2,"shield"],
+  ["N6","Agent runtime","TZ-5",4,0,"bot"],["N7","Tool broker","TZ-5",4,1,"shield"],
+  ["N9","Human verifier","TZ-5",4,2,"person"],
+  ["N8","Model provider","TZ-7",5,0,"cloud"],["N13","Log archive","TZ-8",5,1,"db"]];
+ var L=[["N1","N2","Raw evidence · Restricted","HTTPS / API, scoped role"],
+  ["N2","N3","Raw artefacts · Restricted","S3 PutObject, SSE-KMS client CMK"],
+  ["N3","N4","Artefacts · Restricted","S3 event → Lambda"],
+  ["N4","N5","Classified artefacts · Restricted","Internal, mTLS"],
+  ["N5","N6","De-identified text · Confidential","S3 GetObject, platform CMK"],
+  ["N5","N11","Token↔value map · Restricted","KMS-wrapped write, separate account"],
+  ["N6","N7","Proposed tool call · Confidential","mTLS, JSON Schema validated"],
+  ["N7","N8","Prompt · Confidential, redacted","Bedrock over PrivateLink"],
+  ["N7","N9","Irreversible action · pending","Approval request, logged"],
+  ["N6","N10","Draft findings · Confidential","Internal"],
+  ["N9","N10","Verified findings · Confidential","Signed by named verifier"],
+  ["N11","N10","Re-identification · Restricted","Assembly role only"],
+  ["N10","N12","Report · Restricted","TLS 1.3, expiring link, hash logged"],
+  ["N14","N2","Assertion · none","SAML 2.0 / OIDC + STS"],
+  ["N7","N13","Tool call trace · Confidential","CloudWatch → S3 Object Lock"],
+  ["N2","N13","Access trail · Confidential","CloudTrail org trail"]];
+ var CW=182,GAP=10,X0=14,Y0=92,RH=66,NH=50;
+ var rows=Math.max.apply(null,COLS.map(function(c){return c[2];}));
+ var W=X0*2+6*CW+5*GAP,H=Y0+rows*RH+40;
+ var s='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">'+defs();
+ s+='<text x="14" y="22" font-size="13" font-weight="700" fill="#1b4965">OV-2 · OPERATIONAL RESOURCE FLOW</text>';
+ s+='<text x="14" y="40" font-size="10.5" fill="#5a6a78">Fourteen nodes and sixteen needlines. Hover a line for '+
+  'the resource it carries and the protocol.</text>';
+ COLS.forEach(function(c,k){var x=X0+k*(CW+GAP);
+  s+=shell(x,Y0-16,CW,c[2]*RH+10,c[0],"","");
+  s+='<text x="'+(x+8)+'" y="'+(Y0-24)+'" font-size="9.5" font-weight="700" fill="'+
+   (ZC[c[0]]?ZC[c[0]].col:"#5a6a78")+'">'+esc(c[1])+'</text>';});
+ var P={};N.forEach(function(n){P[n[0]]={x:X0+n[3]*(CW+GAP)+10,y:Y0+n[4]*RH,w:CW-20,h:NH};});
+ L.forEach(function(l){var a=P[l[0]],b=P[l[1]];if(!a||!b)return;
+  var x1,y1,x2,y2;
+  if(a.x===b.x){var ud=a.y<b.y;x1=a.x+a.w/2;y1=ud?a.y+a.h:a.y;x2=x1;y2=ud?b.y:b.y+b.h;}
+  else{var lr=a.x<b.x;x1=lr?a.x+a.w:a.x;y1=a.y+a.h/2;x2=lr?b.x:b.x+b.w;y2=b.y+b.h/2;}
+  var col=l[2].indexOf("Restricted")>=0?"#C0453C":"#7fa8c0";
+  s+='<g><title>'+esc(l[2]+" — "+l[3])+'</title>'+
+   '<path d="M'+x1+' '+y1+' C'+((x1+x2)/2)+' '+y1+' '+((x1+x2)/2)+' '+y2+' '+x2+' '+y2+
+   '" stroke="'+col+'" stroke-width="1.5" stroke-opacity="0.7" fill="none" marker-end="url(#ar)"/></g>';});
+ N.forEach(function(n){var p=P[n[0]];
+  s+=card(p.x,p.y,p.w,p.h,n[2],"","");
+  s+=icon(n[5],p.x+11,p.y+10);
+  s+='<text x="'+(p.x+30)+'" y="'+(p.y+19)+'" font-size="10.5" font-weight="700" fill="#12232b">'+
+   esc(n[1])+'</text>';
+  s+='<text x="'+(p.x+11)+'" y="'+(p.y+38)+'" font-size="9" fill="'+ZC[n[2]].col+'">'+
+   esc(n[0]+" · "+n[2])+'</text>';});
+ s+='</svg>';
+ var h='<div class="panel"><h3>OV-2 — operational resource flow</h3><p class="note">Nodes grouped by trust zone. '+
+  'Red needlines carry Restricted material; blue carry Confidential or less. The zone bands are colour only — no '+
+  'border — so the raised nodes read as the objects and the bands as the context.</p><div class="arch">'+s+
+  '</div>'+zoneKey(["TZ-2","TZ-3","TZ-4","TZ-5","TZ-6"])+'</div>';
+ h+='<div class="panel"><h3>Needlines — what crosses, and how</h3><table><thead><tr><th>From</th><th>To</th>'+
+  '<th>Resource and classification</th><th>Interface and protocol</th></tr></thead><tbody>'+
+  L.map(function(l){var fn=N.filter(function(n){return n[0]===l[0];})[0],
+   tn=N.filter(function(n){return n[0]===l[1];})[0];
+   var r=l[2].indexOf("Restricted")>=0;
+   return '<tr><td class="when"><b>'+esc(l[0])+'</b> '+esc(fn?fn[1]:"")+'</td><td class="when"><b>'+esc(l[1])+
+    '</b> '+esc(tn?tn[1]:"")+'</td><td'+(r?' style="color:var(--crit);font-weight:600"':'')+'>'+esc(l[2])+
+    '</td><td>'+esc(l[3])+'</td></tr>';}).join("")+'</tbody></table></div>';
+ document.getElementById("viewOv2").innerHTML=h;}
+
+
+/* ---------- overlay diagrams: one base, six concerns ---------- */
+var OV={cur:"cls"};
+function renderOvl(){
+ var o=OVL.filter(function(x){return x.id===OV.cur;})[0]||OVL[0];
+ var COLW=186,COLGAP=8,ROWH=74,X0=14,Y0=114;
+ var ZONECOL=["TZ-6","TZ-1","TZ-3","TZ-4","TZ-5","TZ-MIX"];
+ var ZONELAB=["Customer","Edge and identity","Identified zone","Boundary","Agent zone","Assembly, provider, archive · mixed zones"];
+ var W=X0*2+6*COLW+5*COLGAP,H=Y0+4*ROWH+30;
+ var s='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">'+defs();
+ s+='<text x="14" y="22" font-size="13" font-weight="700" fill="#1b4965">'+esc(o.name.toUpperCase())+'</text>';
+ s+='<text x="14" y="40" font-size="10.5" fill="#5a6a78">'+esc(o.blurb)+'</text>';
+ var lx=14;o.legend.forEach(function(l){
+  s+='<rect x="'+lx+'" y="56" width="13" height="13" rx="3" fill="'+l[1]+'" stroke="rgba(0,0,0,.12)"/>';
+  s+='<text x="'+(lx+19)+'" y="66" font-size="10" fill="#5a6a78">'+esc(l[0])+'</text>';
+  lx+=l[0].length*5.6+40;});
+ for(var c=0;c<6;c++){var x=X0+c*(COLW+COLGAP);
+  s+=shell(x,Y0-18,COLW,4*ROWH+6,ZONECOL[c],"","");
+  var zc=ZC[ZONECOL[c]]?ZC[ZONECOL[c]].col:"#5a6a78";
+  s+='<text x="'+(x+8)+'" y="'+(Y0-26)+'" font-size="9.5" font-weight="700" fill="'+zc+'">'+
+   esc(ZONELAB[c])+'</text>';}
+ ONODES.forEach(function(n){
+  var cell=o.cells[n[0]]||["","","—"];
+  var x=X0+n[3]*(COLW+COLGAP)+10,y=Y0+n[4]*ROWH;
+  var fill=o.legend[["S","F","K","O","R","A"].indexOf(cell[1])>=0?0:0];
+  /* colour comes from the level letter mapped onto the legend order */
+  var idx={"R":0,"K":0,"A":0,"S":0,"B":2,"X":3,"C":1,"P":2,"I":2,"T":2,"N":3,"V":3,"W":2,"F":0,"O":0}[cell[1]];
+  if(idx===undefined)idx=3;
+  var col=o.legend[Math.min(idx,o.legend.length-1)][1];
+  s+='<g><title>'+esc(n[1]+" — "+cell[0]+". "+cell[2])+'</title>'+
+   card(x,y,COLW-20,58,n[2],"","")+
+   '<rect x="'+x+'" y="'+y+'" width="5" height="58" rx="2.5" fill="'+col+'"/>'+
+   '<text x="'+(x+14)+'" y="'+(y+18)+'" font-size="10.5" font-weight="700" fill="#12232b">'+esc(n[1])+'</text>'+
+   '<text x="'+(x+14)+'" y="'+(y+34)+'" font-size="9.5" fill="#5a6a78">'+esc(n[0])+' · '+esc(n[2])+'</text>'+
+   '<rect x="'+(x+14)+'" y="'+(y+40)+'" width="'+Math.min(COLW-48,cell[0].length*5.9+14)+
+   '" height="14" rx="4" fill="'+col+'" fill-opacity="0.45"/>'+
+   '<text x="'+(x+21)+'" y="'+(y+50.5)+'" font-size="9" font-weight="700" fill="#2a3942">'+esc(cell[0])+
+   '</text></g>';});
+ s+='</svg>';
+ var h='<div class="panel"><h3>Overlay diagrams</h3><p class="note">One base architecture, six concerns laid '+
+  'over it. The base never changes, so the differences between overlays are the differences that matter. Hover '+
+  'any component for the detail.</p><div class="bar" style="padding:0 0 12px;background:transparent;border:0">'+
+  OVL.map(function(x){return '<button class="btn'+(x.id===OV.cur?" primary":"")+'" data-ovl="'+x.id+'">'+
+   esc(x.name.split(" —")[0])+'</button>';}).join("")+'</div><div class="arch">'+s+'</div></div>';
+ h+='<div class="panel"><h3>'+esc(o.name)+' — component by component</h3><table><thead><tr><th>Node</th>'+
+  '<th>Component</th><th>Zone</th><th>Value</th><th>Detail</th></tr></thead><tbody>'+
+  ONODES.map(function(n){var c=o.cells[n[0]]||["—","","—"];
+   return '<tr><td class="when"><b>'+esc(n[0])+'</b></td><td><b>'+esc(n[1])+'</b></td>'+
+    '<td class="when" style="color:'+ZC[n[2]].col+'">'+esc(n[2])+'</td>'+
+    '<td class="when"><b>'+esc(c[0])+'</b></td><td>'+esc(c[2])+'</td></tr>';}).join("")+
+  '</tbody></table></div>';
+ document.getElementById("viewOvl").innerHTML=h;
+ [].forEach.call(document.querySelectorAll("#viewOvl [data-ovl]"),function(b){
+  b.addEventListener("click",function(){OV.cur=b.getAttribute("data-ovl");renderOvl();});});}
+
+/* ---------- interfaces and configuration ---------- */
+function renderIface(){
+ var h='<div class="panel"><h3>Interfaces, protocols and configuration</h3><p class="note">Twelve interfaces with '+
+  'the protocol, the configuration that makes it safe, and the reason. These are the settings that turn the '+
+  'diagrams into something operable.</p></div>';
+ h+='<div class="cards">'+IFACE.map(function(f){
+  return '<div class="card" style="margin-left:0"><div class="chd">'+
+   '<span class="seq">'+esc(f[0])+'</span>'+
+   '<span class="cact" style="font-size:13.5px;color:#1b4965">'+esc(f[1])+'</span>'+
+   '<span class="tag t-mod">'+esc(f[2])+'</span></div>'+
+   '<p style="margin:0 0 8px;font-size:12.5px;color:var(--ink-soft)">'+esc(f[3])+'</p>'+
+   '<div class="how"><div><h5>Configuration</h5><p>'+esc(f[4])+'</p></div>'+
+   '<div><h5>Why these settings</h5><p>'+esc(f[5])+'</p></div>'+
+   '<div><h5>How it is proved</h5><p>'+esc(f[6])+'</p></div></div></div>';}).join("")+'</div>';
+ document.getElementById("viewIface").innerHTML=h;}
+
+
+/* ---------- model strategy ---------- */
+function renderModel(){
+ var h='<div class="panel"><h3>Which model, and what it costs you architecturally</h3><p class="note">'+
+  'Verified against Anthropic documentation on 6 August 2026. Model availability moves — check before committing, '+
+  'and note that access to this tier was suspended on 12 June 2026 and restored on 1 July.</p>'+
+  '<table><thead><tr><th>Model ID</th><th>Tier</th><th>Availability</th><th>Safeguards</th><th>Context</th>'+
+  '<th>Price</th><th>Retention</th></tr></thead><tbody>'+
+  MODELS.map(function(m){var ga=m[2].indexOf("Limited")<0;
+   return '<tr><td class="when"><b>'+esc(m[0])+'</b></td><td><b>'+esc(m[1])+'</b></td>'+
+    '<td><span class="tag '+(ga?"t-auto":"t-crit")+'">'+esc(m[2])+'</span></td><td>'+esc(m[3])+'</td>'+
+    '<td class="when">'+esc(m[4])+'</td><td class="when">'+esc(m[5])+'</td>'+
+    '<td class="when">'+esc(m[6])+'</td></tr>';}).join("")+'</tbody></table></div>';
+ h+='<div class="cards">'+MODELS.map(function(m){
+  return '<div class="card" style="margin-left:0"><div class="chd">'+
+   '<span class="seq">'+esc(m[1])+'</span><span class="cact">'+esc(m[0])+'</span>'+
+   '<span class="tag t-mod">'+esc(m[5])+'</span></div>'+
+   '<p style="margin:0;font-size:12.5px;color:var(--ink-soft)">'+esc(m[7])+'</p></div>';}).join("")+'</div>';
+ h+='<div class="panel" style="margin-top:14px"><h3>Five consequences for this architecture</h3>'+
+  '<p class="note">Two of these change the design rather than just the configuration.</p><table><tbody>'+
+  MNOTES.map(function(n,k){return '<tr><td style="width:300px"><b style="color:'+(k<2?"var(--crit)":"var(--petrol)")+
+   '">'+esc(n[0])+'</b></td><td>'+esc(n[1])+'</td></tr>';}).join("")+'</tbody></table></div>';
+ h+='<div class="panel"><h3>Routing design</h3><p class="note">The router is a control, not just a cost lever — '+
+  'it decides which class of data meets which retention regime.</p><table><thead><tr><th>Work</th>'+
+  '<th>Model</th><th>Why</th></tr></thead><tbody>'+
+  [["Extraction, classification, normalisation of collected artefacts","Sonnet tier",
+    "Highest token volume, lowest reasoning demand. Runs on de-identified text and can use a zero-retention tier."],
+   ["Control analysis, finding drafting, report prose","Opus tier",
+    "The bulk of the reasoning. Cheaper per token by a wide margin and adequate for almost all of it."],
+   ["Long-horizon agentic work across a whole engagement corpus","Fable 5",
+    "Where the 1M context and frontier reasoning genuinely earn the price. Expect occasional refusals on cyber-adjacent analysis and fall back."],
+   ["Offensive-cyber reasoning with safeguards lifted","Mythos 5, if approved",
+    "Project Glasswing only. Architect as though you will not have it; treat arrival as a model-ID change."]]
+   .map(function(r){return '<tr><td><b>'+esc(r[0])+'</b></td><td class="when">'+esc(r[1])+'</td><td>'+
+    esc(r[2])+'</td></tr>';}).join("")+'</tbody></table></div>';
+ h+='<div class="panel"><h3>Refusal and fallback — the integration pattern</h3><table><tbody>'+
+  [["Detect","Treat a refusal as a distinct outcome, not an error and not an answer. Fable 5 returns a decline rather than failing the call."],
+   ["Fall back","Retry once on a different Claude model with the same prompt. Record which model produced the output that reached a human."],
+   ["Log","Every refusal with the prompt class, not the prompt content. A rising refusal rate is a signal about how you are framing the work."],
+   ["Never route around a refusal by rephrasing automatically","An agent that reformulates until something answers has defeated the safeguard, and that is a decision no automated system should make on its own."],
+   ["Bill for it","Refusals are billable. Budget alarms should count them."]]
+   .map(function(r){return '<tr><td style="width:250px"><b>'+esc(r[0])+'</b></td><td>'+esc(r[1])+
+    '</td></tr>';}).join("")+'</tbody></table></div>';
+ document.getElementById("viewModel").innerHTML=h;}
+
+/* ---------- build plan ---------- */
+function filters(){return {q:(document.getElementById("q").value||"").toLowerCase(),
+ s:document.getElementById("fStatus").value,c:document.getElementById("fCrit").value,
+ e:document.getElementById("fEff").value,sort:document.getElementById("sortBy").value};}
+function match(i,f){var st=itm(i.id);
+ if(f.s&&st.status!==f.s)return false;
+ if(f.c&&i.c!==f.c)return false;
+ if(f.e&&i.eff!==f.e)return false;
+ if(f.q&&!(i.id+" "+i.t+" "+i.d+" "+i.how+" "+i.tool).toLowerCase().includes(f.q))return false;
+ return true;}
+function sortIt(a,how){var o={crit:0,high:1,mod:2,low:3};
+ return a.slice().sort(function(x,y){if(how==="crit")return o[x.c]-o[y.c]||x.p-y.p;
+  if(how==="hrs")return y.hrs-x.hrs||x.p-y.p;return x.p-y.p;});}
+function renderBuild(){var f=filters(),h="",shown=0;
+ GROUPS.forEach(function(g){
+  var items=sortIt(g.items.filter(function(i){return match(i,f);}),f.sort);
+  if(!items.length)return;shown+=items.length;
+  var st={done:0,prog:0,open:0,na:0},hrs=0;
+  g.items.forEach(function(i){st[itm(i.id).status]++;hrs+=i.hrs;});
+  var open=!state.collapsed[g.id];
+  h+='<section class="grp"><div class="grp-hd" data-toggle="'+g.id+'" tabindex="0" role="button">'+
+   '<span class="car">'+(open?"▾":"▸")+'</span><div><h3>'+esc(g.id)+'. '+esc(g.name)+'</h3>'+
+   '<div class="gd">'+esc(g.desc)+'</div></div><span class="pill">'+
+   '<span class="tag t-auto">'+st.done+' built</span><span class="tag t-high">'+st.prog+' active</span>'+
+   '<span class="tag t-low">'+st.open+' to do</span><span class="tag t-hr">'+hrs+' h</span>'+
+   '<span class="pbar" title="'+pctWeighted(g.items)+'% complete, weighted by estimated hours"><i style="width:'+
+   pctWeighted(g.items)+'%"></i></span><span class="pval">'+pctWeighted(g.items)+'%</span></span></div>';
+  if(open){h+='<div>'+items.map(function(i){var s=itm(i.id);
+   return '<div class="item" data-id="'+esc(i.id)+'"><div class="it-top">'+
+    '<span class="seq">'+i.p+'</span>'+
+    '<div class="it-t" data-x="'+esc(i.id)+'">'+esc(i.t)+
+     '<div class="it-d">'+esc(i.d)+'</div></div>'+
+    '<span class="tag t-'+i.c+'">'+CRIT[i.c]+'</span>'+
+    '<span class="tag t-'+i.eff+'">'+EFF[i.eff]+'</span>'+
+    '<span class="tag t-hr">'+i.hrs+' h</span>'+
+    '<span class="tag t-cost">'+esc(i.cost)+'</span>'+
+    (s.assignee?'<span class="who-chip" title="Assigned to">'+esc(s.assignee)+'</span>':'')+
+    '<span class="pbar" title="'+pctOf(i)+'% complete"><i style="width:'+pctOf(i)+'%"></i></span>'+
+    '<span class="pval">'+pctOf(i)+'%</span>'+
+    '<button class="howtg" data-x="'+esc(i.id)+'">'+((state.showHow||state.open[i.id])?"Hide how-to":"How to")+
+    '</button></div>'+
+    ((state.showHow||state.open[i.id])?'<div class="how">'+
+     '<div><h5>How to do it</h5><p>'+esc(i.how)+'</p></div>'+
+     '<div><h5>Why it matters</h5><p>'+esc(i.why)+'</p></div>'+
+     '<div><h5>Tool and cost</h5><p><b>'+esc(i.tool)+'</b> — '+esc(i.cost)+
+      '<br>Estimate: '+i.hrs+' hours · '+EFF[i.eff]+'</p></div></div>':'')+
+    '<div class="fields"><label>Status</label><select data-f="status">'+
+     ["open","prog","done","na"].map(function(k){return '<option value="'+k+'"'+(s.status===k?" selected":"")+
+      '>'+STAT[k]+'</option>';}).join("")+'</select>'+
+     '<label>Owner</label><select data-f="owner">'+
+     ["","Platform","Engineering","Security Officer","External"].map(function(k){return '<option value="'+k+'"'+
+      ((s.owner||i.who)===k?" selected":"")+'>'+(k||"—")+'</option>';}).join("")+'</select>'+
+     '<label>Assignee</label><input type="text" data-f="assignee" placeholder="Name" value="'+
+      esc(s.assignee)+'" style="min-width:130px">'+
+     '<label>Progress</label><select data-f="pct">'+
+      ["","0","10","25","50","75","90","100"].map(function(k){return '<option value="'+k+'"'+
+       (String(s.pct)===k?" selected":"")+'>'+(k===""?"from status":k+"%")+'</option>';}).join("")+'</select>'+
+     '<label>Target</label><input type="date" data-f="target" value="'+esc(s.target)+'">'+
+     '<input type="text" data-f="notes" placeholder="Note" value="'+esc(s.notes)+'"></div></div>';}).join("")+
+   '</div>';}
+  h+='</section>';});
+ document.getElementById("viewBuild").innerHTML=h||'<div class="empty">Nothing matches those filters.</div>';
+ document.getElementById("count").textContent=shown+" of "+all().length+" tasks";}
+
+
+
+
+
+
+/* ---------- cost ---------- */
+function renderCost(){
+ var tot=COSTS.reduce(function(a,c){return a+ +c[3];},0);
+ var core=COSTS.filter(function(c){return ["Secureframe or equivalent","External firm, annual",
+  "StackHawk (if authenticated API scanning is needed)","GitHub Team or Enterprise"].indexOf(c[1])<0;})
+  .reduce(function(a,c){return a+ +c[3];},0);
+ var h='<div class="kpis">'+
+  [["Core run rate","$"+core.toLocaleString()+"/yr"],["With audit and pentest","$"+tot.toLocaleString()+"/yr"],
+   ["Build effort",all().reduce(function(a,i){return a+i.hrs;},0)+" hours"],["Tasks",all().length]].map(function(k){
+   return '<div class="kpi"><div class="n" style="font-size:18px">'+k[1]+'</div><div class="l">'+k[0]+
+    '</div></div>';}).join("")+'</div>';
+ h+='<div class="panel"><h3>Tools and annual cost</h3><p class="note">List or benchmark pricing verified '+
+  '6 August 2026, modelled at 15 people, 8 committers, 18 laptops. Budget envelopes, not quotes — Kandji, '+
+  'Secureframe and the pentest are all negotiable.</p>'+
+  '<table><thead><tr><th>Category</th><th>Choice</th><th>Price</th><th>Annual</th><th>Why this one</th>'+
+  '<th>Alternative considered</th></tr></thead><tbody>'+
+  COSTS.map(function(c){return '<tr><td class="when">'+esc(c[0])+'</td><td><b>'+esc(c[1])+'</b></td>'+
+   '<td class="when">'+esc(c[2])+'</td><td class="when">'+(+c[3]?"$"+(+c[3]).toLocaleString():"—")+'</td>'+
+   '<td>'+esc(c[4])+'</td><td style="color:var(--ink-soft)">'+esc(c[5])+'</td></tr>';}).join("")+
+  '<tr class="tot"><td colspan="3">Total including audit, pentest and optional lines</td><td>$'+
+  tot.toLocaleString()+'</td><td colspan="2">Core architecture alone, excluding compliance platform, pentest, '+
+  'GitHub tier and optional DAST: <b>$'+core.toLocaleString()+'</b></td></tr>'+
+  '</tbody></table></div>';
+ h+='<div class="panel"><h3>What is deliberately not bought</h3><p class="note">Two of these are the questions '+
+  'that get asked most often.</p><table><tbody>'+
+  [["IAST","The median Contrast Security contract is about $36,000 a year with a floor near $18,000, and there is no maintained open-source alternative — the community edition covers a single Java or .NET application. At this headcount that money buys the penetration test and every other tool on this list. Revisit at 50 engineers with an AppSec owner."],
+   ["Agentless laptop posture, as marketed","1Password Device Trust and Kolide are commonly described as agentless and their own documentation requires an agent. The honest options are Google Workspace Endpoint Verification, which is lighter but needs the Enterprise tier for Context-Aware Access, or accepting an agent and getting enforcement with it. Agentless is genuine for cloud workloads — Inspector snapshot scanning — and that is where this architecture uses it."],
+   ["CNAPP (Wiz, Orca, Sysdig)","Better products, enterprise minimums. GuardDuty, Security Hub, Config and Prowler produce the same evidence at this scale."],
+   ["A SIEM","At twenty people it is a liability rather than a control. CloudTrail into S3 with Athena meets the retention requirement for a fraction of the cost and the operational load."]]
+   .map(function(r){return '<tr><td style="width:230px"><b>'+esc(r[0])+'</b></td><td>'+esc(r[1])+'</td></tr>';})
+   .join("")+'</tbody></table></div>';
+ document.getElementById("viewCost").innerHTML=h;}
+
+/* ---------- sequence ---------- */
+function renderSeq(){var a=sortIt(all(),"seq"),cum=0;
+ var h='<div class="panel"><h3>Build order</h3><p class="note">Fifty tasks in dependency order, with cumulative '+
+  'effort. Roughly 206 hours — five to six focused weeks for one engineer, or three weeks across two. Order '+
+  'matters more than speed: each item assumes the ones above it exist.</p>'+
+  '<table><thead><tr><th>#</th><th>Task</th><th>Section</th><th>Criticality</th><th>Effort</th>'+
+  '<th>Cumulative</th><th>Assignee</th><th>Progress</th><th>Status</th></tr></thead><tbody>';
+ a.forEach(function(i){cum+=i.hrs;var g=GROUPS.filter(function(x){
+   return x.items.indexOf(i)>=0;})[0];
+  var st=itm(i.id).status;
+  h+='<tr><td class="when">'+i.p+'</td><td><b>'+esc(i.id)+'</b> '+esc(i.t)+'</td>'+
+   '<td class="when">'+esc(g?g.id:"")+'</td><td><span class="tag t-'+i.c+'">'+CRIT[i.c]+'</span></td>'+
+   '<td class="when">'+i.hrs+' h</td><td class="when">'+cum+' h</td>'+
+   '<td class="when">'+esc(itm(i.id).assignee||"—")+'</td>'+
+   '<td class="when"><span class="pbar" style="width:56px"><i style="width:'+pctOf(i)+'%"></i></span> '+
+   pctOf(i)+'%</td>'+
+   '<td class="when">'+STAT[st]+'</td></tr>';});
+ h+='</tbody></table></div>';
+ var byWho={};all().forEach(function(i){var a=itm(i.id).assignee||"Unassigned";
+  if(!byWho[a])byWho[a]=[];byWho[a].push(i);});
+ h+='<div class="panel"><h3>Progress by person</h3><p class="note">Weighted by estimated hours, so a '+
+  'half-finished eight-hour task counts for more than a finished two-hour one.</p><table><thead><tr>'+
+  '<th>Assignee</th><th>Tasks</th><th>Hours</th><th>Progress</th></tr></thead><tbody>'+
+  Object.keys(byWho).sort().map(function(k){var set=byWho[k],hh=0;
+   set.forEach(function(i){hh+=i.hrs;});
+   var pw=pctWeighted(set);
+   return '<tr><td><b>'+esc(k)+'</b></td><td class="when">'+set.length+'</td><td class="when">'+hh+
+    ' h</td><td><span class="pbar" style="width:120px"><i style="width:'+pw+'%"></i></span> '+pw+
+    '%</td></tr>';}).join("")+'</tbody></table></div>';
+ h+='<div class="panel"><h3>The first ten, if you only have a fortnight</h3><p class="note">These ten close the '+
+  'largest exposures and unblock everything else. About 43 hours.</p><ol style="margin:0;padding-left:18px;'+
+  'font-size:12.5px;line-height:1.7">'+a.slice(0,10).map(function(i){
+   return '<li><b>'+esc(i.t)+'</b> — '+i.hrs+' h, '+CRIT[i.c].toLowerCase()+'</li>';}).join("")+'</ol></div>';
+ document.getElementById("viewSeq").innerHTML=h;}
+
+/* ---------- log + meter ---------- */
+function renderMeter(){var a=all(),d=0,p=0,n=0;
+ a.forEach(function(i){var s=itm(i.id).status;if(s==="done")d++;else if(s==="prog")p++;else if(s==="na")n++;});
+ var t=a.length,app=t-n;
+ document.getElementById("barDone").style.width=(d/t*100)+"%";
+ document.getElementById("barProg").style.width=(p/t*100)+"%";
+ document.getElementById("barNa").style.width=(n/t*100)+"%";
+ /* Hours left respects the percentage, so a half-finished task counts as half. */
+ var hrsLeft=0;a.forEach(function(i){if(itm(i.id).status==="na")return;
+  hrsLeft+=i.hrs*(100-pctOf(i))/100;});
+ hrsLeft=Math.round(hrsLeft);
+ var wp=pctWeighted(a);
+ document.getElementById("meterPct").textContent=wp+"% complete, weighted by effort · "+hrsLeft+" hours left";
+ document.getElementById("meterLabel").textContent=d+" built · "+p+" in progress · "+(t-d-p-n)+
+  " not started · "+n+" not applicable";}
+function renderLog(){var host=document.getElementById("viewLog");
+ if(!state.log.length){host.innerHTML='<div class="empty">No changes yet. Set an editor, then move a task — every '+
+  'change is stamped here with who made it.</div>';return;}
+ host.innerHTML='<div class="panel"><h3>Change log</h3><p class="note">'+state.log.length+' change'+
+  (state.log.length===1?"":"s")+', most recent first.</p><table><thead><tr><th>When</th><th>Editor</th>'+
+  '<th>Task</th><th>Field</th><th>Change</th></tr></thead><tbody>'+state.log.map(function(e){
+  return '<tr><td class="when">'+esc(fmt(e.at))+'</td><td><b>'+esc(e.by)+'</b>'+
+   (e.role?'<br><span style="color:var(--ink-soft);font-size:11.5px">'+esc(e.role)+'</span>':'')+
+   '</td><td>'+esc(e.id)+'</td><td>'+esc(e.field)+'</td><td>'+esc(e.from)+' → <b>'+esc(e.to)+
+   '</b></td></tr>';}).join("")+'</tbody></table></div>';}
+function render(){renderMeter();renderArch();renderOv1();renderOv2();renderFlow();renderOvl();renderIface();renderModel();renderStores();renderBuild();renderCost();renderSeq();renderLog();}
+
+document.getElementById("viewBuild").addEventListener("change",function(e){
+ var f=e.target.getAttribute("data-f");if(!f)return;
+ var row=e.target.closest(".item");if(!row)return;
+ var id=row.getAttribute("data-id"),val=e.target.value;
+ /* If no editor is set, ask — then apply the edit rather than discarding it. */
+ if(!state.editor){pending={id:id,f:f,v:val};askEditor();
+  if(!state.editor)return;                      /* dialog path: applied on save */
+  pending=null;}
+ stamp(id,f,val);renderMeter();renderBuild();renderSeq();renderLog();});
+var pending=null;
+document.getElementById("viewBuild").addEventListener("click",function(e){
+ var tg=e.target.closest(".howtg");
+ if(tg){var k=tg.getAttribute("data-x");state.open[k]=!state.open[k];save();renderBuild();return;}
+ var hd=e.target.closest("[data-toggle]");if(!hd)return;
+ var g=hd.getAttribute("data-toggle");state.collapsed[g]=!state.collapsed[g];save();renderBuild();});
+["q","fStatus","fCrit","fEff","sortBy"].forEach(function(id){
+ document.getElementById(id).addEventListener("input",renderBuild);});
+document.getElementById("expandAll").addEventListener("click",function(){state.collapsed={};save();renderBuild();});
+document.getElementById("collapseAll").addEventListener("click",function(){
+ GROUPS.forEach(function(g){state.collapsed[g.id]=true;});save();renderBuild();});
+document.getElementById("showHow").addEventListener("click",function(){state.showHow=!state.showHow;
+ this.textContent=state.showHow?"Collapse all how-to":"Expand all how-to";save();renderBuild();});
+document.getElementById("exportCsv").addEventListener("click",function(){
+ var q=function(v){return '"'+String(v==null?"":v).replace(/"/g,'""')+'"';};
+ var rows=[["Section","#","ID","Task","What","How to do it","Why it matters","Criticality","Effort type",
+  "Hours","Tool","Cost","Role","Assignee","Progress %","Status","Target","Notes"]];
+ GROUPS.forEach(function(g){g.items.forEach(function(i){var s=itm(i.id);
+  rows.push([g.name,i.p,i.id,i.t,i.d,i.how,i.why,CRIT[i.c],EFF[i.eff],i.hrs,i.tool,i.cost,
+   s.owner||i.who,s.assignee,pctOf(i),STAT[s.status],s.target,s.notes]);});});
+ var b=new Blob([rows.map(function(r){return r.map(q).join(",");}).join("\n")],{type:"text/csv"});
+ var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="agentic-reference-architecture.csv";
+ a.click();URL.revokeObjectURL(a.href);});
+document.getElementById("exportJson").addEventListener("click",function(){
+ var b=new Blob([JSON.stringify(state,null,1)],{type:"application/json"});
+ var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="agentic-arch-state.json";a.click();
+ URL.revokeObjectURL(a.href);});
+document.getElementById("importBtn").addEventListener("click",function(){document.getElementById("fileIn").click();});
+document.getElementById("fileIn").addEventListener("change",function(e){var f=e.target.files[0];if(!f)return;
+ var r=new FileReader();r.onload=function(){try{var p=JSON.parse(r.result);state.items=p.items||{};
+  state.log=(p.log||[]).concat(state.log).slice(0,600);state.collapsed=p.collapsed||{};
+  if(p.editor)state.editor=p.editor;save();renderWho();render();}catch(err){alert("Could not read that file.");}};
+ r.readAsText(f);e.target.value="";});
+function showTab(v){
+ [].forEach.call(document.querySelectorAll("nav.tabs button"),function(x){
+  x.setAttribute("aria-selected",x.getAttribute("data-view")===v?"true":"false");});
+ ["arch","ov1","ov2","flow","ovl","iface","model","stores","build","cost","seq","log"].forEach(function(k){
+  document.getElementById("view"+k.charAt(0).toUpperCase()+k.slice(1)).hidden=(v!==k);});
+ document.getElementById("toolbar").style.display=(v==="build")?"flex":"none";}
+[].forEach.call(document.querySelectorAll("nav.tabs button"),function(b){
+ b.addEventListener("click",function(){showTab(b.getAttribute("data-view"));});});
+(function init(){
+ GROUPS.forEach(function(g){if(state.collapsed[g.id]===undefined)state.collapsed[g.id]=true;});
+ document.getElementById("showHow").textContent=state.showHow?"Collapse all how-to":"Expand all how-to";
+ renderWho();render();showTab("arch");
+ var hrs=all().reduce(function(a,i){return a+i.hrs;},0);
+ document.getElementById("foot").textContent=all().length+" build tasks · "+hrs+" hours estimated · "+GROUPS.length+" sections · "+
+  (persistent?"changes saved in this browser":"session only")+
+  " · pricing verified 6 August 2026 and negotiable. Internal.";
+})();
+</script></body></html>

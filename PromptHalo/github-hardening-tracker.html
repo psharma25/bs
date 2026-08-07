@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GitHub Hardening Tracker</title>
+<style>
+  :root{
+    --petrol:#1b4965; --petrol-dk:#123449; --petrol-lt:#5fa8d3; --mist:#cae9ff;
+    --paper:#f6f8fa; --line:#d8dee4; --ink:#1c2530; --ink-soft:#5a6a78; --ctrl:#FFA500;
+    --crit:#9b1c1c; --high:#b45309; --mod:#1b4965; --low:#5a6a78;
+    --done:#2e7d32; --prog:#b26a00; --na:#78868f; --open:#8b94a0;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:'Inter','Calibri','Segoe UI',system-ui,-apple-system,sans-serif;background:var(--paper);color:var(--ink);font-size:14px;line-height:1.5}
+  header{background:var(--petrol);color:#fff;padding:18px 24px 0}
+  .hdr-top{display:flex;flex-wrap:wrap;align-items:flex-start;gap:16px;justify-content:space-between}
+  h1{margin:0;font-size:20px;font-weight:600;letter-spacing:.2px}
+  .sub{margin:4px 0 0;font-size:12.5px;color:var(--mist);max-width:660px}
+  .editor-chip{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.28);border-radius:6px;padding:8px 12px;font-size:12.5px;display:flex;align-items:center;gap:10px}
+  .editor-chip button{background:transparent;border:1px solid rgba(255,255,255,.45);color:#fff;border-radius:4px;padding:3px 8px;font-size:11.5px;cursor:pointer;font-family:inherit}
+  .editor-chip button:hover{background:rgba(255,255,255,.16)}
+  .meter-wrap{margin:18px 0 0;padding-bottom:16px}
+  .meter-top{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;color:var(--mist)}
+  .meter{height:8px;background:rgba(255,255,255,.18);border-radius:4px;overflow:hidden;margin-top:6px;display:flex}
+  .meter i{display:block;height:100%}
+  .m-done{background:#7ed492}.m-prog{background:#ffcf6b}.m-na{background:rgba(255,255,255,.32)}
+  .legend{display:flex;gap:16px;margin-top:8px;font-size:11.5px;color:var(--mist);flex-wrap:wrap}
+  .legend span{display:flex;align-items:center;gap:6px}
+  .dot{width:9px;height:9px;border-radius:2px;display:inline-block}
+  nav.tabs{background:var(--petrol-dk);padding:0 24px;display:flex;gap:2px;overflow-x:auto}
+  nav.tabs button{background:transparent;border:0;border-bottom:3px solid transparent;color:var(--mist);padding:11px 14px;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap}
+  nav.tabs button[aria-selected="true"]{color:#fff;border-bottom-color:var(--ctrl);font-weight:600}
+  nav.tabs button:hover{color:#fff}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:14px 24px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+  input[type=text],select,textarea{font-family:inherit;font-size:13px;color:var(--ink);border:1px solid var(--line);border-radius:5px;padding:7px 9px;background:#fff}
+  input[type=text]:focus,select:focus,textarea:focus{outline:2px solid var(--petrol-lt);outline-offset:-1px;border-color:var(--petrol-lt)}
+  #q{min-width:210px;flex:1 1 210px}
+  .btn{font-family:inherit;font-size:12.5px;padding:7px 12px;border-radius:5px;cursor:pointer;border:1px solid var(--petrol);background:#fff;color:var(--petrol);font-weight:500}
+  .btn:hover{background:var(--mist)}
+  .btn.primary{background:var(--petrol);color:#fff}.btn.primary:hover{background:var(--petrol-dk)}
+  .btn.ghost{border-color:var(--line);color:var(--ink-soft)}
+  .spacer{flex:1}
+  .chk{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-soft)}
+  main{padding:20px 24px 60px;max-width:1180px}
+  section.grp{margin-bottom:22px;background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .grp-hd{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;background:#fff;border-bottom:1px solid var(--line)}
+  .grp-hd:hover{background:var(--paper)}
+  .grp-hd h2{margin:0;font-size:14.5px;font-weight:600;color:var(--petrol)}
+  .grp-hd .count{font-size:12px;color:var(--ink-soft);margin-left:auto;white-space:nowrap}
+  .caret{transition:transform .15s ease;color:var(--ink-soft);font-size:11px}
+  section.grp.collapsed .caret{transform:rotate(-90deg)}
+  section.grp.collapsed .grp-body{display:none}
+  .mini{height:5px;width:90px;background:var(--paper);border-radius:3px;overflow:hidden;border:1px solid var(--line)}
+  .mini i{display:block;height:100%;background:var(--done)}
+  .item{padding:14px 16px;border-bottom:1px solid #eef1f4}
+  .item:last-child{border-bottom:0}
+  .item.is-done{background:#fbfdfb}
+  .item.flash{animation:fl 1.6s ease}
+  @keyframes fl{0%,40%{background:#fff4d6}100%{background:transparent}}
+  .item-top{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+  .seq{font-family:'Consolas','SF Mono',ui-monospace,monospace;font-size:14px;font-weight:700;color:#fff;background:var(--petrol);border-radius:5px;min-width:30px;text-align:center;padding:4px 6px;line-height:1.25}
+  .seq small{display:block;font-size:8.5px;font-weight:500;letter-spacing:.4px;opacity:.75}
+  .titlewrap{flex:1 1 380px;min-width:250px}
+  .t{font-weight:600;font-size:13.5px;margin:0 0 3px}
+  .t .idtag{font-family:'Consolas','SF Mono',ui-monospace,monospace;font-size:11.5px;color:var(--petrol);background:var(--mist);border-radius:4px;padding:2px 6px;margin-right:8px;font-weight:600}
+  .d{margin:0;font-size:12.5px;color:var(--ink-soft)}
+  .where{margin:6px 0 0;font-size:11.5px;color:var(--ink-soft);font-family:'Consolas','SF Mono',ui-monospace,monospace}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px;align-items:center}
+  .cc{font-size:10.5px;font-weight:600;letter-spacing:.3px;color:#7a4a00;background:rgba(255,165,0,.16);border:1px solid var(--ctrl);border-radius:3px;padding:2px 6px}
+  .badge{font-size:10.5px;font-weight:600;letter-spacing:.3px;padding:2px 6px;border-radius:3px;border:1px solid}
+  .b-crit{color:#fff;background:var(--crit);border-color:var(--crit)}
+  .b-high{color:#fff;background:var(--high);border-color:var(--high)}
+  .b-mod{color:var(--mod);background:#eef6fb;border-color:var(--petrol-lt)}
+  .b-low{color:var(--low);background:#f1f3f5;border-color:var(--line)}
+  .b-auto{color:#1c5c2e;background:#e8f5ea;border-color:#8bc79b}
+  .b-semi{color:#7a4a00;background:#fff6e5;border-color:#e0b464}
+  .b-man{color:var(--ink-soft);background:#f1f3f5;border-color:var(--line)}
+  .rat{margin-top:9px;border-left:3px solid var(--mist);padding:2px 0 2px 11px}
+  .rat p{margin:0 0 5px;font-size:12px;color:var(--ink-soft)}
+  .rat p:last-child{margin-bottom:0}
+  .rat b{color:var(--petrol);font-weight:600}
+  .rat code{font-family:'Consolas','SF Mono',ui-monospace,monospace;font-size:11.5px;background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:0 4px}
+  .b-est{color:var(--petrol);background:#eef6fb;border-color:var(--petrol-lt)}
+  .howbtn{margin-top:9px;font-family:inherit;font-size:12px;font-weight:600;color:var(--petrol);background:#fff;
+    border:1px solid var(--petrol-lt);border-radius:5px;padding:5px 11px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+  .howbtn:hover{background:var(--mist)}
+  .howbtn .cv{font-size:10px;transition:transform .15s ease}
+  .howbtn[aria-expanded="true"] .cv{transform:rotate(90deg)}
+  .how{margin-top:10px;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:13px 15px}
+  .how h4{margin:0 0 6px;font-size:11.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--petrol);font-weight:700}
+  .how h4:not(:first-child){margin-top:14px}
+  .how ul,.how ol{margin:0;padding-left:20px;font-size:12.5px;color:var(--ink)}
+  .how li{margin-bottom:4px}
+  .how li:last-child{margin-bottom:0}
+  .how p.v{margin:0;font-size:12.5px;color:var(--ink)}
+  .how pre{margin:8px 0 0;background:#12242f;color:#d6e6f0;border-radius:5px;padding:9px 11px;overflow-x:auto;
+    font-family:'Consolas','SF Mono',ui-monospace,monospace;font-size:11.5px;line-height:1.55}
+  .how .est{font-size:12px;color:var(--ink-soft);border-top:1px solid var(--line);margin-top:13px;padding-top:9px}
+  .how .est b{color:var(--petrol)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+  .controls select{min-width:130px}
+  .controls input[type=text]{min-width:140px}
+  .stamp{font-size:11.5px;color:var(--ink-soft);text-align:right;white-space:nowrap;flex:0 0 auto}
+  .stamp b{color:var(--ink);font-weight:600}
+  .ev{width:100%;margin-top:8px;min-height:42px;resize:vertical;font-size:12.5px}
+  select.status{font-weight:600}
+  .st-open{color:var(--open)}.st-prog{color:var(--prog)}.st-done{color:var(--done)}.st-na{color:var(--na)}
+  /* dashboard */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:20px}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:8px;padding:15px 16px}
+  .kpi .n{font-size:30px;font-weight:700;color:var(--petrol);line-height:1.1}
+  .kpi .n.alert{color:var(--crit)}
+  .kpi .l{font-size:12px;color:var(--ink-soft);margin-top:3px}
+  .kpi .h{font-size:11.5px;color:var(--ink-soft);margin-top:7px;border-top:1px solid var(--line);padding-top:7px}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:8px;margin-bottom:20px;overflow:hidden}
+  .panel h3{margin:0;padding:12px 16px;font-size:14px;color:var(--petrol);border-bottom:1px solid var(--line);font-weight:600}
+  .panel .body{padding:14px 16px}
+  .panel .note{font-size:12px;color:var(--ink-soft);margin:0 0 12px}
+  .two{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:20px}
+  .rowbar{display:grid;grid-template-columns:112px 1fr 66px;gap:10px;align-items:center;margin-bottom:9px;font-size:12.5px}
+  .rowbar:last-child{margin-bottom:0}
+  .track{height:16px;background:var(--paper);border:1px solid var(--line);border-radius:4px;overflow:hidden;display:flex}
+  .track i{display:block;height:100%}
+  .t-done{background:var(--done)}.t-prog{background:#e8b04b}.t-na{background:#c9d1d8}
+  .rowbar .v{text-align:right;color:var(--ink-soft);font-size:12px;white-space:nowrap}
+  .rowbar .k{font-weight:600}
+  ol.queue{margin:0;padding:0;list-style:none;counter-reset:qq}
+  ol.queue li{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid #eef1f4}
+  ol.queue li:last-child{border-bottom:0}
+  ol.queue .qn{font-family:'Consolas','SF Mono',ui-monospace,monospace;font-weight:700;color:#fff;background:var(--petrol);border-radius:5px;padding:3px 7px;height:fit-content;font-size:12.5px}
+  ol.queue .qt{flex:1}
+  ol.queue .qt p{margin:0}
+  ol.queue .qt .qh{font-weight:600;font-size:13px;margin-bottom:2px}
+  ol.queue .qt .qw{font-size:12px;color:var(--ink-soft)}
+  ol.queue .qgo{align-self:center}
+  .clear{padding:26px 16px;text-align:center;color:var(--done);font-size:13px;font-weight:600}
+  table.log,table.sec{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff}
+  table.log th,table.log td,table.sec th,table.sec td{padding:8px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  table.log th,table.sec th{background:var(--paper);font-weight:600;color:var(--petrol);font-size:12px}
+  table.log td.when{white-space:nowrap;color:var(--ink-soft);font-size:11.5px}
+  .empty{padding:34px 16px;text-align:center;color:var(--ink-soft);font-size:13px}
+  .modal{position:fixed;inset:0;background:rgba(18,52,73,.62);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px}
+  .modal[hidden]{display:none}
+  .card{background:#fff;border-radius:10px;padding:26px;width:100%;max-width:420px;box-shadow:0 18px 44px rgba(0,0,0,.28)}
+  .card h3{margin:0 0 6px;font-size:17px;color:var(--petrol)}
+  .card p{margin:0 0 16px;font-size:13px;color:var(--ink-soft)}
+  .card label{display:block;font-size:12px;font-weight:600;margin:0 0 4px}
+  .card input{width:100%;margin-bottom:14px}
+  .card .row{display:flex;gap:8px;justify-content:flex-end}
+  footer{padding:0 24px 40px;max-width:1180px;font-size:11.5px;color:var(--ink-soft)}
+  @media print{nav.tabs,.toolbar,.editor-chip button,.btn{display:none!important}body{background:#fff}section.grp.collapsed .grp-body{display:block}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-top">
+    <div>
+      <h1>GitHub Hardening Tracker</h1>
+      <p class="sub">Configuration baseline for a private GitHub organization, aligned to GitHub's documented security guidance. Criticality, automatability and sequence are engineering judgement, not vendor guidance. SOC&nbsp;2 mappings are indicative — confirm with your auditor.</p>
+    </div>
+    <div class="editor-chip">
+      <span>Editing as <strong id="who">—</strong></span>
+      <button type="button" id="switchEditor">Change</button>
+    </div>
+  </div>
+  <div class="meter-wrap">
+    <div class="meter-top"><span id="meterLabel">—</span><span id="meterPct">0%</span></div>
+    <div class="meter">
+      <i class="m-done" id="barDone" style="width:0"></i>
+      <i class="m-prog" id="barProg" style="width:0"></i>
+      <i class="m-na" id="barNa" style="width:0"></i>
+    </div>
+    <div class="legend">
+      <span><i class="dot" style="background:#7ed492"></i>Complete <b id="cDone">0</b></span>
+      <span><i class="dot" style="background:#ffcf6b"></i>In progress <b id="cProg">0</b></span>
+      <span><i class="dot" style="background:rgba(255,255,255,.32)"></i>Not applicable <b id="cNa">0</b></span>
+      <span><i class="dot" style="background:rgba(255,255,255,.55)"></i>Not started <b id="cOpen">0</b></span>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" aria-selected="true" data-view="dash">Dashboard</button>
+  <button role="tab" aria-selected="false" data-view="checklist">Checklist</button>
+  <button role="tab" aria-selected="false" data-view="log">Change log</button>
+</nav>
+
+<div class="toolbar" id="toolbar" style="display:none">
+  <input type="text" id="q" placeholder="Search controls, settings, notes…" aria-label="Search">
+  <select id="fStatus" aria-label="Filter by status"><option value="">All statuses</option><option value="open">Not started</option><option value="prog">In progress</option><option value="done">Complete</option><option value="na">Not applicable</option></select>
+  <select id="fCrit" aria-label="Filter by criticality"><option value="">All criticality</option><option value="crit">Critical</option><option value="high">High</option><option value="mod">Moderate</option><option value="low">Low</option></select>
+  <select id="fAuto" aria-label="Filter by automatability"><option value="">All effort types</option><option value="auto">Fully automatable</option><option value="semi">Partly automatable</option><option value="man">Manual</option></select>
+  <select id="fOwner" aria-label="Filter by owner"><option value="">All owners</option></select>
+  <select id="sortBy" aria-label="Sort"><option value="sec">Group by section</option><option value="prio">Order by remediation sequence</option></select>
+  <label class="chk"><input type="checkbox" id="showRat" checked> Show rationale</label>
+  <span class="spacer"></span>
+  <button class="btn ghost" id="expandAll">Expand all</button>
+  <button class="btn ghost" id="collapseAll">Collapse all</button>
+  <button class="btn" id="exportCsv">Export CSV</button>
+  <button class="btn" id="importBtn">Import file</button>
+  <button class="btn primary" id="exportJson">Save file</button>
+  <input type="file" id="fileIn" accept="application/json" hidden>
+</div>
+
+<main>
+  <div id="viewDash"></div>
+  <div id="viewChecklist" hidden></div>
+  <div id="viewLog" hidden></div>
+</main>
+<footer id="foot"></footer>
+
+<div class="modal" id="editorModal" hidden>
+  <div class="card">
+    <h3>Who is making these updates?</h3>
+    <p>Your name is stamped on every item you change and recorded in the change log. Use the name that should appear in audit evidence.</p>
+    <label for="nameIn">Full name</label><input type="text" id="nameIn" placeholder="Jane Okafor" autocomplete="name">
+    <label for="roleIn">Role or email (optional)</label><input type="text" id="roleIn" placeholder="Security Officer">
+    <div class="row"><button class="btn ghost" id="cancelEditor" hidden>Cancel</button><button class="btn primary" id="saveEditor">Start editing</button></div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+var mem={};
+var store={get:function(k){try{return window.localStorage.getItem(k);}catch(e){return mem[k]||null;}},
+           set:function(k,v){try{window.localStorage.setItem(k,v);}catch(e){mem[k]=v;}}};
+var KEY="gh-hardening-tracker-v2";
+var persistent=(function(){try{window.localStorage.setItem("__t","1");window.localStorage.removeItem("__t");return true;}catch(e){return false;}})();
+
+/* c=criticality, cw=why critical, a=automatability, aw=how, p=sequence no, pw=why here */
+var GROUPS=[
+{id:"A",name:"Organization foundation",items:[
+ {id:"A1",cc:"CC6.1",p:10,c:"high",a:"man",t:"Repositories owned by the organization, not a personal account",
+  d:"Transfer any personally owned repository into the org and confirm none remain outside it.",
+  w:"Repository → Settings → General → Transfer ownership",
+  cw:"A repository on a personal account sits outside every org control you configure: 2FA enforcement, base permissions, rulesets, audit log. It also disappears when that person leaves, and no admin can recover it.",
+  aw:"Transfer is a deliberate one-time action per repository and requires the receiving org to accept. Detection of stray repos can be scripted against the member list.",
+  pw:"Placed after the org-level guardrails because a repository transferred in before those settings exist inherits nothing. Set the boundary first, then move assets inside it."},
+ {id:"A2",cc:"CC6.2",p:11,c:"high",a:"man",t:"At least two organization owners, reviewed quarterly",
+  d:"Keep the owner count small but never one. Confirm the list each quarter.",
+  w:"Organization → People → filter Role: Owner",
+  cw:"A single owner is an availability failure waiting to happen — illness, departure or a lost second factor locks the company out of its own source code with no self-service recovery.",
+  aw:"Adding an owner is manual. Detecting drift in the owner list is a scripted check against the members API.",
+  pw:"Immediately after ownership consolidation, because that step concentrates control and this one stops the concentration becoming a single point of failure."},
+ {id:"A3",cc:"CC6.3",p:2,c:"crit",a:"auto",t:"Base repository permission set to None",
+  d:"Grant access per repository through teams instead of relying on the org-wide default.",
+  w:"Organization → Settings → Member privileges → Base permissions",
+  cw:"The default grants every member read access to every private repository. One over-permissioned account then reads the entire codebase, and least privilege is defeated before you write a single team grant.",
+  aw:"Single org setting, settable via the API in one call and enforceable as code.",
+  pw:"Second overall and before any team design, because base permissions are additive. Set it to None first or you spend the team work discovering that everyone already had read anyway."},
+ {id:"A4",cc:"CC6.6",p:4,c:"crit",a:"auto",t:"Members cannot create public repositories",
+  d:"Restrict repository creation so no member can stand up a public repository.",
+  w:"Organization → Settings → Member privileges → Repository creation",
+  cw:"A public repository created in a hurry is a disclosure that is indexed, forked and cached within minutes. There is no undo — anything committed must be treated as compromised.",
+  aw:"One org setting, API-settable.",
+  pw:"Grouped with the visibility lock in the first wave. These two settings together close the accidental-disclosure path, which is the highest-consequence and cheapest thing on this list."},
+ {id:"A5",cc:"CC6.6",p:3,c:"crit",a:"auto",t:"Members cannot change repository visibility",
+  d:"Reserve visibility changes for owners.",
+  w:"Organization → Settings → Member privileges → Repository visibility change",
+  cw:"The single most common real-world exposure is someone flipping a private repository public to share a link quickly, intending to flip it back. The window is short and the indexing is not.",
+  aw:"One org setting, API-settable.",
+  pw:"Third, right behind base permissions. It is irreversible harm prevented by a one-click setting — the best ratio available anywhere in this baseline."},
+ {id:"A6",cc:"CC6.6",p:9,c:"high",a:"auto",t:"Forking of private repositories disabled",
+  d:"Turn off forking of private repositories at org level.",
+  w:"Organization → Settings → Member privileges → Repository forking",
+  cw:"A fork copies code outside the original repository's access controls, and the copy follows the forker rather than the org. Revoking their access afterwards does not retrieve it.",
+  aw:"One org setting, API-settable.",
+  pw:"End of the exposure wave. Slightly behind visibility because a fork stays inside a known account, while a public flip goes to the whole internet."},
+ {id:"A7",cc:"CC6.3",p:14,c:"mod",a:"auto",t:"Members cannot delete or transfer repositories",
+  d:"Remove the ability for a member to move a repository outside the org or destroy it.",
+  w:"Organization → Settings → Member privileges → Repository deletion and transfer",
+  cw:"Destruction and exfiltration in one action. Lower ranked than visibility only because backups and clones usually make it recoverable, where public disclosure never is.",
+  aw:"One org setting, API-settable.",
+  pw:"In the control-plane wave, alongside the other member-privilege settings so they are configured and evidenced as one change."},
+ {id:"A8",cc:"CC6.1",p:41,c:"low",a:"semi",t:"Organization email domain verified",
+  d:"Verify the domain and restrict notification email to it.",
+  w:"Organization → Settings → Verified and approved domains",
+  cw:"Mainly an assurance and anti-impersonation measure. It also stops org notifications reaching personal inboxes, which matters more for confidentiality than for access.",
+  aw:"DNS record creation plus a verification click.",
+  pw:"Late. It improves hygiene and appearance but blocks no attack path that the earlier controls leave open."},
+ {id:"A9",cc:"CC6.6",p:42,c:"mod",a:"semi",t:"Third-party OAuth apps and GitHub Apps restricted",
+  d:"Require owner approval before an app receives organization data, and review what is already installed.",
+  w:"Organization → Settings → Third-party access",
+  cw:"An approved app can hold broad, persistent read access to every repository and does not appear in your people list. It is the access path most often missed in review.",
+  aw:"The restriction is one setting; adjudicating each existing app is a manual review.",
+  pw:"After the identity and access wave, because you need the org boundary settled before deciding which integrations belong inside it."}
+]},
+{id:"B",name:"Authentication and credentials",items:[
+ {id:"B1",cc:"CC6.1",p:1,c:"crit",a:"auto",t:"Two-factor authentication enforced organization-wide",
+  d:"Enforce at organization level rather than asking individuals.",
+  w:"Organization → Settings → Authentication security → Require two-factor authentication",
+  cw:"Credential theft is the most common initial access route into a code repository, and every other control here assumes the account is genuinely the person. Without 2FA the whole baseline rests on a password.",
+  aw:"One org setting. Note it removes non-compliant members, so inventory first.",
+  pw:"First. Everything else in this list protects assets from an authenticated identity — that assumption has to hold before the rest means anything."},
+ {id:"B2",cc:"CC6.1",p:37,c:"mod",a:"semi",t:"Phishing-resistant second factors preferred over SMS",
+  d:"Passkeys or hardware keys first, authenticator apps second, SMS documented as an exception.",
+  w:"Organization → Settings → Authentication security → 2FA method requirement",
+  cw:"SMS is interceptable via SIM swap and relay phishing. Real, but a materially smaller exposure than having no second factor at all.",
+  aw:"The requirement is a setting; migrating people onto new factors is a coordination exercise.",
+  pw:"Deliberately well after basic 2FA. Getting everyone onto some second factor beats getting a few onto the best one."},
+ {id:"B3",cc:"CC6.1",p:34,c:"mod",a:"semi",t:"SAML single sign-on configured, or the gap documented",
+  d:"Where an IdP exists and the plan supports SSO, enable and require it. Otherwise record 2FA plus quarterly review as the compensating control.",
+  w:"Organization → Settings → Authentication security → SAML",
+  cw:"SSO makes deprovisioning immediate and central. Without it, offboarding depends on someone remembering GitHub, which is exactly the failure mode access reviews exist to catch.",
+  aw:"IdP integration work, then enforcement. Not a toggle.",
+  pw:"Mid-list because it is plan- and IdP-dependent. The documented compensating control is acceptable in the interim, which is why it does not gate anything ahead of it."},
+ {id:"B4",cc:"CC6.1",p:15,c:"crit",a:"semi",t:"Personal access tokens governed",
+  d:"Require approval for fine-grained tokens, restrict classic tokens, cap lifetimes, and inventory what exists today.",
+  w:"Organization → Settings → Personal access tokens → Settings",
+  cw:"A long-lived classic token is a password that skips 2FA, is often pasted into a script or a laptop config, and survives an ordinary offboarding untouched. It is the most common way access outlives employment.",
+  aw:"Policy settings are API-settable; the inventory and cleanup of existing tokens is manual.",
+  pw:"Early in the control-plane wave. Tokens are the bypass around the 2FA you just enforced — leaving them ungoverned undoes step one."},
+ {id:"B5",cc:"CC6.2",p:38,c:"mod",a:"semi",t:"SSH keys and deploy keys inventoried",
+  d:"Deploy keys read-only unless justified; every key tied to a named person or system.",
+  w:"Repository → Settings → Deploy keys",
+  cw:"A write-capable deploy key is an unattended credential with commit rights and no second factor. Fewer of these exist than tokens, which is the only reason it ranks lower.",
+  aw:"Enumeration is scriptable per repository; the decision on each key is human.",
+  pw:"After the token work, which covers the larger population of the same class of risk."},
+ {id:"B6",cc:"CC6.1",p:39,c:"mod",a:"man",t:"Bot and service accounts identified and owned",
+  d:"Every non-human account has a named human owner and appears in the quarterly review.",
+  w:"Organization → People",
+  cw:"Unowned service accounts accumulate permissions and never get reviewed, because reviewers skip anything that is not obviously a person.",
+  aw:"Requires human judgement about which accounts are machines and who owns them.",
+  pw:"Sequenced just before the access review so the review has a complete and labelled population to work from."}
+]},
+{id:"C",name:"Access administration",items:[
+ {id:"C1",cc:"CC6.3",p:12,c:"high",a:"semi",t:"Access granted through teams, not to individuals",
+  d:"Team-based grants make review and revocation a single action.",
+  w:"Organization → Teams",
+  cw:"Individual grants are invisible in practice: they are not enumerated anywhere convenient, so they survive offboarding and quietly break every access review you run.",
+  aw:"Team structure is codifiable; deciding the structure is not.",
+  pw:"First item after base permissions are set to None, because this is the mechanism that puts the access back deliberately."},
+ {id:"C2",cc:"CC6.3",p:13,c:"high",a:"semi",t:"Least privilege roles applied",
+  d:"Admin on a repository should be rare and justified. Most engineers need Write.",
+  w:"Repository → Settings → Collaborators and teams",
+  cw:"Repository Admin can change rulesets, alter visibility where permitted, and add collaborators — it is effectively a bypass of the code integrity controls in section E.",
+  aw:"Role assignment is API-settable once the intended model is decided.",
+  pw:"Immediately after team structure. Doing it in the other order means assigning roles twice."},
+ {id:"C3",cc:"CC6.3",p:16,c:"high",a:"semi",t:"Outside collaborators inventoried and justified",
+  d:"Scope each external party to specific repositories, read-only where possible, with an end date.",
+  w:"Organization → People → Outside collaborators",
+  cw:"External access is the least reviewed and longest lived. Contractor access routinely outlasts the contract because no internal process is triggered when an engagement ends.",
+  aw:"Listing is scripted; the justification and end date are human decisions."},
+ {id:"C4",cc:"CC6.2",p:29,c:"crit",a:"semi",t:"Quarterly access review performed and evidenced",
+  d:"Export member, team and collaborator lists, have a reviewer confirm each entry, retain the signed result.",
+  w:"Organization → People → Export",
+  cw:"This is the detective control that catches everything the preventive controls miss, and it is the one an auditor will test hardest because it produces dated, attributable evidence of management judgement.",
+  aw:"Extraction is fully scriptable; the attestation must be a named human.",
+  pw:"After the access model is actually in place. Reviewing access before you have restructured it just documents the mess."},
+ {id:"C5",cc:"CC6.2",p:28,c:"crit",a:"semi",t:"Offboarding removes access within one business day",
+  d:"Remove from the org, revoke tokens and SSH keys, cancel pending invitations, transfer owned resources.",
+  w:"Organization → People → Remove from organization",
+  cw:"Retained access after departure is the highest-consequence access finding there is, and the one most likely to be exercised. It is also the finding that most often turns into a disclosable incident.",
+  aw:"The removal steps are scriptable as a checklist runner; the trigger comes from HR.",
+  pw:"Ahead of the periodic review, because a working leaver process prevents the findings that the review would otherwise have to catch a quarter late."},
+ {id:"C6",cc:"CC6.3",p:40,c:"low",a:"auto",t:"Pending invitations reviewed",
+  d:"Clear stale unaccepted invitations.",
+  w:"Organization → People → Pending invitations",
+  cw:"An open invitation is latent access to an address that may no longer be controlled by the intended person.",
+  aw:"Fully enumerable and cancellable via the API on a schedule.",
+  pw:"Late and cheap. Worth automating once, then it never needs attention again."}
+]},
+{id:"D",name:"Repository and data protection",items:[
+ {id:"D1",cc:"CC6.6",p:5,c:"crit",a:"auto",t:"Every repository confirmed private",
+  d:"Enumerate all repositories and confirm visibility. Re-check after any migration or transfer.",
+  w:"Organization → Repositories",
+  cw:"This is the direct verification that the exposure you are trying to prevent has not already happened. Settings prevent future mistakes; only enumeration tells you about the current state.",
+  aw:"One API call listing repositories with visibility, easily run on a schedule.",
+  pw:"Immediately after the visibility guardrails. Lock the door, then check whether anything is already outside it."},
+ {id:"D2",cc:"CC6.7",p:32,c:"high",a:"man",t:"No secrets, customer data, or personal data committed",
+  d:"State in the repository what may and may not be stored there, and check current contents rather than assuming.",
+  w:"Repository → README and CONTRIBUTING",
+  cw:"Determines whether a disclosure is an embarrassment or a breach notification. Content classification, not configuration.",
+  aw:"Scanning finds credential patterns; judging whether a data file is personal data is human work.",
+  pw:"After scanning and push protection are running, so the manual review is looking at a much smaller residue."},
+ {id:"D3",cc:"CC6.7",p:51,c:"mod",a:"auto",t:"Standard .gitignore and pre-commit checks in place",
+  d:"Catch credentials, environment files and exports before they reach a commit.",
+  w:"Repository root → .gitignore, .pre-commit-config.yaml",
+  cw:"Reduces the volume of incidents rather than the severity of any one. Genuinely useful, but push protection already covers the severe case.",
+  aw:"Fully automatable and templatable across repositories.",
+  pw:"Late, because it duplicates push protection's coverage at a weaker enforcement point — the developer's own machine."},
+ {id:"D4",cc:"CC6.6",p:52,c:"mod",a:"auto",t:"GitHub Pages restricted or disabled",
+  d:"Disable where unused, or restrict visibility where the plan allows.",
+  w:"Repository → Settings → Pages",
+  cw:"An underappreciated path from a private repository to a public URL, but it only publishes what a workflow explicitly builds.",
+  aw:"Settable per repository via the API.",
+  pw:"Late, conditional on whether Pages is used at all. Where it is in use, promote it into the first wave with the other visibility controls."},
+ {id:"D5",cc:"CC6.7",p:53,c:"low",a:"man",t:"Binary artifacts and trackers stored deliberately",
+  d:"Decide what belongs in Git and what belongs in a document system, and record the decision.",
+  w:"Internal documentation",
+  cw:"Not a security control. It determines whether your change history is legible enough to serve as evidence when someone asks how a document was approved.",
+  aw:"A documented decision, not a setting.",
+  pw:"Last in this section. It affects evidence quality rather than exposure."}
+]},
+{id:"E",name:"Code integrity",items:[
+ {id:"E1",cc:"CC8.1",p:21,c:"crit",a:"auto",t:"Ruleset applied to the default branch",
+  d:"Rulesets are the current mechanism and apply across repositories from org level.",
+  w:"Organization → Settings → Repository rulesets",
+  cw:"Without protection on the default branch, one account with Write can push straight to production code with no review and no trace beyond the commit itself.",
+  aw:"Org-level rulesets are fully API-driven and manageable as code.",
+  pw:"Opens the integrity wave, and must come before the individual requirements below because it is the container they live in."},
+ {id:"E2",cc:"CC8.1",p:22,c:"crit",a:"auto",t:"Pull request required before merging, with at least one approval",
+  d:"Require a pull request and an approving review before merge.",
+  w:"Ruleset → Require a pull request before merging",
+  cw:"This is what converts version history into review evidence: a named approver, at a timestamp, on a specific change. For a SOC 2 change management control it is the single most load-bearing setting here.",
+  aw:"Ruleset parameter, fully automatable.",
+  pw:"Directly after the ruleset exists. It is the requirement that produces the evidence, so everything else in this section supports it."},
+ {id:"E3",cc:"CC8.1",p:25,c:"high",a:"auto",t:"Stale approvals dismissed when new commits are pushed",
+  d:"Invalidate approvals when the branch changes.",
+  w:"Ruleset → Dismiss stale pull request approvals",
+  cw:"Without it, an approved pull request can be rewritten after approval and merged carrying a review that no longer describes the code. The evidence looks correct and is false.",
+  aw:"Ruleset parameter.",
+  pw:"Closes the integrity wave. It hardens the approval evidence rather than creating it, so it follows the settings that create it."},
+ {id:"E4",cc:"CC8.1",p:24,c:"crit",a:"auto",t:"Force pushes and branch deletion blocked",
+  d:"Restrict force pushes and deletions on protected branches.",
+  w:"Ruleset → Restrict force pushes / Restrict deletions",
+  cw:"History is the substrate of every claim you make from this repository — who wrote what, when, and who approved it. A force push rewrites that silently and there is no reliable after-the-fact detection.",
+  aw:"Ruleset parameter.",
+  pw:"With the core ruleset settings. Protecting the record has to be in place before the record is used as evidence."},
+ {id:"E5",cc:"CC8.1",p:35,c:"mod",a:"auto",t:"Required status checks must pass before merge",
+  d:"Tie automated checks to the merge gate rather than leaving them advisory.",
+  w:"Ruleset → Require status checks to pass",
+  cw:"Turns testing and scanning from information into enforcement. Only as strong as the checks behind it, which is why it sits below the review requirement.",
+  aw:"Ruleset parameter, once the checks exist.",
+  pw:"After the scanning tools in section G are configured — requiring a check that does not yet run just blocks merges."},
+ {id:"E6",cc:"CC8.1",p:36,c:"low",a:"auto",t:"Conversation resolution required",
+  d:"Prevent merging with unresolved review comments.",
+  w:"Ruleset → Require conversation resolution before merging",
+  cw:"Review quality rather than review existence. A useful discipline, not a barrier to an attacker.",
+  aw:"Ruleset parameter.",
+  pw:"Late. It improves an existing control rather than adding coverage."},
+ {id:"E7",cc:"CC7.1",p:48,c:"mod",a:"semi",t:"Signed commits required",
+  d:"Require verified commits on protected branches.",
+  w:"Ruleset → Require signed commits",
+  cw:"Commit authorship is a self-asserted config value by default — trivially forged. Signing makes it cryptographic. Real value, but it depends on the account controls above already holding.",
+  aw:"The requirement is a parameter; key distribution and developer setup is the work.",
+  pw:"Late deliberately. Turning this on before every contributor has signing configured stops all merges, which is why it should never lead the sequence."},
+ {id:"E8",cc:"CC8.1",p:49,c:"mod",a:"auto",t:"CODEOWNERS defined for sensitive paths",
+  d:"Route review of policy documents, infrastructure code and workflow files to accountable owners.",
+  w:"Repository root → .github/CODEOWNERS",
+  cw:"Ensures the right person reviews the changes that matter most, particularly workflow files, which are a code execution path.",
+  aw:"A file in the repository, fully templatable.",
+  pw:"After review is mandatory. Routing review to the right people is meaningless until review is required at all."},
+ {id:"E9",cc:"CC8.1",p:23,c:"crit",a:"auto",t:"Rules enforced for administrators",
+  d:"Use a named bypass list where exceptions are genuinely needed.",
+  w:"Ruleset → Bypass list",
+  cw:"A control that owners can silently bypass is not a control, and an auditor will treat it as one that does not operate. A named bypass list keeps the exception visible and reviewable.",
+  aw:"Ruleset parameter.",
+  pw:"With the ruleset settings it protects. Every requirement above is conditional on this one being right."}
+]},
+{id:"F",name:"Secret protection",items:[
+ {id:"F1",cc:"CC7.1",p:7,c:"crit",a:"auto",t:"Secret scanning enabled",
+  d:"Detect credentials already present in the repository and its history.",
+  w:"Repository or Organization → Settings → Advanced Security → Secret scanning",
+  cw:"A committed credential is live until rotated, is present in every clone, and grants access to systems that have nothing to do with GitHub. This is the fastest path from a code repository to production compromise.",
+  aw:"Org-level enablement with a default-on policy for new repositories.",
+  pw:"Immediately after push protection: stop new secrets arriving, then go find the ones already there."},
+ {id:"F2",cc:"CC7.1",p:6,c:"crit",a:"auto",t:"Push protection enabled",
+  d:"Block supported credential types at push time rather than reporting them afterwards.",
+  w:"Repository or Organization → Settings → Advanced Security → Push protection",
+  cw:"The only control here that prevents rather than detects. Once a secret is pushed, remediation means rotating a live credential under time pressure and rewriting history — an order of magnitude more work than the block.",
+  aw:"Org-level setting, enabled for all repositories in one action.",
+  pw:"Sixth, and the highest-value item in the whole baseline for effort spent. Turning it on before scanning means the backlog you are about to discover stops growing while you work through it."},
+ {id:"F3",cc:"CC7.4",p:8,c:"crit",a:"man",t:"Documented response when a secret is detected",
+  d:"Rotate first, then remove from history.",
+  w:"Incident response procedure",
+  cw:"The intuitive response — delete the commit — leaves a live credential in every existing clone and in the platform's cache. Getting the order wrong means the exposure continues while everyone believes it is closed.",
+  aw:"A written procedure and a decision path. Not automatable.",
+  pw:"Written before scanning results start arriving. A procedure drafted during an incident is a procedure drafted badly."},
+ {id:"F4",cc:"CC6.1",p:20,c:"crit",a:"semi",t:"Workflow secrets stored as encrypted secrets",
+  d:"Never in workflow files, never in plain variables, never in code. Scope to environments.",
+  w:"Repository → Settings → Secrets and variables → Actions",
+  cw:"Build credentials are usually the most privileged in the estate — cloud deploy rights, registry push, production database. They are also the ones most often hardcoded for convenience.",
+  aw:"Storage is API-driven; finding and migrating existing hardcoded values is manual.",
+  pw:"With the Actions hardening block, because workflow permissions and secret storage are the same attack surface and should be evidenced together."},
+ {id:"F5",cc:"CC8.1",p:50,c:"mod",a:"auto",t:"Environment protection rules for production deploys",
+  d:"Required reviewers and branch restrictions on the production environment.",
+  w:"Repository → Settings → Environments",
+  cw:"Produces a deployment approval record distinct from the code approval record, which is what separates change authorisation from change review in an audit.",
+  aw:"Fully API-configurable.",
+  pw:"Late, and only once a real deployment pipeline exists to protect."}
+]},
+{id:"G",name:"Supply chain and automation",items:[
+ {id:"G1",cc:"CC7.1",p:31,c:"high",a:"auto",t:"Dependabot alerts enabled",
+  d:"Vulnerability alerts across the dependency graph, org-wide.",
+  w:"Organization → Settings → Advanced Security → Dependabot alerts",
+  cw:"You cannot patch what you cannot see, and dependency vulnerabilities are the most common exploited weakness in application code.",
+  aw:"Org-level setting with default-on for new repositories.",
+  pw:"Opens the monitoring wave. It generates work rather than closing exposure, so it follows the preventive settings."},
+ {id:"G2",cc:"CC7.1",p:43,c:"mod",a:"auto",t:"Dependabot security updates enabled",
+  d:"Automatic pull requests for known vulnerable dependencies, paired with a remediation SLA.",
+  w:"Repository → Settings → Advanced Security",
+  cw:"Closes the loop from alert to fix. Ranked below alerting because unmerged automated pull requests deliver no protection at all.",
+  aw:"Fully automatable, though merging still needs review.",
+  pw:"After alerting, and after review gates exist — otherwise you are auto-merging dependency changes through an unprotected branch."},
+ {id:"G3",cc:"CC8.1",p:44,c:"mod",a:"auto",t:"Dependency review on pull requests",
+  d:"Surface newly introduced vulnerable dependencies at review time.",
+  w:"Repository → Settings → Advanced Security → Dependency review",
+  cw:"Prevents new exposure rather than remediating existing exposure, which makes the backlog stop growing.",
+  aw:"Enabled as a setting or a workflow.",
+  pw:"With the other dependency controls so they are configured and evidenced as one change."},
+ {id:"G4",cc:"CC7.1",p:45,c:"mod",a:"semi",t:"Code scanning configured",
+  d:"Default setup is sufficient to start. Route findings to a named owner with a triage cadence.",
+  w:"Repository → Settings → Advanced Security → Code scanning",
+  cw:"Finds weaknesses in code you wrote, where dependency tooling only covers code you imported. Higher false positive rate, so it needs owned triage to be worth anything.",
+  aw:"Enablement is automatable; triage is human.",
+  pw:"After dependency coverage, which returns more true positives per hour of attention."},
+ {id:"G5",cc:"CC8.1",p:19,c:"crit",a:"semi",t:"Third-party Actions pinned to a full commit SHA",
+  d:"Reference third-party Actions by immutable commit SHA, not by tag.",
+  w:"Workflow files → uses: owner/repo@<sha>",
+  cw:"A tag is mutable. Whoever controls that repository can repoint it at new code that runs inside your pipeline with your secrets. This is the mechanism behind the major CI supply chain compromises, and it needs no interaction from you to fire.",
+  aw:"Detection and rewriting are scriptable; verifying each SHA is the right commit is human.",
+  pw:"High in the control-plane wave and above most scanning work, because it is an active exploited attack path rather than a latent weakness."},
+ {id:"G6",cc:"CC6.6",p:18,c:"crit",a:"auto",t:"Actions restricted to an allow list",
+  d:"Permit local and verified-creator Actions plus a named allow list. Do not leave it open.",
+  w:"Organization → Settings → Actions → General → Policies",
+  cw:"An open policy means any workflow author can execute arbitrary third-party code against your repositories and secrets. It is the widest unrestricted code execution path in a default org.",
+  aw:"One org setting plus a maintained list.",
+  pw:"Just before pinning, because narrowing the population of allowed Actions makes the pinning exercise finite."},
+ {id:"G7",cc:"CC6.3",p:17,c:"crit",a:"auto",t:"Default GITHUB_TOKEN permissions set to read-only",
+  d:"Grant write scopes per workflow where genuinely needed.",
+  w:"Organization → Settings → Actions → Workflow permissions",
+  cw:"A permissive default token turns any compromised or malicious workflow into write access on the repository — including the ability to alter the workflows themselves.",
+  aw:"One org setting, API-settable.",
+  pw:"Opens the Actions block. It shrinks the blast radius of every workflow at once, so it comes before the work of securing individual workflows."},
+ {id:"G8",cc:"CC6.6",p:46,c:"mod",a:"auto",t:"Approval required for outside contributor workflow runs",
+  d:"Prevent an unreviewed pull request from executing on your runners.",
+  w:"Organization → Settings → Actions → Fork pull request workflows",
+  cw:"Serious where outside contributors exist, irrelevant where they do not. Rank it by whether your repositories accept external pull requests.",
+  aw:"One org setting.",
+  pw:"Conditional. Promote it into the first wave if any repository accepts outside contributions."},
+ {id:"G9",cc:"CC6.6",p:47,c:"mod",a:"man",t:"Self-hosted runners used only with private repositories",
+  d:"Never attach a self-hosted runner to a public repository.",
+  w:"Organization → Settings → Actions → Runners",
+  cw:"A self-hosted runner reachable from a public repository is remote code execution on your own infrastructure, and it persists between jobs. Critical if it applies, not applicable if you use hosted runners only.",
+  aw:"An architectural decision plus verification.",
+  pw:"Positioned as a check rather than a task. If you run self-hosted runners, treat this as first-wave work."},
+ {id:"G10",cc:"CC7.1",p:55,c:"low",a:"auto",t:"Dependency graph and SBOM export available",
+  d:"Support vulnerability response and customer or regulatory bill-of-materials requests.",
+  w:"Repository → Insights → Dependency graph → Export SBOM",
+  cw:"Supports response speed and customer assurance rather than preventing anything directly.",
+  aw:"Exportable via the API on a schedule.",
+  pw:"Late unless a customer or regulator is actively asking, in which case it becomes a commitment with a date rather than a hardening item."}
+]},
+{id:"H",name:"Logging and monitoring",items:[
+ {id:"H1",cc:"CC7.2",p:26,c:"high",a:"semi",t:"Audit log reviewed on a defined cadence",
+  d:"Monthly minimum, focused on owner changes, visibility changes and member additions.",
+  w:"Organization → Settings → Logs → Audit log",
+  cw:"Prevention fails silently. Review is how a bypassed or reverted setting gets noticed before it becomes an incident, and it is the evidence that your controls operate rather than merely exist.",
+  aw:"Extraction and filtering are scriptable; the review conclusion is human.",
+  pw:"Opens the evidence wave, once there is a configured state worth detecting drift from."},
+ {id:"H2",cc:"CC7.2",p:27,c:"crit",a:"auto",t:"Audit log retained beyond the platform's window",
+  d:"Export or stream the log to storage you control.",
+  w:"Organization → Settings → Logs → Audit log → Export",
+  cw:"Retention on lower tiers is shorter than a typical audit period, and shorter than the average time to discover an intrusion. Once the window closes the evidence is gone permanently — this is the only item here that gets harder the longer you wait.",
+  aw:"Streaming or scheduled export, fully automatable.",
+  pw:"Immediately after establishing review, and high for its criticality because every day of delay destroys evidence you cannot recreate."},
+ {id:"H3",cc:"CC7.2",p:33,c:"mod",a:"auto",t:"Security alerts routed to a monitored channel",
+  d:"Route to a channel with a named owner rather than an unread inbox.",
+  w:"Organization → Settings → Notifications",
+  cw:"An alert nobody reads is not detection. This is what makes the scanning controls actually operate.",
+  aw:"Notification and webhook configuration.",
+  pw:"After the alert sources exist, so routing is configured once against a known set."},
+ {id:"H4",cc:"CC7.3",p:54,c:"mod",a:"auto",t:"Alerting on high-risk configuration changes",
+  d:"Owner role changes, visibility changes and 2FA requirement changes should notify, not just log.",
+  w:"Audit log streaming or scheduled review",
+  cw:"Reduces time to detect on exactly the changes that would unwind the first wave of this baseline.",
+  aw:"Fully automatable via audit log streaming and rules.",
+  pw:"Late because it depends on retention and routing already being in place. It is the maturity step on top of both."}
+]},
+{id:"I",name:"Vendor and continuity",items:[
+ {id:"I1",cc:"CC9.2",p:30,c:"high",a:"man",t:"GitHub recorded in the vendor inventory",
+  d:"Treat it as a subservice organization and review its assurance report annually.",
+  w:"Vendor management register",
+  cw:"Once code and evidence live there, GitHub carries part of your control environment. An auditor will expect it in scope and will ask what you did with their report.",
+  aw:"Register entry and an annual review. Not automatable.",
+  pw:"In the evidence wave. It is paperwork, but it is paperwork that gates a clean opinion."},
+ {id:"I2",cc:"A1.2",p:56,c:"mod",a:"auto",t:"Repository and metadata backup outside the platform",
+  d:"Code, issues and settings — and confirm the restore path works.",
+  w:"Organization → Settings → Migrations, or a scheduled export",
+  cw:"Covers account loss, ransomware on a privileged account, and destructive insider action. Ranked here because the same events are largely prevented by the earlier access controls.",
+  aw:"Scheduled export, fully automatable.",
+  pw:"Late. It reduces impact after a failure the earlier controls are designed to prevent."},
+ {id:"I3",cc:"CC9.1",p:57,c:"mod",a:"man",t:"Recovery ownership documented",
+  d:"Name who restores access if the sole owner is unavailable, and where recovery codes live.",
+  w:"Business continuity plan",
+  cw:"The scenario is rare but total: nobody can reach the organization at all. Two owners reduce the likelihood; this documents what happens anyway.",
+  aw:"A written decision.",
+  pw:"Paired with backup as the continuity block."},
+ {id:"I4",cc:"CC9.2",p:58,c:"low",a:"man",t:"Terms and data processing agreement reviewed",
+  d:"Confirm plan tier, data residency and processing terms match what you have told customers.",
+  w:"Organization → Settings → Billing and plans",
+  cw:"A commitment-accuracy matter. It becomes material only if what you told a customer differs from what the contract provides.",
+  aw:"A document review.",
+  pw:"Last. Nothing else depends on it and it changes no technical exposure."}
+]}];
+
+/* implementation detail: est = minutes of focused effort, pre = prerequisites, steps, ver = verification, cli = optional command */
+var IMPL={
+A1:{est:90,pre:["List every repository that should belong to the org, including any on personal accounts.","Confirm you are an org owner and a seat is available.","Warn the current owner: transfer breaks their local remotes and any webhooks."],
+ steps:["From the personal account: Repository → Settings → General → Danger zone → Transfer ownership.","Enter the organization as the new owner and confirm the repository name.","Re-apply team access, rulesets and Actions secrets — none of these follow the transfer.","Ask contributors to update their remote URLs."],
+ ver:"The repository appears under Organization → Repositories and no longer under the personal account.",
+ cli:"gh repo list <user> --limit 200 --json name,visibility"},
+A2:{est:20,pre:["Agree who the second owner is. Avoid two people who travel or take leave together.","Confirm they have 2FA configured and recovery codes stored somewhere durable."],
+ steps:["Organization → People → select the person → Role → Owner.","Have them confirm by loading Organization → Settings.","Record both owners in the continuity document.","Set a quarterly reminder to re-check the owner list."],
+ ver:"Organization → People filtered to Role: Owner shows exactly the intended names and no one else.",
+ cli:"gh api orgs/<org>/members?role=admin --jq '.[].login'"},
+A3:{est:15,pre:["Snapshot current access first — this removes implicit read for everyone.","Have the team grants from C1 ready to apply straight after, or people will be blocked.","Tell engineers repositories may briefly disappear from their view."],
+ steps:["Organization → Settings → Member privileges.","Set Base permissions to No permission.","Save, then immediately apply team-based grants."],
+ ver:"An account with no team membership sees no repositories in the organization.",
+ cli:"gh api -X PATCH orgs/<org> -f default_repository_permission=none"},
+A4:{est:10,pre:["Confirm nobody has a legitimate need to publish a public repository this week."],
+ steps:["Organization → Settings → Member privileges → Repository creation.","Allow members to create private repositories only, or restrict creation to owners entirely.","Save."],
+ ver:"A non-owner account sees only Private as an option on the new repository screen.",
+ cli:"gh api -X PATCH orgs/<org> -F members_can_create_public_repositories=false"},
+A5:{est:10,pre:["None. This is safe to apply immediately."],
+ steps:["Organization → Settings → Member privileges → Repository visibility change.","Disable the ability for members to change visibility.","Save."],
+ ver:"A non-owner repository admin no longer sees a Change visibility option in repository settings.",
+ cli:"gh api -X PATCH orgs/<org> -F members_can_change_repo_visibility=false"},
+A6:{est:10,pre:["Check whether any current workflow depends on forking internally — most small teams branch instead."],
+ steps:["Organization → Settings → Member privileges → Repository forking.","Disable forking of private repositories.","Save."],
+ ver:"The Fork button is unavailable on a private repository for a member account.",
+ cli:"gh api -X PATCH orgs/<org> -F members_can_fork_private_repositories=false"},
+A7:{est:10,pre:["Confirm owners are available to perform deletions when genuinely needed."],
+ steps:["Organization → Settings → Member privileges → Repository deletion and transfer.","Restrict to owners only.","Save."],
+ ver:"A repository admin who is not an org owner sees no delete or transfer option.",
+ cli:"gh api -X PATCH orgs/<org> -F members_can_delete_repositories=false"},
+A8:{est:45,pre:["Access to DNS for the domain.","Decide whether to restrict notification email to the verified domain — this affects contractors on other addresses."],
+ steps:["Organization → Settings → Verified and approved domains → Add a domain.","Create the TXT record shown, then wait for propagation.","Return and click Verify.","Optionally enable notification restriction to the verified domain."],
+ ver:"The domain shows as Verified and a verified badge appears on the organization profile.",
+ cli:"dig +short TXT _github-challenge-<org>.<domain>"},
+A9:{est:120,pre:["Export the current list of installed GitHub Apps and authorised OAuth apps.","Identify an owner for each — anything with no owner is a removal candidate."],
+ steps:["Organization → Settings → Third-party access → OAuth app policy → Set up application access restriction.","Review the pending list: approve what is needed, deny the rest.","Repeat for GitHub Apps under Installed GitHub Apps, checking the permission scope of each.","Record approved integrations in the vendor register."],
+ ver:"Every remaining app has a named owner and a documented business reason.",
+ cli:"gh api orgs/<org>/installations --jq '.installations[].app_slug'"},
+
+B1:{est:60,pre:["Export the member list and check who already has 2FA — enforcement removes non-compliant members automatically.","Give at least a week of notice, with setup instructions.","Check bot and service accounts separately; they are removed too."],
+ steps:["Announce the date and share setup instructions.","Chase the remaining non-compliant accounts individually.","Organization → Settings → Authentication security → Require two-factor authentication → Save.","Re-invite anyone removed once they have configured 2FA."],
+ ver:"Organization → People shows no members in the 2FA-disabled filter.",
+ cli:"gh api orgs/<org>/members?filter=2fa_disabled --jq '.[].login'"},
+B2:{est:90,pre:["Confirm people have access to a hardware key or a passkey-capable device.","Check no automation depends on an account using SMS."],
+ steps:["Ask everyone to add a passkey or security key alongside their existing method.","Once adoption is confirmed, set the 2FA method requirement to exclude SMS.","Document any exception with a name, reason and review date."],
+ ver:"The organization security settings show the stricter method requirement and no member is blocked.",
+ cli:""},
+B3:{est:480,pre:["Confirm the plan supports SAML SSO — this is not available on all tiers.","Have IdP admin access and a test account ready.","Save recovery codes before enforcing; a misconfiguration locks everyone out."],
+ steps:["Configure the SAML application in the IdP using GitHub's metadata.","Organization → Settings → Authentication security → enable SAML, paste the sign-on URL and certificate.","Test with a single account before enforcing.","Enforce, then have members authorise their existing PATs and SSH keys for SSO.","If SSO is not available, write the compensating control note instead and mark this control Not applicable."],
+ ver:"A test member is redirected to the IdP and lands in the organization successfully.",
+ cli:""},
+B4:{est:150,pre:["Inventory existing tokens and what they are used for — restriction will break unregistered automation.","Identify which automation should move to a GitHub App or Actions secret instead."],
+ steps:["Organization → Settings → Personal access tokens → Settings.","Require approval for fine-grained tokens accessing the organization.","Restrict classic token access to the organization.","Work the approval queue, approving only tokens with a named owner and a stated purpose.","Set a maximum lifetime and record a rotation date for each approved token."],
+ ver:"Every approved token maps to a named owner, a purpose and an expiry date.",
+ cli:"gh api orgs/<org>/personal-access-tokens --jq '.[] | {owner:.owner.login,expiry:.token_expired}'"},
+B5:{est:120,pre:["List deploy keys and user SSH keys per repository.","Identify which system or person each key belongs to before removing anything."],
+ steps:["For each repository: Settings → Deploy keys, and confirm each key is needed.","Downgrade any write-capable key to read-only unless there is a documented reason.","Remove keys with no identified owner.","Record the remaining keys with owner and rotation date."],
+ ver:"Every remaining key has a named owner; no unexplained write keys remain.",
+ cli:"gh api repos/<org>/<repo>/keys --jq '.[] | {title,read_only}'"},
+B6:{est:90,pre:["Decide what counts as a service account in your naming and tagging convention."],
+ steps:["List all org members and separate humans from machines.","Assign a named human owner to each machine account.","Confirm 2FA where the account supports it; where it does not, document the compensating control.","Add the machine accounts to the quarterly review population."],
+ ver:"Every non-human account appears in the review list with an owner beside it.",
+ cli:"gh api orgs/<org>/members --jq '.[].login'"},
+
+C1:{est:240,pre:["Base permissions must already be None (A3), or team grants add nothing.","Sketch the team structure first — by function or by product, not by individual."],
+ steps:["Organization → Teams → create the teams you designed.","Add members to teams rather than to repositories.","Grant each team access to the repositories it needs, at the lowest workable role.","Remove the individual collaborator grants the teams now replace.","Document what each team is for."],
+ ver:"No repository lists individual collaborators except deliberate, documented exceptions.",
+ cli:"gh api repos/<org>/<repo>/collaborators?affiliation=direct --jq '.[].login'"},
+C2:{est:120,pre:["Teams must exist first (C1).","Agree what justifies repository Admin — usually only owners and one or two maintainers."],
+ steps:["For each repository, review the role granted to each team.","Downgrade Admin to Maintain or Write unless there is a documented reason.","Confirm Read is sufficient for anyone who does not commit.","Record the exceptions with a reason and a review date."],
+ ver:"The Admin population per repository is short and every entry has a written justification.",
+ cli:"gh api repos/<org>/<repo>/teams --jq '.[] | {name,permission}'"},
+C3:{est:90,pre:["Have the contract or engagement end date for each external party to hand."],
+ steps:["Organization → People → Outside collaborators, and export the list.","For each: confirm the repositories are the minimum needed and the role is Read where possible.","Record the business reason and an end date.","Remove anyone whose engagement has ended.","Add the end dates to a calendar so removal is triggered, not remembered."],
+ ver:"Every outside collaborator has a reason and an end date recorded.",
+ cli:"gh api orgs/<org>/outside_collaborators --jq '.[].login'"},
+C4:{est:180,pre:["The access model must be in place first (C1, C2), or the review just documents the mess.","Decide who the reviewer is — it should not be the person who administers access.","Agree the retention location for the signed result."],
+ steps:["Export members, team memberships and outside collaborators on the review date.","Circulate to the reviewer with the repositories and roles each identity holds.","Reviewer marks each entry keep, change or remove, and signs and dates the result.","Action the removals and changes, and record the completion date.","File the signed export in the evidence register."],
+ ver:"A dated, signed export exists for the period, and the actioned changes are traceable in the audit log.",
+ cli:"gh api orgs/<org>/members --jq '.[].login' > access-review-$(date +%F).txt"},
+C5:{est:120,pre:["Agree the trigger with whoever handles departures — the control depends on being told.","Confirm who performs the removal and who covers when they are away."],
+ steps:["Write the checklist: remove from org, revoke PATs and SSH keys, cancel pending invitations, transfer owned repositories and Actions secrets, remove from IdP if SSO is in use.","Agree the one-business-day SLA and where completion is recorded.","Dry-run it against a test account.","Record each real offboarding with the date completed."],
+ ver:"A completed checklist exists for the most recent departure, dated within one business day.",
+ cli:"gh api -X DELETE orgs/<org>/members/<username>"},
+C6:{est:20,pre:["None."],
+ steps:["Organization → People → Pending invitations.","Cancel anything older than the agreed threshold or sent to an address no longer in use.","Add a monthly reminder, or script the check."],
+ ver:"No invitation is older than the agreed threshold.",
+ cli:"gh api orgs/<org>/invitations --jq '.[] | {email,created_at}'"},
+
+D1:{est:30,pre:["Access to list all repositories in the org, including archived ones."],
+ steps:["Organization → Repositories and sort or filter by visibility.","For anything public, confirm it is deliberate; if not, change it to private and treat the contents as exposed.","Include archived repositories — they are easy to miss.","Schedule the check to repeat after any migration."],
+ ver:"The repository list shows no unexpected public entries.",
+ cli:"gh repo list <org> --limit 500 --json name,visibility --jq '.[]|select(.visibility!=\"PRIVATE\")'"},
+D2:{est:180,pre:["Secret scanning should be running first (F1), so the credential class is already covered.","Agree what counts as customer or personal data in your context."],
+ steps:["Write the rule into the repository README or CONTRIBUTING: what may and may not be committed.","Review current contents for data files, exports, database dumps and screenshots.","Remove anything that does not belong and record what was found.","Where data was committed, assess whether it triggers a notification obligation."],
+ ver:"A dated review note exists, and the rule is written where contributors will see it.",
+ cli:"git log --all --name-only --pretty=format: | sort -u | grep -Ei '\\.(csv|sql|xlsx|env|pem)$'"},
+D3:{est:60,pre:["Decide which repositories get the standard configuration."],
+ steps:["Add a shared .gitignore covering environment files, keys, exports and build output.","Add a pre-commit configuration with a secret detection hook.","Document the one-time local install step for contributors.","Confirm it fires by attempting a test commit with a dummy credential."],
+ ver:"A deliberate test commit containing a fake credential is blocked locally.",
+ cli:"pre-commit install && pre-commit run --all-files"},
+D4:{est:20,pre:["Confirm whether Pages is in use anywhere before disabling."],
+ steps:["Repository → Settings → Pages.","Where unused, set the source to None.","Where used, restrict visibility if the plan supports it, and confirm what is published.","Record the decision for each repository."],
+ ver:"No private repository publishes to a public Pages URL unintentionally.",
+ cli:"gh api repos/<org>/<repo>/pages --jq '{status,html_url}'"},
+D5:{est:45,pre:["List the binary artifacts currently tracked, particularly spreadsheets and documents."],
+ steps:["Decide what stays in Git and what moves to a document system.","For anything that stays, note that the change history will not diff and how approval will be evidenced instead.","Record the decision and the reasoning."],
+ ver:"A written decision exists covering each class of binary artifact in the repository.",
+ cli:"git ls-files | grep -Ei '\\.(xlsx|docx|pptx|pdf)$'"},
+
+E1:{est:60,pre:["Confirm the default branch name for each repository.","Warn the team: direct pushes to the default branch stop working.","Decide whether to apply org-wide or per repository — org-wide is easier to evidence."],
+ steps:["Organization → Settings → Repository rulesets → New ruleset → New branch ruleset.","Target the default branch across all repositories, or a named set.","Set enforcement to Active — Evaluate mode only reports and protects nothing.","Add the individual requirements from E2 to E9.","Save and confirm no legitimate automation is broken."],
+ ver:"A direct push to the default branch is rejected for a Write-role account.",
+ cli:"gh api orgs/<org>/rulesets --jq '.[] | {name,enforcement}'"},
+E2:{est:20,pre:["The ruleset must exist (E1).","Confirm the team is large enough that someone other than the author can approve. If not, document the exception."],
+ steps:["In the ruleset, enable Require a pull request before merging.","Set required approvals to at least 1.","Confirm the merge methods you want to permit.","Communicate the new flow before it takes effect."],
+ ver:"A pull request cannot be merged until an approval is recorded.",
+ cli:""},
+E3:{est:10,pre:["E2 must be in place."],
+ steps:["In the ruleset, enable Dismiss stale pull request approvals when new commits are pushed.","Save."],
+ ver:"Pushing a new commit to an approved pull request clears the approval.",
+ cli:""},
+E4:{est:10,pre:["Confirm no release process relies on force pushing or deleting the default branch."],
+ steps:["In the ruleset, enable Restrict force pushes.","Enable Restrict deletions.","Save."],
+ ver:"A force push to the protected branch is rejected.",
+ cli:""},
+E5:{est:30,pre:["The checks must already run reliably on pull requests, or merges will block on a check that never reports."],
+ steps:["Run the checks on a few pull requests first and confirm they pass consistently.","In the ruleset, enable Require status checks to pass and select the named checks.","Enable the requirement that branches are up to date before merging, if appropriate.","Save."],
+ ver:"A pull request with a failing check cannot be merged.",
+ cli:""},
+E6:{est:5,pre:["None."],
+ steps:["In the ruleset, enable Require conversation resolution before merging.","Save."],
+ ver:"A pull request with an unresolved comment cannot be merged.",
+ cli:""},
+E7:{est:180,pre:["Every contributor needs a signing key configured and uploaded before this is enforced, or all merges stop.","Confirm any automation that commits can also sign."],
+ steps:["Distribute setup instructions for GPG or SSH commit signing.","Have each contributor upload their public signing key to their GitHub account.","Confirm commits show as Verified across recent pull requests.","Only then enable Require signed commits in the ruleset."],
+ ver:"Recent commits on the protected branch all display the Verified badge.",
+ cli:"git config --global commit.gpgsign true"},
+E8:{est:45,pre:["Review must already be required (E2), or CODEOWNERS routes nothing.","Agree who owns which paths."],
+ steps:["Create .github/CODEOWNERS listing path patterns and owning teams.","Cover workflow files, infrastructure code and policy documents at minimum.","In the ruleset, enable Require review from Code Owners.","Test with a pull request touching a covered path."],
+ ver:"A pull request touching a covered path automatically requests the owning team.",
+ cli:""},
+E9:{est:15,pre:["Decide whether any bypass is genuinely needed, and for whom."],
+ steps:["In the ruleset, review the Bypass list.","Remove blanket organization admin bypass.","Where a break-glass path is needed, add a specific named role or app and document when it may be used.","Confirm bypass use appears in the audit log."],
+ ver:"An org owner attempting a direct push to the protected branch is blocked, or the bypass is logged.",
+ cli:""},
+
+F1:{est:20,pre:["Confirm the feature is available on your plan for private repositories.","Expect a backlog of historical findings — have someone ready to triage.","Enable push protection first (F2) so the backlog stops growing."],
+ steps:["Organization → Settings → Advanced Security → enable secret scanning for all repositories.","Enable it by default for new repositories.","Work the alert queue: for each, rotate first, then remove.","Record the triage decision on every alert."],
+ ver:"The alert queue is triaged and each open alert has a recorded owner and next step.",
+ cli:"gh api orgs/<org>/secret-scanning/alerts --jq '.[] | {repo:.repository.name,type:.secret_type,state}'"},
+F2:{est:15,pre:["Tell developers what to expect: a blocked push with a bypass prompt.","Agree in advance whether bypass is permitted and who reviews bypass events."],
+ steps:["Organization → Settings → Advanced Security → enable push protection for all repositories.","Enable by default for new repositories.","Test with a dummy credential in a scratch branch.","Route bypass notifications to the security channel."],
+ ver:"A test push containing a recognisable dummy credential is blocked.",
+ cli:""},
+F3:{est:90,pre:["Know which systems the credentials in your repositories actually reach, and who can rotate each."],
+ steps:["Write the procedure: rotate the credential first, confirm the old one is dead, then remove from history.","Name who rotates for each system and how they are reached out of hours.","State the assessment step: what the credential could access and whether that triggers a notification obligation.","Walk one test scenario end to end and time it."],
+ ver:"The written procedure exists, names owners, and has been walked through at least once.",
+ cli:""},
+F4:{est:120,pre:["Inventory where workflow credentials currently live — workflow files, variables, and code.","Identify who can rotate each credential, because migration is a good moment to rotate."],
+ steps:["Repository → Settings → Secrets and variables → Actions, and add each credential as an encrypted secret.","Scope production credentials to an environment rather than the repository.","Update the workflows to reference the secrets.","Remove the hardcoded values and rotate anything that was previously exposed.","Confirm no secret is echoed into logs."],
+ ver:"No credential appears in any workflow file or repository variable, and workflows still run.",
+ cli:"grep -rEi '(api[_-]?key|token|password|secret)\\s*[:=]' .github/workflows/"},
+F5:{est:60,pre:["A deployment workflow must exist to protect.","Agree who approves a production deployment."],
+ steps:["Repository → Settings → Environments → create the production environment.","Add required reviewers and restrict which branches can deploy to it.","Move production credentials into the environment's secrets.","Update the workflow job to declare the environment.","Test with a deployment that waits for approval."],
+ ver:"A production deployment pauses for approval and the approver is recorded.",
+ cli:""},
+
+G1:{est:15,pre:["Expect an initial backlog of alerts; agree who triages and how often."],
+ steps:["Organization → Settings → Advanced Security → enable dependency graph and Dependabot alerts.","Enable by default for new repositories.","Route alerts to the monitored channel.","Agree a remediation SLA by severity and write it down."],
+ ver:"Alerts appear in the security tab and route to the agreed channel.",
+ cli:"gh api orgs/<org>/dependabot/alerts --jq '.[] | {repo:.repository.name,sev:.security_advisory.severity,state}'"},
+G2:{est:30,pre:["Branch protection and review should already be in place (E1, E2), so automated pull requests still get reviewed.","CI should be reliable enough to tell you when a bump breaks something."],
+ steps:["Enable Dependabot security updates at organization level.","Optionally add a dependabot.yml to control update cadence and grouping.","Agree who reviews and merges the pull requests, and how often.","Group low-risk updates to keep the volume manageable."],
+ ver:"Dependabot pull requests appear and are being merged within the agreed SLA.",
+ cli:""},
+G3:{est:20,pre:["Dependency graph must be enabled (G1)."],
+ steps:["Enable dependency review at organization or repository level.","Optionally add the dependency review action to the pull request workflow.","Decide whether to fail the check or only warn, and set the severity threshold.","Add it to required status checks once it is stable."],
+ ver:"A pull request adding a known vulnerable dependency surfaces a warning or failure.",
+ cli:""},
+G4:{est:120,pre:["Confirm the languages in use are supported.","Agree who triages findings — an untriaged scanner is noise, not a control."],
+ steps:["Repository → Settings → Advanced Security → Code scanning → Default setup.","Run the first scan and review the findings.","Dismiss false positives with a written reason rather than silently.","Agree a triage cadence and an owner.","Add to required status checks only once the noise level is acceptable."],
+ ver:"The first scan has completed and every finding is either actioned or dismissed with a reason.",
+ cli:"gh api repos/<org>/<repo>/code-scanning/alerts --jq '.[] | {rule:.rule.id,state}'"},
+G5:{est:150,pre:["List every third-party Action referenced across all workflows.","Narrow the allow list first (G6) so the exercise is finite."],
+ steps:["For each third-party Action, open the repository and find the commit SHA for the version you trust.","Replace the tag reference with the full 40-character SHA, keeping the version in a trailing comment.","Verify the SHA belongs to the tag you expected before committing.","Run the workflows to confirm nothing broke.","Add a periodic review to pick up upstream security fixes — pinning also freezes patches."],
+ ver:"No workflow references a third-party Action by tag or branch.",
+ cli:"grep -rhoE 'uses: [^@]+@[^ ]+' .github/workflows/ | grep -v '@[0-9a-f]\\{40\\}'"},
+G6:{est:45,pre:["Inventory which Actions are actually in use before restricting, or you will break workflows."],
+ steps:["Organization → Settings → Actions → General → Policies.","Select Allow enterprise, and select non-enterprise, actions and reusable workflows.","Permit actions created by GitHub and by verified creators.","Add the specific third-party Actions you use to the allow list.","Run the workflows and add anything legitimate that fails."],
+ ver:"A workflow referencing an Action outside the allow list fails to start.",
+ cli:""},
+G7:{est:20,pre:["Identify workflows that genuinely need write access — release, tagging, and comment-posting jobs typically do."],
+ steps:["Organization → Settings → Actions → General → Workflow permissions → Read repository contents permission.","Add explicit permissions blocks to the workflows that need more, scoped to the specific scope required.","Run each workflow and fix the ones that fail on permissions."],
+ ver:"Workflows run successfully and no workflow relies on the permissive default.",
+ cli:"grep -rL 'permissions:' .github/workflows/"},
+G8:{est:15,pre:["Confirm whether any repository accepts pull requests from outside the organization."],
+ steps:["Organization → Settings → Actions → General → Fork pull request workflows.","Require approval for all outside collaborators.","Agree who approves and how quickly.","If no repository takes external contributions, mark this Not applicable with a note."],
+ ver:"A pull request from an outside account waits for approval before any workflow runs.",
+ cli:""},
+G9:{est:60,pre:["Confirm whether self-hosted runners exist at all. If not, this is Not applicable."],
+ steps:["Organization → Settings → Actions → Runners, and list what exists.","Confirm no runner is available to a public repository.","Restrict runner groups to named private repositories.","Confirm the runner host is patched, isolated from production, and running ephemeral jobs where possible."],
+ ver:"Every runner group is scoped to named private repositories only.",
+ cli:"gh api orgs/<org>/actions/runners --jq '.runners[] | {name,status}'"},
+G10:{est:30,pre:["Dependency graph must be enabled (G1)."],
+ steps:["Repository → Insights → Dependency graph → Export SBOM, and confirm the output is usable.","Decide the format and cadence a customer or regulator would expect.","Script the export if it will be requested regularly.","Store exports with a date so you can show what shipped when."],
+ ver:"A current SBOM export exists for each product repository.",
+ cli:"gh api repos/<org>/<repo>/dependency-graph/sbom > sbom-$(date +%F).json"},
+
+H1:{est:60,pre:["Decide who reviews and what they are looking for — an unfocused log review finds nothing.","Agree where the review conclusion is recorded."],
+ steps:["Write the review scope: owner changes, visibility changes, member additions and removals, ruleset changes, bypass events.","Set the cadence and the calendar reminder.","Run the first review and record what was checked, by whom, and what was found.","File the record in the evidence register."],
+ ver:"A dated review record exists for the most recent period, naming the reviewer.",
+ cli:"gh api orgs/<org>/audit-log --paginate --jq '.[] | select(.action|test(\"repo.access|org.update_member|protected_branch\"))'"},
+H2:{est:120,pre:["Confirm the retention window on your current plan and whether streaming is available.","Decide the destination and who can read it — the archive is sensitive."],
+ steps:["Where streaming is available, configure the endpoint and confirm events arrive.","Where it is not, script a scheduled export via the audit log API.","Set retention on the destination to cover your audit period plus a margin.","Confirm the archive is itself access-controlled and backed up.","Do a test retrieval of an event from more than a month ago."],
+ ver:"An event older than the platform's own retention window can be retrieved from your archive.",
+ cli:"gh api orgs/<org>/audit-log --paginate > audit-$(date +%F).json"},
+H3:{est:45,pre:["The alert sources must exist first (F1, G1, G4).","Agree which channel is genuinely monitored, and by whom."],
+ steps:["Organization → Settings → Notifications, and set the security alert recipients.","Route to a shared channel rather than an individual inbox.","Name the owner responsible for triage and a backup.","Send a test alert and confirm it lands and is seen."],
+ ver:"A test alert reaches the channel and the named owner acknowledges it.",
+ cli:""},
+H4:{est:90,pre:["Audit log export or streaming must be working (H2)."],
+ steps:["Define the high-risk event list: owner role changes, visibility changes, 2FA policy changes, ruleset changes, bypass use.","Write the detection rule in whatever consumes the log stream.","Set the alert destination and confirm it is monitored.","Test by making a reversible change and confirming the alert fires."],
+ ver:"A deliberate test change generates an alert within the expected window.",
+ cli:""},
+
+I1:{est:60,pre:["Know your plan tier and what data actually resides in the platform."],
+ steps:["Add GitHub to the vendor register with the service, data types held, and criticality.","Obtain the current assurance report and review it, noting complementary user entity controls that fall to you.","Record the review date, the reviewer, and any follow-up actions.","Set an annual reminder."],
+ ver:"The register entry exists with a dated review note and the report on file.",
+ cli:""},
+I2:{est:180,pre:["Decide what must be recoverable: code only, or issues, pull requests, settings and secrets metadata too.","Choose a destination with its own access controls."],
+ steps:["Script a scheduled clone of all repositories including all branches and tags.","Export issues, pull requests and settings metadata via the API.","Store with retention and confirm the destination is encrypted and access-controlled.","Perform a test restore into a scratch org and record the result.","Set a recurring reminder to re-test."],
+ ver:"A test restore has been completed and the result recorded with a date.",
+ cli:"gh repo list <org> --limit 500 --json name -q '.[].name' | xargs -I{} git clone --mirror https://github.com/<org>/{}.git"},
+I3:{est:45,pre:["Two owners should already exist (A2)."],
+ steps:["Record who can recover organization access and in what order.","Record where recovery codes are stored and who can retrieve them.","Confirm the billing contact is not a single individual's personal account.","Include the steps in the continuity plan and review annually."],
+ ver:"The continuity plan names the recovery path and someone other than the primary owner can describe it.",
+ cli:""},
+I4:{est:60,pre:["Have to hand what you have told customers about data location and subprocessors."],
+ steps:["Confirm the current plan tier and the features it actually includes.","Review the data processing terms and any data residency commitments.","Compare against what your customer-facing documents claim.","Correct whichever is wrong, and record the review date."],
+ ver:"A dated note records the comparison and confirms the two agree.",
+ cli:""}
+};
+
+var STATUS={open:"Not started",prog:"In progress",done:"Complete",na:"Not applicable"};
+var CRIT={crit:"Critical",high:"High",mod:"Moderate",low:"Low"};
+var AUTO={auto:"Fully automatable",semi:"Partly automatable",man:"Manual"};
+var AUTOS={auto:"Automatable",semi:"Part automatable",man:"Manual"};
+
+var state={editor:null,items:{},log:[],collapsed:{}};
+(function(){var raw=store.get(KEY);if(raw){try{var p=JSON.parse(raw);
+  state.editor=p.editor||null;state.items=p.items||{};state.log=p.log||[];state.collapsed=p.collapsed||{};}catch(e){}}})();
+function save(){store.set(KEY,JSON.stringify(state));}
+function itm(id){if(!state.items[id])state.items[id]={status:"open",owner:"",target:"",notes:"",by:"",at:""};return state.items[id];}
+function flat(){var a=[];GROUPS.forEach(function(g){g.items.forEach(function(i){a.push({g:g,i:i});});});return a;}
+function label(f,v){return f==="status"?(STATUS[v]||v):(v||"(empty)");}
+function stamp(id,f,v){var it=itm(id);if(it[f]===v)return;var old=it[f];it[f]=v;it.by=state.editor.name;it.at=new Date().toISOString();
+  state.log.unshift({at:it.at,by:state.editor.name,role:state.editor.role||"",id:id,field:f,from:label(f,old),to:label(f,v)});
+  if(state.log.length>800)state.log.length=800;save();}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function fmt(iso){if(!iso)return"";var d=new Date(iso);
+  return d.toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"})+" "+d.toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"});}
+
+var modal=document.getElementById("editorModal"),nameIn=document.getElementById("nameIn"),
+    roleIn=document.getElementById("roleIn"),cancelBtn=document.getElementById("cancelEditor");
+function askEditor(canCancel){nameIn.value=state.editor?state.editor.name:"";roleIn.value=state.editor?(state.editor.role||""):"";
+  cancelBtn.hidden=!canCancel;modal.hidden=false;setTimeout(function(){nameIn.focus();},30);}
+document.getElementById("saveEditor").addEventListener("click",function(){
+  var n=nameIn.value.trim();if(!n){nameIn.focus();nameIn.style.borderColor="#c0392b";return;}
+  var prev=state.editor?state.editor.name:null;state.editor={name:n,role:roleIn.value.trim()};
+  if(prev!==n)state.log.unshift({at:new Date().toISOString(),by:n,role:state.editor.role,id:"—",field:"session",
+    from:prev?("handed over from "+prev):"first session",to:"editing"});
+  save();modal.hidden=true;renderWho();render();});
+nameIn.addEventListener("keydown",function(e){if(e.key==="Enter")document.getElementById("saveEditor").click();});
+cancelBtn.addEventListener("click",function(){modal.hidden=true;});
+document.getElementById("switchEditor").addEventListener("click",function(){askEditor(true);});
+function renderWho(){document.getElementById("who").textContent=state.editor?(state.editor.name+(state.editor.role?" · "+state.editor.role:"")):"—";}
+
+var q=document.getElementById("q"),fStatus=document.getElementById("fStatus"),fCrit=document.getElementById("fCrit"),
+    fAuto=document.getElementById("fAuto"),fOwner=document.getElementById("fOwner"),sortBy=document.getElementById("sortBy"),
+    showRat=document.getElementById("showRat");
+
+function matches(g,i){var it=itm(i.id);
+  if(fStatus.value&&it.status!==fStatus.value)return false;
+  if(fCrit.value&&i.c!==fCrit.value)return false;
+  if(fAuto.value&&i.a!==fAuto.value)return false;
+  if(fOwner.value&&(it.owner||"")!==fOwner.value)return false;
+  var s=q.value.trim().toLowerCase();if(!s)return true;
+  var m=IMPL[i.id]||{pre:[],steps:[],ver:"",cli:""};
+  return (i.id+" "+i.t+" "+i.d+" "+i.w+" "+i.cc+" "+i.cw+" "+i.aw+" "+i.pw+" "+g.name+" "+
+          m.pre.join(" ")+" "+m.steps.join(" ")+" "+m.ver+" "+m.cli+" "+
+          (it.owner||"")+" "+(it.notes||"")).toLowerCase().indexOf(s)>-1;}
+
+function counts(){var c={open:0,prog:0,done:0,na:0};flat().forEach(function(x){c[itm(x.i.id).status]++;});return c;}
+function renderMeter(){var n=flat().length,c=counts(),den=n-c.na,pct=den>0?Math.round(c.done/den*100):100;
+  document.getElementById("barDone").style.width=(c.done/n*100)+"%";
+  document.getElementById("barProg").style.width=(c.prog/n*100)+"%";
+  document.getElementById("barNa").style.width=(c.na/n*100)+"%";
+  document.getElementById("meterLabel").textContent=c.done+" of "+den+" applicable controls complete";
+  document.getElementById("meterPct").textContent=pct+"%";
+  ["done","prog","na","open"].forEach(function(k){document.getElementById("c"+k.charAt(0).toUpperCase()+k.slice(1)).textContent=c[k];});}
+function renderOwners(){var cur=fOwner.value,set={};
+  flat().forEach(function(x){var o=(itm(x.i.id).owner||"").trim();if(o)set[o]=1;});
+  var names=Object.keys(set).sort();
+  fOwner.innerHTML='<option value="">All owners</option>'+names.map(function(o){return '<option value="'+esc(o)+'">'+esc(o)+'</option>';}).join("");
+  if(names.indexOf(cur)>-1)fOwner.value=cur;}
+
+function mins(id){var m=IMPL[id];return m?m.est:0;}
+function dur(m){
+  if(!m)return "—";
+  if(m<60)return m+" min";
+  var h=m/60;
+  if(m<480)return (h%1?h.toFixed(1):h)+" h";
+  var d=m/480;
+  return (d%1?d.toFixed(1):d)+" day"+(d>1?"s":"");}
+function badges(i){
+  return '<span class="cc">'+esc(i.cc)+'</span>'+
+    '<span class="badge b-'+i.c+'">'+CRIT[i.c]+'</span>'+
+    '<span class="badge b-'+(i.a==="auto"?"auto":i.a==="semi"?"semi":"man")+'">'+AUTOS[i.a]+'</span>'+
+    '<span class="badge b-est">'+dur(mins(i.id))+'</span>';}
+function howHtml(id){
+  var m=IMPL[id];if(!m)return "";
+  return '<div class="how" id="how-'+id+'" hidden>'+
+    '<h4>Before you start</h4><ul>'+m.pre.map(function(s){return '<li>'+esc(s)+'</li>';}).join("")+'</ul>'+
+    '<h4>Steps</h4><ol>'+m.steps.map(function(s){return '<li>'+esc(s)+'</li>';}).join("")+'</ol>'+
+    '<h4>How you know it worked</h4><p class="v">'+esc(m.ver)+'</p>'+
+    (m.cli?'<h4>Check or apply from the command line</h4><pre>'+esc(m.cli)+'</pre>':"")+
+    '<p class="est">Estimated effort: <b>'+dur(m.est)+'</b> of focused work, excluding notice periods, approvals and waiting on other people.</p>'+
+  '</div>';}
+function rationale(i){
+  return '<div class="rat">'+
+    '<p><b>Why it matters:</b> '+esc(i.cw)+'</p>'+
+    '<p><b>Automation:</b> '+esc(i.aw)+'</p>'+
+    '<p><b>Why this position in the sequence:</b> '+esc(i.pw)+'</p></div>';}
+
+function itemHtml(g,i){var it=itm(i.id);
+  return '<div class="item'+(it.status==="done"?" is-done":"")+'" data-id="'+i.id+'" id="ctl-'+i.id+'">'+
+    '<div class="item-top">'+
+      '<span class="seq">'+i.p+'<small>SEQ</small></span>'+
+      '<div class="titlewrap">'+
+        '<p class="t"><span class="idtag">'+esc(i.id)+'</span>'+esc(i.t)+'</p>'+
+        '<p class="d">'+esc(i.d)+'</p>'+
+        '<p class="where">'+esc(i.w)+'</p>'+
+        '<div class="tags">'+badges(i)+'</div>'+
+        (showRat.checked?rationale(i):"")+
+        '<button type="button" class="howbtn" data-how="'+i.id+'" aria-expanded="false" aria-controls="how-'+i.id+'">'+
+          '<span class="cv">▶</span>How to implement · '+dur(mins(i.id))+'</button>'+
+        howHtml(i.id)+
+      '</div>'+
+      '<span class="stamp">'+(it.by?'Last updated by <b>'+esc(it.by)+'</b><br>'+esc(fmt(it.at)):'No updates yet')+'</span>'+
+    '</div>'+
+    '<div class="controls">'+
+      '<select class="status st-'+it.status+'" data-f="status">'+
+        Object.keys(STATUS).map(function(k){return '<option value="'+k+'"'+(it.status===k?" selected":"")+'>'+STATUS[k]+'</option>';}).join("")+
+      '</select>'+
+      '<input type="text" data-f="owner" value="'+esc(it.owner)+'" placeholder="Owner">'+
+      '<input type="text" data-f="target" value="'+esc(it.target)+'" placeholder="Target date">'+
+    '</div>'+
+    '<textarea class="ev" data-f="notes" placeholder="Evidence reference, screenshot name, or why this is not applicable…">'+esc(it.notes)+'</textarea>'+
+  '</div>';}
+
+function renderChecklist(){
+  var host=document.getElementById("viewChecklist"),html="",shown=0;
+  if(sortBy.value==="prio"){
+    var rows=flat().filter(function(x){return matches(x.g,x.i);}).sort(function(a,b){return a.i.p-b.i.p;});
+    shown=rows.length;
+    html='<section class="grp"><div class="grp-hd" style="cursor:default"><h2>Remediation sequence</h2>'+
+         '<span class="count">'+shown+' controls in dependency order</span></div><div class="grp-body">'+
+         rows.map(function(x){return itemHtml(x.g,x.i);}).join("")+'</div></section>';
+  } else {
+    GROUPS.forEach(function(g){
+      var vis=g.items.filter(function(i){return matches(g,i);});
+      if(!vis.length)return;shown+=vis.length;
+      var done=g.items.filter(function(i){return itm(i.id).status==="done";}).length;
+      var app=g.items.filter(function(i){return itm(i.id).status!=="na";}).length;
+      var pct=app?Math.round(done/app*100):100;
+      html+='<section class="grp'+(state.collapsed[g.id]?" collapsed":"")+'" data-grp="'+g.id+'">'+
+        '<div class="grp-hd" data-toggle="'+g.id+'" role="button" tabindex="0"><span class="caret">▼</span>'+
+        '<h2>'+esc(g.id)+'. '+esc(g.name)+'</h2><span class="count">'+done+'/'+app+' complete</span>'+
+        '<span class="mini"><i style="width:'+pct+'%"></i></span></div><div class="grp-body">'+
+        vis.sort(function(a,b){return a.p-b.p;}).map(function(i){return itemHtml(g,i);}).join("")+'</div></section>';
+    });
+  }
+  host.innerHTML=shown?html:'<div class="empty">No controls match these filters.</div>';
+  document.getElementById("foot").textContent="Showing "+shown+" of "+flat().length+" controls."+
+    (persistent?" Progress is saved in this browser only — use Save file to share it or move it to another machine."
+               :" This browser is not storing progress. Use Save file before closing the page, and Import file to resume.");}
+
+function bar(done,prog,na,total){
+  var t=total||1;
+  return '<span class="track"><i class="t-done" style="width:'+(done/t*100)+'%"></i>'+
+         '<i class="t-prog" style="width:'+(prog/t*100)+'%"></i>'+
+         '<i class="t-na" style="width:'+(na/t*100)+'%"></i></span>';}
+
+function renderDash(){
+  var all=flat(),c=counts(),den=all.length-c.na,pct=den>0?Math.round(c.done/den*100):100;
+  var openCrit=all.filter(function(x){var s=itm(x.i.id).status;return x.i.c==="crit"&&s!=="done"&&s!=="na";});
+  var quick=all.filter(function(x){var s=itm(x.i.id).status;return x.i.a==="auto"&&s!=="done"&&s!=="na";});
+  var unowned=all.filter(function(x){var it=itm(x.i.id);return !(it.owner||"").trim()&&it.status!=="na"&&it.status!=="done";});
+  var queue=all.filter(function(x){var s=itm(x.i.id).status;return s!=="done"&&s!=="na";}).sort(function(a,b){return a.i.p-b.i.p;});
+
+  var h='<div class="kpis">'+
+    '<div class="kpi"><div class="n">'+pct+'%</div><div class="l">Applicable controls complete</div>'+
+      '<div class="h">'+c.done+' complete · '+c.prog+' in progress · '+c.open+' not started</div></div>'+
+    '<div class="kpi"><div class="n'+(openCrit.length?" alert":"")+'">'+openCrit.length+'</div><div class="l">Critical controls still open</div>'+
+      '<div class="h">'+(openCrit.length?"Highest open: "+esc(openCrit.sort(function(a,b){return a.i.p-b.i.p;})[0].i.id):"All critical controls closed")+'</div></div>'+
+    '<div class="kpi"><div class="n">'+quick.length+'</div><div class="l">Open and fully automatable</div>'+
+      '<div class="h">Settings changes rather than projects — usually a single session of work</div></div>'+
+    '<div class="kpi"><div class="n">'+unowned.length+'</div><div class="l">Open controls with no owner</div>'+
+      '<div class="h">Unowned work does not get done, and an auditor will ask who is accountable</div></div>'+
+  '</div>';
+
+  var remain=queue.reduce(function(s,x){return s+mins(x.i.id);},0);
+  var critMin=openCrit.reduce(function(s,x){return s+mins(x.i.id);},0);
+  var quickMin=quick.reduce(function(s,x){return s+mins(x.i.id);},0);
+  var first10=queue.slice(0,10).reduce(function(s,x){return s+mins(x.i.id);},0);
+  var effortPanel='<div class="panel"><h3>Effort remaining</h3><div class="body">'+
+     '<p class="note">Focused working time only. It excludes notice periods, waiting on approvals, and the elapsed time between a change and its verification — for planning, assume calendar time runs roughly double.</p>'+
+     '<div class="kpis" style="margin-bottom:0">'+
+       '<div class="kpi"><div class="n">'+dur(remain)+'</div><div class="l">All open controls</div>'+
+         '<div class="h">'+queue.length+' controls not yet complete</div></div>'+
+       '<div class="kpi"><div class="n'+(critMin?" alert":"")+'">'+dur(critMin)+'</div><div class="l">Open Critical controls</div>'+
+         '<div class="h">The set that changes your actual exposure</div></div>'+
+       '<div class="kpi"><div class="n">'+dur(quickMin)+'</div><div class="l">Open and fully automatable</div>'+
+         '<div class="h">Settings work — largely one sitting with an org owner</div></div>'+
+       '<div class="kpi"><div class="n">'+dur(first10)+'</div><div class="l">Next ten in sequence</div>'+
+         '<div class="h">A realistic first block of work</div></div>'+
+     '</div></div></div>';
+
+  h+='<div class="panel"><h3>Do these next</h3><div class="body">'+
+     '<p class="note">Ordered by the remediation sequence, which follows dependency and blast radius rather than section order. Each entry explains why it sits where it does.</p>';
+  if(!queue.length){h+='<div class="clear">Every applicable control is complete.</div>';}
+  else{h+='<ol class="queue">'+queue.slice(0,8).map(function(x){
+    return '<li><span class="qn">'+x.i.p+'</span><span class="qt">'+
+      '<p class="qh">'+esc(x.i.id)+' · '+esc(x.i.t)+' <span class="badge b-'+x.i.c+'">'+CRIT[x.i.c]+'</span> <span class="badge b-'+x.i.a+'">'+AUTOS[x.i.a]+'</span> <span class="badge b-est">'+dur(mins(x.i.id))+'</span></p>'+
+      '<p class="qw">'+esc(x.i.pw)+'</p></span>'+
+      '<span class="qgo"><button class="btn ghost" data-goto="'+x.i.id+'">Open</button></span></li>';}).join("")+'</ol>';}
+  h+='</div></div>'+effortPanel;
+
+  h+='<div class="two">';
+  var order=["crit","high","mod","low"];
+  h+='<div class="panel"><h3>Progress by criticality</h3><div class="body">'+
+     '<p class="note">Criticality reflects the consequence if the control is absent — irreversibility first, then blast radius, then likelihood.</p>'+
+     order.map(function(k){
+       var set=all.filter(function(x){return x.i.c===k;});
+       var d=set.filter(function(x){return itm(x.i.id).status==="done";}).length;
+       var p=set.filter(function(x){return itm(x.i.id).status==="prog";}).length;
+       var n=set.filter(function(x){return itm(x.i.id).status==="na";}).length;
+       return '<div class="rowbar"><span class="k">'+CRIT[k]+'</span>'+bar(d,p,n,set.length)+
+              '<span class="v">'+d+'/'+set.length+'</span></div>';}).join("")+
+     '</div></div>';
+
+  var aorder=["auto","semi","man"];
+  h+='<div class="panel"><h3>Progress by effort type</h3><div class="body">'+
+     '<p class="note">Fully automatable controls are API-settable and can be enforced as code. Manual controls need a human decision, a written procedure, or an attestation.</p>'+
+     aorder.map(function(k){
+       var set=all.filter(function(x){return x.i.a===k;});
+       var d=set.filter(function(x){return itm(x.i.id).status==="done";}).length;
+       var p=set.filter(function(x){return itm(x.i.id).status==="prog";}).length;
+       var n=set.filter(function(x){return itm(x.i.id).status==="na";}).length;
+       return '<div class="rowbar"><span class="k">'+AUTO[k]+'</span>'+bar(d,p,n,set.length)+
+              '<span class="v">'+d+'/'+set.length+'</span></div>';}).join("")+
+     '</div></div></div>';
+
+  h+='<div class="panel"><h3>Progress by section</h3><table class="sec"><thead><tr>'+
+     '<th>Section</th><th>Complete</th><th>In progress</th><th>Not started</th><th>N/A</th><th>Critical open</th></tr></thead><tbody>'+
+     GROUPS.map(function(g){
+       var s={done:0,prog:0,open:0,na:0},co=0;
+       g.items.forEach(function(i){var st=itm(i.id).status;s[st]++;if(i.c==="crit"&&st!=="done"&&st!=="na")co++;});
+       return '<tr><td><b>'+esc(g.id)+'.</b> '+esc(g.name)+'</td><td>'+s.done+'</td><td>'+s.prog+'</td><td>'+s.open+
+              '</td><td>'+s.na+'</td><td'+(co?' style="color:var(--crit);font-weight:600"':'')+'>'+co+'</td></tr>';}).join("")+
+     '</tbody></table></div>';
+
+  document.getElementById("viewDash").innerHTML=h;}
+
+function renderLog(){var host=document.getElementById("viewLog");
+  if(!state.log.length){host.innerHTML='<div class="empty">No changes recorded yet.</div>';return;}
+  host.innerHTML='<section class="grp"><table class="log"><thead><tr><th>When</th><th>Editor</th><th>Control</th><th>Field</th><th>Change</th></tr></thead><tbody>'+
+    state.log.map(function(e){return "<tr><td class='when'>"+esc(fmt(e.at))+"</td><td><b>"+esc(e.by)+"</b>"+
+      (e.role?"<br><span style='color:var(--ink-soft);font-size:11.5px'>"+esc(e.role)+"</span>":"")+
+      "</td><td>"+esc(e.id)+"</td><td>"+esc(e.field)+"</td><td>"+esc(e.from)+" → <b>"+esc(e.to)+"</b></td></tr>";}).join("")+
+    '</tbody></table></section>';}
+
+function render(){renderMeter();renderOwners();renderDash();renderChecklist();renderLog();}
+
+document.getElementById("viewChecklist").addEventListener("change",function(e){
+  var f=e.target.getAttribute("data-f");if(!f)return;
+  var row=e.target.closest(".item");if(!row)return;
+  if(!state.editor){askEditor(false);return;}
+  stamp(row.getAttribute("data-id"),f,e.target.value);render();});
+document.getElementById("viewChecklist").addEventListener("click",function(e){
+  var hb=e.target.closest("[data-how]");
+  if(hb){var id=hb.getAttribute("data-how"),p=document.getElementById("how-"+id);
+    if(p){p.hidden=!p.hidden;hb.setAttribute("aria-expanded",p.hidden?"false":"true");}return;}
+  var hd=e.target.closest("[data-toggle]");if(!hd)return;
+  var g=hd.getAttribute("data-toggle");state.collapsed[g]=!state.collapsed[g];save();renderChecklist();});
+document.getElementById("viewChecklist").addEventListener("keydown",function(e){
+  if(e.key!=="Enter"&&e.key!==" ")return;var hd=e.target.closest("[data-toggle]");if(!hd)return;e.preventDefault();hd.click();});
+
+function showTab(v){
+  document.querySelectorAll("nav.tabs button").forEach(function(x){x.setAttribute("aria-selected",x.getAttribute("data-view")===v?"true":"false");});
+  document.getElementById("viewDash").hidden=(v!=="dash");
+  document.getElementById("viewChecklist").hidden=(v!=="checklist");
+  document.getElementById("viewLog").hidden=(v!=="log");
+  document.getElementById("toolbar").style.display=(v==="checklist")?"":"none";}
+document.querySelectorAll("nav.tabs button").forEach(function(b){
+  b.addEventListener("click",function(){showTab(b.getAttribute("data-view"));});});
+
+document.getElementById("viewDash").addEventListener("click",function(e){
+  var b=e.target.closest("[data-goto]");if(!b)return;
+  var id=b.getAttribute("data-goto");
+  q.value="";fStatus.value="";fCrit.value="";fAuto.value="";fOwner.value="";
+  var grp=id.charAt(0);state.collapsed[grp]=false;save();
+  showTab("checklist");renderChecklist();
+  var el=document.getElementById("ctl-"+id);
+  if(el){el.classList.add("flash");if(el.scrollIntoView)el.scrollIntoView({block:"center"});}});
+
+[q,fStatus,fCrit,fAuto,fOwner,sortBy].forEach(function(el){el.addEventListener("input",renderChecklist);});
+showRat.addEventListener("change",renderChecklist);
+document.getElementById("expandAll").addEventListener("click",function(){state.collapsed={};save();renderChecklist();});
+document.getElementById("collapseAll").addEventListener("click",function(){GROUPS.forEach(function(g){state.collapsed[g.id]=true;});save();renderChecklist();});
+
+function download(n,t,ty){var b=new Blob([t],{type:ty}),u=URL.createObjectURL(b),a=document.createElement("a");
+  a.href=u;a.download=n;document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(u);},1500);}
+function today(){return new Date().toISOString().slice(0,10);}
+document.getElementById("exportJson").addEventListener("click",function(){
+  download("github-hardening-"+today()+".json",JSON.stringify(state,null,2),"application/json");});
+document.getElementById("exportCsv").addEventListener("click",function(){
+  var rows=[["Sequence","Section","ID","Control","Criticality","Why critical","Automatable","Automation notes","Why this sequence position","Estimated effort (min)","Estimated effort","Prerequisites","Implementation steps","Verification","Command","SOC 2 CC","Where","Status","Owner","Target","Evidence notes","Last updated by","Updated at"]];
+  flat().sort(function(a,b){return a.i.p-b.i.p;}).forEach(function(x){var it=itm(x.i.id),m=IMPL[x.i.id]||{est:0,pre:[],steps:[],ver:"",cli:""};
+    rows.push([x.i.p,x.g.id+". "+x.g.name,x.i.id,x.i.t,CRIT[x.i.c],x.i.cw,AUTO[x.i.a],x.i.aw,x.i.pw,m.est,dur(m.est),
+               m.pre.join(" | "),m.steps.map(function(s,n){return (n+1)+". "+s;}).join(" | "),m.ver,m.cli,x.i.cc,x.i.w,
+               STATUS[it.status],it.owner,it.target,it.notes,it.by,it.at?fmt(it.at):""]);});
+  var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c==null?"":c).replace(/"/g,'""')+'"';}).join(",");}).join("\r\n");
+  download("github-hardening-"+today()+".csv","\ufeff"+csv,"text/csv;charset=utf-8");});
+document.getElementById("importBtn").addEventListener("click",function(){document.getElementById("fileIn").click();});
+document.getElementById("fileIn").addEventListener("change",function(e){
+  var f=e.target.files[0];if(!f)return;var r=new FileReader();
+  r.onload=function(){try{var p=JSON.parse(r.result);
+    if(!p||typeof p!=="object"||!p.items)throw new Error("shape");
+    state.items=p.items||{};state.log=(p.log||[]).concat(state.log).slice(0,800);state.collapsed=p.collapsed||{};
+    save();render();}catch(err){alert("That file could not be read. Choose a JSON file saved from this tracker.");}
+    e.target.value="";};
+  r.readAsText(f);});
+
+renderWho();render();
+if(!state.editor)askEditor(false);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOC 2 Programme Execution Tracker</title>
+<style>
+  :root{
+    --petrol:#1b4965; --petrol-dk:#123449; --petrol-lt:#5fa8d3; --mist:#cae9ff;
+    --paper:#f6f8fa; --line:#d8dee4; --ink:#1c2530; --ink-soft:#5a6a78; --ctrl:#FFA500;
+    --crit:#9b1c1c; --high:#b45309; --mod:#1b4965; --low:#5a6a78;
+    --done:#2e7d32; --prog:#b26a00; --na:#78868f; --open:#8b94a0;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{font-family:'Inter','Calibri','Segoe UI',system-ui,-apple-system,sans-serif;background:var(--paper);
+       color:var(--ink);font-size:14px;line-height:1.5}
+  header{background:var(--petrol);color:#fff;padding:18px 24px 0}
+  .hdr-top{display:flex;flex-wrap:wrap;align-items:flex-start;gap:16px;justify-content:space-between}
+  h1{margin:0;font-size:20px;font-weight:600;letter-spacing:.2px}
+  .sub{margin:4px 0 0;font-size:12.5px;color:var(--mist);max-width:720px}
+  .editor-chip{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.28);border-radius:6px;
+    padding:8px 12px;font-size:12.5px;display:flex;align-items:center;gap:10px}
+  .editor-chip button{background:transparent;border:1px solid rgba(255,255,255,.45);color:#fff;border-radius:4px;
+    padding:3px 8px;font-size:11.5px;cursor:pointer;font-family:inherit}
+  .editor-chip button:hover{background:rgba(255,255,255,.16)}
+  .meter-wrap{margin:18px 0 0;padding-bottom:16px}
+  .meter-top{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;color:var(--mist)}
+  .meter{height:8px;background:rgba(255,255,255,.18);border-radius:4px;overflow:hidden;margin-top:6px;display:flex}
+  .meter i{display:block;height:100%}
+  .m-done{background:#7ed492}.m-prog{background:#ffcf6b}.m-na{background:rgba(255,255,255,.32)}
+  .legend{display:flex;gap:16px;margin-top:8px;font-size:11.5px;color:var(--mist);flex-wrap:wrap}
+  .legend span{display:flex;align-items:center;gap:6px}
+  .dot{width:9px;height:9px;border-radius:2px;display:inline-block}
+  nav.tabs{background:var(--petrol-dk);padding:0 24px;display:flex;gap:2px;overflow-x:auto}
+  nav.tabs button{background:transparent;border:0;border-bottom:3px solid transparent;color:var(--mist);
+    padding:11px 14px;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap}
+  nav.tabs button[aria-selected="true"]{color:#fff;border-bottom-color:var(--ctrl);font-weight:600}
+  nav.tabs button:hover{color:#fff}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:14px 24px;background:#fff;
+    border-bottom:1px solid var(--line)}
+  .toolbar input,.toolbar select{font-family:inherit;font-size:13px;padding:6px 9px;border:1px solid var(--line);
+    border-radius:5px;background:#fff;color:var(--ink)}
+  .toolbar input[type=search]{min-width:230px}
+  .btn{font-family:inherit;font-size:12.5px;padding:6px 11px;border:1px solid var(--line);border-radius:5px;
+    background:#fff;cursor:pointer;color:var(--ink-soft)}
+  .btn:hover{color:var(--petrol);border-color:var(--petrol-lt)}
+  .btn.primary{background:var(--petrol);color:#fff;border-color:var(--petrol)}
+  .btn.ghost{border-style:dashed}
+  .count{margin-left:auto;font-size:12px;color:var(--ink-soft)}
+  main{padding:18px 24px 44px}
+  .grp{background:#fff;border:1px solid var(--line);border-radius:8px;margin-bottom:14px;overflow:hidden}
+  .grp-hd{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;background:#fbfcfd;
+    border-bottom:1px solid var(--line)}
+  .grp-hd:hover{background:#f2f6f9}
+  .grp-hd h3{margin:0;font-size:14.5px;color:var(--petrol);font-weight:600}
+  .grp-hd .gd{font-size:12px;color:var(--ink-soft);font-weight:400;margin-top:2px;max-width:640px}
+  .grp-hd .car{color:var(--petrol);font-size:11px;width:12px}
+  .grp-hd .pill{margin-left:auto;display:flex;gap:6px;align-items:center;flex:none}
+  .grp-body{padding:0}
+  .item{border-bottom:1px solid #eef2f5;padding:12px 16px 12px 16px}
+  .item:last-child{border-bottom:none}
+  .it-top{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+  .seq{background:var(--petrol);color:#fff;border-radius:4px;font-size:11px;font-weight:700;padding:2px 7px;
+    flex:none;margin-top:1px}
+  .it-t{font-weight:600;font-size:13.5px;flex:1;min-width:250px}
+  .it-d{font-size:12.5px;color:var(--ink-soft);margin:4px 0 0}
+  .tag{font-size:10.5px;font-weight:700;letter-spacing:.3px;padding:2px 7px;border-radius:10px;flex:none}
+  .t-crit{background:#f6dcda;color:var(--crit)}.t-high{background:#fae7c8;color:var(--high)}
+  .t-mod{background:#d9e6ef;color:var(--mod)}.t-low{background:#e7ebee;color:var(--low)}
+  .t-auto{background:#d7ece0;color:#1f5c41}.t-semi{background:#fae7c8;color:var(--high)}
+  .t-man{background:#e7ebee;color:var(--low)}
+  .t-wk{background:#eef3f6;color:var(--petrol)}
+  .cc{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--ink-soft)}
+  .why{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:10px}
+  .why div{background:#fbfcfd;border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+  .why h5{margin:0 0 3px;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-soft)}
+  .why p{margin:0;font-size:12px;color:var(--ink);line-height:1.45}
+  .why .ev h5{color:var(--petrol)}
+  .fields{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px;padding-top:9px;
+    border-top:1px dashed var(--line)}
+  .fields label{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink-soft)}
+  .fields select,.fields input{font-family:inherit;font-size:12.5px;padding:4px 7px;border:1px solid var(--line);
+    border-radius:5px;background:#fff}
+  .fields input[type=text]{min-width:190px}
+  .st-done{border-color:var(--done)!important;color:var(--done)}
+  .st-prog{border-color:var(--prog)!important;color:var(--prog)}
+  .st-na{border-color:var(--na)!important;color:var(--na)}
+  .stamp{font-size:11px;color:var(--ink-soft);margin-left:auto}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin-bottom:14px}
+  .panel h3{margin:0 0 3px;font-size:14px;color:var(--petrol)}
+  .panel .note{margin:0 0 10px;font-size:12px;color:var(--ink-soft)}
+  .kpis{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 16px;min-width:118px}
+  .kpi .n{font-size:22px;font-weight:700;color:var(--petrol);line-height:1.15}
+  .kpi .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-soft)}
+  .rowbar{display:flex;align-items:center;gap:10px;margin:5px 0;font-size:12.5px}
+  .rowbar .k{width:120px;color:var(--ink-soft)}
+  .rowbar .v{width:56px;text-align:right;color:var(--ink-soft);font-size:11.5px}
+  .bar{flex:1;height:9px;background:#eef2f5;border-radius:5px;overflow:hidden;display:flex}
+  .bar i{display:block;height:100%}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th{text-align:left;background:#f2f6f9;color:var(--petrol);font-size:11px;text-transform:uppercase;
+    letter-spacing:.3px;padding:8px 10px;border-bottom:1px solid var(--line)}
+  td{padding:7px 10px;border-bottom:1px solid #eef2f5;vertical-align:top}
+  .when{white-space:nowrap;color:var(--ink-soft);font-size:11.5px}
+  .empty{background:#fff;border:1px dashed var(--line);border-radius:8px;padding:26px;text-align:center;
+    color:var(--ink-soft)}
+  dialog{border:0;border-radius:10px;padding:0;box-shadow:0 18px 48px rgba(20,40,55,.28);max-width:440px;width:92%}
+  dialog::backdrop{background:rgba(18,52,73,.45)}
+  .dlg{padding:20px 22px}
+  .dlg h3{margin:0 0 4px;font-size:16px;color:var(--petrol)}
+  .dlg p{margin:0 0 14px;font-size:12.5px;color:var(--ink-soft)}
+  .dlg input{width:100%;font-family:inherit;font-size:13.5px;padding:8px 10px;border:1px solid var(--line);
+    border-radius:5px;margin-bottom:10px}
+  .dlg .row{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
+  .gantt{overflow-x:auto}
+  footer{padding:0 24px 30px;font-size:11.5px;color:var(--ink-soft)}
+</style></head><body>
+<header>
+ <div class="hdr-top">
+  <div>
+   <h1>SOC 2 Programme Execution Tracker</h1>
+   <p class="sub">Nine workstreams, 59 tasks, from finalising the policy set to the Type II observation window.
+   Every task carries what to do, where to do it, why it matters, how far it can be automated, why it sits where it
+   does in the sequence, and the evidence it produces. Changes are stamped with who made them.</p>
+  </div>
+  <div class="editor-chip"><span id="who">No editor set</span><button id="switchEditor">Change</button></div>
+ </div>
+ <div class="meter-wrap">
+  <div class="meter-top"><span id="meterLabel">Programme progress</span><span id="meterPct">0%</span></div>
+  <div class="meter"><i class="m-done" id="barDone" style="width:0"></i><i class="m-prog" id="barProg"
+    style="width:0"></i><i class="m-na" id="barNa" style="width:0"></i></div>
+  <div class="legend">
+   <span><i class="dot" style="background:#7ed492"></i>Complete</span>
+   <span><i class="dot" style="background:#ffcf6b"></i>In progress</span>
+   <span><i class="dot" style="background:rgba(255,255,255,.32)"></i>Not applicable</span>
+   <span><i class="dot" style="background:rgba(255,255,255,.18)"></i>Not started</span>
+  </div>
+ </div>
+</header>
+<nav class="tabs">
+ <button data-view="dash" aria-selected="true">Dashboard</button>
+ <button data-view="plan" aria-selected="false">Plan</button>
+ <button data-view="time" aria-selected="false">Timeline</button>
+ <button data-view="log" aria-selected="false">Change log</button>
+</nav>
+<div class="toolbar" id="toolbar">
+ <input type="search" id="q" placeholder="Search task, control, evidence…">
+ <select id="fStatus"><option value="">All statuses</option><option value="open">Not started</option>
+  <option value="prog">In progress</option><option value="done">Complete</option><option value="na">Not applicable</option></select>
+ <select id="fOwner"><option value="">All owners</option></select>
+ <select id="fCrit"><option value="">All criticality</option><option value="crit">Critical</option>
+  <option value="high">High</option><option value="mod">Moderate</option><option value="low">Low</option></select>
+ <select id="fAuto"><option value="">Automated or manual</option><option value="auto">Automated</option>
+  <option value="semi">Semi-automated</option><option value="man">Manual</option></select>
+ <select id="sortBy"><option value="seq">Sequence</option><option value="wk">Start week</option>
+  <option value="crit">Criticality</option><option value="status">Status</option></select>
+ <button class="btn" id="expandAll">Expand</button>
+ <button class="btn" id="collapseAll">Collapse</button>
+ <button class="btn ghost" id="showRat">Detail on</button>
+ <button class="btn" id="exportCsv">CSV</button>
+ <button class="btn" id="exportJson">Save JSON</button>
+ <button class="btn" id="importBtn">Load JSON</button>
+ <input type="file" id="fileIn" accept="application/json" hidden>
+ <span class="count" id="count"></span>
+</div>
+<main>
+ <section id="viewDash"></section>
+ <section id="viewPlan" hidden></section>
+ <section id="viewTime" hidden></section>
+ <section id="viewLog" hidden></section>
+</main>
+<footer id="foot"></footer>
+<dialog id="editorModal"><form method="dialog" class="dlg">
+ <h3>Who is making these updates?</h3>
+ <p>Your name is stamped against every change so the team can see who moved what, and when. It is stored in this
+ browser only.</p>
+ <input id="nameIn" placeholder="Name" autocomplete="name">
+ <input id="roleIn" placeholder="Role — Security Officer, CEO, contractor" autocomplete="organization-title">
+ <div class="row"><button class="btn" value="cancel" id="cancelEditor">Cancel</button>
+ <button class="btn primary" value="ok" id="saveEditor">Save</button></div>
+</form></dialog>
+<script>
+"use strict";
+var GROUPS=[{"id": "A", "name": "Finalise the policy set", "desc": "Twenty-seven documents are approved. Forty-two controls are still not fully addressed and four referenced documents do not exist. This closes the design gap.", "items": [{"id": "A1", "cc": "CC4.2-03, CC4.2-04, CC4.2-06, CC5.3-04, CC7.5-03", "p": 1, "c": "crit", "a": "man", "ws": 1, "we": 2, "who": "Security Officer", "t": "Choose one destination for every deficiency", "d": "Adopt the POL-ISP-001 \u00a78 plan of action as the single home, then amend POL-CM-001 \u00a712, POL-BCP-001 \u00a713, POL-VPM-001 \u00a713 and POL-IRP-001 \u00a713 to name it.", "w": "POL-ISP-001 \u00a78, then four cross-references", "cw": "Five approved policies name five different destinations for a deficiency. The complete population an auditor asks for cannot be produced from any one of them, and a population assembled from five is not defensible as complete.", "aw": "The amendment is manual. Once made, routing findings into one queue is a tooling setting in Secureframe and the pipeline.", "pw": "First, because it is the single highest-value edit in the programme and everything in section H depends on there being one place evidence of remediation lands.", "ev": "Amended clauses in all five policies; one exported deficiency population reconciling to every evaluation source"}, {"id": "A2", "cc": "CC2.3-03, CC2.3-04", "p": 2, "c": "crit", "a": "man", "ws": 1, "we": 2, "who": "CEO", "t": "Establish whether POL-PRIV-001 exists", "d": "Find out if the Privacy Policy is published. If it is, bring it into the library with an identifier, version, approval date and owner. If it is not, remove the references and state the notification periods in POL-IRP-001 \u00a711 and the customer agreements directly.", "w": "Document library and the customer agreements", "cw": "Two customer-facing controls cite it as the source of the notification period. Either a live commitment sits outside version control and annual review, or the timeframe the incident process depends on does not exist. Which one applies is currently unknown.", "aw": "Entirely manual, and it is a decision rather than a task. Fifteen minutes of looking, then one of two short pieces of work.", "pw": "Second, because it is a question not a project, and every week it stays open is a week CC2.3-04 cannot be scored honestly.", "ev": "Either the controlled document with its approval record, or the amended references plus the notification obligation extract"}, {"id": "A3", "cc": "CC1.1-01, CC1.1-03, CC5.1-04", "p": 3, "c": "high", "a": "man", "ws": 2, "we": 4, "who": "Security Officer", "t": "Remove POL-COI-001 and reconcile Annex A", "d": "Delete the reference to POL-COI-001, point conflict of interest controls at POL-COC-001 \u00a77, and reconcile Annex A so every criterion names a document that exists at a stated version.", "w": "POL-ISP-001 \u00a713 Annex A", "cw": "Annex A is the artefact an assessor uses to trace a criterion to its owner. Nine controls currently trace to a document that cannot be produced, so the trace fails at the first missing identifier and calls the rest of the mapping into question.", "aw": "Manual edit. The reconciliation itself can be generated from the Policy Mapping tab of the control plan workbook rather than assembled by hand.", "pw": "Early, because Annex A is what section E loads into Secureframe. Loading it before it reconciles just moves the error into a second system.", "ev": "Reconciled Annex A with identifier, version, approval date and owner per document"}, {"id": "A4", "cc": "CC3.1-02, CC3.1-05, CC3.3-04, CC3.4-03, CC3.4-04", "p": 4, "c": "high", "a": "man", "ws": 3, "we": 5, "who": "Security Officer", "t": "Insert the five POL-RSK-001 clauses", "d": "Scope tied to the SSP boundary at \u00a72; objective recorded against each control at \u00a79; nil return at \u00a717; SSP and asset inventory updated on a trigger at \u00a712; named monitoring sources at \u00a717.", "w": "POL-RSK-001 sections 2, 9, 12 and 17", "cw": "POL-RSK-001 is the strongest policy in the library and these are the only five things it does not say. Each is one or two sentences.", "aw": "Manual drafting. The clause text is already written in the coverage pack, so this is paste and renumber.", "pw": "Before the first risk assessment in section F, because the assessment is performed against the policy as it stands. Amending afterwards means the first run does not meet the standard.", "ev": "POL-RSK-001 v1.1 with the five clauses and a revision history entry"}, {"id": "A5", "cc": "CC6.6-03, CC7.4-01, CC9.1-04", "p": 5, "c": "high", "a": "man", "ws": 4, "we": 6, "who": "CEO", "t": "Fix the three clauses that assume a different company", "d": "Create the network diagram requirement at POL-NET-001 \u00a75. Reconcile POL-IRP-001 \u00a76 to actual headcount. Name the Security Officer alternate at POL-BCP-001 \u00a78 \u2014 at two people that is the CEO.", "w": "POL-NET-001, POL-IRP-001, POL-BCP-001", "cw": "POL-IRP-001 \u00a76 states the Company has fifteen to twenty people and needs four incident roles. At current headcount that cannot be staffed, and a policy asserting a capability you do not hold is a worse audit position than a recorded limitation.", "aw": "Manual. Naming the alternate costs nothing; the incident role reconciliation may need an external responder or counsel named, which is a procurement conversation.", "pw": "After the risk clauses because it uses the same drafting session, and before section I because an assessor reads POL-IRP-001 \u00a76 against your headcount on day one.", "ev": "Amended sections with revision history; named alternate recorded in the business impact analysis"}, {"id": "A6", "cc": "CC6.3-04, CC8.1-06", "p": 6, "c": "mod", "a": "man", "ws": 5, "we": 7, "who": "Security Officer", "t": "Settle the AI policy architecture", "d": "Reduce POL-AI-001 \u00a715 and \u00a716 to pointers, delete POL-SDLC-001 \u00a714 entirely, and cut POL-SDLC-001 \u00a713 from twelve clauses to three.", "w": "POL-AI-001 and POL-SDLC-001", "cw": "Every agentic requirement is currently stated between two and six times across five documents, and POL-AI-001 \u00a76 promises not to restate controls owned elsewhere. Today the duplicates agree. At the next revision one will change and the others will not.", "aw": "Manual, and it is subtractive \u2014 you are deleting more than you write. That makes it faster than it looks.", "pw": "After the other policy edits so the library is only reissued once, and before section E so Secureframe loads the final structure.", "ev": "POL-AI-001 and POL-SDLC-001 at v1.1 with the duplication removed"}, {"id": "A7", "cc": "CC5.3-01, CC5.3-02", "p": 7, "c": "high", "a": "semi", "ws": 6, "we": 8, "who": "Security Officer", "t": "Refresh the tables of contents and reissue at v1.1", "d": "Refresh the TOC field in the 21 affected documents, correct the seven wrong cross-references, run a cross-reference check across the library, and reissue with the correction recorded in each revision history.", "w": "All 27 documents", "cw": "Twenty-one of twenty-seven documents show a contents page that does not match their own headings \u2014 POL-VM-001 presents a Change Management contents page. Every incorrect citation found in the coverage assessments traces back to this.", "aw": "The field refresh is scriptable across the folder. The cross-reference check is manual but only needs doing once, then added to the pre-approval checklist.", "pw": "Last in this section so it captures every preceding edit, and it is the milestone that closes the design gap.", "ev": "27 documents reissued at v1.1 with matching contents pages and revision history entries"}]}, {"id": "B", "name": "Make the tool selections", "desc": "Six decisions, four of which cost nothing. Tooling is 8 to 23 per cent of programme spend, so these are quick decisions with long consequences.", "items": [{"id": "B1", "cc": "CC6.7-03, CC7.1-02, CC7.1-03", "p": 8, "c": "crit", "a": "auto", "ws": 1, "we": 1, "who": "Security Officer", "t": "Adopt Semgrep and gitleaks \u2014 decide and install in one week", "d": "Semgrep free tier for SAST, software composition analysis and secrets. gitleaks as a pre-commit hook and a CI job.", "w": "GitHub repositories and the CI pipeline", "cw": "Semgrep's free tier covers ten contributors and performs reachability analysis, which POL-RSK-001 \u00a78 names as acceptable evidence and GitHub Advanced Security cannot produce. It is both cheaper and closer to your own policy.", "aw": "Fully automated once installed. gitleaks pre-commit prevents rather than detects, which is why it retires APP-001 rather than mitigating it.", "pw": "First tool decision because it is free, takes a day, and closes an accepted risk. There is no reason to sequence it behind anything.", "ev": "Pipeline configuration, scan results, and the pre-commit hook in the repository"}, {"id": "B2", "cc": "CC6.1-05, CC6.8-01, CC6.8-02, CC6.4-03", "p": 9, "c": "crit", "a": "auto", "ws": 2, "we": 4, "who": "Security Officer", "t": "Choose Kandji and buy company laptops", "d": "Kandji for MDM and endpoint detection in one agent, roughly $67 per device per year, plus company-owned machines.", "w": "Procurement, then Kandji enrolment", "cw": "One purchase retires PHY-001 and closes three CC6 controls. Huntress carries a fifty-endpoint minimum, so eighteen devices still cost about $5,400. CrowdStrike Falcon Go is antivirus, not endpoint detection and response, and would leave you in breach of POL-AM-001 \u00a76.", "aw": "Enrolment and policy enforcement are automated. Buying the laptops is a one-time manual decision.", "pw": "Early, because device compliance is a precondition for the conditional access decision and for most of CC6.", "ev": "Enrolment records, compliance report per device, and the three-way coverage reconciliation"}, {"id": "B3", "cc": "CC8.1-04, CC4.1-05, CC5.2-04", "p": 10, "c": "high", "a": "man", "ws": 3, "we": 4, "who": "CEO", "t": "Decide GitHub Enterprise, or accept AC-002 for another year", "d": "Enterprise at $21 per user per month buys SAML single sign-on and IP allow lists. Nothing else provides them.", "w": "GitHub billing settings", "cw": "This is the entirety of risk AC-002. At fifteen to twenty people holding client-issued credentials it is worth the money; at five it is not. Branch protection on private repositories also depends on it, which gates three controls across three criteria.", "aw": "The decision is manual. Everything it unlocks is automated.", "pw": "Before section C, because half the GitHub hardening work needs the plan tier decided first.", "ev": "Billing record, SAML configuration, IP allow list, branch protection settings"}, {"id": "B4", "cc": "CC6.1-05", "p": 11, "c": "high", "a": "man", "ws": 3, "we": 5, "who": "Security Officer", "t": "Decide where device conditioning is enforced", "d": "Either move Google Workspace to Enterprise for Context-Aware Access, or enforce compliance at the Kandji layer and record the substitution in the Annual Assessment.", "w": "Google Workspace admin, or Kandji", "cw": "POL-AC-001 \u00a713 and POL-NET-001 \u00a75 both require access conditioned on device state. Context-Aware Access sits in the Workspace Enterprise tier, which is quote-only. The MDM route is cheaper and perfectly defensible \u2014 it just has to be written down rather than assumed.", "aw": "Either route is a configuration once decided. The decision itself is manual and needs a recorded rationale.", "pw": "After Kandji is chosen, because the MDM route only exists if the MDM does.", "ev": "Either the Context-Aware Access policy, or the recorded substitution in the Annual Assessment"}, {"id": "B5", "cc": "CC7.1-04, CC7.2-04, CC3.2-04", "p": 12, "c": "high", "a": "auto", "ws": 4, "we": 5, "who": "Security Officer", "t": "Adopt promptfoo and garak for agentic testing", "d": "Both free, both run in CI. Evaluation and adversarial testing before release and on significant change.", "w": "CI pipeline", "cw": "POL-VPM-001 \u00a711 and POL-AI-001 \u00a717 require prompt injection, insecure output handling and excessive agency assessed before release. A conventional scanner reports none of it. This is the category most companies skip and the one your policy is most specific about.", "aw": "Automated in CI once written. Writing the first evaluation set is manual and takes a day per agent.", "pw": "Alongside the other pipeline tooling so it is configured once, and before any agentic component reaches a client-facing path.", "ev": "Evaluation results per release, adversarial test records, findings tracked to closure"}, {"id": "B6", "cc": "CC7.2-01, CC7.2-02, CC7.2-03, CC7.1-01", "p": 13, "c": "crit", "a": "auto", "ws": 2, "we": 3, "who": "Security Officer", "t": "Turn on AWS logging, GuardDuty, Security Hub and Config", "d": "Audit logging in every account at thirteen-month retention with ninety days queryable, GuardDuty in every region, Security Hub and Config for the baseline, Prowler for the evidence export.", "w": "AWS Organizations and each account", "cw": "POL-LOG-001 \u00a77 sets thirteen months so retention outlasts a twelve-month observation window. Set it at creation \u2014 it cannot be applied retrospectively to logs that were never kept. The alert on disabling logging protects every other detective control in the plan.", "aw": "Fully automated and cheap, roughly $1,200 to $3,000 a year on this footprint.", "pw": "Second in the tooling wave and before section H, because evidence cannot accumulate for a period that has already passed.", "ev": "Logging configuration showing sources, regions and retention; GuardDuty findings; the disable-logging alert"}]}, {"id": "C", "name": "Harden GitHub", "desc": "Driven by the GitHub Hardening Tracker. This section tracks the programme-level dependency and the checkpoints, not the individual settings.", "items": [{"id": "C1", "cc": "CC6.1-01, CC6.2-01", "p": 14, "c": "crit", "a": "auto", "ws": 3, "we": 3, "who": "Security Officer", "t": "Complete the organisation foundation wave", "d": "Base permissions to None, member repository creation and visibility restricted, private forking disabled, two organisation owners, all repositories owned by the org.", "w": "GitHub organisation settings", "cw": "Base permissions grant every member read access to every private repository by default. Least privilege is defeated before a single team grant is written.", "aw": "Every setting in this wave is API-settable and enforceable as code. Detection of drift is a scripted check.", "pw": "First GitHub wave because these settings are additive \u2014 a repository transferred in before the guardrails exist inherits nothing.", "ev": "Organisation settings export and the members-by-role list"}, {"id": "C2", "cc": "CC6.1-02, CC6.3-02", "p": 15, "c": "crit", "a": "auto", "ws": 3, "we": 4, "who": "Security Officer", "t": "Enforce two-factor and SAML across the organisation", "d": "Require two-factor for every member and outside collaborator, enable SAML single sign-on against Google Workspace, and set the IP allow list.", "w": "GitHub organisation security settings", "cw": "Federating GitHub is what makes departure a single suspension rather than a separate revocation. Without it GitHub stays on the maintained list of non-federating systems forever.", "aw": "Automated, but requires the Enterprise plan decided at B3.", "pw": "Immediately after the foundation wave and gated by B3.", "ev": "SAML configuration, two-factor enforcement report, IP allow list"}, {"id": "C3", "cc": "CC8.1-04, CC8.1-07, CC4.1-05", "p": 16, "c": "crit", "a": "auto", "ws": 4, "we": 5, "who": "Security Officer", "t": "Enable branch protection and make the pipeline the change population", "d": "Rulesets requiring a pull request, one approving review from a non-author, and passing status checks on every production branch. Deployment automated so the record is a by-product.", "w": "Repository rulesets and the deployment workflow", "cw": "CC8.1 is tested on whether the complete set of changes can be produced and each one traced, not on whether changes were approved. An assembled list cannot be shown to be complete.", "aw": "Automated. The settings themselves are in-scope changes under POL-CM-001 \u00a710 and must not be altered outside the process.", "pw": "After SAML so the approver identity is federated, and before section H so the first quarterly change review has a real population.", "ev": "Ruleset export, deployment population for the period traceable to a non-author approver"}, {"id": "C4", "cc": "CC6.7-03", "p": 17, "c": "high", "a": "auto", "ws": 4, "we": 4, "who": "Security Officer", "t": "Turn on secret scanning and push protection", "d": "gitleaks pre-commit and CI from B1, plus GitHub secret scanning with push protection where the plan allows.", "w": "Repository security settings and the pre-commit hook", "cw": "POL-ENC-001 \u00a79 names secrets in code as the most common cause of a serious incident at this size. Push protection prevents rather than detects, which is the difference between an incident and a non-event.", "aw": "Fully automated once configured.", "pw": "With the branch protection wave so the repository settings are done in one sitting.", "ev": "Scan results, push protection blocks, and records of revocation and rotation where a secret was exposed"}, {"id": "C5", "cc": "CC6.3-04, CC6.3-01", "p": 18, "c": "high", "a": "semi", "ws": 5, "we": 6, "who": "Security Officer", "t": "Inventory machine accounts, apps and tokens", "d": "Every GitHub App, OAuth app, deploy key, personal access token and service account listed with a human owner and a scope, and included in the quarterly access review.", "w": "Organisation settings, installed apps and the audit log", "cw": "Service accounts accumulate permissions precisely because nobody thinks of them as users. POL-AC-001 \u00a711 requires each to have a named human owner and a stated reachable scope verified against actual permissions.", "aw": "The inventory can be pulled from the API. Deciding what each one is for is manual and is the part that takes time.", "pw": "After the access model is set, so you are inventorying against a stable permission structure.", "ev": "Non-human identity inventory with owner, scope and last review date"}, {"id": "C6", "cc": "CC7.2-01, CC4.1-05", "p": 19, "c": "mod", "a": "auto", "ws": 6, "we": 7, "who": "Security Officer", "t": "Stream the GitHub audit log and confirm retention", "d": "Enable audit log streaming to the same destination as the AWS logs, and confirm thirteen-month retention.", "w": "Organisation audit log settings", "cw": "Without streaming, GitHub's own retention is what bounds your evidence period, not your policy. The quarterly change review needs the log to reach back across the whole observation window.", "aw": "Automated once configured.", "pw": "Last GitHub item, because it is the thing that makes everything configured above provable later.", "ev": "Streaming configuration and a log sample covering the retention period"}]}, {"id": "D", "name": "Implement the controls", "desc": "The 42 controls with an open action, and the operating model behind them. This is where design becomes practice.", "items": [{"id": "D1", "cc": "CC1.1-04, CC2.2-04, CC2.2-06", "p": 20, "c": "crit", "a": "man", "ws": 2, "we": 2, "who": "CEO", "t": "Create the security and ethics reporting channels", "d": "security@ published externally with a security.txt file, and ethics@ routing only to the CEO. Both named in POL-COC-001 \u00a716, briefed at onboarding, with a nil return recorded annually.", "w": "Google Workspace groups and the company website", "cw": "Neither exists. POL-COC-001 \u00a716 provides that concerns about the Security Officer may go directly to the CEO, and no channel implements it. Meanwhile the Security Officer is a contractor holding standing privileged access to client environments \u2014 every reporting route currently passes through the person a report might concern.", "aw": "Mailbox creation is a five-minute automated task. The publication and the briefing are manual.", "pw": "Very early, because it is nearly free and it closes the most uncomfortable structural gap in CC1.", "ev": "Mailbox configuration showing routing, the published security.txt, and the annual nil return"}, {"id": "D2", "cc": "CC1.3-01, CC1.4-01, CC1.5-02", "p": 21, "c": "high", "a": "man", "ws": 3, "we": 5, "who": "CEO", "t": "Produce the organisation chart, role descriptions and review form", "d": "A one-page chart including contractors and the fractional Security Officer, competency statements per role, and a one-page annual review form carrying security responsibilities.", "w": "The governance repository", "cw": "CC1 carries 21 of the 47 open items and is the weakest criterion in the plan. Most of its gaps are a form, a chart or a signature rather than a system.", "aw": "Manual, and deliberately lightweight. Do not procure a performance platform for this.", "pw": "Early in the CC1 wave because the chart is an input to the screening tiers and the delegation records.", "ev": "Organisation chart, role descriptions with competencies, completed annual review forms"}, {"id": "D3", "cc": "CC1.1-06, CC1.4-06", "p": 22, "c": "high", "a": "man", "ws": 4, "we": 6, "who": "Security Officer", "t": "Create STD-SCR-001 and the contractor equivalence statement", "d": "Record the checks applied per role tier, add the equivalence statement to POL-HRS-001, assign contractors to the same personnel group as employees, and flow the requirement down in contractor agreements.", "w": "New standard plus POL-HRS-001 and the contractor agreement template", "cw": "Most of the team is engaged rather than employed, and those contractors hold access to client environments. There is currently no statement that they are screened to the same standard, and the tiers the HRS plan produces have nowhere to be recorded.", "aw": "The standard is manual. Once written, screening becomes an onboarding step in Secureframe that runs automatically.", "pw": "Before any further engagement starts, because retrofitting screening evidence to someone already working is awkward and sometimes impossible.", "ev": "STD-SCR-001; screening record per person showing tier, date, outcome and authoriser"}, {"id": "D4", "cc": "CC1.2-02, CC1.3-04, CC3.2-06", "p": 23, "c": "high", "a": "semi", "ws": 6, "we": 8, "who": "CEO", "t": "Put the Governance Decisions Log into use", "d": "One line per approval, risk acceptance, exception, delegation and appointment, with the date, the decider and the control reference. Risk acceptances carry the register entry identifier and an expiry.", "w": "The Governance Log tab of the control plan workbook", "cw": "CC1.2-02 needs decisions recorded with a date and a decider, not just minutes. An acceptance without an expiry becomes permanent by default, which is how a temporary decision turns into an unexplained exclusion two audits later.", "aw": "The log itself is manual. What it records comes from decisions that are happening anyway \u2014 the discipline is writing them down the same day.", "pw": "Once the policy set is stable, because the first entries are the acceptances arising from it.", "ev": "Governance Log with entries carrying date, decider, control reference and expiry where applicable"}, {"id": "D5", "cc": "CC1.5-03, CC5.1-02, CC5.1-04", "p": 24, "c": "crit", "a": "semi", "ws": 5, "we": 7, "who": "Security Officer", "t": "Build the control matrix", "d": "Every control with its owner, operating frequency, the risk it treats, the objective it serves and whether it prevents or detects. Regenerate Annex A from it rather than maintaining both.", "w": "Secureframe, exported to the governance repository", "cw": "This is the artefact that turns a checklist into a control environment. It is also what CC5.1-04 requires Annex A to reflect, and what the compliance calendar is built from.", "aw": "Semi-automated: Secureframe holds most fields, but the objective and control-type columns are entered once by hand.", "pw": "Before Secureframe loading in section E, because the matrix is what gets loaded.", "ev": "Control matrix showing owner, frequency, risk, objective and control type per control"}, {"id": "D6", "cc": "CC2.3-01, CC2.3-02, CC2.3-05, CC3.1-03", "p": 25, "c": "crit", "a": "man", "ws": 3, "we": 7, "who": "CEO", "t": "Make the six customer-facing commitments real", "d": "Customer commitments register, published security contact, obligations register, and a Security Officer review gate at engagement intake before any commitment is given.", "w": "The control plan workbook and the engagement intake checklist", "cw": "POL-ISP-001 \u00a79 states six commitments as approved, signed policy. Five of them operate nowhere. An approved commitment with no control behind it is representable to a client, which makes this contractual exposure as well as an audit finding.", "aw": "The registers are manual but short. The intake gate is a checklist item, not a system.", "pw": "In parallel with the policy work, because the registers are compiled from documents you are already reading.", "ev": "Commitments register with the control per promise; obligations register; reviewed questionnaire records"}, {"id": "D7", "cc": "CC6.2-03, CC6.2-04, CC6.8-01", "p": 26, "c": "crit", "a": "auto", "ws": 7, "we": 9, "who": "Security Officer", "t": "Select the HRIS and build the leaver path", "d": "Connect an HR system so a complete joiner, mover and leaver population exists. Suspend the identity provider account first and keep the timestamp. Maintain the list of systems that do not federate, including client-granted access.", "w": "HRIS, Google Workspace, and the non-federating systems list", "cw": "Revocation timeliness is tested against the population, not against individual records. Without an authoritative personnel list, CC6.2-04 and CC6.8-01 stall at Documented however well the work is performed.", "aw": "Automated once connected. Choosing the system is the manual part and it is currently unanswered at Setup step 1.", "pw": "Before the first quarterly access review in section H, because the review reconciles against this population.", "ev": "Joiner, mover and leaver export with revocation timestamps; three-way endpoint coverage reconciliation"}, {"id": "D8", "cc": "CC1.2-04, CC1.2-06, CC1.3-05, CC3.3-03, CC4.1-01", "p": 27, "c": "crit", "a": "man", "ws": 11, "we": 14, "who": "CEO", "t": "Draft and sign the Annual Control Environment Assessment", "d": "One document covering control effectiveness, segregation of duties, the independence limitation, management override and its compensating controls, and the Steering Committee composition review.", "w": "FRM-CE-001, which does not yet exist and must be created", "cw": "Four controls name FRM-CE-001 as their evidence artefact and it is not in the library. This single signed document is the compensating control for CC1.2 independence, CC1.3-05 segregation and CC3.3-03 management override \u2014 say the limitations plainly rather than leaving them implicit.", "aw": "Entirely manual and it should be. The CEO signature is the control.", "pw": "Late, because it assesses everything the earlier sections built. It is milestone M4.", "ev": "Signed Annual Control Environment Assessment with the three limitations stated and compensating controls named"}]}, {"id": "E", "name": "Enter the controls in Secureframe", "desc": "Loading the control set, wiring the automated tests, and making the platform the system of record rather than a second copy.", "items": [{"id": "E1", "cc": "CC5.1-04, CC1.5-03", "p": 28, "c": "high", "a": "semi", "ws": 5, "we": 6, "who": "Security Officer", "t": "Load the control set and map it to the criteria", "d": "Enter all 160 controls with owner, frequency and owning document, mapped to CC1 through CC9, matching Annex A exactly.", "w": "Secureframe control library", "cw": "Two sources of truth is worse than one imperfect one. If the platform and Annex A disagree, every evidence request becomes an argument about which is right.", "aw": "Bulk import from the control plan workbook rather than typed entry. Export the mapping back out to check it round-trips.", "pw": "After A3 reconciles Annex A and D5 builds the matrix, so what is loaded is final.", "ev": "Control set export from Secureframe reconciling to Annex A and the control matrix"}, {"id": "E2", "cc": "CC4.1-02, CC4.1-03, CC6.8-01", "p": 29, "c": "high", "a": "auto", "ws": 6, "we": 7, "who": "Security Officer", "t": "Connect the integrations and switch on the automated tests", "d": "AWS, GitHub, Google Workspace, Kandji and the HRIS connected, with the automated control tests enabled and failures routed to the plan of action.", "w": "Secureframe integrations", "cw": "This is where the platform earns its cost. Automated tests turn 115 controls into something that reports itself rather than something someone has to check.", "aw": "Fully automated once connected. Check what Secureframe already covers before buying a separate cloud posture tool.", "pw": "After the underlying systems are configured in sections B and C \u2014 connecting to an unhardened estate just produces a long list of failures.", "ev": "Integration status, automated test results per control, failures raised into the plan of action"}, {"id": "E3", "cc": "CC4.2-01, CC4.2-02, CC4.2-03", "p": 30, "c": "crit", "a": "semi", "ws": 7, "we": 8, "who": "Security Officer", "t": "Route every deficiency into the single plan of action", "d": "Failing tests, scan findings, access review exceptions, incident corrective actions and vendor gaps all land in one queue with owner, severity and remediation date.", "w": "Secureframe tasks, or a single project in the task tracker", "cw": "A1 chose the destination. This is where the choice becomes real. Until findings converge, nobody can answer how many deficiencies are open.", "aw": "Automated for tool-generated findings. Manual entry for the ones that arise in a meeting.", "pw": "Immediately after the integrations, so the first wave of failures lands somewhere useful rather than in an inbox.", "ev": "Plan of action with owner, severity, date and closure verification per deficiency"}, {"id": "E4", "cc": "CC1.1-02, CC2.2-03, CC1.4-04", "p": 31, "c": "high", "a": "auto", "ws": 6, "we": 8, "who": "Security Officer", "t": "Set up onboarding, policy acceptance and training", "d": "Policy acceptance and security training assigned at onboarding and reset annually, with contractors in the same personnel group as employees.", "w": "Secureframe personnel workflows", "cw": "This is the cheapest recurring control in the plan to automate and one of the most sampled. It also makes the contractor equivalence from D3 real rather than stated.", "aw": "Fully automated once configured, including the annual reset.", "pw": "Once STD-SCR-001 exists, so the screening tier is assignable at the same time.", "ev": "Acknowledgment register, training completion report, screening records per person"}, {"id": "E5", "cc": "CC1.5-03, CC4.2-06, CC5.3-04", "p": 32, "c": "high", "a": "auto", "ws": 8, "we": 9, "who": "Security Officer", "t": "Build the compliance calendar and wire the due dates", "d": "Every recurring control with its due date, and anything not done by it raised automatically as a deficiency.", "w": "Secureframe calendar plus the Calendar tab of the control plan", "cw": "POL-BCP-001 \u00a715 already treats a missed test as a deficiency. Generalising that rule is what stops a monitoring programme quietly stopping, and it is the amendment A1 makes possible.", "aw": "Automated once the frequencies are loaded. This is the control that makes the other cadence controls self-policing.", "pw": "After the control set is loaded, because the calendar is generated from the frequency field.", "ev": "Compliance calendar with due dates; deficiency records for any missed performance"}, {"id": "E6", "cc": "CC2.2-05, CC4.2-02, CC4.2-05", "p": 33, "c": "mod", "a": "semi", "ws": 9, "we": 10, "who": "Security Officer", "t": "Produce the first quarterly Committee report from the platform", "d": "One report: control status, open deficiencies with owners and dates, overdue items escalated, repeat findings, training completion, risk treatment progress.", "w": "Secureframe reporting, exported to the governance repository", "cw": "Three policies each require a quarterly report to the same body. Merge them into one rather than producing three, and generate it rather than writing it.", "aw": "Semi-automated: the numbers come from the platform, the judgement does not.", "pw": "First run in the quarter after loading, so the numbers mean something.", "ev": "Dated quarterly report with deficiency status, escalations and repeat findings"}]}, {"id": "F", "name": "Complete the risk register, automated", "desc": "POL-RSK-001 is the strongest policy in the library and none of it operates. This makes the register a live instrument rather than a spreadsheet.", "items": [{"id": "F1", "cc": "CC3.2-03, CC3.2-06", "p": 34, "c": "crit", "a": "semi", "ws": 4, "we": 5, "who": "Security Officer", "t": "Configure the register to the twelve required fields", "d": "Identifier, threat, vulnerability and consequence, affected assets and data types, inherent score, existing controls, residual score, treatment, owner, agreed date, status and review date. Entries are never deleted, only closed with a date and reason.", "w": "Secureframe risk register", "cw": "POL-RSK-001 \u00a710 specifies all twelve. Configuring the register to the policy before the first assessment is far cheaper than retrofitting fields to entries later, and deletion of entries would breach \u00a710 outright.", "aw": "Field configuration is a one-time setup. After that, entry is manual but structured.", "pw": "Before the first assessment, so the assessment populates a register that already meets the standard.", "ev": "Register export showing all twelve fields populated per entry"}, {"id": "F2", "cc": "CC3.1-04, CC3.2-01", "p": 35, "c": "high", "a": "auto", "ws": 5, "we": 6, "who": "Security Officer", "t": "Automate the scoring and the treatment clock", "d": "The \u00a77 likelihood and impact scales, the \u00a78 reachability matrix that sets a minimum likelihood, and the \u00a79 treatment bands so the due date computes from the residual score rather than being typed.", "w": "Secureframe risk settings, or a formula layer in the register", "cw": "An approved methodology exists that no system currently applies. Without it scores are entered by judgement and last year's high does not equal this year's, so the trend means nothing.", "aw": "Automatable, and this is the difference between a register and a list. CISA KEV entries floor at likelihood 4 under \u00a78 and that lookup can be scripted.", "pw": "After the fields exist and before the assessment, so the first run scores consistently.", "ev": "Scoring configuration; register entries showing computed scores and due dates"}, {"id": "F3", "cc": "CC3.2-02, CC3.2-04, CC3.2-07", "p": 36, "c": "crit", "a": "man", "ws": 5, "we": 8, "who": "Security Officer", "t": "Run the first assessment in three sweeps", "d": "One pass over the entity under \u00a76, one over vendors and subservice organisations under \u00a713, one over AI and agentic systems under \u00a714 enumerated against MITRE ATLAS with the taxonomy version recorded.", "w": "Workshop, output into the register", "cw": "Agentic components fail in ways a conventional register does not anticipate \u2014 prompt injection, tool misuse, unbounded action, model supply chain. A register without them is incomplete for this company specifically, whatever it says about the rest.", "aw": "The sweeps are manual. What follows \u2014 scoring, due dates, escalation, reporting \u2014 is automated by F2.", "pw": "After the policy clauses in A4 land, because the assessment is performed against the policy as it stands.", "ev": "Dated risk assessment showing all three sweeps and the ATLAS version referenced"}, {"id": "F4", "cc": "CC3.3-01, CC3.3-02, CC3.3-03", "p": 37, "c": "high", "a": "man", "ws": 7, "we": 9, "who": "CEO", "t": "Complete the fraud section", "d": "The four company-specific fraud risks POL-RSK-001 \u00a711 already names, plus management override as a standing risk with its three compensating controls.", "w": "The same risk assessment document", "cw": "Small headcount is the condition under which fraud risk is highest, not lowest. The policy already names misuse of privileged access to client systems, which is the largest single exposure the Company has and appears on no conventional small-company fraud checklist.", "aw": "Manual. Four headings, one paragraph each, in the document you are already writing.", "pw": "Inside the first assessment rather than as a separate exercise.", "ev": "Fraud section of the risk assessment with the four named risks and the override compensating controls"}, {"id": "F5", "cc": "CC3.4-01, CC3.4-02", "p": 38, "c": "high", "a": "semi", "ws": 8, "we": 10, "who": "Security Officer", "t": "Wire the seven change triggers into intake", "d": "The \u00a712 trigger list repeated as one line in the engagement intake checklist and the vendor intake form, with a governance-repository issue per trigger closed by the updated register entry.", "w": "Engagement intake, vendor intake, governance repository", "cw": "A trigger list that lives only in a policy is not read at the moment a change happens. Intake is where the change originates and therefore where the trigger has to be met.", "aw": "Semi-automated: an issue template makes the record consistent. Recognising the trigger is human.", "pw": "After the register is live, because the trigger's output is a register update.", "ev": "Trigger records including the assessed, no new risk outcomes, each closed by a register entry"}, {"id": "F6", "cc": "CC3.2-05, CC4.2-02", "p": 39, "c": "mod", "a": "auto", "ws": 9, "we": 11, "who": "Security Officer", "t": "Automate treatment tracking and quarterly reporting", "d": "Every treatment with a named owner, an agreed date and a defined completion test, with overdue items escalating to the CEO and appearing in the quarterly report.", "w": "Secureframe tasks and reporting", "cw": "The failure mode at this size is not identifying risks \u2014 it is that treatments have no date and drift for a year. The date is the control, and the completion test is the clause most often skipped.", "aw": "Automated once the fields are required. Make the completion test a required field so it cannot be omitted.", "pw": "Last in this section, once there are treatments to track.", "ev": "Treatment plans with completion tests; quarterly progress record; escalation records for overdue items"}]}, {"id": "G", "name": "Vendor risk assessments and questionnaires", "desc": "Twenty-nine documents reference vendors and none of the assessment operates. This includes the AWS review that four separate controls depend on.", "items": [{"id": "G1", "cc": "CC9.2-01, CC2.3-03", "p": 40, "c": "high", "a": "semi", "ws": 6, "we": 7, "who": "Security Officer", "t": "Build the vendor inventory and tier it", "d": "Every vendor tiered by criticality and data sensitivity, with tier, data shared, owner and review date recorded. Derive the published sub-processor list from the same inventory.", "w": "Secureframe vendor module", "cw": "The tiering is what makes everything after it proportionate. A low-tier vendor holding no Company data should not receive the same assessment as a critical one, and POL-VM-001 \u00a75 is explicit about that.", "aw": "Semi-automated: expenditure reconciliation and connected-application review surface vendors you forgot. An unmanaged service usually appears on a card statement before it appears anywhere else.", "pw": "Before the questionnaires, because the tier determines which vendors get one.", "ev": "Vendor inventory with tier, data shared, owner and review date; published sub-processor list"}, {"id": "G2", "cc": "CC9.2-02", "p": 41, "c": "high", "a": "semi", "ws": 7, "we": 9, "who": "Security Officer", "t": "Issue the security questionnaire to critical and high vendors", "d": "Assessment before onboarding and at the review date, covering security controls, data handling, subprocessors and breach notification. Security Officer approval required before Confidential or Restricted data is shared.", "w": "Secureframe questionnaire workflow, or a standard form", "cw": "POL-VM-001 \u00a76 requires assessment before data is shared. The approval gate is the control; the questionnaire is the evidence behind it.", "aw": "The send, chase and store cycle is automatable. Reading the answers is not, and reading them is the control.", "pw": "After tiering so you are not questionnaireing vendors who hold nothing.", "ev": "Completed questionnaires per critical and high vendor; approval records before data sharing"}, {"id": "G3", "cc": "CC9.2-03, CC4.1-07, CC6.4-02, CC3.2-07", "p": 42, "c": "crit", "a": "man", "ws": 7, "we": 8, "who": "Security Officer", "t": "Review the AWS assurance report and assign every user entity control", "d": "A dated review recording the period covered, the opinion, any exceptions relevant to the services consumed, and every complementary user entity control assigned an owner and confirmed as operating.", "w": "AWS Artifact, reviewed into the vendor record", "cw": "Four separate controls depend on this one activity and it has never happened. A complementary user entity control that nobody owns is unperformed by definition, and this is the question an assessor asks directly.", "aw": "Obtaining the report is automated through Artifact. Reading it and assigning the user entity controls is manual and is the whole of the control.", "pw": "Early in this section because four controls unblock at once, which makes it the highest-leverage single task in the programme after A1.", "ev": "Dated attestation review with exceptions noted and every user entity control assigned an owner"}, {"id": "G4", "cc": "CC9.2-04", "p": 43, "c": "high", "a": "semi", "ws": 8, "we": 10, "who": "Security Officer", "t": "Assess the model providers as sub-processors", "d": "For each provider: whether submitted data trains the model, retention, hosting region, and the contract tier actually purchased. Zero-retention evidenced twice \u2014 by the organisation setting and by the contractual clause.", "w": "Provider admin consoles and the contracts", "cw": "POL-VM-001 \u00a710 requires the double evidence because a setting without a clause can be changed by the provider without notice. Deletion commitments must also be traced through \u2014 deleting your own copy does not discharge a commitment where the provider retains prompt content.", "aw": "The settings are exportable. The contract review is manual and needs the tier confirmed, because consumer and enterprise terms differ materially.", "pw": "After the vendor inventory exists, and before any new client data reaches a model.", "ev": "Provider assessments with settings screenshots and contractual clauses; sub-processor list updated"}, {"id": "G5", "cc": "CC9.2-05, CC6.8-03", "p": 44, "c": "mod", "a": "semi", "ws": 9, "we": 11, "who": "Security Officer", "t": "Close the shadow vendor path", "d": "Third-party application access to Google Workspace restricted by allow-list, connected applications reviewed quarterly, and expenditure reconciled periodically against the inventory.", "w": "Google Workspace admin, plus the finance export", "cw": "Most unmanaged third-party risk arrives through someone connecting a useful tool, not through a procurement decision. Allow-listing turns that from a discovery into an approval.", "aw": "The allow-list is automated. The expenditure reconciliation is finance work performed for a security purpose and needs a named owner or it will not happen.", "pw": "Once the inventory exists to reconcile against.", "ev": "Connected-application review records; allow-list configuration; expenditure reconciliation"}, {"id": "G6", "cc": "CC9.2-02, CC2.3-06", "p": 45, "c": "mod", "a": "man", "ws": 10, "we": 12, "who": "CEO", "t": "Get the contract clauses right for critical vendors", "d": "Confidentiality, data protection, breach notification, data return or deletion, and flow-down of customer and regulatory requirements in every critical and high tier contract.", "w": "Contract templates and renewals", "cw": "The flow-down clause is what carries a client's requirements to a sub-processor, and it is the one most often omitted because it requires knowing what the client asked for \u2014 which is the obligations register from D6.", "aw": "Manual, and it happens at renewal rather than on demand.", "pw": "Last in this section because it is opportunistic \u2014 you amend at renewal, not before.", "ev": "Contract clauses evidenced per critical and high tier vendor"}]}, {"id": "H", "name": "Collect evidence, monthly and quarterly", "desc": "This is what moves 137 controls from Documented to Evidenced. Nothing else does, and it cannot be compressed.", "items": [{"id": "H1", "cc": "CC4.1-03, CC7.1-02, CC7.1-03", "p": 46, "c": "crit", "a": "auto", "ws": 7, "we": 26, "who": "Security Officer", "t": "Monthly \u2014 vulnerability scanning and dependency findings", "d": "Monthly scan of production infrastructure, continuous dependency scanning in the pipeline, findings triaged on exploitability in the actual environment with the criticality rationale recorded.", "w": "AWS Inspector, the CI pipeline, Secureframe", "cw": "POL-VPM-001 \u00a78 requires the rationale recorded per finding \u2014 the base score is the start of the assessment, not its conclusion. A reachable medium outranks an unreachable critical, and that position needs to be written down or it looks like inconsistency.", "aw": "Fully automated except the triage rationale, which is a sentence per finding.", "pw": "Starts as soon as the scanners are live, because the evidence period runs from the first scan, not from the decision.", "ev": "Scan records per period, finding population with severity and closure date, rescan verification"}, {"id": "H2", "cc": "CC4.1-04, CC7.3-03, CC7.2-03", "p": 47, "c": "crit", "a": "semi", "ws": 7, "we": 26, "who": "Security Officer", "t": "Monthly \u2014 alert disposition review", "d": "A dated note recording the reviewer, the period covered and the conclusion, supported by the complete alert population with the disposition of each \u2014 including those assessed as not requiring incident response.", "w": "AWS Security Hub and GuardDuty, note filed in the governance repository", "cw": "The complete population including dismissed alerts is the artefact most often unavailable, because tooling shows open alerts by default and closed ones age out of view. A quiet month still produces a note \u2014 a nil disposition review is still a performed control.", "aw": "The population export is automated. The conclusion is a paragraph a person writes.", "pw": "Monthly from the moment logging is on. This is the cheapest recurring control to run and the easiest to skip.", "ev": "Monthly dated review note; complete alert population with disposition per alert"}, {"id": "H3", "cc": "CC4.1-02, CC6.3-01, CC6.3-02, CC6.3-04", "p": 48, "c": "crit", "a": "semi", "ws": 10, "we": 26, "who": "Security Officer", "t": "Quarterly \u2014 access reviews across the boundary", "d": "Cloud accounts, code repositories, identity provider administration, production data stores and finance systems. A complete population, a decision per entitlement, reconciled to reviews due, with removals evidenced as removed.", "w": "Secureframe access review workflow", "cw": "POL-AC-001 \u00a712 states the trap plainly: a review is only a control if it produces a complete population and a decision per entitlement. A screenshot of a user list is not a review. The reconciliation is the part auditors sample and the part most often missing.", "aw": "Population and reconciliation are automated. The decisions are human and should be.", "pw": "First run once the HRIS gives an authoritative population, then every quarter without exception.", "ev": "Quarterly review records with reviewer, entitlement, decision, date and reconciliation to reviews due"}, {"id": "H4", "cc": "CC4.1-05, CC8.1-05, CC8.1-07", "p": 49, "c": "high", "a": "auto", "ws": 10, "we": 26, "who": "Security Officer", "t": "Quarterly \u2014 change population review", "d": "The complete deployment population reviewed for changes lacking an approver, self-approved changes, direct production modifications and emergency change frequency.", "w": "GitHub deployment history and rulesets", "cw": "At two people self-approved changes will not be zero, and the honest number is more defensible than a review reporting none. Record the count and the compensating control from POL-CM-001 \u00a76.", "aw": "Four queries against the merge history. Automate the counts; the conclusion is a paragraph.", "pw": "Quarterly from the first full quarter after branch protection is enabled.", "ev": "Quarterly change population review record with the four counts and any deficiencies raised"}, {"id": "H5", "cc": "CC2.2-05, CC4.2-02, CC4.2-05, CC3.2-05", "p": 50, "c": "crit", "a": "semi", "ws": 10, "we": 26, "who": "Security Officer", "t": "Quarterly \u2014 the Committee report", "d": "One written report merging the three that policy requires: control status, deficiencies with owners severities and dates, overdue items escalated, repeat findings identified, training completion, risk treatment progress, vulnerability service levels.", "w": "Secureframe reporting into a dated document", "cw": "Expect zero overdue items in the first quarter and record the zero. An auditor cannot distinguish an empty escalation section from an unperformed report.", "aw": "Generated rather than written, then edited. The repeat-findings count is the number that matters and it needs the single deficiency population from A1 and E3.", "pw": "Every quarter from the first full one. Missing one is itself a deficiency under the E5 rule.", "ev": "Dated quarterly reports with deficiency status, escalations, repeat findings and treatment progress"}, {"id": "H6", "cc": "CC4.1-06, CC7.5-04, CC9.1-03", "p": 51, "c": "high", "a": "man", "ws": 14, "we": 20, "who": "Security Officer", "t": "Annual \u2014 continuity exercise, incident tabletop and restoration test", "d": "One sitting covering both plans, using a scenario POL-BCP-001 \u00a713 already names \u2014 unavailability of the Security Officer during an active incident tests both plans and the CC7.4-01 role gap at once. Plus a restoration test that restores actual data.", "w": "Governance repository, AWS backups", "cw": "In a period with no incidents the exercise is the only evidence either plan works. A test finding nothing shall be scrutinised before it is accepted, and a restoration test that confirms a job completed is not a restoration test.", "aw": "Manual, and it should be. Automating a tabletop defeats its purpose.", "pw": "Before the readiness review, so any defect it reveals can still be fixed inside the programme.", "ev": "Exercise record with objective, result, RTO and RPO achieved, deficiencies; restoration test record"}, {"id": "H7", "cc": "CC4.2-04, CC4.2-06", "p": 52, "c": "high", "a": "auto", "ws": 10, "we": 26, "who": "Security Officer", "t": "Continuous \u2014 closure verification and missed-evaluation tracking", "d": "A deficiency closes only when the corrective action has been verified and the verification recorded. Anything not performed by its due date is itself a deficiency, recorded and escalated.", "w": "Secureframe tasks and the compliance calendar", "cw": "Closure without verification is the most common finding in a second-year Type II, because year one closes on assertion and year two samples it.", "aw": "Automated once verification is a required field on closure and the calendar feeds the plan of action.", "pw": "Runs from the moment the calendar is wired at E5 and never stops.", "ev": "Closure records showing the verification performed; deficiency records for missed evaluations"}]}, {"id": "I", "name": "Type I and the observation window", "desc": "A Type I tests design and is reachable once A to H land. A Type II tests operation across a window that cannot start until the controls are running.", "items": [{"id": "I1", "cc": "CC4.1-01", "p": 53, "c": "crit", "a": "man", "ws": 12, "we": 14, "who": "CEO", "t": "Readiness review \u2014 every control at 2 or above", "d": "Walk all 160 controls. Anything still at 0 or 1 is either closed, or accepted in writing with a rationale and a compensating control.", "w": "The control plan workbook and the Governance Log", "cw": "This is milestone M5 and the Type I bar. A control at 1 is design only \u2014 the words exist and nothing has run. Going into fieldwork with unacknowledged ones is how a qualified opinion happens.", "aw": "Manual review. The scoring is already in the workbook, so this is a decision session rather than an assessment.", "pw": "After the first assessment and the first cycles, so the scores reflect reality rather than intention.", "ev": "Readiness record showing every control at 2 or above, or accepted in writing"}, {"id": "I2", "cc": "", "p": 54, "c": "high", "a": "man", "ws": 13, "we": 15, "who": "CEO", "t": "Select the service auditor and agree the scope", "d": "Choose the firm, agree the Trust Services Criteria in scope, the system description, the carve-out method for AWS, and the observation window dates.", "w": "Procurement, then the engagement letter", "cw": "The carve-out method and the system description are decisions that shape everything the auditor tests. Agreeing them late means rework across the control set.", "aw": "Manual. Budget $10,000 to $25,000 for a Type II on a small SaaS scope.", "pw": "Once readiness is credible, so the scoping conversation is grounded in what actually exists.", "ev": "Engagement letter with scope, criteria, carve-out method and window dates"}, {"id": "I3", "cc": "CC4.1-03, CC7.1-02", "p": 55, "c": "high", "a": "man", "ws": 15, "we": 18, "who": "Security Officer", "t": "Independent penetration test", "d": "External firm, scoped to whatever is internet-facing plus the application, with findings remediated or accepted before fieldwork.", "w": "External provider", "cw": "POL-VPM-001 \u00a713 requires it to be independent, so it cannot be self-performed. Sequence it after the free scanners have cleared the easy findings \u2014 the engagement scope, and therefore the price, is smaller.", "aw": "Manual procurement. Retesting of fixes is usually included and should be used.", "pw": "Late enough that the estate is hardened, early enough that findings can be closed before the auditor sees them.", "ev": "Penetration test report with evidence that findings were remediated or accepted"}, {"id": "I4", "cc": "", "p": 56, "c": "crit", "a": "man", "ws": 18, "we": 21, "who": "CEO", "t": "Type I fieldwork and the management assertion", "d": "Provide the system description, the control matrix, the evidence set, and sign the assertion that controls are suitably designed as at the report date.", "w": "Auditor portal and the governance repository", "cw": "The assertion is management's, not the auditor's. Signing it means standing behind the system description \u2014 which is why A3 reconciling Annex A matters this far downstream.", "aw": "Manual. The evidence request list is long but everything on it should already exist by now.", "pw": "Milestone M6. If M5 slipped, this slips with it rather than proceeding on hope.", "ev": "Type I report and the signed management assertion"}, {"id": "I5", "cc": "", "p": 57, "c": "crit", "a": "auto", "ws": 22, "we": 48, "who": "Security Officer", "t": "Run the observation window", "d": "Six months minimum. Every monthly and quarterly cycle from section H performed on time, with evidence retained.", "w": "Everything built in sections E, F and H", "cw": "This is where a Type II is won or lost, and it cannot be compressed or reconstructed. A missed quarterly access review inside the window is a gap in the population, and there is no way to go back and perform it.", "aw": "As automated as sections B, C and E made it. The 34 manual controls are what the window actually tests.", "pw": "Milestone M7 opens it. Discipline from here decides the report, not effort.", "ev": "Two quarterly cycles and six monthly cycles, each dated and retained"}, {"id": "I6", "cc": "CC4.2-05, CC1.2-02", "p": 58, "c": "high", "a": "semi", "ws": 22, "we": 48, "who": "CEO", "t": "Governance through the window", "d": "Quarterly Committee reports through the window, repeat findings escalated as design concerns rather than reworked, and every decision recorded in the Governance Log.", "w": "The Governance Log and the quarterly report", "cw": "A control that fails twice is a design problem, not an operating slip, and treating it as the latter is how a Type II qualification happens.", "aw": "Semi-automated. The numbers generate; the escalation judgement does not.", "pw": "Runs alongside I5 and is the evidence that oversight operated, not just controls.", "ev": "Quarterly reports across the window; Governance Log entries with date and decider"}, {"id": "I7", "cc": "", "p": 59, "c": "high", "a": "man", "ws": 48, "we": 52, "who": "CEO", "t": "Type II fieldwork", "d": "Operating effectiveness tested across the window, with sampling across every period.", "w": "Auditor portal", "cw": "The auditor samples the population, so completeness matters more than perfection. A period with a documented exception and a remediation is a better position than a period with a gap nobody explains.", "aw": "Manual, but the evidence should be an export rather than a hunt if sections E and H were run properly.", "pw": "Milestone M9, roughly mid-2027 on this plan.", "ev": "Type II report covering the observation window"}]}];
+var KEY="pm_exec_tracker_v1";
+var persistent=(function(){try{localStorage.setItem("__t","1");localStorage.removeItem("__t");return true;}
+ catch(e){return false;}})();
+var store={get:function(k){try{return localStorage.getItem(k);}catch(e){return null;}},
+ set:function(k,v){try{localStorage.setItem(k,v);}catch(e){}}};
+var state={editor:null,items:{},log:[],collapsed:{},showRat:false};
+(function(){var raw=store.get(KEY);if(raw){try{var p=JSON.parse(raw);
+ state.editor=p.editor||null;state.items=p.items||{};state.log=p.log||[];state.collapsed=p.collapsed||{};
+ state.showRat=!!p.showRat;}catch(e){}}})();
+function save(){store.set(KEY,JSON.stringify(state));}
+function itm(id){if(!state.items[id])state.items[id]={status:"open",owner:"",target:"",notes:""};
+ return state.items[id];}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){
+ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function all(){var a=[];GROUPS.forEach(function(g){g.items.forEach(function(i){a.push(i);});});return a;}
+var CRIT={crit:"Critical",high:"High",mod:"Moderate",low:"Low"};
+var AUTO={auto:"Automated",semi:"Semi-automated",man:"Manual"};
+var STAT={open:"Not started",prog:"In progress",done:"Complete",na:"Not applicable"};
+function fmt(t){var d=new Date(t);return d.toLocaleDateString(undefined,{day:"2-digit",month:"short"})+" "+
+ d.toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"});}
+
+/* ---------- editor ---------- */
+var dlg=document.getElementById("editorModal");
+function askEditor(){document.getElementById("nameIn").value=state.editor?state.editor.name:"";
+ document.getElementById("roleIn").value=state.editor?state.editor.role:"";
+ if(dlg.showModal)dlg.showModal();else{ /* no dialog support: fall back to prompt */
+  var n=window.prompt("Your name — stamped against every change");if(!n)return;
+  var r=window.prompt("Your role")||"";state.editor={name:n.trim(),role:r.trim()};save();renderWho();}}
+document.getElementById("saveEditor").addEventListener("click",function(){
+ var n=document.getElementById("nameIn").value.trim();if(!n)return;
+ state.editor={name:n,role:document.getElementById("roleIn").value.trim()};save();renderWho();});
+document.getElementById("switchEditor").addEventListener("click",askEditor);
+function renderWho(){document.getElementById("who").textContent=state.editor
+ ?("Editing as "+state.editor.name+(state.editor.role?" · "+state.editor.role:""))
+ :"No editor set — set one before changing anything";}
+function stamp(id,field,val){var it=itm(id),from=it[field]||"";if(from===val)return;
+ it[field]=val;
+ state.log.unshift({at:Date.now(),by:state.editor?state.editor.name:"unknown",
+  role:state.editor?state.editor.role:"",id:id,field:field,
+  from:(field==="status"?(STAT[from]||"—"):(from||"—")),to:(field==="status"?STAT[val]:(val||"—"))});
+ state.log=state.log.slice(0,800);save();}
+
+/* ---------- filters ---------- */
+function filters(){return {q:(document.getElementById("q").value||"").toLowerCase(),
+ s:document.getElementById("fStatus").value,o:document.getElementById("fOwner").value,
+ c:document.getElementById("fCrit").value,a:document.getElementById("fAuto").value,
+ sort:document.getElementById("sortBy").value};}
+function match(i,f){var st=itm(i.id);
+ if(f.s&&st.status!==f.s)return false;
+ if(f.o&&(st.owner||i.who)!==f.o)return false;
+ if(f.c&&i.c!==f.c)return false;
+ if(f.a&&i.a!==f.a)return false;
+ if(f.q&&!(i.id+" "+i.t+" "+i.d+" "+i.cc+" "+i.ev+" "+i.w).toLowerCase().includes(f.q))return false;
+ return true;}
+function sortItems(arr,how){var ord={crit:0,high:1,mod:2,low:3},so={open:0,prog:1,done:2,na:3};
+ return arr.slice().sort(function(a,b){
+  if(how==="wk")return a.ws-b.ws||a.p-b.p;
+  if(how==="crit")return ord[a.c]-ord[b.c]||a.p-b.p;
+  if(how==="status")return so[itm(a.id).status]-so[itm(b.id).status]||a.p-b.p;
+  return a.p-b.p;});}
+
+/* ---------- meter ---------- */
+function renderMeter(){var a=all(),d=0,p=0,n=0;
+ a.forEach(function(i){var s=itm(i.id).status;if(s==="done")d++;else if(s==="prog")p++;else if(s==="na")n++;});
+ var t=a.length,app=t-n;
+ document.getElementById("barDone").style.width=(d/t*100)+"%";
+ document.getElementById("barProg").style.width=(p/t*100)+"%";
+ document.getElementById("barNa").style.width=(n/t*100)+"%";
+ document.getElementById("meterPct").textContent=(app?Math.round(d/app*100):0)+"% of applicable tasks complete";
+ document.getElementById("meterLabel").textContent=d+" complete · "+p+" in progress · "+(t-d-p-n)+
+  " not started · "+n+" not applicable";}
+
+/* ---------- plan ---------- */
+function renderPlan(){var f=filters(),host=document.getElementById("viewPlan"),h="",shown=0;
+ GROUPS.forEach(function(g){
+  var items=sortItems(g.items.filter(function(i){return match(i,f);}),f.sort);
+  if(!items.length)return;
+  shown+=items.length;
+  var st={done:0,prog:0,open:0,na:0};g.items.forEach(function(i){st[itm(i.id).status]++;});
+  var open=!state.collapsed[g.id];
+  h+='<section class="grp"><div class="grp-hd" data-toggle="'+g.id+'" tabindex="0" role="button">'+
+   '<span class="car">'+(open?"▾":"▸")+'</span><div><h3>'+esc(g.id)+'. '+esc(g.name)+'</h3>'+
+   '<div class="gd">'+esc(g.desc)+'</div></div>'+
+   '<span class="pill"><span class="tag t-auto">'+st.done+' done</span>'+
+   '<span class="tag t-high">'+st.prog+' active</span>'+
+   '<span class="tag t-low">'+st.open+' to start</span>'+
+   '<span class="tag t-wk">W'+Math.min.apply(null,g.items.map(function(i){return i.ws;}))+'–W'+
+   Math.max.apply(null,g.items.map(function(i){return i.we;}))+'</span></span></div>';
+  if(open){h+='<div class="grp-body">'+items.map(function(i){var s=itm(i.id);
+   return '<div class="item" data-id="'+esc(i.id)+'">'+
+    '<div class="it-top"><span class="seq">'+esc(i.id)+'</span>'+
+    '<div class="it-t">'+esc(i.t)+'<div class="it-d">'+esc(i.d)+'</div>'+
+     '<div class="it-d cc">'+(i.cc?"Closes "+esc(i.cc)+" · ":"")+"Where: "+esc(i.w)+'</div></div>'+
+    '<span class="tag t-'+i.c+'">'+CRIT[i.c]+'</span>'+
+    '<span class="tag t-'+i.a+'">'+AUTO[i.a]+'</span>'+
+    '<span class="tag t-wk">W'+i.ws+(i.we!==i.ws?'–W'+i.we:'')+'</span></div>'+
+    (state.showRat?'<div class="why">'+
+      '<div><h5>Why it matters</h5><p>'+esc(i.cw)+'</p></div>'+
+      '<div><h5>How far it automates</h5><p>'+esc(i.aw)+'</p></div>'+
+      '<div><h5>Why here in the sequence</h5><p>'+esc(i.pw)+'</p></div>'+
+      '<div class="ev"><h5>Evidence it produces</h5><p>'+esc(i.ev)+'</p></div></div>':'')+
+    '<div class="fields">'+
+     '<label>Status</label><select data-f="status" class="st-'+s.status+'">'+
+      ["open","prog","done","na"].map(function(k){return '<option value="'+k+'"'+
+       (s.status===k?" selected":"")+'>'+STAT[k]+'</option>';}).join("")+'</select>'+
+     '<label>Owner</label><select data-f="owner">'+
+      ["","Security Officer","CEO","External","Shared"].map(function(k){return '<option value="'+k+'"'+
+       ((s.owner||i.who)===k?" selected":"")+'>'+(k||"—")+'</option>';}).join("")+'</select>'+
+     '<label>Target</label><input type="date" data-f="target" value="'+esc(s.target)+'">'+
+     '<input type="text" data-f="notes" placeholder="Note" value="'+esc(s.notes)+'">'+
+    '</div></div>';}).join("")+'</div>';}
+  h+='</section>';});
+ host.innerHTML=h||'<div class="empty">Nothing matches those filters.</div>';
+ document.getElementById("count").textContent=shown+" of "+all().length+" tasks";}
+
+/* ---------- dashboard ---------- */
+function bar(d,p,n,t){t=t||1;return '<span class="bar">'+
+ '<i style="width:'+(d/t*100)+'%;background:var(--done)"></i>'+
+ '<i style="width:'+(p/t*100)+'%;background:var(--prog)"></i>'+
+ '<i style="width:'+(n/t*100)+'%;background:var(--na)"></i></span>';}
+function renderDash(){var a=all(),c={done:0,prog:0,open:0,na:0};
+ a.forEach(function(i){c[itm(i.id).status]++;});
+ var h='<div class="kpis">'+
+  [["Complete",c.done],["In progress",c.prog],["Not started",c.open],["Not applicable",c.na]]
+   .map(function(k){return '<div class="kpi"><div class="n">'+k[1]+'</div><div class="l">'+k[0]+'</div></div>';})
+   .join("")+'</div>';
+ var next=sortItems(a.filter(function(i){var s=itm(i.id).status;return s==="open"||s==="prog";}),"seq").slice(0,8);
+ h+='<div class="panel"><h3>Do these next</h3><p class="note">The eight earliest tasks in the sequence that are '+
+  'not finished. Sequence order, not date order — later items assume these are done.</p><table><thead><tr>'+
+  '<th>Task</th><th>Weeks</th><th>Criticality</th><th>Owner</th><th>Status</th></tr></thead><tbody>'+
+  next.map(function(i){var s=itm(i.id);
+   return '<tr><td><b>'+esc(i.id)+'</b> '+esc(i.t)+'</td><td class="when">W'+i.ws+'–W'+i.we+'</td>'+
+    '<td><span class="tag t-'+i.c+'">'+CRIT[i.c]+'</span></td><td>'+esc(s.owner||i.who)+'</td>'+
+    '<td>'+STAT[s.status]+'</td></tr>';}).join("")+'</tbody></table></div>';
+ h+='<div class="panel"><h3>Progress by criticality</h3><p class="note">Critical tasks left open are what put the '+
+  'timeline at risk, not the total count.</p>'+
+  ["crit","high","mod","low"].map(function(k){var set=a.filter(function(i){return i.c===k;});
+   var d=0,p=0,n=0;set.forEach(function(i){var s=itm(i.id).status;if(s==="done")d++;else if(s==="prog")p++;
+    else if(s==="na")n++;});
+   return '<div class="rowbar"><span class="k">'+CRIT[k]+'</span>'+bar(d,p,n,set.length)+
+    '<span class="v">'+d+'/'+set.length+'</span></div>';}).join("")+'</div>';
+ h+='<div class="panel"><h3>Progress by effort type</h3><p class="note">Automated work scales. Manual work is what '+
+  'headcount limits, and it is what the observation window actually tests.</p>'+
+  ["auto","semi","man"].map(function(k){var set=a.filter(function(i){return i.a===k;});
+   var d=0,p=0,n=0;set.forEach(function(i){var s=itm(i.id).status;if(s==="done")d++;else if(s==="prog")p++;
+    else if(s==="na")n++;});
+   return '<div class="rowbar"><span class="k">'+AUTO[k]+'</span>'+bar(d,p,n,set.length)+
+    '<span class="v">'+d+'/'+set.length+'</span></div>';}).join("")+'</div>';
+ h+='<div class="panel"><h3>Progress by workstream</h3><table><thead><tr><th>Workstream</th><th>Weeks</th>'+
+  '<th>Complete</th><th>In progress</th><th>Not started</th><th>Critical open</th></tr></thead><tbody>'+
+  GROUPS.map(function(g){var s={done:0,prog:0,open:0,na:0},co=0;
+   g.items.forEach(function(i){var st=itm(i.id).status;s[st]++;
+    if(i.c==="crit"&&st!=="done"&&st!=="na")co++;});
+   var lo=Math.min.apply(null,g.items.map(function(i){return i.ws;}));
+   var hi=Math.max.apply(null,g.items.map(function(i){return i.we;}));
+   return '<tr><td><b>'+esc(g.id)+'.</b> '+esc(g.name)+'</td><td class="when">W'+lo+'–W'+hi+'</td><td>'+s.done+
+    '</td><td>'+s.prog+'</td><td>'+s.open+'</td><td'+(co?' style="color:var(--crit);font-weight:600"':'')+'>'+co+
+    '</td></tr>';}).join("")+'</tbody></table></div>';
+ document.getElementById("viewDash").innerHTML=h;}
+
+/* ---------- timeline ---------- */
+function renderTime(){var a=all(),WK=52,LW=250,CW=13,RH=22,TH=46;
+ var rows=[];GROUPS.forEach(function(g){
+  rows.push({grp:true,id:g.id,t:g.id+". "+g.name,
+   ws:Math.min.apply(null,g.items.map(function(i){return i.ws;})),
+   we:Math.max.apply(null,g.items.map(function(i){return i.we;}))});
+  if(!state.collapsed[g.id])g.items.forEach(function(i){rows.push({grp:false,i:i});});});
+ var H=TH+rows.length*RH+30,W=LW+WK*CW+30;
+ var s='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">';
+ for(var q=0;q<4;q++){var x=LW+q*13*CW;
+  s+='<rect x="'+x+'" y="'+(TH-14)+'" width="'+(13*CW)+'" height="'+(rows.length*RH+14)+'" fill="'+
+   (q%2?"#fbfcfd":"#fff")+'"/>';
+  s+='<text x="'+(x+5)+'" y="'+(TH-20)+'" font-size="10.5" font-weight="700" fill="#5a6a78">Q'+(q+1)+
+   ' · W'+(q*13+1)+'–'+((q+1)*13)+'</text>';}
+ for(var w=0;w<=WK;w+=4){var xx=LW+w*CW;
+  s+='<line x1="'+xx+'" y1="'+(TH-14)+'" x2="'+xx+'" y2="'+(TH+rows.length*RH)+'" stroke="#eef2f5"/>';}
+ var SC={done:"#2e7d32",prog:"#b26a00",na:"#c9d0d6",open:"#7fa8c0"};
+ rows.forEach(function(r,idx){var y=TH+idx*RH;
+  if(r.grp){
+   s+='<text x="'+(LW-8)+'" y="'+(y+15)+'" text-anchor="end" font-size="11.5" font-weight="700" fill="#1b4965">'+
+    esc(r.t.length>38?r.t.slice(0,37)+"…":r.t)+'</text>';
+   s+='<rect x="'+(LW+(r.ws-1)*CW)+'" y="'+(y+6)+'" width="'+((r.we-r.ws+1)*CW)+'" height="10" rx="3" '+
+    'fill="#cae9ff" stroke="#5fa8d3"/>';
+  }else{var i=r.i,st=itm(i.id).status;
+   s+='<text x="'+(LW-8)+'" y="'+(y+15)+'" text-anchor="end" font-size="10.5" fill="#5a6a78">'+
+    esc(i.id+" "+(i.t.length>34?i.t.slice(0,33)+"…":i.t))+'</text>';
+   s+='<g><title>'+esc(i.id+" · "+i.t+" — weeks "+i.ws+" to "+i.we+", "+(itm(i.id).owner||i.who)+
+    ". Status: "+STAT[st]+".")+'</title><rect x="'+(LW+(i.ws-1)*CW)+'" y="'+(y+6)+'" width="'+
+    ((i.we-i.ws+1)*CW)+'" height="10" rx="3" fill="'+SC[st]+'" opacity="'+(st==="open"?.55:.95)+'"/></g>';}});
+ s+='</svg>';
+ document.getElementById("viewTime").innerHTML='<div class="panel"><h3>Timeline</h3><p class="note">Week 1 is the '+
+  'week of 10 August 2026. Bars recolour with status — blue not started, amber in progress, green complete, grey '+
+  'not applicable. Collapse a workstream on the Plan tab and it collapses here too.</p><div class="gantt">'+s+
+  '</div></div>';}
+
+/* ---------- log ---------- */
+function renderLog(){var host=document.getElementById("viewLog");
+ if(!state.log.length){host.innerHTML='<div class="empty">No changes recorded yet. Set an editor, then change a '+
+  'status — every edit is stamped here with who made it.</div>';return;}
+ host.innerHTML='<div class="panel"><h3>Change log</h3><p class="note">Most recent first. '+state.log.length+
+  ' change'+(state.log.length===1?"":"s")+' recorded.</p><table><thead><tr><th>When</th><th>Editor</th>'+
+  '<th>Task</th><th>Field</th><th>Change</th></tr></thead><tbody>'+
+  state.log.map(function(e){return '<tr><td class="when">'+esc(fmt(e.at))+'</td><td><b>'+esc(e.by)+'</b>'+
+   (e.role?'<br><span style="color:var(--ink-soft);font-size:11.5px">'+esc(e.role)+'</span>':'')+
+   '</td><td>'+esc(e.id)+'</td><td>'+esc(e.field)+'</td><td>'+esc(e.from)+' → <b>'+esc(e.to)+
+   '</b></td></tr>';}).join("")+'</tbody></table></div>';}
+
+function render(){renderMeter();renderDash();renderPlan();renderTime();renderLog();}
+
+/* ---------- events ---------- */
+document.getElementById("viewPlan").addEventListener("change",function(e){
+ var f=e.target.getAttribute("data-f");if(!f)return;
+ var row=e.target.closest(".item");if(!row)return;
+ if(!state.editor){askEditor();return;}
+ stamp(row.getAttribute("data-id"),f,e.target.value);render();});
+document.getElementById("viewPlan").addEventListener("click",function(e){
+ var hd=e.target.closest("[data-toggle]");if(!hd)return;
+ var g=hd.getAttribute("data-toggle");state.collapsed[g]=!state.collapsed[g];save();renderPlan();renderTime();});
+document.getElementById("viewPlan").addEventListener("keydown",function(e){
+ if(e.key!=="Enter"&&e.key!==" ")return;var hd=e.target.closest("[data-toggle]");if(!hd)return;
+ e.preventDefault();hd.click();});
+["q","fStatus","fOwner","fCrit","fAuto","sortBy"].forEach(function(id){
+ document.getElementById(id).addEventListener("input",renderPlan);});
+document.getElementById("expandAll").addEventListener("click",function(){state.collapsed={};save();
+ renderPlan();renderTime();});
+document.getElementById("collapseAll").addEventListener("click",function(){
+ GROUPS.forEach(function(g){state.collapsed[g.id]=true;});save();renderPlan();renderTime();});
+document.getElementById("showRat").addEventListener("click",function(){
+ state.showRat=!state.showRat;this.textContent=state.showRat?"Detail off":"Detail on";save();renderPlan();});
+document.getElementById("exportCsv").addEventListener("click",function(){
+ var q=function(v){return '"'+String(v==null?"":v).replace(/"/g,'""')+'"';};
+ var rows=[["Workstream","ID","Task","What to do","Where","Controls closed","Criticality","Effort","Start week",
+  "End week","Default owner","Status","Owner","Target","Notes","Why it matters","How it automates",
+  "Why here","Evidence"]];
+ GROUPS.forEach(function(g){g.items.forEach(function(i){var s=itm(i.id);
+  rows.push([g.name,i.id,i.t,i.d,i.w,i.cc,CRIT[i.c],AUTO[i.a],i.ws,i.we,i.who,STAT[s.status],s.owner||i.who,
+   s.target,s.notes,i.cw,i.aw,i.pw,i.ev]);});});
+ var b=new Blob([rows.map(function(r){return r.map(q).join(",");}).join("\n")],{type:"text/csv"});
+ var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="soc2-programme-tracker.csv";a.click();
+ URL.revokeObjectURL(a.href);});
+document.getElementById("exportJson").addEventListener("click",function(){
+ var b=new Blob([JSON.stringify(state,null,1)],{type:"application/json"});
+ var a=document.createElement("a");a.href=URL.createObjectURL(b);
+ a.download="soc2-programme-state.json";a.click();URL.revokeObjectURL(a.href);});
+document.getElementById("importBtn").addEventListener("click",function(){
+ document.getElementById("fileIn").click();});
+document.getElementById("fileIn").addEventListener("change",function(e){
+ var f=e.target.files[0];if(!f)return;var r=new FileReader();
+ r.onload=function(){try{var p=JSON.parse(r.result);
+  state.items=p.items||{};state.log=(p.log||[]).concat(state.log).slice(0,800);
+  state.collapsed=p.collapsed||{};if(p.editor)state.editor=p.editor;save();renderWho();render();}
+  catch(err){alert("That file could not be read as tracker state.");}};
+ r.readAsText(f);e.target.value="";});
+function showTab(v){
+ [].forEach.call(document.querySelectorAll("nav.tabs button"),function(x){
+  x.setAttribute("aria-selected",x.getAttribute("data-view")===v?"true":"false");});
+ document.getElementById("viewDash").hidden=(v!=="dash");
+ document.getElementById("viewPlan").hidden=(v!=="plan");
+ document.getElementById("viewTime").hidden=(v!=="time");
+ document.getElementById("viewLog").hidden=(v!=="log");
+ document.getElementById("toolbar").style.display=(v==="plan")?"flex":"none";}
+[].forEach.call(document.querySelectorAll("nav.tabs button"),function(b){
+ b.addEventListener("click",function(){showTab(b.getAttribute("data-view"));});});
+(function init(){
+ var owners={};all().forEach(function(i){owners[i.who]=1;});
+ var fo=document.getElementById("fOwner");
+ ["Security Officer","CEO","External","Shared"].forEach(function(o){
+  var op=document.createElement("option");op.textContent=o;fo.appendChild(op);});
+ GROUPS.forEach(function(g){if(state.collapsed[g.id]===undefined)state.collapsed[g.id]=true;});
+ document.getElementById("showRat").textContent=state.showRat?"Detail off":"Detail on";
+ renderWho();render();showTab("dash");
+ document.getElementById("foot").textContent="59 tasks across 9 workstreams · week 1 is the week of 10 August 2026"+
+  " · "+(persistent?"changes are saved in this browser":"changes are held for this session only")+
+  " · use Save JSON to hand the state to someone else. Internal.";
+ if(!state.editor)setTimeout(askEditor,400);
+})();
+</script></body></html>
