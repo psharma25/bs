@@ -52,6 +52,11 @@
   text-decoration:none;color:inherit;transition:box-shadow .13s,transform .13s,border-color .13s}
  .card:hover{box-shadow:0 3px 12px rgba(20,45,60,.11);transform:translateY(-1px);border-left-color:var(--petrol)}
  .card.folder{border-left-color:var(--petrol);background:linear-gradient(180deg,#fff 0%,#fbfdfe 100%)}
+ .card.doc{border-left-color:var(--green)}
+ .card.ext{border-left-color:var(--petrol-lt)}
+ .card.ext h3::after{content:" ↗";color:var(--petrol-lt);font-weight:400}
+ .card.ext .path::after{content:" — opens in a new tab";color:#9aa8b1;font-family:var(--sans);font-size:10.5px}
+ .card.doc .path::after{content:" — downloads";color:#9aa8b1;font-family:var(--sans);font-size:10.5px}
  .card h3{margin:0 0 5px;font-size:14.5px;font-weight:650;color:var(--petrol);padding-right:62px}
  .card p{margin:0 0 10px;font-size:12.5px;color:var(--soft);flex:1}
  .path{font-family:var(--mono);font-size:11px;color:#7d8b95;word-break:break-all;
@@ -132,12 +137,20 @@ const ITEMS = [
     tags:["AI","Architecture"],
     access:"public" },
 
-  { name:"Control-to-policy map",
+  { name:"Control-to-policy map & gap assessment",
     file:"control-policy-map.html",
     group:"Assurance",
-    desc:"Cross-walk from controls to the policy that carries them, so every control has a named owner document.",
-    tags:["Mapping","Policy"],
+    desc:"Cross-walk from controls to the policy that carries them, and where the gaps sit — controls with no owning document, and policies covering nothing.",
+    tags:["Mapping","Policy","Gap assessment"],
     access:"public" },
+
+  { name:"Trust Center",
+    file:"https://thebitsense.com/trustcenter/",
+    group:"Assurance",
+    desc:"Published security posture and evidence summary. Choose PromptHalo from the Product selector to see their view.",
+    tags:["Trust Center","External","Customer-facing"],
+    access:"public",
+    external:true },
 
   { name:"SOC 2 programme tracker",
     file:"soc2-programme-tracker.html",
@@ -159,6 +172,22 @@ const ITEMS = [
     desc:"Tracks which artefact satisfies which requirement, and whether it is current enough to submit.",
     tags:["Evidence","SOC 2"],
     access:"restricted" },
+
+  { name:"SOC 2 programme map",
+    file:"PromptHalo_Programme_Map.xlsx",
+    group:"Assurance",
+    desc:"Seven workstreams and 42 tasks on a week-by-week roadmap, with milestones, blockers and capacity.",
+    tags:["XLSX","Roadmap","SOC 2"],
+    access:"restricted",
+    doc:true },
+
+  { name:"Common Criteria control plan",
+    file:"PromptHalo_Common_Criteria_Control_Plan.xlsx",
+    group:"Assurance",
+    desc:"160 controls across CC1–CC9 with policy mapping, governance log, evidence calendar and dashboard.",
+    tags:["XLSX","Controls","SOC 2"],
+    access:"restricted",
+    doc:true },
 
   { name:"GitHub hardening tracker",
     file:"github-hardening-tracker.html",
@@ -216,8 +245,10 @@ function esc(s){
 
 function card(it){
   const a = document.createElement("a");
-  a.className = "card" + (it.folder ? " folder" : "");
+  a.className = "card" + (it.folder ? " folder" : "") + (it.doc ? " doc" : "") + (it.external ? " ext" : "");
   a.href = it.file;
+  if (it.doc) a.setAttribute("download", "");
+  if (it.external){ a.target = "_blank"; a.rel = "noopener noreferrer"; }
   a.addEventListener("click", () => {
     seen[it.file] = Date.now();
     try { localStorage.setItem(KEY, JSON.stringify(seen)); } catch (e) {}
