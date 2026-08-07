@@ -1,0 +1,2248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Enterprise Risk Register</title>
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root{
+  --petrol:#1b4965;
+  --petrol-2:#2a6f97;
+  --petrol-3:#468faf;
+  --ink:#0f2733;
+  --ink-2:#3d5a6c;
+  --ink-3:#6b8494;
+  --ice:#e8f0f5;
+  --ice-2:#f2f7fa;
+  --paper:#f6f8fa;
+  --white:#ffffff;
+  --line:#d5e0e8;
+  --line-2:#e6edf2;
+
+  /* Rating scale — deliberately desaturated so the grid reads as data, not alarm */
+  --low:#1f7a5a;      --low-bg:#e3f2ec;      --low-br:#a9d8c5;
+  --mod:#b07d00;      --mod-bg:#fdf3dc;      --mod-br:#ecd394;
+  --high:#c25a10;     --high-bg:#fdeadd;     --high-br:#f2c19a;
+  --crit:#a3201b;     --crit-bg:#fbe3e1;     --crit-br:#eeb0ac;
+
+  --shadow:0 1px 2px rgba(15,39,51,.06), 0 4px 14px rgba(15,39,51,.06);
+  --shadow-lg:0 10px 40px rgba(15,39,51,.18);
+  --r:10px;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Menlo,Consolas,monospace;
+  --sans:"Inter","Segoe UI",Calibri,-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--sans);
+  background:var(--paper);
+  color:var(--ink);
+  font-size:14px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer}
+h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-0.01em}
+a{color:var(--petrol-2)}
+
+/* ============================================================
+   MASTHEAD
+   ============================================================ */
+.masthead{
+  background:linear-gradient(180deg,var(--petrol) 0%,#163d55 100%);
+  color:#fff;
+  padding:18px 26px 0;
+  position:sticky;top:0;z-index:60;
+  box-shadow:0 1px 0 rgba(0,0,0,.15);
+}
+.mast-row{display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap}
+.mast-id{flex:1 1 320px;min-width:260px}
+.eyebrow{
+  font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  font-weight:600;color:var(--petrol-3);font-family:var(--mono);
+}
+.masthead h1{font-size:22px;margin:3px 0 2px;color:#fff;font-weight:600}
+.mast-sub{font-size:12.5px;color:#b8d3e2;margin:0}
+.mast-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center;padding-top:4px}
+
+.btn{
+  background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);
+  color:#fff;padding:7px 12px;border-radius:7px;font-size:12.5px;font-weight:500;
+  transition:background .13s,border-color .13s;white-space:nowrap;
+}
+.btn:hover{background:rgba(255,255,255,.2)}
+.btn:focus-visible{outline:2px solid var(--petrol-3);outline-offset:2px}
+.btn-primary{background:#fff;color:var(--petrol);border-color:#fff;font-weight:600}
+.btn-primary:hover{background:var(--ice)}
+
+/* ---- KPI strip ---- */
+.kpis{display:flex;gap:0;flex-wrap:wrap;margin-top:16px;border-top:1px solid rgba(255,255,255,.14)}
+.kpi{
+  padding:11px 22px 11px 0;margin-right:22px;
+  border-right:1px solid rgba(255,255,255,.12);
+  min-width:96px;
+}
+.kpi:last-child{border-right:none}
+.kpi-v{font-size:21px;font-weight:600;line-height:1.05;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.kpi-l{font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:#8fb7cc;margin-top:3px;font-weight:600}
+.kpi-crit .kpi-v{color:#ff9d94}
+.kpi-good .kpi-v{color:#8fe0bd}
+
+/* ---- Tabs ---- */
+.tabs{display:flex;gap:2px;margin-top:6px;overflow-x:auto}
+.tab{
+  background:none;border:none;color:#a8c8da;padding:11px 15px 12px;
+  font-size:13px;font-weight:550;border-bottom:2.5px solid transparent;
+  white-space:nowrap;transition:color .13s;
+}
+.tab:hover{color:#e2eff6}
+.tab[aria-selected="true"]{color:#fff;border-bottom-color:var(--petrol-3)}
+.tab .cnt{font-size:10.5px;color:#7fa8c0;margin-left:5px;font-family:var(--mono)}
+.tab[aria-selected="true"] .cnt{color:var(--petrol-3)}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.wrap{padding:20px 26px 70px;max-width:1680px;margin:0 auto}
+.panel{display:none}
+.panel.on{display:block;animation:fade .18s ease}
+@keyframes fade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+
+.card{
+  background:var(--white);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--shadow);margin-bottom:18px;overflow:hidden;
+}
+.card-hd{
+  padding:13px 17px;border-bottom:1px solid var(--line-2);
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--ice-2);
+}
+.card-hd h3{font-size:13.5px;color:var(--petrol)}
+.card-hd .hint{font-size:11.5px;color:var(--ink-3);margin-left:auto}
+.card-bd{padding:17px}
+
+/* ============================================================
+   FILTER BAR
+   ============================================================ */
+.filters{
+  display:flex;gap:9px;flex-wrap:wrap;align-items:center;
+  background:var(--white);border:1px solid var(--line);border-radius:var(--r);
+  padding:11px 13px;margin-bottom:16px;box-shadow:var(--shadow);
+}
+.filters input[type=search],.filters select{
+  border:1px solid var(--line);border-radius:7px;padding:7px 10px;background:var(--white);
+  font-size:12.5px;color:var(--ink);
+}
+.filters input[type=search]{min-width:240px;flex:1 1 240px}
+.filters select{cursor:pointer}
+.filters input:focus,.filters select:focus{outline:2px solid var(--petrol-3);outline-offset:-1px;border-color:var(--petrol-3)}
+.f-clear{
+  background:var(--ice);border:1px solid var(--line);color:var(--petrol);
+  border-radius:7px;padding:7px 11px;font-size:12px;font-weight:550;
+}
+.f-clear:hover{background:var(--ice-2)}
+.f-count{font-size:12px;color:var(--ink-3);margin-left:auto;font-variant-numeric:tabular-nums}
+
+/* ============================================================
+   REGISTER TABLE
+   ============================================================ */
+.cat-block{margin-bottom:14px;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:#fff;box-shadow:var(--shadow)}
+.cat-hd{
+  display:flex;align-items:center;gap:11px;padding:10px 15px;
+  background:var(--ice-2);border-bottom:1px solid var(--line-2);cursor:pointer;
+  border-left:4px solid var(--cat,#1b4965);
+}
+.cat-hd:hover{background:var(--ice)}
+.cat-code{
+  font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;
+  background:var(--cat,#1b4965);color:#fff;padding:3px 7px;border-radius:4px;
+}
+.cat-name{font-size:13px;font-weight:600;color:var(--ink)}
+.cat-meta{margin-left:auto;display:flex;gap:7px;align-items:center;font-size:11px;color:var(--ink-3)}
+.chev{transition:transform .16s;color:var(--ink-3);font-size:11px}
+.cat-block.shut .chev{transform:rotate(-90deg)}
+.cat-block.shut .tbl-scroll{display:none}
+
+.tbl-scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+thead th{
+  text-align:left;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:700;padding:8px 10px;background:#fff;
+  border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0;
+}
+tbody td{padding:9px 10px;border-bottom:1px solid var(--line-2);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody tr{cursor:pointer;transition:background .1s}
+tbody tr:hover{background:var(--ice-2)}
+.col-id{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--petrol);white-space:nowrap}
+.col-title{min-width:250px;max-width:400px}
+.col-title b{font-weight:600;display:block;color:var(--ink);font-size:12.5px}
+.col-title span{color:var(--ink-3);font-size:11.5px;display:block;margin-top:2px;line-height:1.4}
+.col-owner{white-space:nowrap;font-size:12px;color:var(--ink-2)}
+.num{font-variant-numeric:tabular-nums;text-align:center;white-space:nowrap}
+
+/* score pill */
+.score{
+  display:inline-flex;align-items:center;gap:5px;padding:2px 7px;border-radius:5px;
+  font-family:var(--mono);font-size:11px;font-weight:700;border:1px solid;
+}
+.score i{font-style:normal;font-weight:500;opacity:.72;font-size:10px}
+.s-low{color:var(--low);background:var(--low-bg);border-color:var(--low-br)}
+.s-mod{color:var(--mod);background:var(--mod-bg);border-color:var(--mod-br)}
+.s-high{color:var(--high);background:var(--high-bg);border-color:var(--high-br)}
+.s-crit{color:var(--crit);background:var(--crit-bg);border-color:var(--crit-br)}
+
+.delta{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--low)}
+.delta.zero{color:var(--ink-3)}
+.delta.up{color:var(--crit)}
+
+.tag{
+  display:inline-block;padding:2px 7px;border-radius:20px;font-size:10.5px;font-weight:600;
+  border:1px solid var(--line);background:var(--ice-2);color:var(--ink-2);white-space:nowrap;
+}
+.t-Open{background:#fbe3e1;border-color:#eeb0ac;color:#a3201b}
+.t-Treating{background:#fdf3dc;border-color:#ecd394;color:#b07d00}
+.t-Monitoring{background:#e8f0f5;border-color:#bfd6e3;color:#1b4965}
+.t-Accepted{background:#efe9f7;border-color:#cdbde6;color:#5b3f8c}
+.t-Closed{background:#e3f2ec;border-color:#a9d8c5;color:#1f7a5a}
+.t-Transferred{background:#e6f1f6;border-color:#b4d5e5;color:#2a6f97}
+
+/* example rows — present for illustration, deliberately recessive */
+tbody tr.is-example td{color:#93a7b3}
+tbody tr.is-example .col-id{color:#93a7b3;font-weight:500}
+tbody tr.is-example .col-title b{color:#7d95a3;font-weight:500}
+tbody tr.is-example .col-title span{color:#a3b5c0}
+tbody tr.is-example .score,tbody tr.is-example .tag,tbody tr.is-example .ctrl-ref{
+  filter:saturate(.18);opacity:.7;
+}
+tbody tr.is-example .delta{color:#a3b5c0}
+tbody tr.is-example:hover td{color:var(--ink-2)}
+tbody tr.is-example:hover .score,tbody tr.is-example:hover .tag,tbody tr.is-example:hover .ctrl-ref{filter:none;opacity:1}
+tbody tr.is-example:hover .col-title b{color:var(--ink)}
+.tag-ex{background:#f0f3f5;border-color:#dbe4ea;color:#8b9daa;font-weight:500}
+.sf-note{
+  border-left:3px solid var(--petrol-3);background:var(--ice-2);padding:11px 14px;
+  border-radius:0 8px 8px 0;font-size:12.5px;line-height:1.6;color:var(--ink-2);margin:0 0 16px;
+}
+.sf-note b{color:var(--petrol)}
+.f-toggle{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2);cursor:pointer;white-space:nowrap}
+.f-toggle input{accent-color:var(--petrol);width:14px;height:14px;cursor:pointer}
+
+.ctrl-ref{
+  font-family:var(--mono);font-size:10px;background:var(--ice-2);border:1px solid var(--line);
+  color:var(--ink-2);padding:1px 5px;border-radius:4px;margin:0 3px 3px 0;display:inline-block;
+}
+.ctrl-ref.pri{background:#fff4e5;border-color:#ffd8a3;color:#a86000;font-weight:600}
+.overdue{color:var(--crit);font-weight:650}
+
+/* ============================================================
+   HEAT / MIGRATION MAP  — signature element
+   ============================================================ */
+.map-layout{display:grid;grid-template-columns:minmax(0,1fr) 268px;gap:18px}
+@media(max-width:1080px){.map-layout{grid-template-columns:1fr}}
+
+.matrix-shell{position:relative;padding:0 0 0 34px}
+.yaxis{
+  position:absolute;left:0;top:0;bottom:26px;width:34px;
+  display:flex;align-items:center;justify-content:center;
+}
+.yaxis span{
+  transform:rotate(-90deg);white-space:nowrap;font-size:9.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-3);font-weight:700;
+}
+.xaxis{text-align:center;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:700;padding-top:9px}
+
+.matrix{position:relative;display:grid;grid-template-columns:56px repeat(5,minmax(0,1fr));gap:4px}
+.mx-lab{
+  display:flex;align-items:center;justify-content:flex-end;padding-right:8px;
+  font-size:10px;color:var(--ink-2);font-weight:600;text-align:right;line-height:1.15;
+}
+.mx-lab.col{justify-content:center;padding:5px 2px 0;text-align:center}
+.mx-lab .n{font-family:var(--mono);color:var(--ink-3);font-weight:700;margin-right:4px}
+.mx-cell{
+  position:relative;aspect-ratio:1.5/1;min-height:60px;border-radius:7px;border:1px solid;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  transition:transform .12s,box-shadow .12s;
+}
+.mx-cell.click{cursor:pointer}
+.mx-cell.click:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(15,39,51,.16);z-index:3}
+.mx-cell .c-n{font-size:19px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.mx-cell .c-s{font-family:var(--mono);font-size:9px;opacity:.62;font-weight:600}
+.mx-cell.empty .c-n{opacity:.22;font-weight:400}
+.c-low{background:var(--low-bg);border-color:var(--low-br);color:var(--low)}
+.c-mod{background:var(--mod-bg);border-color:var(--mod-br);color:var(--mod)}
+.c-high{background:var(--high-bg);border-color:var(--high-br);color:var(--high)}
+.c-crit{background:var(--crit-bg);border-color:var(--crit-br);color:var(--crit)}
+
+#migSvg{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:visible}
+.mig-path{fill:none;stroke-width:1.6;opacity:.55;transition:opacity .15s,stroke-width .15s}
+.mig-path.hot{opacity:1;stroke-width:3}
+.mig-dot{transition:r .15s}
+
+.map-side{display:flex;flex-direction:column;gap:14px}
+.legend{border:1px solid var(--line);border-radius:9px;padding:12px;background:var(--white)}
+.legend h4{font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);margin-bottom:9px}
+.lg-row{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:11.5px}
+.lg-sw{width:15px;height:15px;border-radius:4px;border:1px solid;flex:none}
+.lg-nm{font-weight:600}
+.lg-rg{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink-3)}
+
+.mig-list{border:1px solid var(--line);border-radius:9px;background:#fff;overflow:hidden}
+.mig-list h4{font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);padding:11px 12px 8px}
+.mig-item{
+  display:flex;align-items:center;gap:8px;padding:7px 12px;border-top:1px solid var(--line-2);
+  font-size:11.5px;cursor:pointer;
+}
+.mig-item:hover{background:var(--ice-2)}
+.mig-item .mid{font-family:var(--mono);font-size:10.5px;font-weight:700;color:var(--petrol);flex:none}
+.mig-item .mtx{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink-2)}
+.mig-item .mdl{font-family:var(--mono);font-size:10.5px;font-weight:700;flex:none}
+
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:#fff}
+.seg button{background:#fff;border:none;padding:6px 12px;font-size:12px;font-weight:550;color:var(--ink-2);border-right:1px solid var(--line)}
+.seg button:last-child{border-right:none}
+.seg button[aria-pressed="true"]{background:var(--petrol);color:#fff}
+
+/* ============================================================
+   CATEGORY PROFILE CARDS
+   ============================================================ */
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(292px,1fr));gap:14px}
+.cprof{
+  border:1px solid var(--line);border-radius:var(--r);background:#fff;padding:14px;
+  box-shadow:var(--shadow);border-top:3px solid var(--cat,#1b4965);
+}
+.cprof-hd{display:flex;align-items:center;gap:9px;margin-bottom:3px}
+.cprof-hd .cat-code{font-size:10px}
+.cprof h4{font-size:13px;color:var(--ink)}
+.cprof .desc{font-size:11.5px;color:var(--ink-3);margin:5px 0 11px;line-height:1.45;min-height:33px}
+.bar{height:7px;border-radius:4px;background:var(--line-2);display:flex;overflow:hidden;margin-bottom:8px}
+.bar i{display:block;height:100%}
+.cstats{display:flex;gap:14px;font-size:11px;color:var(--ink-3);flex-wrap:wrap}
+.cstats b{display:block;font-size:16px;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2}
+.cstats .arrow{color:var(--low);font-weight:700}
+
+/* ============================================================
+   TREATMENT PLAN
+   ============================================================ */
+.tp{border:1px solid var(--line);border-radius:var(--r);background:#fff;margin-bottom:11px;box-shadow:var(--shadow);overflow:hidden}
+.tp-hd{display:flex;align-items:center;gap:11px;padding:11px 15px;border-bottom:1px solid var(--line-2);flex-wrap:wrap}
+.tp-hd .col-id{font-size:11.5px}
+.tp-hd b{font-size:13px;font-weight:600;flex:1 1 240px}
+.tp-bd{padding:13px 15px;display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:20px}
+@media(max-width:800px){.tp-bd{grid-template-columns:1fr}}
+.tp-bd .lbl{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:700;margin-bottom:4px}
+.tp-bd p{margin:0 0 12px;font-size:12.5px;color:var(--ink-2);line-height:1.5}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:5px 0;border-bottom:1px dotted var(--line);font-size:12px}
+.kv:last-child{border-bottom:none}
+.kv span{color:var(--ink-3)}
+.kv b{font-weight:600;text-align:right}
+
+/* ============================================================
+   MODAL / DETAIL DRAWER
+   ============================================================ */
+.scrim{
+  position:fixed;inset:0;background:rgba(15,39,51,.5);backdrop-filter:blur(2px);
+  z-index:100;display:none;align-items:flex-start;justify-content:center;padding:34px 18px;overflow-y:auto;
+}
+.scrim.on{display:flex}
+.modal{
+  background:#fff;border-radius:12px;width:100%;max-width:900px;box-shadow:var(--shadow-lg);
+  animation:pop .18s ease;
+}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.99)}to{opacity:1;transform:none}}
+.modal-hd{
+  padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;gap:12px;
+  background:var(--ice-2);border-radius:12px 12px 0 0;position:sticky;top:0;z-index:2;
+}
+.modal-hd h3{font-size:16px;flex:1;line-height:1.32}
+.x{background:none;border:none;font-size:22px;color:var(--ink-3);line-height:1;padding:0 4px}
+.x:hover{color:var(--ink)}
+.modal-bd{padding:20px}
+.modal-ft{padding:13px 20px;border-top:1px solid var(--line);display:flex;gap:9px;justify-content:flex-end;background:var(--ice-2);border-radius:0 0 12px 12px;flex-wrap:wrap}
+
+.fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.fgrid.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.fgrid.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:700px){.fgrid,.fgrid.g3,.fgrid.g4{grid-template-columns:1fr}}
+.f{display:flex;flex-direction:column;gap:4px;margin-bottom:13px}
+.f.full{grid-column:1/-1}
+.f label{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
+.f input,.f select,.f textarea{
+  border:1px solid var(--line);border-radius:7px;padding:8px 10px;font-size:13px;background:#fff;width:100%;
+}
+.f textarea{resize:vertical;min-height:66px;line-height:1.5}
+.f input:focus,.f select:focus,.f textarea:focus{outline:2px solid var(--petrol-3);outline-offset:-1px;border-color:var(--petrol-3)}
+.f .note{font-size:11px;color:var(--ink-3)}
+
+.fieldset{border:1px solid var(--line);border-radius:9px;padding:14px;margin-bottom:16px;position:relative}
+.fieldset > legend{
+  font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--petrol);
+  font-weight:700;padding:0 7px;
+}
+.calc{
+  display:flex;align-items:center;gap:9px;background:var(--ice-2);border:1px dashed var(--line);
+  border-radius:7px;padding:9px 12px;font-size:11.5px;color:var(--ink-3);margin-top:2px;
+}
+.calc b{font-family:var(--mono);color:var(--ink)}
+
+.btn-d{background:var(--white);border:1px solid var(--line);color:var(--ink-2);padding:8px 14px;border-radius:7px;font-size:13px;font-weight:550}
+.btn-d:hover{background:var(--ice-2)}
+.btn-s{background:var(--petrol);border:1px solid var(--petrol);color:#fff;padding:8px 16px;border-radius:7px;font-size:13px;font-weight:600}
+.btn-s:hover{background:var(--petrol-2)}
+.btn-x{background:#fff;border:1px solid var(--crit-br);color:var(--crit);padding:8px 14px;border-radius:7px;font-size:13px;font-weight:550;margin-right:auto}
+.btn-x:hover{background:var(--crit-bg)}
+
+/* detail view */
+.dv-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:1px;background:var(--line-2);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-bottom:18px}
+.dv-cell{background:#fff;padding:11px 13px}
+.dv-cell .lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:700;margin-bottom:5px}
+.dv-cell .val{font-size:13px;font-weight:600}
+.dv-sec{margin-bottom:17px}
+.dv-sec .lbl{font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--petrol);font-weight:700;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--line-2)}
+.dv-sec p{margin:0;font-size:13px;line-height:1.6;color:var(--ink-2)}
+
+/* ============================================================
+   METHODOLOGY
+   ============================================================ */
+.meth{max-width:940px}
+.meth h3{font-size:15px;color:var(--petrol);margin:24px 0 9px}
+.meth h3:first-child{margin-top:0}
+.meth p{font-size:13px;line-height:1.65;color:var(--ink-2);margin:0 0 12px}
+.meth table{font-size:12.5px;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:16px}
+.meth thead th{background:var(--ice-2);position:static}
+.meth tbody td{vertical-align:top}
+.meth tbody tr{cursor:default}
+.meth tbody tr:hover{background:transparent}
+.callout{border-left:3px solid var(--petrol-3);background:var(--ice-2);padding:12px 15px;border-radius:0 8px 8px 0;margin:0 0 16px;font-size:12.5px;line-height:1.6;color:var(--ink-2)}
+
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--ink);color:#fff;padding:11px 20px;border-radius:8px;font-size:13px;font-weight:500;
+  box-shadow:var(--shadow-lg);z-index:200;opacity:0;transition:transform .22s,opacity .22s;pointer-events:none;
+}
+.toast.on{transform:translateX(-50%) translateY(0);opacity:1}
+
+.empty{text-align:center;padding:56px 20px;color:var(--ink-3)}
+.empty b{display:block;font-size:15px;color:var(--ink-2);margin-bottom:5px;font-weight:600}
+
+/* ============================================================
+   PRINT — board / audit pack
+   ============================================================ */
+@media print{
+  @page{size:landscape;margin:11mm}
+  body{background:#fff;font-size:9.5pt}
+  .masthead{position:static;background:#fff;color:var(--ink);padding:0 0 10px;box-shadow:none;border-bottom:2px solid var(--petrol)}
+  .masthead h1{color:var(--petrol);font-size:17pt}
+  .mast-sub{color:var(--ink-3)}
+  .mast-actions,.tabs,.filters,.scrim,.toast,.chev,.seg{display:none!important}
+  .kpi{border-color:var(--line)}
+  .kpi-l{color:var(--ink-3)}
+  .kpi-v{color:var(--petrol)}
+  .kpi-crit .kpi-v{color:var(--crit)}
+  .kpi-good .kpi-v{color:var(--low)}
+  .panel{display:block!important}
+  .card,.cat-block,.tp,.cprof{box-shadow:none;break-inside:avoid}
+  .cat-block.shut .tbl-scroll{display:block}
+  tbody tr{break-inside:avoid}
+  .wrap{padding:0;max-width:none}
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="mast-row">
+    <div class="mast-id">
+      <div class="eyebrow">ISMS · Clause 6.1 / 8.2 · CC3.1–CC3.4</div>
+      <h1>Enterprise Risk Register</h1>
+      <p class="mast-sub" id="mastSub">Loading the register…</p>
+      <p class="mast-sub" id="diagLine" style="font-size:10.5px;opacity:.62;margin-top:2px;font-family:var(--mono)"></p>
+    </div>
+    <div class="mast-actions">
+      <button class="btn btn-primary" id="bAdd">+ Add risk</button>
+      <button class="btn" id="bImport">Import</button>
+      <button class="btn" id="bJson">Export JSON</button>
+      <button class="btn" id="bCsv">Export CSV</button>
+      <button class="btn" id="bPrint">Print pack</button>
+      <button class="btn" id="bReset" title="Restore the seeded register">Reset</button>
+      <input type="file" id="fileIn" accept="application/json,.json" hidden>
+    </div>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" data-p="register" aria-selected="true">Register <span class="cnt" id="cReg"></span></button>
+    <button class="tab" role="tab" data-p="matrix" aria-selected="false">Risk map</button>
+    <button class="tab" role="tab" data-p="cats" aria-selected="false">Categories <span class="cnt" id="cCat"></span></button>
+    <button class="tab" role="tab" data-p="treat" aria-selected="false">Treatment plans <span class="cnt" id="cTre"></span></button>
+    <button class="tab" role="tab" data-p="backup" aria-selected="false">Backup <span class="cnt" id="cBak"></span></button>
+    <button class="tab" role="tab" data-p="meth" aria-selected="false">Methodology</button>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <!-- ══ REGISTER ══════════════════════════════════════════ -->
+  <section class="panel on" id="p-register" role="tabpanel">
+    <div class="filters">
+      <input type="search" id="fq" placeholder="Search risk ID, title, owner, control reference…" aria-label="Search risks">
+      <select id="fcat" aria-label="Filter by category"><option value="">All categories</option></select>
+      <select id="fstat" aria-label="Filter by status"><option value="">All statuses</option></select>
+      <select id="fband" aria-label="Filter by residual rating">
+        <option value="">All residual ratings</option>
+        <option value="Critical">Critical residual</option>
+        <option value="High">High residual</option>
+        <option value="Moderate">Moderate residual</option>
+        <option value="Low">Low residual</option>
+      </select>
+      <select id="fown" aria-label="Filter by owner"><option value="">All owners</option></select>
+      <select id="fsort" aria-label="Sort">
+        <option value="res">Sort: residual, highest first</option>
+        <option value="inh">Sort: inherent, highest first</option>
+        <option value="delta">Sort: largest control effect</option>
+        <option value="gap">Sort: smallest control effect</option>
+        <option value="review">Sort: review date, soonest</option>
+        <option value="id">Sort: risk ID</option>
+      </select>
+      <label class="f-toggle"><input type="checkbox" id="fEx"> Hide examples</label>
+      <button class="f-clear" id="fClear">Clear</button>
+      <span class="f-count" id="fCount"></span>
+    </div>
+    <div id="regBody"></div>
+  </section>
+
+  <!-- ══ RISK MAP ══════════════════════════════════════════ -->
+  <section class="panel" id="p-matrix" role="tabpanel">
+    <div class="card">
+      <div class="card-hd">
+        <h3>Risk migration map</h3>
+        <div class="seg" role="group" aria-label="Map view">
+          <button data-m="mig" aria-pressed="true">Migration</button>
+          <button data-m="inh" aria-pressed="false">Inherent</button>
+          <button data-m="res" aria-pressed="false">Residual</button>
+        </div>
+        <span class="hint" id="mapHint">Each line traces one risk from where it sits before controls to where it sits after.</span>
+      </div>
+      <div class="card-bd">
+        <div class="map-layout">
+          <div>
+            <div class="matrix-shell">
+              <div class="yaxis"><span>Likelihood</span></div>
+              <div class="matrix" id="matrix"><svg id="migSvg"></svg></div>
+              <div class="xaxis">Impact</div>
+            </div>
+          </div>
+          <aside class="map-side">
+            <div class="legend">
+              <h4>Rating bands</h4>
+              <div class="lg-row"><i class="lg-sw c-crit"></i><span class="lg-nm" style="color:var(--crit)">Critical</span><span class="lg-rg">16 – 25</span></div>
+              <div class="lg-row"><i class="lg-sw c-high"></i><span class="lg-nm" style="color:var(--high)">High</span><span class="lg-rg">10 – 15</span></div>
+              <div class="lg-row"><i class="lg-sw c-mod"></i><span class="lg-nm" style="color:var(--mod)">Moderate</span><span class="lg-rg">5 – 9</span></div>
+              <div class="lg-row"><i class="lg-sw c-low"></i><span class="lg-nm" style="color:var(--low)">Low</span><span class="lg-rg">1 – 4</span></div>
+              <div class="lg-row" style="border-top:1px solid var(--line-2);margin-top:7px;padding-top:9px">
+                <span style="font-size:11px;color:var(--ink-3);line-height:1.45">Appetite line sits at 9. Residual above it needs a treatment plan or a signed acceptance.</span>
+              </div>
+            </div>
+            <div class="mig-list" id="migList"></div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CATEGORIES ════════════════════════════════════════ -->
+  <section class="panel" id="p-cats" role="tabpanel">
+    <div class="cat-grid" id="catGrid"></div>
+  </section>
+
+  <!-- ══ TREATMENT ═════════════════════════════════════════ -->
+  <section class="panel" id="p-treat" role="tabpanel">
+    <div id="treatBody"></div>
+  </section>
+
+  <!-- ══ BACKUP ════════════════════════════════════════════ -->
+  <section class="panel" id="p-backup" role="tabpanel">
+    <div class="card">
+      <div class="card-hd">
+        <h3>Previous register — retained for reference</h3>
+        <button class="f-clear" id="bBakJson">Export backup as JSON</button>
+        <span class="hint">Read-only. Not counted in any figure on the Register, Risk map, Categories or Treatment tabs.</span>
+      </div>
+      <div class="card-bd">
+        <div class="sf-note" style="border-left-color:#b4c4ce;background:#f4f7f9;margin-bottom:16px">
+          <b>Why this is here.</b> The live register now holds only genuine risks that have been accepted with a compensating control. The entries below were the working draft — a mix of illustrative content and candidate risks. They are kept so nothing is lost and so the scoring rationale on any entry you later promote is still available. To bring one back, copy it into the live register through the add form.
+        </div>
+        <div id="bakBody"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ METHODOLOGY ═══════════════════════════════════════ -->
+  <section class="panel" id="p-meth" role="tabpanel">
+    <div class="card meth">
+      <div class="card-bd">
+
+        <h3>How a score is produced</h3>
+        <p>Every score in this register is arithmetic: <b>likelihood × impact</b>, each on a 1–5 anchored scale, giving 1–25. Nothing is estimated by the tool. Two assessors given the same anchors should land on the same number, and where they don't, the disagreement is about the anchor, which is a conversation worth having.</p>
+        <p><b>Inherent</b> is scored assuming the controls listed against the risk are absent or wholly ineffective. <b>Residual</b> is scored on the controls as they actually operate today, not as designed and not as intended. The difference between the two is the measured value of the control set, and it is the number a board should be asking about.</p>
+
+        <div class="callout"><b>The common failure.</b> Teams score inherent risk as "what it would be without <i>any</i> controls at all", which drives every inherent score to 20–25 and makes the column meaningless. Score inherent against the specific controls named on that row being removed, and the column starts carrying information.</div>
+
+        <h3>Likelihood anchors</h3>
+        <table><thead><tr><th style="width:52px">Level</th><th style="width:110px">Label</th><th>Anchor</th></tr></thead><tbody>
+          <tr><td class="num">5</td><td><b>Almost certain</b></td><td>Expected more than once a year, or already observed in the environment.</td></tr>
+          <tr><td class="num">4</td><td><b>Likely</b></td><td>Expected roughly annually; peers of similar profile report it regularly.</td></tr>
+          <tr><td class="num">3</td><td><b>Possible</b></td><td>Credible within 1–3 years; the preconditions exist.</td></tr>
+          <tr><td class="num">2</td><td><b>Unlikely</b></td><td>Would need an unusual combination of conditions; roughly 3–10 years.</td></tr>
+          <tr><td class="num">1</td><td><b>Rare</b></td><td>No known occurrence in comparable environments; beyond 10 years.</td></tr>
+        </tbody></table>
+
+        <h3>Impact anchors</h3>
+        <table><thead><tr><th style="width:52px">Level</th><th style="width:110px">Label</th><th>Financial / operational</th><th>Regulatory / customer</th></tr></thead><tbody>
+          <tr><td class="num">5</td><td><b>Severe</b></td><td>Business-threatening loss; core service down beyond RTO.</td><td>Enforcement action, mandatory breach notification, or loss of a flagship account.</td></tr>
+          <tr><td class="num">4</td><td><b>Major</b></td><td>Material loss; several days of degraded service.</td><td>Regulator engagement, qualified audit opinion, multiple customer escalations.</td></tr>
+          <tr><td class="num">3</td><td><b>Moderate</b></td><td>Contained loss absorbed within budget; hours of disruption.</td><td>Reportable finding; contractual remediation commitment.</td></tr>
+          <tr><td class="num">2</td><td><b>Minor</b></td><td>Absorbed in normal operating cost; localised disruption.</td><td>Internal finding; customer questionnaire friction.</td></tr>
+          <tr><td class="num">1</td><td><b>Negligible</b></td><td>No measurable operational effect.</td><td>No external visibility.</td></tr>
+        </tbody></table>
+
+        <h3>Appetite and escalation</h3>
+        <p>The appetite line sits at a residual score of <b>9</b>. Residual at 10 or above requires either an active treatment plan with a named owner and a date, or a formal acceptance recorded against the risk with the accepting authority named. Residual at 16 or above is reported to the steering committee at every sitting until it comes down, regardless of treatment progress.</p>
+
+        <h3>Review cadence</h3>
+        <table><thead><tr><th style="width:150px">Residual rating</th><th style="width:130px">Review interval</th><th>Reported to</th></tr></thead><tbody>
+          <tr><td><span class="score s-crit">Critical</span></td><td>Monthly</td><td>Steering committee, every sitting</td></tr>
+          <tr><td><span class="score s-high">High</span></td><td>Quarterly</td><td>Steering committee, quarterly</td></tr>
+          <tr><td><span class="score s-mod">Moderate</span></td><td>Semi-annual</td><td>Security function, exception report only</td></tr>
+          <tr><td><span class="score s-low">Low</span></td><td>Annual</td><td>Register refresh only</td></tr>
+        </tbody></table>
+
+        <h3>Event triggers that force an out-of-cycle re-score</h3>
+        <p>A register that only moves on the calendar is a document. A register that moves on events is a control. Re-score on: a security incident touching the risk; a new or changed system, vendor, or data flow; an audit or assessment finding; a material change in the threat picture for the asset class; a control failure or a missed control test; a change of owner; and any acceptance reaching its expiry date.</p>
+
+        <h3>Framework mapping</h3>
+        <p>Control references on each row point at the control library, not at framework text. One control can satisfy several frameworks, so mapping is held once on the control and inherited by every risk that cites it. That is what keeps the register from forking into a SOC 2 register, an ISO register, and a customer-questionnaire register that quietly disagree with one another.</p>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ══ MODAL ══════════════════════════════════════════════ -->
+<div class="scrim" id="scrim" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="modal" id="modal">
+    <div class="modal-hd">
+      <h3 id="mTitle">Risk</h3>
+      <button class="x" id="mClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-bd" id="mBody"></div>
+    <div class="modal-ft" id="mFoot"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+"use strict";
+/* ============================================================
+   STORAGE — works as a hosted artifact, as a downloaded local
+   file, and (worst case) in memory for the session.
+   ============================================================ */
+const KEY = "risk_register_v2";          /* v2 seed: 24 risks, 6 August 2026. v1 data is left untouched. */
+const STORE_TIMEOUT_MS = 1200;
+
+/* A storage call that never settles would leave boot suspended before the
+   first render, which presents as an empty register. Every call is raced
+   against a timeout so boot always continues. */
+function withTimeout(promise, ms, fallback){
+  return Promise.race([
+    Promise.resolve(promise).catch(() => fallback),
+    new Promise(res => setTimeout(() => res(fallback), ms))
+  ]);
+}
+
+const Store = (() => {
+  let mem = null;
+  const hasW = typeof window !== "undefined" && window.storage && typeof window.storage.get === "function";
+  const hasL = (() => { try { const k="__t"; localStorage.setItem(k,"1"); localStorage.removeItem(k); return true; } catch(e){ return false; } })();
+  return {
+    mode: hasW ? "workspace" : hasL ? "local" : "session",
+    degraded: false,
+    async get(){
+      if (hasW){
+        const r = await withTimeout(window.storage.get(KEY), STORE_TIMEOUT_MS, "__timeout__");
+        if (r === "__timeout__"){ this.degraded = true; return null; }
+        try { return r && r.value ? JSON.parse(r.value) : null; } catch(e){ return null; }
+      }
+      if (hasL){ try { const v = localStorage.getItem(KEY); return v ? JSON.parse(v) : null; } catch(e){ return null; } }
+      return mem;
+    },
+    async set(v){
+      const s = JSON.stringify(v);
+      mem = v;
+      if (hasW){
+        const ok = await withTimeout(window.storage.set(KEY, s).then(() => true), STORE_TIMEOUT_MS, false);
+        if (ok) return true;
+        this.degraded = true;
+      }
+      if (hasL){ try { localStorage.setItem(KEY, s); return true; } catch(e){} }
+      return true;
+    },
+    async clear(){
+      if (hasW){ await withTimeout(window.storage.delete(KEY), STORE_TIMEOUT_MS, null); }
+      if (hasL){ try { localStorage.removeItem(KEY); } catch(e){} }
+      mem = null;
+    }
+  };
+})();
+
+/* ============================================================
+   TAXONOMY
+   ============================================================ */
+const CATS = [
+  { code:"GOV", name:"Governance & Organisation",     color:"#1b4965", desc:"Ownership, policy authority, oversight cadence and the mandate of the security function." },
+  { code:"AC",  name:"Access Control & Identity",     color:"#2a6f97", desc:"Who can reach what, on whose authority, and how that authority is withdrawn." },
+  { code:"DP",  name:"Data Protection & Privacy",     color:"#3d8fa8", desc:"Classification, encryption, retention, residency and lawful handling of regulated data." },
+  { code:"APP", name:"Product & Application Security",color:"#8a5a2b", desc:"Secure design, code, dependencies and the security posture of what is shipped to customers." },
+  { code:"OPS", name:"Operations & Change",           color:"#3a7d5f", desc:"Configuration, patching, change control and the day-to-day running of production." },
+  { code:"TPR", name:"Third Party & Supply Chain",    color:"#6a4c93", desc:"Vendors, subprocessors, open-source dependencies and inherited risk." },
+  { code:"AI",  name:"AI & Model Governance",         color:"#a63d7a", desc:"Model selection, prompt and output handling, training-data provenance and human oversight." },
+  { code:"BCP", name:"Resilience & Continuity",       color:"#1f6f78", desc:"Backup, recovery, availability commitments and tested return to service." },
+  { code:"IR",  name:"Incident Response & Monitoring",color:"#b0453a", desc:"Detection coverage, triage capability, notification timelines and post-incident learning." },
+  { code:"HR",  name:"People & Insider Risk",         color:"#55637a", desc:"Screening, awareness, joiner–mover–leaver and deliberate or negligent insider action." },
+  { code:"PHY", name:"Physical & Environmental",      color:"#6b7280", desc:"Facilities, devices, media and the physical boundary around information assets." },
+  { code:"CMP", name:"Compliance & Legal",            color:"#8a6d1f", desc:"Regulatory obligations, contractual commitments, attestations and audit readiness." }
+];
+const CAT = Object.fromEntries(CATS.map(c => [c.code, c]));
+const STATUSES   = ["Open","Treating","Monitoring","Accepted","Transferred","Closed"];
+const TREATMENTS = ["Mitigate","Accept with compensating control","Accept","Transfer","Avoid"];
+const L_LAB = { 1:"Rare", 2:"Unlikely", 3:"Possible", 4:"Likely", 5:"Almost certain" };
+const I_LAB = { 1:"Negligible", 2:"Minor", 3:"Moderate", 4:"Major", 5:"Severe" };
+
+/* ============================================================
+   SCORING — deterministic. Nothing here is inferred.
+   ============================================================ */
+const score = (l, i) => (+l || 0) * (+i || 0);
+function band(s){
+  /* Bands and appetite follow POL-RSK-001 Section 9 exactly.
+     20-25 Critical, 12-16 High, 6-10 Moderate, 3-5 Low, 1-2 Very low.
+     Very low is folded into Low so the four rating classes still apply. */
+  if (s >= 20) return "Critical";
+  if (s >= 12) return "High";
+  if (s >= 6)  return "Moderate";
+  return "Low";
+}
+const BAND_CLS = { Critical:"crit", High:"high", Moderate:"mod", Low:"low" };
+const APPETITE = 11;   /* POL-RSK-001 Section 9: no risk shall remain untreated at a residual score of 12 or above. */
+
+/* ============================================================
+   LIVE REGISTER — 24 entries. Seven accepted with compensating
+   controls; seventeen open gaps raised from the CC1-CC9 gap
+   assessment and the policy library review of 6 August 2026.
+   ============================================================ */
+function seed(){ return [
+
+{ id:"GOV-001", cat:"GOV", title:"No oversight independent of security operations",
+  desc:"The people who design and operate the security controls are the same people who assess whether those controls are working. There is no independent party positioned to challenge a judgement before it becomes the operating position.",
+  cause:"Company size. An independent oversight function is not warranted at current headcount and would be nominal if created.",
+  effect:"Self-assessment goes unchallenged; an assessor cannot test whether authority was exercised at the right level or whether an inconvenient finding was quietly downgraded.",
+  asset:"Governance structure", owner:"CEO", il:4, ii:4, controls:["CC1.2","CC2.3","CC4.1","A.5.1"],
+  ctrlNote:"Compensating rather than preventive. The signature is the control: it puts a named accountable person on the record for the assessment result.",
+  treatment:"Accept with compensating control",
+  plan:"Accepted. Compensating control: the CEO reviews and signs the annual assessment, taking personal accountability for the result rather than delegating it back to the function that produced it. Revisit if headcount, funding structure or a customer contract introduces an oversight requirement.",
+  planOwner:"CEO", due:"", rl:3, ri:3, tl:3, ti:3, status:"Accepted", opened:"2026-08-05", review:"2027-08-05",
+  reviewTrigger:"Annual",
+  secureframe:"Recorded in Secureframe as a single risk register entry. Treatment set to accepted with compensating control; review date set to the annual assessment.",
+  evidence:"Annual assessment report countersigned and dated by the CEO." },
+
+{ id:"GOV-002", cat:"GOV", title:"Segregation of duties not practicable at two people",
+  desc:"With two people, the same individual can request, approve and implement a change. Maker and checker cannot be separated for every activity without stopping work altogether.",
+  cause:"Headcount. There is no third party to hold the checker role.",
+  effect:"A change, an access grant or a control exception can pass end to end without a second pair of eyes, and nothing in the record shows whether one was applied.",
+  asset:"Change and access processes", owner:"CEO", il:4, ii:4, controls:["CC5.2","CC6.3","CC8.1","A.5.3"],
+  ctrlNote:"Detective rather than preventive. Separation is replaced by after-the-fact visibility and accountable sign-off.",
+  treatment:"Accept with compensating control",
+  plan:"Accepted. Compensating controls: independent review of the activities where separation matters most, enhanced logging so every privileged action is attributable and reconstructable after the fact, and CEO sign-off on the categories that cannot be separated. Revisit at the third hire.",
+  planOwner:"CEO", due:"", rl:3, ri:3, tl:3, ti:3, status:"Accepted", opened:"2026-08-05", review:"2027-08-05",
+  reviewTrigger:"Annual",
+  evidence:"Review record for the period; privileged action log sample showing attribution; sign-off record for non-separable categories." },
+
+{ id:"AC-001", cat:"AC", title:"A repository clone survives offboarding",
+  desc:"A local clone taken during an engagement remains on the individual's device after their access is withdrawn. Revocation stops future access; it does not reach the copy already made.",
+  cause:"Revoking access does not delete a local copy, and local clones are permitted.",
+  effect:"Source and any embedded client material persist outside company control after departure, with no technical means of recovery.",
+  asset:"Source repositories", owner:"CEO", il:4, ii:4, controls:["CC6.2","CC6.3","A.5.11","A.8.10"],
+  ctrlNote:"Revocation operates correctly but cannot reach data already copied. The attestation is contractual, not technical.",
+  treatment:"Accept with compensating control",
+  plan:"Accepted. Compensating controls: least-privilege repository access so any clone carries the minimum, verified disk encryption on any device permitted to clone, and a written attestation of deletion signed at offboarding.",
+  planOwner:"CEO", due:"", rl:3, ri:3, tl:3, ti:3, status:"Accepted", opened:"2026-08-05", review:"2027-08-05",
+  reviewTrigger:"Annual",
+  evidence:"Repository permission export; encryption verification per device; signed deletion attestations for leavers in the period." },
+
+{ id:"AC-002", cat:"AC", title:"GitHub authentication is weaker than other services — no SAML SSO or IP allow list on Team",
+  desc:"GitHub is the one service that sits outside the standard authentication posture. Identity is not federated and network conditions cannot be applied, so it is governed differently from everything else in the estate.",
+  cause:"SAML single sign-on and IP allow lists are Enterprise Cloud features. The Team plan provides enforced two-factor authentication and nothing further.",
+  effect:"Account compromise on GitHub is not detectable or containable through the controls that cover the rest of the estate, and access does not terminate with the identity provider session.",
+  asset:"GitHub organisation", owner:"CEO", il:4, ii:4, controls:["CC6.1","CC6.6","A.8.5","A.5.15"],
+  ctrlNote:"Enforced two-factor authentication is in place and verified. Federation and network conditions are unavailable at this plan tier.",
+  treatment:"Accept with compensating control",
+  plan:"Accepted on cost grounds at current size. Compensating controls: enforced two-factor authentication using passkeys or hardware security keys rather than app-based codes, minimal repository membership so the blast radius stays small, and periodic audit log review.",
+  planOwner:"CEO", due:"", rl:2, ri:4, tl:2, ti:4, status:"Accepted", opened:"2026-08-05", review:"2027-08-05",
+  reviewTrigger:"Annual",
+  evidence:"Two-factor method inventory showing key type per member; organisation membership export; audit log review record." },
+
+{ id:"PHY-001", cat:"PHY", title:"Personal endpoints unmanaged; encryption cannot be enforced",
+  desc:"Work happens on personally owned devices the company does not manage. Disk encryption, screen lock and patch level can be asked for and checked, but not enforced or guaranteed.",
+  cause:"No device management by design. The position is verification, not enforcement.",
+  effect:"A lost or compromised personal device may hold client data without the protections the policy describes.",
+  asset:"Personal endpoints", owner:"CEO", il:4, ii:4, controls:["CC6.7","A.8.1","A.7.9"],
+  ctrlNote:"Reporting only. Posture is observed and recorded; it is not imposed.",
+  treatment:"Accept with compensating control",
+  plan:"Accepted. Compensating controls: a read-only posture check that reports encryption, lock and patch state without taking management authority over a personal device, and browser-first access patterns that keep client data off the laptop in the first place.",
+  planOwner:"CEO", due:"", rl:3, ri:3, tl:3, ti:3, status:"Accepted", opened:"2026-08-05", review:"2027-08-05",
+  reviewTrigger:"Annual",
+  evidence:"Posture check report per person per period; access architecture note evidencing browser-first handling." },
+
+{ id:"APP-001", cat:"APP", title:"Credentials committable to private repositories undetected",
+  desc:"A secret committed to a private repository is not blocked at push time and may sit in history unnoticed. Privacy of the repository is not the same as absence of the secret.",
+  cause:"Push protection on private repositories requires the paid Secret Protection add-on, which has not been purchased.",
+  effect:"A live credential persists in history and remains exposed to everyone with repository access, including after a member leaves.",
+  asset:"Source repositories", owner:"CEO", il:4, ii:4, controls:["CC6.1","CC7.1","A.8.5","A.8.8"],
+  ctrlNote:"Detection after the fact, not prevention at push. Policy text must describe scanning, not blocking, until the add-on is in place.",
+  treatment:"Accept with compensating control",
+  plan:"Accepted until the Secret Protection add-on is purchased, at which point push protection replaces this acceptance. Compensating controls: the free leak-scan report reviewed on a schedule, secrets covered explicitly in code review, and immediate rotation on discovery.",
+  planOwner:"CEO", due:"", rl:3, ri:3, tl:2, ti:3, status:"Accepted", opened:"2026-08-05", review:"2027-08-05",
+  reviewTrigger:"Until Secret Protection purchased",
+  evidence:"Leak-scan report per period; code review record; rotation record for any finding, with time from discovery to rotation." },
+
+/* ── Open gap under treatment ── */
+
+{ id:"CMP-001", cat:"CMP", title:"Sub-processor list and user entity controls are promised but not published",
+  desc:"The Privacy Policy commits to providing a sub-processor list on request, and the service description requires the controls customers must operate themselves to be stated. Neither artefact exists. The commitment is live regardless of whether the list is.",
+  cause:"The Privacy Policy was published ahead of the underlying artefacts. No process derives a sub-processor list from the vendor inventory, and the controls that sit on the customer side of the line have never been written down.",
+  effect:"A customer request cannot be met within a reasonable time, and the published promise becomes a demonstrable inaccuracy rather than an outstanding action. Separately, controls customers must operate go unstated, so a failure on their side reads as a gap on yours.",
+  asset:"Published commitments; vendor inventory", owner:"Teja",
+  il:4, ii:3, controls:["CC2.3-03","CC2.3-06","A.5.19","A.5.34"],
+  ctrlNote:"Neither control activity is operating. The vendor inventory exists and is the source the list should be derived from, which is the only reason residual sits below inherent.",
+  treatment:"Mitigate",
+  plan:"Derive the sub-processor list from the vendor inventory rather than maintaining a second list, so it cannot drift from the record it depends on. Publish it with a visible last-updated date. Separately, write down the controls customers must operate themselves and publish them alongside. Include model and AI providers in scope of the list.",
+  planOwner:"Teja", due:"", rl:3, ri:3, tl:1, ti:3, status:"Open", opened:"2026-08-05", review:"",
+  evidence:"Published sub-processor list showing derivation from the vendor inventory and a last-updated date; published user entity controls; a dated sample response to a customer request." },
+
+/* -- Raised 6 August 2026 from the CC1-CC9 gap assessment and the policy library review -- */
+
+{ id:"GOV-003", cat:"GOV", title:"Deficiency population is fragmented across five destinations",
+  desc:"Five approved policies each name a different home for a deficiency: the plan of action at POL-ISP-001 Section 8, the deficiency log at POL-CM-001 Section 12, the risk register at POL-BCP-001 Section 13, the finding population at POL-VPM-001 Section 13, and the deficiency log again at POL-IRP-001 Section 13. No policy states that these are the same artefact.",
+  cause:"Each policy was drafted to be complete in itself and named its own destination. Nothing reconciled them afterwards.",
+  effect:"The complete population of deficiencies open during an observation period cannot be produced from any single source, and a population assembled from five would not be defensible as complete. Overdue items are invisible because no one list holds them all.",
+  asset:"Deficiency management process", owner:"Security Officer", il:5, ii:3, controls:["CC4.2-03","CC4.2-04","CC4.2-06","CC5.3-04","CC7.5-03"],
+  ctrlNote:"Each individual evaluation is well defined and produces findings. What is missing is a single destination, which is why this scores on likelihood rather than impact.",
+  treatment:"Mitigate",
+  plan:"Adopt the POL-ISP-001 Section 8 plan of action as the single destination, since it is already the CC1.5-04 artefact. Insert the consolidating clause at Section 8 and amend the four cross-references in POL-CM-001, POL-BCP-001, POL-VPM-001 and POL-IRP-001 to name it. Set out in WRK-CC19-001 Section 7.",
+  planOwner:"Security Officer", due:"2026-09-15", rl:4, ri:3, tl:1, ti:3, status:"Open", opened:"2026-08-06", review:"",
+  reviewTrigger:"On policy revision",
+  evidence:"Amended clauses in all five policies; a single exported deficiency population for the period reconciling to every evaluation source." },
+
+{ id:"GOV-004", cat:"GOV", title:"Control environment is designed but has not yet operated",
+  desc:"137 of the 160 controls on the Common Criteria tabs are scored Documented. The policy library is approved and signed, and almost nothing has yet been performed. One control is scored Implemented and none is Evidenced.",
+  cause:"The policy set was issued on 23 July 2026. No evaluation, assessment or quarterly cycle has run since.",
+  effect:"A Type I examination would report design deficiencies against every control below level 2, and a Type II observation window cannot begin until the controls are operating and producing retained evidence. The gap is not a drafting gap and cannot be closed by further writing.",
+  asset:"Security programme", owner:"CEO", il:5, ii:4, controls:["CC4.1-01","CC3.2-02","CC5.3-04","CC2.2-05"],
+  ctrlNote:"Design is substantially complete and unusually strong for the size. Operation has not started, which is the whole of the exposure.",
+  treatment:"Mitigate",
+  plan:"Run the three activities that carry the most controls: set and baseline this year security objectives, perform the first full risk assessment in the three sweeps POL-RSK-001 Section 6, 13 and 14 require, and complete the first control self-assessment signed by the CEO. Then start the quarterly cycle so an observation window can begin.",
+  planOwner:"Security Officer", due:"2026-09-30", rl:4, ri:4, tl:2, ti:3, status:"Open", opened:"2026-08-06", review:"",
+  reviewTrigger:"Quarterly until the first cycle completes",
+  evidence:"Approved objectives with baseline values; dated risk assessment; signed control self-assessment; first quarterly Committee report." },
+
+{ id:"AC-003", cat:"AC", title:"No authoritative joiner, mover and leaver population",
+  desc:"POL-AC-001 Section 8 requires a complete joiner, mover and leaver population producible from the human resources system, because that is the population revocation timeliness is tested against. No HR system has been selected, so no such population exists.",
+  cause:"The HRIS decision at Setup step 1 is still open. Personnel records are held informally.",
+  effect:"Revocation within one business day cannot be evidenced however well it is performed, because completeness cannot be shown. Endpoint protection coverage cannot be reconciled three ways either, since one of the three sources does not exist.",
+  asset:"Identity and personnel records", owner:"Security Officer", il:4, ii:4, controls:["CC6.2-03","CC6.2-04","CC6.8-01","CC1.4-03"],
+  ctrlNote:"Revocation itself is defined precisely and the identity provider suspension path is sound. The missing element is the population, not the control.",
+  treatment:"Mitigate",
+  plan:"Select and connect an HR system so personnel import automatically as employees or contractors, then set an engagement end date on every contractor identity so access lapses if the engagement is not renewed. Build the maintained list of systems that do not federate.",
+  planOwner:"Security Officer", due:"2026-09-30", rl:4, ri:3, tl:1, ti:4, status:"Open", opened:"2026-08-06", review:"",
+  reviewTrigger:"On HRIS selection",
+  evidence:"Joiner, mover and leaver export for the period with revocation timestamps; three-way endpoint coverage reconciliation." },
+
+{ id:"HR-001", cat:"HR", title:"Contractor screening equivalence is not recorded",
+  desc:"Most of the team is engaged rather than employed, and those contractors hold access to client environments. POL-HRS-001 carries no statement that contractors meet the same screening, training and acknowledgement standard as employees, and the screening tiers it produces have nowhere to be recorded.",
+  cause:"STD-SCR-001 does not exist. The HRS plan generates screening tiers as a Phase 1 output with no home, and no equivalence clause was drafted.",
+  effect:"The Company cannot show that the people with the most sensitive access were screened to any defined standard, which is the first question asked about a firm that holds client credentials.",
+  asset:"Personnel and contractor records", owner:"Security Officer", il:4, ii:4, controls:["CC1.1-06","CC1.4-06","CC1.4-02"],
+  ctrlNote:"Screening is required for employees by policy and is a Secureframe onboarding step. The equivalence and the tier definitions are what is missing.",
+  treatment:"Mitigate",
+  plan:"Create STD-SCR-001 recording the checks applied per role tier, add the contractor equivalence statement to POL-HRS-001, assign contractors to the same Secureframe personnel group as employees so they inherit the same policy, training and screening set, and flow the requirement down in contractor agreements.",
+  planOwner:"Security Officer", due:"2026-09-30", rl:3, ri:4, tl:1, ti:4, status:"Open", opened:"2026-08-06", review:"",
+  reviewTrigger:"On each contractor engagement",
+  evidence:"STD-SCR-001; screening record per person showing tier, date, outcome and authoriser; contractor agreement clause." },
+
+{ id:"HR-002", cat:"HR", title:"Every reporting route passes through the person it may concern",
+  desc:"Neither the security address nor the ethics address exists. POL-COC-001 Section 16 and POL-ISP-001 Section 7 both provide that concerns about the Security Officer may be reported directly to the CEO, and no channel implements that. The Security Officer is a contractor holding standing privileged access to client environments, which POL-RSK-001 Section 11 names as a company-specific fraud risk.",
+  cause:"The two mailboxes at Setup step 13 have not been created and neither is named in a published document.",
+  effect:"A concern about the person who operates the controls has no route that does not pass through that person. The anti-retaliation commitment in the Code of Conduct is unsupported by any mechanism.",
+  asset:"Reporting channels", owner:"CEO", il:3, ii:5, controls:["CC1.1-04","CC2.2-04","CC2.2-06","CC3.3-02"],
+  ctrlNote:"Nothing is operating. The policy positions are correct and complete; only the aliases and their publication are missing.",
+  treatment:"Mitigate",
+  plan:"Create a security address and an ethics address routing only to the CEO. Name both in POL-COC-001 Section 16 alongside the anti-retaliation commitment, brief them at onboarding and in awareness training, publish the security address externally with a security.txt file, and record a nil return annually.",
+  planOwner:"CEO", due:"2026-08-29", rl:3, ri:4, tl:1, ti:4, status:"Open", opened:"2026-08-06", review:"",
+  reviewTrigger:"Annual nil return",
+  evidence:"Mailbox configuration showing routing; the clause naming both addresses; published security.txt; annual report log or affirmative nil return." },
+
+{ id:"HR-003", cat:"HR", title:"Standing privileged access to client environments is not observable",
+  desc:"POL-RSK-001 Section 11 names misuse of privileged access to client systems for personal or competitive advantage as a company-specific fraud risk, and lists logging of privileged access among the compensating controls for management override. Access exercised inside a client tenant is usually logged by the client, not by the Company.",
+  cause:"The Company holds credentials issued by clients and operates inside their environments. The log source for that activity sits on the client side of the boundary.",
+  effect:"The compensating control named in the policy may not reach the activity it is supposed to cover, so the largest fraud exposure the Company has would be neither prevented nor detected from the Company side.",
+  asset:"Client environment access", owner:"Security Officer", il:3, ii:5, controls:["CC3.3-02","CC6.3-05","CC7.2-01"],
+  ctrlNote:"Access is governed properly by POL-AC-001 Section 14 — engagement agreement, written scope, engagement file, relinquishment on close. Observability is the weak half.",
+  treatment:"Mitigate",
+  plan:"Confirm per engagement what the client logs and retains for the Company credentials, record it in the engagement file, and where the client cannot provide attribution, require individually attributable accounts as a condition of the engagement. Reconcile open client access against active engagements quarterly.",
+  planOwner:"Security Officer", due:"2026-10-31", rl:3, ri:4, tl:2, ti:4, status:"Open", opened:"2026-08-06", review:"",
+  reviewTrigger:"Per engagement",
+  evidence:"Engagement file entry recording the client log position; quarterly reconciliation of open client access to active engagements." },
+
+{ id:"AI-001", cat:"AI", title:"Agentic identities are neither inventoried nor observable",
+  desc:"POL-AC-001 Section 11 requires every non-human identity inventoried with a named human owner, purpose, reachable scope and last review date, operating under a dedicated least-privilege identity with a human approval gate before any irreversible action. POL-LOG-001 Section 10 requires agent activity logged with the triggering input, tools invoked, parameters and approvals. None of this is operating.",
+  cause:"The clauses were written ahead of the tooling. No inventory exists, no dedicated identities have been created, and no agent logging is configured.",
+  effect:"An agent processing client-supplied content with tool access is the highest-consequence identity in the estate. Without the triggering input recorded, a prompt injection event cannot be reconstructed at all — the action is visible but its cause is not.",
+  asset:"Agentic systems and non-human identities", owner:"Security Officer", il:4, ii:5, controls:["CC6.3-04","CC7.2-04","CC7.1-04","CC3.2-04"],
+  ctrlNote:"Policy coverage here is materially stronger than common practice. Nothing has been implemented, so the residual sits close to the inherent.",
+  treatment:"Mitigate",
+  plan:"Inventory every agent and service account with a human owner, purpose and reachable scope. Give each a dedicated identity distinguishable in logs, remove wildcard permissions, and require human approval before deletion, movement of funds, external communication or any production change. Log the triggering input, tools invoked and gate approvals, and alert on tool invocation outside the allow-list.",
+  planOwner:"Security Officer", due:"2026-10-31", rl:4, ri:4, tl:2, ti:4, status:"Open", opened:"2026-08-06", review:"",
+  reviewTrigger:"On any change to agent tooling or permissions",
+  evidence:"Non-human identity inventory with owner, scope and last review date; agent activity log sample showing reconstruction; approval gate records." },
+
+{ id:"OPS-001", cat:"OPS", title:"No current network diagram, and no clause requires one",
+  desc:"POL-NET-001 Section 14 lists a current network diagram showing accounts, environments, public entry points and trust boundaries among the records a service auditor will sample. No clause anywhere requires the diagram to be produced, assigns it an owner, or requires it to be kept current.",
+  cause:"The artefact appears only in an evidence list. Evidence lists describe outputs; they do not create obligations.",
+  effect:"An evidence request names an artefact that nothing obliges anyone to produce, so it will be drawn retrospectively and inaccurately or not at all. It is also the document an assessor uses to orient before sampling anything else.",
+  asset:"Network architecture documentation", owner:"Security Officer", il:4, ii:3, controls:["CC6.6-03","CC2.1-01"],
+  ctrlNote:"Every other CC6.6 control is fully covered by policy. This is the only gap in the strongest criterion in the workbook.",
+  treatment:"Mitigate",
+  plan:"Add a clause to POL-NET-001 Section 5 requiring the diagram maintained, owned by the Security Officer and reviewed annually and on material architecture change. Generate it from the infrastructure definitions rather than drawing it, so it cannot drift from what is deployed.",
+  planOwner:"Security Officer", due:"2026-09-30", rl:3, ri:3, tl:1, ti:3, status:"Open", opened:"2026-08-06", review:"",
+  reviewTrigger:"On material architecture change",
+  evidence:"The clause; the diagram with version history in the governance repository." },
+
+{ id:"OPS-002", cat:"OPS", title:"Production change population is not yet authoritative",
+  desc:"POL-CM-001 Section 10 requires branch protection enforcing a pull request, an approving review from someone other than the author and passing status checks, and requires a complete exportable population of production deployments each traceable to an approved change. Branch protection on private repositories requires GitHub Team, which has not been enabled.",
+  cause:"Plan tier. Branch protection on private repositories is not available on the free tier.",
+  effect:"Self-approved changes and direct production modification cannot be distinguished from approved ones, so the CC4.1-05 quarterly change review has no reliable population to examine and CC8.1 cannot be evidenced.",
+  asset:"Source repositories and deployment pipeline", owner:"Security Officer", il:4, ii:4, controls:["CC8.1-04","CC8.1-07","CC4.1-05","CC5.2-04"],
+  ctrlNote:"The policy is precise and the pipeline model is right. One plan-tier dependency gates three controls across three criteria.",
+  treatment:"Mitigate",
+  plan:"Enable GitHub Team and configure branch protection on the default branch of every repository in scope. Confirm the deployment export reconciles to the merge history before the first observation period rather than discovering a gap when it is sampled.",
+  planOwner:"Security Officer", due:"2026-09-15", rl:4, ri:3, tl:1, ti:3, status:"Open", opened:"2026-08-06", review:"",
+  reviewTrigger:"On repository creation",
+  evidence:"Branch protection settings export; deployment population for the period reconciled to merge history, each traceable to a non-author approver." },
+
+{ id:"DP-001", cat:"DP", title:"Key administration and access to the data a key protects cannot be separated",
+  desc:"POL-ENC-001 Section 8 requires key policies to grant use and administration separately, and provides that no single identity shall hold both unrestricted key administration and access to the data the key protects. At two people that separation cannot be achieved through identity alone.",
+  cause:"Headcount. There is no third party to hold key administration independently of data access.",
+  effect:"An administrator can grant themselves access to encrypted data and then remove the evidence of having done so, unless the key logs sit outside their control.",
+  asset:"Encryption keys and encrypted data stores", owner:"CEO", il:3, ii:4, controls:["CC6.7-02","CC5.2-02","CC6.3-02"],
+  ctrlNote:"Compensating rather than preventive, and consistent with the treatment already accepted at GOV-002 for segregation generally.",
+  treatment:"Accept with compensating control",
+  plan:"Accepted. Compensating controls: key use and key policy changes logged to a destination the key administrator cannot alter, alerting on key deletion or disablement since key destruction is equivalent to data destruction, and the position stated in the annual assessment alongside the other segregation limitations. Revisit at the third hire.",
+  planOwner:"CEO", due:"", rl:3, ri:3, tl:3, ti:3, status:"Accepted", opened:"2026-08-06", review:"2027-08-05",
+  reviewTrigger:"Annual",
+  evidence:"Key policy export showing use and administration granted separately where possible; key use log sample; alert configuration for key deletion." },
+
+{ id:"TPR-001", cat:"TPR", title:"AWS complementary user entity controls have never been confirmed",
+  desc:"Four separate controls depend on one activity that has not happened: obtaining the AWS assurance report annually, reviewing it for exceptions, identifying the complementary user entity controls it places on the Company, and confirming each is operating or recording the gap in the risk register.",
+  cause:"The review has no calendar entry and no owner in practice, although three policies require it.",
+  effect:"The Company relies on a subservice organisation for its physical, environmental and much of its infrastructure control, and cannot show which controls that reliance places back on itself. A complementary user entity control that nobody owns is unperformed by definition.",
+  asset:"AWS subservice relationship", owner:"Security Officer", il:4, ii:4, controls:["CC9.2-03","CC4.1-07","CC6.4-02","CC3.2-07"],
+  ctrlNote:"POL-VM-001 Section 9 states the requirement better than most: obtaining a report is not a control, reading it and acting on what falls to the Company is.",
+  treatment:"Mitigate",
+  plan:"Attach the review to the annual risk assessment. Record the period covered, the opinion, any exceptions relevant to the services consumed, and assign an owner to every complementary user entity control, confirming each as operating. Cover any gap between the report period and the observation window with a bridge letter or record it as a limitation.",
+  planOwner:"Security Officer", due:"2026-09-30", rl:4, ri:3, tl:1, ti:3, status:"Open", opened:"2026-08-06", review:"",
+  reviewTrigger:"Annual",
+  evidence:"Dated attestation review note; complementary user entity control list with owners and confirmation; bridge letter or recorded limitation." },
+
+{ id:"BCP-001", cat:"BCP", title:"No designated alternate for the Security Officer",
+  desc:"POL-BCP-001 Section 8 requires every critical responsibility to have a documented procedure and a named alternate, and requires the Security Officer role specifically to have a designated alternate with equivalent access available through the break-glass procedure. No alternate is designated and no critical-responsibility procedures exist.",
+  cause:"The role is fractional and held by one person. The alternate was never named because the answer felt obvious.",
+  effect:"POL-BCP-001 Section 8 states that at a headcount below twenty the unavailability of one person is the most probable disruption. At two people it is the standing condition, and it would stop control operation and any active incident response at the same moment.",
+  asset:"Security programme and privileged access", owner:"CEO", il:4, ii:4, controls:["CC9.1-04","CC9.1-01","CC1.3-04"],
+  ctrlNote:"POL-RSK-001 Section 15 requires key person risk assessed for each critical role including the Security Officer. Neither the assessment nor the alternate exists.",
+  treatment:"Mitigate",
+  plan:"Designate the CEO as the alternate and record it, with break-glass access as the mechanism and both parties holding the credential as POL-PWD-001 Section 11 requires. Write the recovery procedures to the Section 8 standard: executable by a competent person who did not build the system, and stored where they remain reachable when the primary environment is not.",
+  planOwner:"CEO", due:"2026-09-30", rl:4, ri:4, tl:2, ti:3, status:"Open", opened:"2026-08-06", review:"",
+  reviewTrigger:"On any change of critical role holder",
+  evidence:"Business impact analysis naming an alternate per critical activity; break-glass test record; recovery procedures in the governance repository." },
+
+{ id:"IR-001", cat:"IR", title:"The incident role model assumes a company four times this size",
+  desc:"POL-IRP-001 Section 6 opens by stating the Company has fifteen to twenty people and builds a four-role incident structure on that premise: incident lead, Accountable Party, communications lead and scribe, with the incident lead and communications lead required to be different people because each becomes a full-time task at Severity One.",
+  cause:"The section was drafted against a headcount the Company does not have.",
+  effect:"At Severity One the structure cannot be staffed. A policy asserting a capability the Company does not hold is a worse position at audit than a stated constraint, and in a real incident the roles would be improvised at the worst possible moment.",
+  asset:"Incident response capability", owner:"CEO", il:4, ii:4, controls:["CC7.4-01","CC7.4-02","CC9.1-04"],
+  ctrlNote:"The rest of POL-IRP-001 is strong, including Section 10 on artificial intelligence and agentic incidents. This is a single section out of step with the operating reality.",
+  treatment:"Mitigate",
+  plan:"Correct the headcount statement. Then either name the external parties who fill the communications lead and scribe roles, which a retained responder or external counsel can do, or record which roles are combined together with the limitation and its compensating control. Verify the contact list, notification extract and escalation paths at the annual exercise.",
+  planOwner:"CEO", due:"2026-09-30", rl:4, ri:3, tl:2, ti:3, status:"Open", opened:"2026-08-06", review:"",
+  reviewTrigger:"Annual exercise and after any Severity One incident",
+  evidence:"Amended Section 6; named role assignments including any external party; current contact list verified at the exercise." },
+
+{ id:"CMP-002", cat:"CMP", title:"Approved customer commitments operate nowhere",
+  desc:"POL-ISP-001 Section 9 states six customer-facing commitments as approved, signed policy: commitments recorded and reviewed annually, a published security contact, a current sub-processor list, notification obligations, pre-commitment review by the Security Officer, and the carve-out with complementary user entity controls. Five of the six have no operating control behind them.",
+  cause:"The policy was approved ahead of the artefacts it describes, and no implementation plan task creates them.",
+  effect:"An approved commitment with no operating control is worse than an absent one, because it is representable to a customer. The exposure is contractual as much as it is an audit finding.",
+  asset:"Published commitments", owner:"CEO", il:4, ii:4, controls:["CC2.3-01","CC2.3-02","CC2.3-05","CC3.1-03"],
+  ctrlNote:"CMP-001 covers the sub-processor list and user entity controls specifically. This entry covers the other four commitments in the same section.",
+  treatment:"Mitigate",
+  plan:"Build the customer commitments register listing every promise and the control that delivers it, and a single obligations register recording legal, regulatory and contractual duties with their source. Publish the security contact externally with a security.txt file. Add a Security Officer review step to engagement intake so no commitment reaches a customer unreviewed.",
+  planOwner:"CEO", due:"2026-09-30", rl:4, ri:4, tl:1, ti:4, status:"Open", opened:"2026-08-06", review:"",
+  reviewTrigger:"Annual and per commitment",
+  evidence:"Commitments register with the control per promise; obligations register with annual review note; published security.txt; reviewed questionnaire and proposal records." },
+
+{ id:"CMP-003", cat:"CMP", title:"POL-PRIV-001 is relied upon but is not in the controlled library",
+  desc:"The Privacy Policy is cited as the source of the customer notification period and of the sub-processor commitment, and was recorded as verified in an earlier coverage assessment. It is not among the 22 policies and 5 standards approved on 23 July 2026.",
+  cause:"Either the document is published outside the document control regime, or it does not exist and the citations were carried forward untested.",
+  effect:"Either a live customer-facing commitment sits outside version control, approval and annual review, or the notification timeframe the incident process depends on has no source. Both are material, and which one applies is currently unknown.",
+  asset:"Published privacy commitments", owner:"CEO", il:4, ii:4, controls:["CC2.3-04","CC2.3-03","CC7.4-04","CC5.3-01"],
+  ctrlNote:"No control can be relied upon here until the document is either produced and brought under control or the references are removed.",
+  treatment:"Mitigate",
+  plan:"Establish whether POL-PRIV-001 exists. If it is published, bring it into the library with an identifier, version, approval date and owner and record it in Annex A. If it does not exist, remove the references and state the notification periods in POL-IRP-001 Section 11 and the customer agreements directly. Either way, build the notification obligation extract the incident process requires.",
+  planOwner:"CEO", due:"2026-08-29", rl:4, ri:4, tl:1, ti:4, status:"Open", opened:"2026-08-06", review:"",
+  reviewTrigger:"On resolution",
+  evidence:"Either the controlled document with approval record, or the amended references plus the notification obligation extract." },
+
+{ id:"CMP-004", cat:"CMP", title:"Document control integrity — stale contents pages and wrong cross-references",
+  desc:"21 of the 27 approved documents carry a table of contents that does not match their own headings, because the field was never refreshed before approval. POL-VM-001 presents a Change Management contents page. Internal cross-references are wrong in at least two places: POL-RSK-001 Sections 4 and 8 both cite Section 8 for the risk appetite, which is at Section 9, and POL-CM-001 Section 9 states that emergency changes follow Section 9, which is itself.",
+  cause:"Documents were produced from a shared template and approved without a field refresh or a cross-reference check.",
+  effect:"A reader following a cross-reference lands in the wrong place, and the two defects found sit in the clauses that set the risk appetite and the emergency change path — both heavily sampled. Every incorrect citation in the earlier coverage assessments traced back to this.",
+  asset:"Policy library", owner:"Security Officer", il:5, ii:3, controls:["CC5.3-01","CC5.3-02","CC2.2-01"],
+  ctrlNote:"The substance of every document is sound. This is a production defect in an otherwise strong library, which is why impact is moderate rather than major.",
+  treatment:"Mitigate",
+  plan:"Refresh the table of contents field in all 21 affected documents, correct the two known cross-reference defects, run a cross-reference check across the library, and reissue as version 1.1 with the correction recorded in each revision history. Add a field refresh to the pre-approval checklist so the defect does not recur at the annual review.",
+  planOwner:"Security Officer", due:"2026-09-15", rl:4, ri:3, tl:1, ti:3, status:"Open", opened:"2026-08-06", review:"",
+  reviewTrigger:"At each policy revision",
+  evidence:"Reissued documents at v1.1 with matching contents pages; revision history entries; the amended pre-approval checklist." },
+
+{ id:"CMP-005", cat:"CMP", title:"Annex A cannot be reconciled — referenced documents do not exist",
+  desc:"POL-ISP-001 Section 6 requires Annex A to map every Trust Services Criterion in scope to an owning document with a named control owner, and states that every criterion in scope has at least one owning document. The control tabs reference POL-COI-001 and STD-SCR-001, neither of which exists, alongside POL-PRIV-001.",
+  cause:"Owning documents were assigned by expected identifier rather than against the library as issued.",
+  effect:"Annex A is the artefact an assessor uses to trace a criterion to its owner. Until it names only documents that can be produced, that trace fails at the first missing identifier and calls the rest of the mapping into question.",
+  asset:"POL-ISP-001 Annex A", owner:"Security Officer", il:4, ii:3, controls:["CC5.1-04","CC1.1-03","CC1.1-06"],
+  ctrlNote:"Two of the three references have a straightforward answer: conflicts of interest are governed by POL-COC-001 Section 7, and STD-SCR-001 needs creating rather than replacing.",
+  treatment:"Mitigate",
+  plan:"Remove the POL-COI-001 reference and point conflict of interest controls at POL-COC-001 Section 7. Create STD-SCR-001 under HR-001. Resolve POL-PRIV-001 under CMP-003. Then reconcile Annex A against all nine control tabs so that every criterion names a document that exists at a stated version.",
+  planOwner:"Security Officer", due:"2026-09-30", rl:4, ri:3, tl:1, ti:3, status:"Open", opened:"2026-08-06", review:"",
+  reviewTrigger:"At each policy revision",
+  evidence:"Reconciled Annex A with identifier, version, approval date and owner per document; a criterion-to-document trace with no unresolved reference." }
+
+];}
+
+/* ============================================================
+   BACKUP — the previous register, retained read-only.
+   ============================================================ */
+function archive(){ return [
+{ id:"GOV-001", cat:"GOV", title:"Security function has no standing decision forum",
+  desc:"Security decisions requiring a business trade-off are made ad hoc in engineering channels with no record of who decided or on what basis, so accepted risks are invisible and reversible by anyone.",
+  cause:"No chartered steering committee; security reports through a delivery-oriented line.", effect:"Undocumented acceptances surface during audit as unmanaged risk; repeat decisions consume leadership time.",
+  asset:"ISMS governance", owner:"CEO", il:4, ii:4, controls:["CC1.2","CC3.1","A.5.1"], ctrlNote:"Policy exists but is not operated on a cadence.",
+  treatment:"Mitigate", plan:"Charter the steering committee, set a quarterly cadence with a standing agenda covering register movement, exceptions due to expire, incident themes and control test results. Minute every decision against a risk ID.",
+  planOwner:"CEO", due:"2026-09-30", rl:2, ri:4, tl:2, ti:3, status:"Treating", opened:"2026-02-11", review:"2026-09-15",
+  evidence:"Committee charter; four quarters of minutes referencing risk IDs." },
+
+{ id:"GOV-002", cat:"GOV", title:"Risk register maintained but not fed by operational events",
+  desc:"The register is refreshed on an annual calendar. Incidents, audit findings, new vendors and architecture changes do not trigger a re-score, so the register drifts away from the real posture between refreshes.",
+  cause:"No event hooks between operational processes and the register.", effect:"Register presents a materially stale picture to auditors and the board.",
+  asset:"ISMS governance", owner:"Security Officer", il:4, ii:3, controls:["CC3.2","CC3.4","A.5.7"], ctrlNote:"Annual refresh runs; event-driven review does not.",
+  treatment:"Mitigate", plan:"Add a mandatory register-impact field to incident closure, vendor onboarding, and change approval. Re-score within ten working days of any triggering event.",
+  planOwner:"Security Officer", due:"2026-10-31", rl:3, ri:3, tl:2, ti:3, status:"Treating", opened:"2026-03-04", review:"2026-08-01",
+  evidence:"Incident closure template; sample of event-triggered re-scores with dates." },
+
+{ id:"GOV-003", cat:"GOV", title:"Key-person dependency across the whole security programme",
+  desc:"Programme knowledge, tool administration, auditor relationships and evidence locations sit with one individual. Absence or departure stalls the certification path and control operation simultaneously.",
+  cause:"Small team with no documented runbooks or deputised second.", effect:"Certification timeline slips; control operation lapses undetected during absence.",
+  asset:"Security programme", owner:"CEO", il:4, ii:4, controls:["CC1.4","A.6.3"], ctrlNote:"No documented succession or cross-training.",
+  treatment:"Mitigate", plan:"Document each recurring control activity as a runbook, name a deputy for every monthly and quarterly activity, and hold a live handover rehearsal each half-year.",
+  planOwner:"CEO", due:"2026-11-28", rl:3, ri:4, tl:2, ti:3, status:"Open", opened:"2026-01-22", review:"2026-07-20",
+  evidence:"Runbook set; deputy assignment matrix; rehearsal record." },
+
+{ id:"AC-001", cat:"AC", title:"Standing privileged access to production without time bounds",
+  desc:"Engineers hold persistent administrative rights in production. Any credential compromise or account misuse yields immediate full-environment access with no additional barrier.",
+  cause:"Access granted at onboarding and never scoped down; no just-in-time elevation path.", effect:"A single phished credential becomes full production compromise.",
+  asset:"Production cloud environment", owner:"Head of Engineering", il:5, ii:5, controls:["CC6.1","CC6.3","A.8.2","AC.L2-3.1.5"], ctrlNote:"MFA enforced; elevation and time bounds not implemented.",
+  treatment:"Mitigate", plan:"Move standing admin to a just-in-time role with approval and a four-hour expiry. Break-glass account held offline, alerting on use. Quarterly recertification of the remaining standing set.",
+  planOwner:"Head of Engineering", due:"2026-09-15", rl:2, ri:5, tl:1, ti:5, status:"Treating", opened:"2025-11-30", review:"2026-08-25",
+  evidence:"Elevation request log; break-glass alert test; recertification sign-off." },
+
+{ id:"AC-002", cat:"AC", title:"Leaver access not revoked within the committed window",
+  desc:"Deprovisioning depends on a manual ticket from HR. Two sampled leavers retained SaaS access beyond the one-business-day commitment stated in customer contracts.",
+  cause:"No identity provider integration with the HR system; SaaS apps outside single sign-on.", effect:"Former staff retain data access; contractual commitment breached and evidenced in the sample.",
+  asset:"SaaS estate; identity provider", owner:"IT Manager", il:4, ii:4, controls:["CC6.2","CC6.3","A.5.11"], ctrlNote:"Process documented, execution inconsistent, exceptions found in sample.",
+  treatment:"Mitigate", plan:"Integrate the identity provider with the HR system so termination triggers automatic suspension. Bring the remaining eleven non-federated apps into single sign-on. Monthly orphan-account report.",
+  planOwner:"IT Manager", due:"2026-10-15", rl:2, ri:4, tl:1, ti:4, status:"Treating", opened:"2026-04-02", review:"2026-09-01",
+  evidence:"Termination-to-suspension timestamps for all leavers in period; orphan report." },
+
+{ id:"AC-003", cat:"AC", title:"Shared service accounts with static credentials",
+  desc:"Several integrations authenticate with long-lived static secrets shared across environments and stored in configuration files, with no rotation history and no attribution of use.",
+  cause:"Legacy integrations built before a secrets manager was adopted.", effect:"Credential exposure is unattributable and rotation requires coordinated downtime.",
+  asset:"Integration credentials", owner:"Head of Engineering", il:4, ii:4, controls:["CC6.1","A.8.5","IA.L2-3.5.10"], ctrlNote:"Secrets manager in place for new services only.",
+  treatment:"Mitigate", plan:"Migrate remaining integrations to workload identity where the platform supports it, and to managed secrets with ninety-day rotation where it does not. Remove secrets from configuration and rewrite history.",
+  planOwner:"Platform Lead", due:"2026-12-19", rl:2, ri:4, tl:2, ti:3, status:"Treating", opened:"2026-02-18", review:"2026-10-01",
+  evidence:"Secret inventory with rotation dates; repository history scan result." },
+
+{ id:"AC-004", cat:"AC", title:"Access reviews performed without evidence of remediation",
+  desc:"Quarterly access reviews are completed and signed, but flagged removals are not tracked to closure. Two prior-quarter flags remained active at the following review.",
+  cause:"Review output is a spreadsheet with no downstream ticketing.", effect:"The review operates as a paper control and would not survive testing.",
+  asset:"Access review process", owner:"Security Officer", il:3, ii:3, controls:["CC6.2","A.5.18"], ctrlNote:"Review occurs on cadence; closure loop absent.",
+  treatment:"Mitigate", plan:"Every flagged item raises a ticket at review time with a five-day service level; the next review opens by confirming the prior quarter's closures.",
+  planOwner:"Security Officer", due:"2026-09-30", rl:2, ri:3, tl:1, ti:3, status:"Treating", opened:"2026-05-12", review:"2026-09-30",
+  evidence:"Review pack with linked tickets and closure timestamps." },
+
+{ id:"DP-001", cat:"DP", title:"Customer data present in non-production environments",
+  desc:"Staging and development are refreshed from production snapshots without masking, extending regulated data into environments with weaker access control and no monitoring.",
+  cause:"No masking or synthetic-data capability in the refresh pipeline.", effect:"Breach scope and notification obligations extend to environments never designed to hold customer data.",
+  asset:"Non-production environments", owner:"Head of Engineering", il:5, ii:5, controls:["CC6.7","A.8.11","A.8.33"], ctrlNote:"Access controlled but data itself unprotected.",
+  treatment:"Mitigate", plan:"Build a masking step into the refresh job covering direct and quasi-identifiers. Purge existing non-production copies. Add a scheduled scan that alerts on production-pattern data outside production.",
+  planOwner:"Data Platform Lead", due:"2026-09-30", rl:2, ri:5, tl:1, ti:4, status:"Treating", opened:"2025-12-08", review:"2026-08-20",
+  evidence:"Masking job definition; purge confirmation; two consecutive clean scan results." },
+
+{ id:"DP-002", cat:"DP", title:"Retention schedule defined but not enforced in systems",
+  desc:"The retention policy states periods by data class, but no system enforces deletion. Records exist well beyond their stated period across the primary datastore and object storage.",
+  cause:"Policy written for audit; no technical lifecycle implementation.", effect:"Regulatory exposure on data-subject requests and unnecessary breach surface.",
+  asset:"Primary datastore; object storage", owner:"Data Platform Lead", il:4, ii:4, controls:["CC6.5","A.5.34","A.8.10"], ctrlNote:"Policy published; enforcement absent.",
+  treatment:"Mitigate", plan:"Apply object lifecycle rules and a scheduled purge job per data class, with a quarterly exception report for records held under legal hold.",
+  planOwner:"Data Platform Lead", due:"2026-11-30", rl:2, ri:4, tl:2, ti:3, status:"Open", opened:"2026-03-19", review:"2026-07-30",
+  evidence:"Lifecycle configuration; purge job logs; legal hold register." },
+
+{ id:"DP-003", cat:"DP", title:"Encryption in transit not enforced on internal service traffic",
+  desc:"External traffic is encrypted, but service-to-service traffic inside the virtual network runs unencrypted on the assumption the network boundary is trustworthy.",
+  cause:"Perimeter-based design predating the current architecture.", effect:"Lateral movement after any foothold yields cleartext data in transit.",
+  asset:"Internal service mesh", owner:"Platform Lead", il:3, ii:4, controls:["CC6.7","A.8.24","SC.L2-3.13.8"], ctrlNote:"External TLS enforced and tested; internal not.",
+  treatment:"Mitigate", plan:"Enable mutual TLS across the service mesh, defaulting to strict mode once the permissive-mode telemetry shows no residual cleartext paths.",
+  planOwner:"Platform Lead", due:"2026-10-31", rl:2, ri:4, tl:1, ti:4, status:"Treating", opened:"2026-04-25", review:"2026-10-01",
+  evidence:"Mesh policy in strict mode; telemetry showing zero cleartext connections." },
+
+{ id:"APP-001", cat:"APP", title:"No security review gate before customer-facing release",
+  desc:"Changes reach production on engineering judgement alone. Authentication, authorisation and data-exposure changes ship without a documented security assessment.",
+  cause:"Speed-oriented delivery process with no defined gate or criteria.", effect:"Design-level flaws reach customers and are found by customers or their testers.",
+  asset:"Product platform", owner:"Head of Engineering", il:4, ii:4, controls:["CC8.1","A.8.25","A.8.29"], ctrlNote:"Peer code review operates; security review does not.",
+  treatment:"Mitigate", plan:"Define a change-risk triage in the pull-request template. Anything touching authentication, authorisation, data export or a new external interface requires security sign-off before merge.",
+  planOwner:"Head of Engineering", due:"2026-09-30", rl:2, ri:4, tl:2, ti:3, status:"Treating", opened:"2026-01-15", review:"2026-09-10",
+  evidence:"Pull-request template; sample of triaged changes with sign-off." },
+
+{ id:"APP-002", cat:"APP", title:"Known vulnerable dependencies past remediation service level",
+  desc:"Dependency scanning runs, but findings are not tracked against the service levels in the vulnerability management policy. Several high-severity findings exceed the thirty-day target.",
+  cause:"Scanner output not routed into the backlog with due dates.", effect:"Exploitable components remain in production and the policy is demonstrably not followed.",
+  asset:"Application dependencies", owner:"Head of Engineering", il:4, ii:4, controls:["CC7.1","A.8.8","RA.L2-3.11.2"], ctrlNote:"Detection works; remediation tracking does not.",
+  treatment:"Mitigate", plan:"Auto-raise a ticket per finding with a due date derived from severity. Weekly ageing report to engineering leadership; anything past service level escalates at the next steering sitting.",
+  planOwner:"Head of Engineering", due:"2026-09-15", rl:3, ri:4, tl:2, ti:4, status:"Treating", opened:"2026-02-27", review:"2026-08-15",
+  evidence:"Ageing report across three months; ticket close-out sample." },
+
+{ id:"APP-003", cat:"APP", title:"No software bill of materials produced at build",
+  desc:"There is no machine-readable component inventory per release, so exposure to a newly disclosed component vulnerability cannot be answered quickly and customers asking for one cannot be satisfied.",
+  cause:"Build pipeline predates the requirement; no generation step.", effect:"Days of manual effort per disclosure event; enterprise deals stall on the question.",
+  asset:"Build pipeline", owner:"Platform Lead", il:3, ii:3, controls:["CC7.1","A.8.8"], ctrlNote:"No compensating inventory exists.",
+  treatment:"Mitigate", plan:"Generate a signed bill of materials at build in a standard format, retain per release, and expose the current one through the trust centre on request.",
+  planOwner:"Platform Lead", due:"2026-10-30", rl:1, ri:3, tl:1, ti:3, status:"Treating", opened:"2026-05-06", review:"2026-10-15",
+  evidence:"Build artefact with attached inventory; retention location." },
+
+{ id:"OPS-001", cat:"OPS", title:"Infrastructure changes applied outside change control",
+  desc:"Console changes are made directly in production during incidents and are not reconciled back into infrastructure code, so the declared state and the running state diverge silently.",
+  cause:"Emergency path has no retrospective reconciliation step.", effect:"Rebuilds reintroduce faults; drift defeats configuration-based control assertions.",
+  asset:"Cloud infrastructure", owner:"Platform Lead", il:4, ii:3, controls:["CC8.1","A.8.32"], ctrlNote:"Standard changes controlled; emergency path is not closed out.",
+  treatment:"Mitigate", plan:"Enable drift detection on a daily schedule and require reconciliation within two business days of any emergency change, tracked on the incident record.",
+  planOwner:"Platform Lead", due:"2026-09-30", rl:2, ri:3, tl:2, ti:2, status:"Treating", opened:"2026-03-28", review:"2026-09-20",
+  evidence:"Drift detection output; reconciliation entries on emergency change records." },
+
+{ id:"OPS-002", cat:"OPS", title:"Logging coverage incomplete across production services",
+  desc:"Three production services do not ship logs to the central platform, and administrative actions in two SaaS applications are not collected at all. Detection and investigation both have blind spots.",
+  cause:"Onboarding to central logging is manual and not part of service go-live.", effect:"Incidents in uncovered services are detected late, and forensic reconstruction is incomplete.",
+  asset:"Logging platform", owner:"Platform Lead", il:4, ii:4, controls:["CC7.2","A.8.15","AU.L2-3.3.1"], ctrlNote:"Central platform exists; coverage is partial.",
+  treatment:"Mitigate", plan:"Publish a coverage matrix by service, add log shipping to the service go-live checklist, and alert when any expected source stops reporting for more than an hour.",
+  planOwner:"Platform Lead", due:"2026-10-31", rl:2, ri:4, tl:1, ti:4, status:"Treating", opened:"2026-04-14", review:"2026-09-25",
+  evidence:"Coverage matrix at full coverage; source-silence alert test." },
+
+{ id:"OPS-003", cat:"OPS", title:"Endpoint patch compliance not measured",
+  desc:"Operating system and browser updates rely on individual user action. There is no measurement of how many endpoints are current, and no way to answer the question in a customer questionnaire.",
+  cause:"No device management platform deployed.", effect:"Unpatched endpoints hold session tokens and source access; the control cannot be evidenced.",
+  asset:"Employee endpoints", owner:"IT Manager", il:4, ii:3, controls:["CC7.1","A.8.8","A.8.1"], ctrlNote:"Disk encryption enforced; patching unmanaged.",
+  treatment:"Mitigate", plan:"Deploy device management to the full fleet, set a fourteen-day maximum patch age, and report compliance monthly with non-compliant devices losing access to production tooling.",
+  planOwner:"IT Manager", due:"2026-11-14", rl:2, ri:3, tl:2, ti:2, status:"Open", opened:"2026-06-02", review:"2026-08-30",
+  evidence:"Fleet enrolment percentage; monthly patch compliance report." },
+
+{ id:"TPR-001", cat:"TPR", title:"Subprocessors onboarded without security assessment",
+  desc:"Four subprocessors handling customer data were engaged on commercial terms alone, with no security review, no data processing terms and no record of what data each receives.",
+  cause:"Procurement has no security gate below a spend threshold.", effect:"Inherited breach exposure and a contractual notification obligation that cannot be met.",
+  asset:"Subprocessor estate", owner:"Security Officer", il:4, ii:5, controls:["CC9.2","A.5.19","A.5.21"], ctrlNote:"Vendor policy written; not applied to in-flight vendors.",
+  treatment:"Mitigate", plan:"Assess the four retrospectively, execute data processing terms, publish the subprocessor list, and put a security gate in procurement that triggers on data access rather than on spend.",
+  planOwner:"Security Officer", due:"2026-10-31", rl:2, ri:5, tl:2, ti:4, status:"Treating", opened:"2026-01-08", review:"2026-08-10",
+  evidence:"Assessment records; executed terms; published subprocessor list." },
+
+{ id:"TPR-002", cat:"TPR", title:"Critical vendor attestations not tracked to expiry",
+  desc:"Vendor reports are collected once at onboarding. Nobody tracks report periods or expiry, so the file may contain an attestation that expired eighteen months ago.",
+  cause:"No vendor register field for report period or renewal date.", effect:"Reliance is placed on assurance that no longer covers the current period.",
+  asset:"Vendor register", owner:"Security Officer", il:3, ii:3, controls:["CC9.2","A.5.22"], ctrlNote:"Onboarding review occurs; ongoing monitoring does not.",
+  treatment:"Mitigate", plan:"Add report-period and expiry fields to the vendor register with a sixty-day renewal reminder, and review bridge letters for any gap between report period and current date.",
+  planOwner:"Security Officer", due:"2026-09-30", rl:2, ri:3, tl:1, ti:3, status:"Treating", opened:"2026-05-20", review:"2026-09-30",
+  evidence:"Vendor register with current expiry dates; renewal reminder log." },
+
+{ id:"TPR-003", cat:"TPR", title:"Concentration on a single cloud region and provider",
+  desc:"The entire platform runs in one region of one provider. A regional failure or a provider-level account action removes the service with no alternative path.",
+  cause:"Deliberate early-stage choice for speed and cost.", effect:"Availability commitments cannot be met during a regional event.",
+  asset:"Platform hosting", owner:"CEO", il:2, ii:5, controls:["A.5.30","CC7.5"], ctrlNote:"Cross-region backup exists; no standby compute.",
+  treatment:"Accept", plan:"Accepted for the current period on the basis that cross-region backups meet the recovery point objective and no customer contract commits to a recovery time below twenty-four hours. Revisit when the first contract commits to a tighter recovery time.",
+  planOwner:"CEO", due:"2027-02-28", rl:2, ri:5, tl:2, ti:5, status:"Accepted", opened:"2025-10-14", review:"2027-02-28",
+  evidence:"Signed acceptance; backup restore test evidence; contract review confirming no tighter commitment." },
+
+{ id:"AI-001", cat:"AI", title:"Customer data sent to third-party model providers without a documented basis",
+  desc:"Product features call external model providers with prompt content that can include customer data. Data-handling terms, retention behaviour and training use have not been established or disclosed.",
+  cause:"Feature built ahead of an AI governance process.", effect:"Undisclosed processing, potential contract breach, and an unanswerable customer due-diligence question.",
+  asset:"AI feature pipeline", owner:"Security Officer", il:5, ii:5, controls:["CC9.2","A.5.19","A.5.34"], ctrlNote:"No provider terms review; no disclosure to customers.",
+  treatment:"Mitigate", plan:"Confirm zero-retention and no-training terms with each provider, add providers to the published subprocessor list, apply pre-send redaction for identified fields, and log every call with its data classification.",
+  planOwner:"Security Officer", due:"2026-09-15", rl:2, ri:5, tl:1, ti:5, status:"Treating", opened:"2026-02-05", review:"2026-08-18",
+  evidence:"Provider terms with retention clause; redaction test results; call log sample." },
+
+{ id:"AI-002", cat:"AI", title:"Agentic actions execute without a human decision point",
+  desc:"Agent features can take consequential actions in connected systems on model output alone. A prompt-injection payload in retrieved content could drive an action the customer never asked for.",
+  cause:"Autonomy shipped ahead of an approval and constraint model.", effect:"Unauthorised change or data movement in a customer system, attributable to the product.",
+  asset:"Agent runtime", owner:"Head of Engineering", il:4, ii:5, controls:["CC8.1","A.8.28"], ctrlNote:"Scope limits exist per integration; no approval step for write actions.",
+  treatment:"Mitigate", plan:"Classify actions as read or write. Write actions require explicit user confirmation and are capped per session. Untrusted retrieved content is fenced and never treated as instruction. Every action is logged with its triggering input.",
+  planOwner:"Head of Engineering", due:"2026-10-15", rl:2, ri:5, tl:1, ti:5, status:"Treating", opened:"2026-03-11", review:"2026-09-05",
+  evidence:"Action classification matrix; injection test suite results; action log sample." },
+
+{ id:"AI-003", cat:"AI", title:"No inventory of AI use across the business",
+  desc:"Teams adopt AI tooling independently. There is no list of which tools are in use, what data they touch, or which have been reviewed, so the answer to a customer or regulator is a guess.",
+  cause:"Self-service adoption with no registration path.", effect:"Unassessed processing of regulated data; governance claims cannot be substantiated.",
+  asset:"AI tooling estate", owner:"Security Officer", il:4, ii:3, controls:["CC3.2","A.5.9"], ctrlNote:"Acceptable use policy mentions AI; no inventory maintained.",
+  treatment:"Mitigate", plan:"Stand up an AI use register capturing purpose, data classes, provider, human oversight and review date. Run a discovery pass against expense and identity provider records, then require registration before adoption.",
+  planOwner:"Security Officer", due:"2026-11-30", rl:2, ri:3, tl:2, ti:2, status:"Open", opened:"2026-06-16", review:"2026-09-12",
+  evidence:"Populated register; discovery pass output; registration workflow." },
+
+{ id:"BCP-001", cat:"BCP", title:"Backups taken but never restored end to end",
+  desc:"Automated backups run and report success. No full restore has ever been performed, so the recovery time objective is an assumption and backup integrity is unverified.",
+  cause:"Restore testing has no owner and no scheduled window.", effect:"A recovery event becomes the first test, at the worst possible moment.",
+  asset:"Backup estate", owner:"Platform Lead", il:3, ii:5, controls:["CC7.5","A.8.13","A.5.29"], ctrlNote:"Backup job success monitored; restore unverified.",
+  treatment:"Mitigate", plan:"Perform a full restore to an isolated environment each half-year, measure elapsed time against the objective, and record the result with the operator and timings.",
+  planOwner:"Platform Lead", due:"2026-09-30", rl:2, ri:5, tl:1, ti:5, status:"Treating", opened:"2026-02-20", review:"2026-09-30",
+  evidence:"Restore test record with start and finish times and data integrity checks." },
+
+{ id:"BCP-002", cat:"BCP", title:"Continuity plan not exercised against a realistic scenario",
+  desc:"A continuity plan exists as a document. It has never been walked through, so role assignments, contact routes and decision authority are untested and several named individuals have left.",
+  cause:"Plan produced for a customer questionnaire rather than for use.", effect:"Extended outage while roles and authority are worked out live.",
+  asset:"Continuity plan", owner:"CEO", il:3, ii:4, controls:["A.5.29","A.5.30","CC7.5"], ctrlNote:"Document current in form only.",
+  treatment:"Mitigate", plan:"Run a tabletop against a regional outage scenario, capture the gaps found, update the plan and re-test the corrected version within the same quarter.",
+  planOwner:"CEO", due:"2026-12-15", rl:2, ri:4, tl:2, ti:3, status:"Open", opened:"2026-05-28", review:"2026-10-20",
+  evidence:"Tabletop record with participants, gaps identified and plan revision." },
+
+{ id:"IR-001", cat:"IR", title:"No tested path to meet contractual breach notification timelines",
+  desc:"Customer contracts commit to notification within seventy-two hours of a confirmed breach. There is no defined assessment path, no drafted notification templates and no named legal route to get there.",
+  cause:"Incident procedure covers technical containment only.", effect:"A notification obligation is missed and the failure is itself reportable.",
+  asset:"Incident response process", owner:"Security Officer", il:3, ii:5, controls:["CC7.3","CC7.4","A.5.24","A.5.26"], ctrlNote:"Technical response defined; notification path undefined.",
+  treatment:"Mitigate", plan:"Define breach assessment criteria and who declares. Draft notification templates for customer, regulator and subprocessor. Rehearse the notification path as part of the next tabletop, timed against the seventy-two hour clock.",
+  planOwner:"Security Officer", due:"2026-10-31", rl:2, ri:5, tl:1, ti:5, status:"Treating", opened:"2026-03-02", review:"2026-09-08",
+  evidence:"Notification templates; tabletop timing record against the contractual clock." },
+
+{ id:"IR-002", cat:"IR", title:"Alerts generated with no defined triage ownership out of hours",
+  desc:"Detection produces alerts into a shared channel with no rota, no acknowledgement expectation and no escalation path outside working hours.",
+  cause:"Monitoring built before an on-call model existed.", effect:"Overnight and weekend detections sit unhandled until the next working day.",
+  asset:"Detection pipeline", owner:"Platform Lead", il:4, ii:4, controls:["CC7.2","CC7.3","A.8.16"], ctrlNote:"Alerts fire correctly; response is unassigned.",
+  treatment:"Mitigate", plan:"Route security alerts into the existing on-call rota with severity-based acknowledgement targets and an automatic escalation after the target elapses.",
+  planOwner:"Platform Lead", due:"2026-09-30", rl:2, ri:4, tl:2, ti:3, status:"Treating", opened:"2026-04-30", review:"2026-09-18",
+  evidence:"Rota configuration; acknowledgement time distribution over one quarter." },
+
+{ id:"HR-001", cat:"HR", title:"Security awareness delivered once at onboarding only",
+  desc:"New joiners complete an induction module. There is no refresher, no phishing simulation and no measurement, so the control cannot be evidenced beyond the joining date.",
+  cause:"No annual awareness cycle established.", effect:"Behavioural exposure grows over tenure; a common audit finding with no available evidence.",
+  asset:"Workforce", owner:"IT Manager", il:4, ii:3, controls:["CC1.4","A.6.3"], ctrlNote:"Induction module completed and recorded.",
+  treatment:"Mitigate", plan:"Run annual refresher training with completion tracked to individual, quarterly phishing simulation with reporting rate as the measured outcome, and targeted follow-up rather than punitive handling.",
+  planOwner:"IT Manager", due:"2026-10-31", rl:3, ri:3, tl:2, ti:3, status:"Treating", opened:"2026-04-08", review:"2026-09-22",
+  evidence:"Completion records by individual; simulation results showing reporting rate trend." },
+
+{ id:"HR-002", cat:"HR", title:"Contractors engaged without background screening or agreements",
+  desc:"Contractors receive production-adjacent access on the same footing as employees, without screening, confidentiality agreements or a defined end date on their access.",
+  cause:"Contractor onboarding runs outside the HR process.", effect:"Unscreened individuals hold sensitive access with no contractual recourse and no automatic expiry.",
+  asset:"Contractor population", owner:"IT Manager", il:3, ii:4, controls:["CC1.4","A.6.1","A.6.2"], ctrlNote:"Employees screened; contractors not in scope of the process.",
+  treatment:"Mitigate", plan:"Extend screening and confidentiality agreements to all contractors with data access, and set an access expiry matching the engagement end date at the point of provisioning.",
+  planOwner:"IT Manager", due:"2026-10-15", rl:2, ri:4, tl:1, ti:4, status:"Open", opened:"2026-06-24", review:"2026-09-28",
+  evidence:"Screening records; signed agreements; access expiry dates against engagement dates." },
+
+{ id:"PHY-001", cat:"PHY", title:"Unmanaged personal devices reaching corporate data",
+  desc:"Staff access mail and chat from personal phones and laptops with no management, no separation of corporate data and no ability to wipe on departure.",
+  cause:"No formal bring-your-own-device position.", effect:"Corporate data leaves with the device and the departure, with no recovery path.",
+  asset:"Personal devices", owner:"IT Manager", il:4, ii:3, controls:["A.8.1","A.7.9","CC6.7"], ctrlNote:"Multi-factor authentication required; device posture unassessed.",
+  treatment:"Mitigate", plan:"Publish a device position, require application-level management on any personal device accessing corporate data, and enforce conditional access that blocks unmanaged devices from data-bearing applications.",
+  planOwner:"IT Manager", due:"2026-11-30", rl:2, ri:3, tl:2, ti:2, status:"Open", opened:"2026-06-30", review:"2026-10-10",
+  evidence:"Conditional access policy; enrolled device count against workforce." },
+
+{ id:"CMP-001", cat:"CMP", title:"Contractual security commitments not mapped to operating controls",
+  desc:"Customer agreements contain security obligations negotiated deal by deal. There is no consolidated view, so the business does not know in aggregate what it has promised.",
+  cause:"Commitments agreed in sales without a register.", effect:"Undetected non-compliance discovered during a customer audit rather than internally.",
+  asset:"Customer contracts", owner:"Security Officer", il:4, ii:4, controls:["CC2.3","A.5.20","A.5.31"], ctrlNote:"Standard terms controlled; negotiated deviations not tracked.",
+  treatment:"Mitigate", plan:"Build a commitment register extracting every security obligation from executed agreements, map each to the control that satisfies it, and require security review of any deviation before signature.",
+  planOwner:"Security Officer", due:"2026-11-30", rl:2, ri:4, tl:2, ti:3, status:"Open", opened:"2026-05-14", review:"2026-08-28",
+  evidence:"Commitment register with control mapping; review record for deviations in period." },
+
+{ id:"CMP-002", cat:"CMP", title:"Policy set published without evidence of workforce acknowledgement",
+  desc:"Policies are approved and stored, but there is no record that individuals have read and accepted them, and no annual re-acknowledgement.",
+  cause:"Policies distributed by link with no tracking.", effect:"Enforcement of policy against an individual is weak and the control fails a basic evidence test.",
+  asset:"Policy library", owner:"Security Officer", il:3, ii:2, controls:["CC2.2","CC5.3","A.5.1"], ctrlNote:"Approval and version control operate correctly.",
+  treatment:"Mitigate", plan:"Move policy distribution to a tool that records acknowledgement per individual per version, with annual re-acknowledgement tied to the review cycle.",
+  planOwner:"Security Officer", due:"2026-09-30", rl:1, ri:2, tl:1, ti:2, status:"Treating", opened:"2026-06-10", review:"2026-09-30",
+  evidence:"Acknowledgement report by individual and policy version." },
+
+/* ── Accepted risks ── one live entry, six retained as worked examples ── */
+
+{ id:"GOV-004", cat:"GOV", title:"No oversight board",
+  desc:"There is no board, audit committee or independent oversight body. Security decisions, risk acceptances and policy approvals rest with the founder alone, so no independent party challenges a judgement call before it becomes the operating position.",
+  cause:"Company size. An oversight body is not warranted at current headcount and would be nominal if created.", effect:"Acceptances and approvals carry no independent challenge; an auditor cannot test whether authority was exercised at the right level.",
+  asset:"Governance structure", owner:"Founder", il:4, ii:4, controls:["CC1.2","CC2.3","A.5.1"],
+  ctrlNote:"Compensating rather than preventive. The decision log is the control that makes the acceptance testable.",
+  treatment:"Accept with compensating control",
+  plan:"Accepted. Compensating controls: an annual independent assessment by a named external assessor; a written decision log capturing every risk acceptance, policy approval and material security decision with date and rationale; assessor review of that log at each annual cycle. Revisit if headcount, funding structure or a customer contract introduces an oversight requirement.",
+  planOwner:"Founder", due:"", rl:3, ri:3, tl:3, ti:3, status:"Accepted", opened:"2026-08-05", review:"2027-08-05",
+  reviewTrigger:"Annual assessment",
+  secureframe:"Recorded in Secureframe as a single risk register entry. Treatment set to accepted with compensating control; review date set to the annual assessment.",
+  evidence:"Signed acceptance naming the accepting authority; decision log covering the period; annual assessment report referencing the log." },
+
+{ id:"PHY-002", cat:"PHY", title:"Personal endpoints are unmanaged, so encryption, screen lock and patching cannot be enforced", example:true,
+  desc:"Staff work from personally owned devices that the company does not manage. Disk encryption, screen lock timeout and operating system patch level cannot be enforced technically, only asked for and checked.",
+  cause:"No MDM by design. Section 5 promises verification, not enforcement.", effect:"A lost or compromised personal device may hold client data without the protections the policy describes.",
+  asset:"Personal endpoints", owner:"Founder", il:4, ii:4, controls:["A.8.1","A.7.9","CC6.7"],
+  ctrlNote:"Verification only. Posture is reported, not enforced.",
+  treatment:"Accept with compensating control",
+  plan:"Accepted. Compensating controls: a read-only device check that reports posture without taking management authority, and browser-first access patterns that keep client data off the laptop in the first place.",
+  planOwner:"Founder", due:"", rl:3, ri:3, tl:3, ti:3, status:"Accepted", opened:"2026-08-05", review:"2027-08-05",
+  reviewTrigger:"Annual assessment",
+  evidence:"Device check report per person per period; access architecture note showing browser-first handling." },
+
+{ id:"AC-005", cat:"AC", title:"A repository clone survives offboarding", example:true,
+  desc:"A local clone taken during an engagement remains on the individual's device after their access is withdrawn. Revocation stops future access; it does not reach the copy already made.",
+  cause:"Revoking GitHub access does not delete a local copy. Section 6 permits local clones.", effect:"Source and any embedded client material persist outside the company's control after departure.",
+  asset:"Source repositories", owner:"Founder", il:4, ii:4, controls:["CC6.2","CC6.3","A.5.11"],
+  ctrlNote:"Revocation operates correctly but cannot reach data already copied.",
+  treatment:"Accept with compensating control",
+  plan:"Accepted. Compensating controls: least-privilege repository access so a clone carries the minimum, cloud development environments as the default working pattern, verified disk encryption on any device permitted to clone, and a written attestation of deletion at offboarding.",
+  planOwner:"Founder", due:"", rl:3, ri:3, tl:3, ti:3, status:"Accepted", opened:"2026-08-05", review:"2027-08-05",
+  reviewTrigger:"Annual assessment",
+  evidence:"Repository permission export; signed deletion attestations for leavers in period." },
+
+{ id:"AC-006", cat:"AC", title:"GitHub authentication is weaker than every other service", example:true,
+  desc:"GitHub is the one service where the company cannot apply its standard authentication posture. Identity is not federated and network conditions cannot be applied, so it sits outside the single sign-on boundary that covers everything else.",
+  cause:"SAML SSO and IP allow lists are Enterprise Cloud only; the Team plan gives enforced two-factor authentication and nothing further.", effect:"Account compromise on GitHub is not detectable or containable through the same controls that cover the rest of the estate.",
+  asset:"GitHub organisation", owner:"Founder", il:4, ii:4, controls:["CC6.1","A.8.5","A.5.15"],
+  ctrlNote:"Enforced two-factor authentication is in place. Federation and network conditions are not available at this plan tier.",
+  treatment:"Accept with compensating control",
+  plan:"Accepted on cost grounds at current size. Compensating controls: passkeys or hardware security keys rather than app-based second factors, minimal repository membership, and periodic audit log review.",
+  planOwner:"Founder", due:"", rl:2, ri:4, tl:2, ti:4, status:"Accepted", opened:"2026-08-05", review:"2027-08-05",
+  reviewTrigger:"Annual assessment",
+  evidence:"Two-factor method inventory showing key type per member; audit log review record." },
+
+{ id:"APP-004", cat:"APP", title:"Credentials can be committed to private repositories undetected", example:true,
+  desc:"A secret committed to a private repository is not blocked at push time and may sit in history unnoticed. Privacy of the repository is not the same as absence of the secret.",
+  cause:"Push protection on private repositories requires the paid Secret Protection add-on. Section 6 states repositories are configured to block them.", effect:"A live credential persists in history and remains exposed to anyone with repository access, including after a member leaves.",
+  asset:"Source repositories", owner:"Founder", il:4, ii:4, controls:["CC6.1","CC7.1","A.8.5"],
+  ctrlNote:"Policy text overstates the technical position. Section 6 needs correcting to describe detection rather than blocking.",
+  treatment:"Accept with compensating control",
+  plan:"Accepted. Compensating controls: the free leak-scan report reviewed on a schedule, secrets covered explicitly in code review, and immediate rotation on discovery. Correct Section 6 to state that repositories are scanned rather than configured to block.",
+  planOwner:"Founder", due:"", rl:3, ri:3, tl:3, ti:3, status:"Accepted", opened:"2026-08-05", review:"2027-08-05",
+  reviewTrigger:"Annual assessment",
+  evidence:"Leak-scan report per period; rotation record for any finding; corrected Section 6 text." },
+
+{ id:"AI-004", cat:"AI", title:"Client data can reach unapproved AI tools or personal accounts", example:true,
+  desc:"Nothing technically prevents a person pasting client material into a consumer AI tool or a personal account. The control is entirely behavioural.",
+  cause:"Prohibited by policy; no data loss prevention, no managed browser, no egress control.", effect:"Client material processed under terms the company has not reviewed, with no record that it happened.",
+  asset:"Client data", owner:"Founder", il:4, ii:5, controls:["A.5.9","A.5.34","CC9.2"],
+  ctrlNote:"Policy and training only. No technical enforcement exists at current tooling.",
+  treatment:"Accept with compensating control",
+  plan:"Accepted. Compensating controls: a maintained list of approved tools with reviewed terms, training that covers the specific failure mode rather than AI in general, and annual acknowledgement.",
+  planOwner:"Founder", due:"", rl:3, ri:4, tl:3, ti:4, status:"Accepted", opened:"2026-08-05", review:"2027-08-05",
+  reviewTrigger:"Annual assessment",
+  evidence:"Approved tool list with review dates; training completion records; signed acknowledgements." },
+
+{ id:"HR-003", cat:"HR", title:"Another employer's code or confidential material enters Company work", example:true,
+  desc:"Several people hold concurrent contracts elsewhere. Material belonging to another engagement could enter company work product, creating an ownership or confidentiality problem that surfaces long after the fact.",
+  cause:"Concurrent engagements are normal at this size and are not going to stop.", effect:"Contaminated deliverable, contested ownership, or a confidentiality breach against a third party.",
+  asset:"Work product", owner:"Founder", il:3, ii:4, controls:["A.5.31","A.6.2","A.6.6"],
+  ctrlNote:"Contractual and procedural. No technical detection.",
+  treatment:"Accept with compensating control",
+  plan:"Accepted. Compensating controls: the Section 7 clause in every engagement agreement, a conflict of interest process run at onboarding and on each new engagement, and an onboarding briefing that names the failure mode explicitly.",
+  planOwner:"Founder", due:"", rl:2, ri:4, tl:2, ti:4, status:"Accepted", opened:"2026-08-05", review:"2027-08-05",
+  reviewTrigger:"Annual assessment",
+  evidence:"Executed agreements containing the clause; conflict of interest declarations per person per engagement; briefing record." }
+];}
+</script>
+<script>
+"use strict";
+/* ============================================================
+   STATE
+   ============================================================ */
+let RISKS = [];
+let SHUT  = new Set();
+let MAPMODE = "mig";
+let CELLFILTER = null;   // {l,i,which}
+const $  = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const TODAY = new Date(new Date().toDateString());
+
+function fmtDate(d){
+  if (!d) return "—";
+  const t = new Date(d + "T00:00:00");
+  if (isNaN(t)) return esc(d);
+  return t.toLocaleDateString("en-GB", { day:"2-digit", month:"short", year:"numeric" });
+}
+const isOverdue = d => { if (!d) return false; const t = new Date(d + "T00:00:00"); return !isNaN(t) && t < TODAY; };
+
+function toast(msg){
+  const t = $("#toast"); t.textContent = msg; t.classList.add("on");
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("on"), 2400);
+}
+async function save(){ await Store.set(RISKS); }
+
+/* ============================================================
+   DERIVED HELPERS
+   ============================================================ */
+const inh = r => score(r.il, r.ii);
+const res = r => score(r.rl, r.ri);
+const tgt = r => score(r.tl, r.ti);
+const reduction = r => { const a = inh(r); return a ? Math.round((a - res(r)) / a * 100) : 0; };
+
+function pill(s, label){
+  const b = band(s);
+  return `<span class="score s-${BAND_CLS[b]}">${s}<i>${label || b}</i></span>`;
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+function buildFilterOptions(){
+  const fcat = $("#fcat"), fstat = $("#fstat"), fown = $("#fown");
+  fcat.length = 1; fstat.length = 1; fown.length = 1;
+  CATS.forEach(c => fcat.add(new Option(`${c.code} — ${c.name}`, c.code)));
+  STATUSES.forEach(s => fstat.add(new Option(s, s)));
+  Array.from(new Set(RISKS.map(r => r.owner).filter(Boolean))).sort()
+    .forEach(o => fown.add(new Option(o, o)));
+}
+
+function wire(){
+  $$(".tab").forEach(t => t.addEventListener("click", () => {
+    $$(".tab").forEach(x => x.setAttribute("aria-selected", String(x === t)));
+    $$(".panel").forEach(p => p.classList.toggle("on", p.id === "p-" + t.dataset.p));
+    if (t.dataset.p === "matrix") requestAnimationFrame(drawMigration);
+  }));
+  ["#fq","#fcat","#fstat","#fband","#fown","#fsort","#fEx"].forEach(s =>
+    $(s).addEventListener("input", () => { CELLFILTER = null; renderRegister(); }));
+  $("#fClear").addEventListener("click", () => {
+    $("#fq").value = ""; ["#fcat","#fstat","#fband","#fown"].forEach(s => $(s).value = "");
+    $("#fEx").checked = false; $("#fsort").value = "res"; CELLFILTER = null; renderRegister();
+  });
+  $("#bAdd").addEventListener("click", () => openEdit(null));
+  $("#bPrint").addEventListener("click", () => window.print());
+  $("#bJson").addEventListener("click", exportJson);
+  $("#bCsv").addEventListener("click", exportCsv);
+  $("#bImport").addEventListener("click", () => $("#fileIn").click());
+  $("#bBakJson").addEventListener("click", () => {
+    download(`risk-register-backup-${stamp()}.json`, JSON.stringify(ARCHIVE, null, 2), "application/json");
+    toast("Backup exported as JSON");
+  });
+  $("#fileIn").addEventListener("change", importJson);
+  $("#bReset").addEventListener("click", async () => {
+    if (!confirm("Restore the seeded register of " + seed().length + " risks? Anything you have added since will be lost. The Backup tab is unaffected.")) return;
+    try { await Store.clear(); } catch(e){}
+    RISKS = seed();
+    renderAll(); buildFilterOptions(); setSub(); diag();
+    try { await Store.set(RISKS); } catch(e){ Store.degraded = true; setSub(); diag(); }
+    toast("Register reset to the " + RISKS.length + " seeded risks");
+  });
+  $("#mClose").addEventListener("click", closeModal);
+  $("#scrim").addEventListener("click", e => { if (e.target === $("#scrim")) closeModal(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+  $$(".seg [data-m]").forEach(b => b.addEventListener("click", () => {
+    MAPMODE = b.dataset.m;
+    $$(".seg [data-m]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    $("#mapHint").textContent = MAPMODE === "mig"
+      ? "Each line traces one risk from where it sits before controls to where it sits after."
+      : MAPMODE === "inh"
+        ? "Position before the listed controls are credited. Click a cell to filter the register."
+        : "Position with controls operating as they do today. Click a cell to filter the register.";
+    renderMatrix();
+  }));
+  window.addEventListener("resize", () => { if ($("#p-matrix").classList.contains("on")) drawMigration(); });
+}
+
+function renderAll(){ renderKpis(); renderRegister(); renderMatrix(); renderCats(); renderTreat(); renderBackup(); }
+
+/* ============================================================
+   BACKUP TABLE — read-only
+   ============================================================ */
+const ARCHIVE = archive();
+
+function renderBackup(){
+  $("#cBak").textContent = ARCHIVE.length;
+  const byCat = {};
+  ARCHIVE.forEach(r => (byCat[r.cat] = byCat[r.cat] || []).push(r));
+  $("#bakBody").innerHTML = CATS.filter(c => byCat[c.code]).map(c => {
+    const list = byCat[c.code].slice().sort((a, b) => res(b) - res(a));
+    return `<div class="cat-block" style="--cat:${c.color};margin-bottom:12px">
+      <div class="cat-hd" style="cursor:default">
+        <span class="cat-code">${c.code}</span>
+        <span class="cat-name">${esc(c.name)}</span>
+        <span class="cat-meta"><span>${list.length} entr${list.length === 1 ? "y" : "ies"}</span></span>
+      </div>
+      <div class="tbl-scroll"><table>
+        <thead><tr>
+          <th style="width:82px">Ref</th><th>Entry</th><th style="width:132px">Owner</th>
+          <th style="width:110px">Inherent</th><th style="width:110px">Residual</th>
+          <th style="width:96px">Treatment</th><th style="width:104px">Status</th>
+        </tr></thead>
+        <tbody>${list.map(r => `<tr style="cursor:default">
+          <td class="col-id">${esc(r.id)}</td>
+          <td class="col-title"><b>${esc(r.title)}</b><span>${esc((r.desc || "").slice(0, 120))}${(r.desc || "").length > 120 ? "…" : ""}</span></td>
+          <td class="col-owner">${esc(r.owner || "—")}</td>
+          <td class="num">${pill(inh(r))}</td>
+          <td class="num">${pill(res(r))}</td>
+          <td><span class="tag">${esc(r.treatment || "—")}</span></td>
+          <td><span class="tag t-${esc(r.status)}">${esc(r.status)}</span></td>
+        </tr>`).join("")}</tbody>
+      </table></div>
+    </div>`;
+  }).join("");
+}
+
+/* ============================================================
+   KPIs
+   ============================================================ */
+function renderKpis(){
+  const n = RISKS.length;
+  const iSum = RISKS.reduce((a, r) => a + inh(r), 0);
+  const rSum = RISKS.reduce((a, r) => a + res(r), 0);
+  const above = RISKS.filter(r => res(r) > APPETITE && r.status !== "Accepted" && r.status !== "Closed").length;
+  const critH = RISKS.filter(r => ["Critical","High"].includes(band(res(r)))).length;
+  const acc  = RISKS.filter(r => r.status === "Accepted").length;
+  const od   = RISKS.filter(r => isOverdue(r.review) && r.status !== "Closed").length;
+  const cut  = iSum ? Math.round((iSum - rSum) / iSum * 100) : 0;
+
+  $("#kpis").innerHTML = [
+    ["Risks on register", n, ""],
+    ["High or critical, residual", critH, critH ? "kpi-crit" : "kpi-good"],
+    ["Above appetite", RISKS.filter(r => res(r) > APPETITE).length, RISKS.filter(r => res(r) > APPETITE).length ? "kpi-crit" : "kpi-good"],
+    ["Control effect", cut + "%", "kpi-good"],
+    ["Accepted", acc, ""],["Open or treating", RISKS.filter(r => ["Open","Treating"].includes(r.status)).length, ""],
+    ["Reviews overdue", od, od ? "kpi-crit" : "kpi-good"]
+  ].map(([l, v, cls]) => `<div class="kpi ${cls}"><div class="kpi-v">${v}</div><div class="kpi-l">${l}</div></div>`).join("");
+
+  $("#cReg").textContent = n;
+  $("#cCat").textContent = new Set(RISKS.map(r => r.cat)).size;
+  $("#cTre").textContent = RISKS.filter(r => r.plan && r.status !== "Closed").length;
+}
+
+/* ============================================================
+   REGISTER
+   ============================================================ */
+function filtered(){
+  const q  = $("#fq").value.trim().toLowerCase();
+  const c  = $("#fcat").value, st = $("#fstat").value, bd = $("#fband").value, ow = $("#fown").value;
+  const hideEx = $("#fEx").checked;
+  let out = RISKS.filter(r => {
+    if (hideEx && r.example) return false;
+    if (c && r.cat !== c) return false;
+    if (st && r.status !== st) return false;
+    if (ow && r.owner !== ow) return false;
+    if (bd && band(res(r)) !== bd) return false;
+    if (CELLFILTER){
+      const l = CELLFILTER.which === "inh" ? r.il : r.rl;
+      const i = CELLFILTER.which === "inh" ? r.ii : r.ri;
+      if (l !== CELLFILTER.l || i !== CELLFILTER.i) return false;
+    }
+    if (q){
+      const hay = [r.id, r.title, r.desc, r.owner, r.planOwner, r.asset, r.status,
+                   (r.controls || []).join(" ")].join(" ").toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  const s = $("#fsort").value;
+  const cmp = {
+    res:   (a, b) => res(b) - res(a) || inh(b) - inh(a),
+    inh:   (a, b) => inh(b) - inh(a) || res(b) - res(a),
+    delta: (a, b) => (inh(b) - res(b)) - (inh(a) - res(a)),
+    gap:   (a, b) => (inh(a) - res(a)) - (inh(b) - res(b)),
+    review:(a, b) => String(a.review || "9999").localeCompare(String(b.review || "9999")),
+    id:    (a, b) => a.id.localeCompare(b.id)
+  }[s] || ((a, b) => res(b) - res(a));
+  return out.sort(cmp);
+}
+
+function renderRegister(){
+  const anyEx = RISKS.some(r => r.example);
+  $("#fEx").parentElement.style.display = anyEx ? "" : "none";
+  if (!anyEx) $("#fEx").checked = false;
+  const rows = filtered();
+  $("#fCount").textContent = `${rows.length} of ${RISKS.length} risks` +
+    (CELLFILTER ? ` · likelihood ${CELLFILTER.l} × impact ${CELLFILTER.i}` : "");
+
+  if (!rows.length){
+    $("#regBody").innerHTML = `<div class="card"><div class="empty"><b>No risks match these filters</b>Clear the filters to see the full register, or add a risk.</div></div>`;
+    return;
+  }
+  const byCat = {};
+  rows.forEach(r => (byCat[r.cat] = byCat[r.cat] || []).push(r));
+
+  $("#regBody").innerHTML = CATS.filter(c => byCat[c.code]).map(c => {
+    const list = byCat[c.code];
+    const worst = Math.max(...list.map(res));
+    const above = list.filter(r => res(r) > APPETITE).length;
+    return `
+    <div class="cat-block ${SHUT.has(c.code) ? "shut" : ""}" style="--cat:${c.color}">
+      <div class="cat-hd" data-cat="${c.code}" role="button" tabindex="0" aria-expanded="${!SHUT.has(c.code)}">
+        <span class="chev">▾</span>
+        <span class="cat-code">${c.code}</span>
+        <span class="cat-name">${esc(c.name)}</span>
+        <span class="cat-meta">
+          <span>${list.length} risk${list.length === 1 ? "" : "s"}</span>
+          ${above ? `<span style="color:var(--crit);font-weight:650">${above} above appetite</span>` : ""}
+          <span>worst residual ${pill(worst)}</span>
+        </span>
+      </div>
+      <div class="tbl-scroll"><table>
+        <thead><tr>
+          <th style="width:82px">Risk ID</th>
+          <th>Risk</th>
+          <th style="width:132px">Owner</th>
+          <th style="width:118px">Inherent</th>
+          <th style="width:118px">Residual</th>
+          <th style="width:66px">Effect</th>
+          <th style="width:96px">Treatment</th>
+          <th style="width:104px">Status</th>
+          <th style="width:150px">Controls</th>
+          <th style="width:104px">Next review</th>
+        </tr></thead>
+        <tbody>${list.map(rowHtml).join("")}</tbody>
+      </table></div>
+    </div>`;
+  }).join("");
+
+  $$(".cat-hd").forEach(h => {
+    const go = () => { const k = h.dataset.cat; SHUT.has(k) ? SHUT.delete(k) : SHUT.add(k); renderRegister(); };
+    h.addEventListener("click", go);
+    h.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+  });
+  $$("tbody tr[data-id]").forEach(tr => tr.addEventListener("click", () => openDetail(tr.dataset.id)));
+}
+
+function rowHtml(r){
+  const a = inh(r), b = res(r), d = a - b;
+  const dCls = d > 0 ? "" : d === 0 ? "zero" : "up";
+  const ctrls = (r.controls || []).slice(0, 3).map(c => `<span class="ctrl-ref">${esc(c)}</span>`).join("") +
+                ((r.controls || []).length > 3 ? `<span class="ctrl-ref">+${r.controls.length - 3}</span>` : "");
+  return `<tr data-id="${esc(r.id)}" class="${r.example ? "is-example" : ""}">
+    <td class="col-id">${esc(r.id)}</td>
+    <td class="col-title"><b>${esc(r.title)}</b>${r.example ? `<span class="tag tag-ex" style="margin:3px 0 0">Example</span>` : ""}<span>${esc((r.desc || "").slice(0, 138))}${(r.desc || "").length > 138 ? "…" : ""}</span></td>
+    <td class="col-owner">${esc(r.owner || "—")}</td>
+    <td class="num">${pill(a)}</td>
+    <td class="num">${pill(b)}</td>
+    <td class="num"><span class="delta ${dCls}">${d > 0 ? "−" : d === 0 ? "" : "+"}${Math.abs(d)}</span></td>
+    <td><span class="tag">${esc(r.treatment || "—")}</span></td>
+    <td><span class="tag t-${esc(r.status)}">${esc(r.status)}</span></td>
+    <td>${ctrls || "—"}</td>
+    <td class="num ${isOverdue(r.review) && r.status !== "Closed" ? "overdue" : ""}">${fmtDate(r.review)}${r.reviewTrigger ? `<div style="font-size:9.5px;color:var(--ink-3);font-weight:600;letter-spacing:.04em;margin-top:2px">${esc(r.reviewTrigger)}</div>` : ""}</td>
+  </tr>`;
+}
+
+/* ============================================================
+   RISK MAP — the signature view
+   ============================================================ */
+function renderMatrix(){
+  const m = $("#matrix");
+  m.innerHTML = '<svg id="migSvg"></svg>';
+  const frag = document.createDocumentFragment();
+
+  for (let l = 5; l >= 1; l--){
+    const lab = document.createElement("div");
+    lab.className = "mx-lab";
+    lab.innerHTML = `<span class="n">${l}</span> ${L_LAB[l]}`;
+    frag.appendChild(lab);
+
+    for (let i = 1; i <= 5; i++){
+      const s = l * i, b = band(s);
+      const count = MAPMODE === "inh"
+        ? RISKS.filter(r => r.il === l && r.ii === i).length
+        : RISKS.filter(r => r.rl === l && r.ri === i).length;
+      const cell = document.createElement("div");
+      cell.className = `mx-cell c-${BAND_CLS[b]} ${count ? "click" : "empty"}`;
+      cell.dataset.l = l; cell.dataset.i = i;
+      cell.title = `${L_LAB[l]} × ${I_LAB[i]} — score ${s}, ${b}`;
+      cell.innerHTML = `<span class="c-n">${count || "·"}</span><span class="c-s">${s}</span>`;
+      if (count) cell.addEventListener("click", () => {
+        CELLFILTER = { l, i, which: MAPMODE === "inh" ? "inh" : "res" };
+        $$(".tab").forEach(x => x.setAttribute("aria-selected", String(x.dataset.p === "register")));
+        $$(".panel").forEach(p => p.classList.toggle("on", p.id === "p-register"));
+        renderRegister();
+        toast(`Filtered to ${L_LAB[l].toLowerCase()} × ${I_LAB[i].toLowerCase()}`);
+      });
+      frag.appendChild(cell);
+    }
+  }
+  frag.appendChild(document.createElement("div"));
+  for (let i = 1; i <= 5; i++){
+    const lab = document.createElement("div");
+    lab.className = "mx-lab col";
+    lab.innerHTML = `<span class="n">${i}</span> ${I_LAB[i]}`;
+    frag.appendChild(lab);
+  }
+  m.appendChild(frag);
+  renderMigList();
+  requestAnimationFrame(drawMigration);
+}
+
+function cellCentre(l, i){
+  const c = document.querySelector(`.mx-cell[data-l="${l}"][data-i="${i}"]`);
+  if (!c) return null;
+  const mb = $("#matrix").getBoundingClientRect(), cb = c.getBoundingClientRect();
+  return { x: cb.left - mb.left + cb.width / 2, y: cb.top - mb.top + cb.height / 2, w: cb.width, h: cb.height };
+}
+
+const BAND_HEX = { Critical:"#a3201b", High:"#c25a10", Moderate:"#b07d00", Low:"#1f7a5a" };
+
+function drawMigration(){
+  const svg = $("#migSvg");
+  if (!svg) return;
+  const mb = $("#matrix").getBoundingClientRect();
+  svg.setAttribute("viewBox", `0 0 ${mb.width} ${mb.height}`);
+  svg.setAttribute("width", mb.width);
+  svg.setAttribute("height", mb.height);
+  svg.innerHTML = "";
+  if (MAPMODE !== "mig" || !mb.width) return;
+
+  const NS = "http://www.w3.org/2000/svg";
+  const groups = {};
+  RISKS.forEach(r => { const k = `${r.il}:${r.ii}`; (groups[k] = groups[k] || []).push(r); });
+
+  Object.values(groups).forEach(list => {
+    const n = list.length;
+    list.forEach((r, idx) => {
+      const A = cellCentre(r.il, r.ii), B = cellCentre(r.rl, r.ri);
+      if (!A || !B) return;
+      const sp = n > 1 ? (idx - (n - 1) / 2) * Math.min(13, (A.w - 18) / n) : 0;
+      const x1 = A.x + sp, y1 = A.y + (n > 1 ? sp * 0.34 : 0);
+      const x2 = B.x + sp * 0.72, y2 = B.y + sp * 0.24;
+      const col = BAND_HEX[band(res(r))];
+      const moved = (r.il !== r.rl || r.ii !== r.ri);
+
+      const g = document.createElementNS(NS, "g");
+      g.dataset.rid = r.id;
+      g.style.cursor = "pointer";
+
+      if (moved){
+        const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+        const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1;
+        const cx = mx - dy / len * 16, cy = my + dx / len * 16;
+        const p = document.createElementNS(NS, "path");
+        p.setAttribute("d", `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`);
+        p.setAttribute("class", "mig-path");
+        p.setAttribute("stroke", col);
+        g.appendChild(p);
+
+        const st = document.createElementNS(NS, "circle");
+        st.setAttribute("cx", x1); st.setAttribute("cy", y1); st.setAttribute("r", 2.6);
+        st.setAttribute("fill", "#fff"); st.setAttribute("stroke", col); st.setAttribute("stroke-width", "1.4");
+        g.appendChild(st);
+      }
+      const end = document.createElementNS(NS, "circle");
+      end.setAttribute("cx", x2); end.setAttribute("cy", y2);
+      end.setAttribute("r", moved ? 4.6 : 4);
+      end.setAttribute("class", "mig-dot");
+      end.setAttribute("fill", col);
+      end.setAttribute("stroke", "#fff"); end.setAttribute("stroke-width", "1.5");
+      g.appendChild(end);
+
+      const t = document.createElementNS(NS, "title");
+      t.textContent = `${r.id} — ${r.title}\ninherent ${inh(r)} (${band(inh(r))}) → residual ${res(r)} (${band(res(r))})`;
+      g.appendChild(t);
+
+      g.style.pointerEvents = "auto";
+      g.addEventListener("click", () => openDetail(r.id));
+      g.addEventListener("mouseenter", () => highlight(r.id, true));
+      g.addEventListener("mouseleave", () => highlight(r.id, false));
+      svg.appendChild(g);
+    });
+  });
+}
+
+function highlight(id, on){
+  $$("#migSvg g").forEach(g => {
+    const p = g.querySelector(".mig-path");
+    if (p) p.classList.toggle("hot", on && g.dataset.rid === id);
+    if (on && g.dataset.rid !== id) g.style.opacity = ".22"; else g.style.opacity = "1";
+  });
+  $$(".mig-item").forEach(el => el.style.background = (on && el.dataset.rid === id) ? "var(--ice)" : "");
+}
+
+function renderMigList(){
+  const top = RISKS.slice().sort((a, b) => (inh(b) - res(b)) - (inh(a) - res(a))).slice(0, 8);
+  $("#migList").innerHTML = `<h4>Largest control effect</h4>` + top.map(r => {
+    const d = inh(r) - res(r);
+    return `<div class="mig-item" data-rid="${esc(r.id)}">
+      <span class="mid">${esc(r.id)}</span>
+      <span class="mtx">${esc(r.title)}</span>
+      <span class="mdl" style="color:${d > 0 ? "var(--low)" : "var(--ink-3)"}">${inh(r)}→${res(r)}</span>
+    </div>`;
+  }).join("");
+  $$(".mig-item").forEach(el => {
+    el.addEventListener("click", () => openDetail(el.dataset.rid));
+    el.addEventListener("mouseenter", () => highlight(el.dataset.rid, true));
+    el.addEventListener("mouseleave", () => highlight(el.dataset.rid, false));
+  });
+}
+
+/* ============================================================
+   CATEGORY PROFILES
+   ============================================================ */
+function renderCats(){
+  $("#catGrid").innerHTML = CATS.map(c => {
+    const list = RISKS.filter(r => r.cat === c.code);
+    if (!list.length) return "";
+    const counts = { Critical:0, High:0, Moderate:0, Low:0 };
+    list.forEach(r => counts[band(res(r))]++);
+    const iAvg = (list.reduce((a, r) => a + inh(r), 0) / list.length).toFixed(1);
+    const rAvg = (list.reduce((a, r) => a + res(r), 0) / list.length).toFixed(1);
+    const seg = ["Critical","High","Moderate","Low"].map(b =>
+      counts[b] ? `<i style="width:${counts[b] / list.length * 100}%;background:${BAND_HEX[b]}" title="${counts[b]} ${b.toLowerCase()}"></i>` : "").join("");
+    const above = list.filter(r => res(r) > APPETITE && r.status !== "Accepted").length;
+    return `<article class="cprof" style="--cat:${c.color}">
+      <div class="cprof-hd"><span class="cat-code" style="background:${c.color}">${c.code}</span><h4>${esc(c.name)}</h4></div>
+      <p class="desc">${esc(c.desc)}</p>
+      <div class="bar">${seg}</div>
+      <div class="cstats">
+        <div><b>${list.length}</b>risks</div>
+        <div><b>${iAvg}</b>avg inherent</div>
+        <div><b class="arrow">${rAvg}</b>avg residual</div>
+        <div><b style="color:${above ? "var(--crit)" : "var(--low)"}">${above}</b>above appetite</div>
+      </div>
+    </article>`;
+  }).join("");
+}
+
+/* ============================================================
+   TREATMENT PLANS
+   ============================================================ */
+function renderTreat(){
+  const list = RISKS.filter(r => r.plan && r.status !== "Closed")
+    .sort((a, b) => String(a.due || "9999").localeCompare(String(b.due || "9999")));
+  if (!list.length){ $("#treatBody").innerHTML = `<div class="card"><div class="empty"><b>No treatment plans recorded</b>Open a risk and add a plan with an owner and a date.</div></div>`; return; }
+  $("#treatBody").innerHTML = list.map(r => {
+    const c = CAT[r.cat] || { color:"#1b4965", name:r.cat };
+    const od = isOverdue(r.due);
+    return `<article class="tp" style="border-left:4px solid ${c.color}">
+      <div class="tp-hd">
+        <span class="cat-code" style="background:${c.color}">${r.cat}</span>
+        <span class="col-id">${esc(r.id)}</span>
+        <b>${esc(r.title)}</b>
+        <span class="tag t-${esc(r.status)}">${esc(r.status)}</span>
+        <span class="tag">${esc(r.treatment)}</span>
+        ${pill(res(r), "residual")}
+      </div>
+      <div class="tp-bd">
+        <div>
+          <div class="lbl">Planned treatment</div>
+          <p>${esc(r.plan)}</p>
+          <div class="lbl">Evidence this will produce</div>
+          <p>${esc(r.evidence || "Not defined.")}</p>
+        </div>
+        <div>
+          <div class="kv"><span>Accountable</span><b>${esc(r.planOwner || r.owner || "—")}</b></div>
+          <div class="kv"><span>Target date</span><b class="${od ? "overdue" : ""}">${fmtDate(r.due)}</b></div>
+          <div class="kv"><span>Inherent</span><b>${inh(r)} · ${band(inh(r))}</b></div>
+          <div class="kv"><span>Residual today</span><b>${res(r)} · ${band(res(r))}</b></div>
+          <div class="kv"><span>Target residual</span><b>${tgt(r)} · ${band(tgt(r))}</b></div>
+          <div class="kv"><span>Within appetite at target</span><b style="color:${tgt(r) <= APPETITE ? "var(--low)" : "var(--crit)"}">${tgt(r) <= APPETITE ? "Yes" : "No — needs acceptance"}</b></div>
+        </div>
+      </div>
+    </article>`;
+  }).join("");
+}
+</script>
+<script>
+"use strict";
+/* ============================================================
+   DETAIL VIEW
+   ============================================================ */
+function openDetail(id){
+  const r = RISKS.find(x => x.id === id);
+  if (!r) return;
+  const c = CAT[r.cat] || { color:"#1b4965", name:r.cat };
+  const d = inh(r) - res(r);
+
+  $("#mTitle").innerHTML = `<span class="cat-code" style="background:${c.color};margin-right:9px">${r.cat}</span>
+    <span style="font-family:var(--mono);font-size:13px;color:var(--petrol);margin-right:8px">${esc(r.id)}</span>${esc(r.title)}`;
+
+  $("#mBody").innerHTML = `
+    <div class="dv-strip">
+      <div class="dv-cell"><div class="lbl">Inherent</div><div class="val">${pill(inh(r))}</div></div>
+      <div class="dv-cell"><div class="lbl">Residual</div><div class="val">${pill(res(r))}</div></div>
+      <div class="dv-cell"><div class="lbl">Target residual</div><div class="val">${pill(tgt(r))}</div></div>
+      <div class="dv-cell"><div class="lbl">Control effect</div><div class="val" style="color:${d > 0 ? "var(--low)" : "var(--ink-3)"}">${d > 0 ? "−" : ""}${Math.abs(d)} points · ${reduction(r)}%</div></div>
+      <div class="dv-cell"><div class="lbl">Status</div><div class="val"><span class="tag t-${esc(r.status)}">${esc(r.status)}</span></div></div>
+      <div class="dv-cell"><div class="lbl">Within appetite</div><div class="val" style="color:${res(r) <= APPETITE ? "var(--low)" : "var(--crit)"}">${res(r) <= APPETITE ? "Yes" : r.status === "Accepted" ? "No — accepted" : "No"}</div></div>
+    </div>
+
+    ${r.secureframe ? `<div class="sf-note"><b>Secureframe → Risk Register.</b> ${esc(r.secureframe)}</div>` : ""}
+    ${r.example ? `<div class="sf-note" style="border-left-color:#b4c4ce;background:#f4f7f9"><b>Retained as a worked example.</b> This entry illustrates the acceptance pattern and is not the live register entry. Use the filter bar to hide examples.</div>` : ""}
+
+    <div class="dv-sec"><div class="lbl">Risk statement</div><p>${esc(r.desc)}</p></div>
+    <div class="fgrid">
+      <div class="dv-sec"><div class="lbl">Cause</div><p>${esc(r.cause || "—")}</p></div>
+      <div class="dv-sec"><div class="lbl">Consequence</div><p>${esc(r.effect || "—")}</p></div>
+    </div>
+
+    <div class="dv-strip">
+      <div class="dv-cell"><div class="lbl">Risk owner</div><div class="val">${esc(r.owner || "—")}</div></div>
+      <div class="dv-cell"><div class="lbl">Asset affected</div><div class="val" style="font-weight:500;font-size:12.5px">${esc(r.asset || "—")}</div></div>
+      <div class="dv-cell"><div class="lbl">Opened</div><div class="val" style="font-weight:500;font-size:12.5px">${fmtDate(r.opened)}</div></div>
+      <div class="dv-cell"><div class="lbl">Next review</div><div class="val ${isOverdue(r.review) && r.status !== "Closed" ? "overdue" : ""}" style="font-size:12.5px">${r.reviewTrigger ? esc(r.reviewTrigger) : fmtDate(r.review)}</div></div>
+    </div>
+
+    <div class="dv-sec"><div class="lbl">Scoring basis</div>
+      <p><b>Inherent ${inh(r)}</b> — likelihood ${r.il} (${L_LAB[r.il]}) × impact ${r.ii} (${I_LAB[r.ii]}), scored with the controls below treated as absent.<br>
+         <b>Residual ${res(r)}</b> — likelihood ${r.rl} (${L_LAB[r.rl]}) × impact ${r.ri} (${I_LAB[r.ri]}), scored on the controls as they operate today.</p>
+    </div>
+
+    <div class="dv-sec"><div class="lbl">Controls relied upon</div>
+      <p>${(r.controls || []).map(x => `<span class="ctrl-ref pri">${esc(x)}</span>`).join(" ") || "None recorded."}</p>
+      ${r.ctrlNote ? `<p style="margin-top:7px;font-size:12.5px;color:var(--ink-3)"><b>Operating note:</b> ${esc(r.ctrlNote)}</p>` : ""}
+    </div>
+
+    <div class="dv-sec"><div class="lbl">Treatment — ${esc(r.treatment)}</div><p>${esc(r.plan || "No plan recorded.")}</p>
+      <p style="margin-top:8px;font-size:12.5px;color:var(--ink-3)"><b>Accountable:</b> ${esc(r.planOwner || r.owner || "—")} · <b>Target date:</b> ${fmtDate(r.due)} · <b>Target residual:</b> ${tgt(r)} (${band(tgt(r))})</p>
+    </div>
+
+    <div class="dv-sec"><div class="lbl">Evidence expected</div><p>${esc(r.evidence || "Not defined.")}</p></div>`;
+
+  $("#mFoot").innerHTML = `<button class="btn-d" id="mCancel">Close</button><button class="btn-s" id="mEdit">Edit risk</button>`;
+  $("#mCancel").addEventListener("click", closeModal);
+  $("#mEdit").addEventListener("click", () => openEdit(r.id));
+  $("#scrim").classList.add("on");
+}
+
+function closeModal(){ $("#scrim").classList.remove("on"); }
+
+/* ============================================================
+   ADD / EDIT
+   ============================================================ */
+function openEdit(id){
+  const r = id ? RISKS.find(x => x.id === id) : null;
+  const v = r || { cat:"GOV", status:"Open", treatment:"Mitigate", il:3, ii:3, rl:2, ri:3, tl:2, ti:2,
+                   controls:[], opened:new Date().toISOString().slice(0, 10) };
+  const sel = (n, val, opts, labeller) => `<select id="${n}">` +
+    opts.map(o => `<option value="${o}" ${String(o) === String(val) ? "selected" : ""}>${labeller ? labeller(o) : o}</option>`).join("") + "</select>";
+  const scale = n => [1,2,3,4,5];
+
+  $("#mTitle").textContent = r ? `Edit ${r.id}` : "Add a risk";
+  $("#mBody").innerHTML = `
+    <fieldset class="fieldset"><legend>Identification</legend>
+      <div class="fgrid g3">
+        <div class="f"><label for="eId">Risk ID</label><input id="eId" value="${esc(v.id || "")}" placeholder="GOV-004">
+          <span class="note">Category prefix plus a sequence. Never reuse a retired ID.</span></div>
+        <div class="f"><label for="eCat">Category</label>${sel("eCat", v.cat, CATS.map(c => c.code), c => `${c} — ${CAT[c].name}`)}</div>
+        <div class="f"><label for="eOwner">Risk owner</label><input id="eOwner" value="${esc(v.owner || "")}" placeholder="Named individual, not a team"></div>
+      </div>
+      <div class="f full"><label for="eTitle">Risk title</label><input id="eTitle" value="${esc(v.title || "")}" placeholder="Short, specific, and readable by someone outside security"></div>
+      <div class="f full"><label for="eDesc">Risk statement</label><textarea id="eDesc" placeholder="What could happen, to what, and why it matters.">${esc(v.desc || "")}</textarea></div>
+      <div class="fgrid">
+        <div class="f"><label for="eCause">Cause</label><textarea id="eCause" style="min-height:56px">${esc(v.cause || "")}</textarea></div>
+        <div class="f"><label for="eEffect">Consequence</label><textarea id="eEffect" style="min-height:56px">${esc(v.effect || "")}</textarea></div>
+      </div>
+      <div class="f full"><label for="eAsset">Asset affected</label><input id="eAsset" value="${esc(v.asset || "")}"></div>
+    </fieldset>
+
+    <fieldset class="fieldset"><legend>Inherent — controls treated as absent</legend>
+      <div class="fgrid">
+        <div class="f"><label for="eIl">Likelihood</label>${sel("eIl", v.il, scale(), n => `${n} — ${L_LAB[n]}`)}</div>
+        <div class="f"><label for="eIi">Impact</label>${sel("eIi", v.ii, scale(), n => `${n} — ${I_LAB[n]}`)}</div>
+      </div>
+      <div class="calc" id="calcI"></div>
+    </fieldset>
+
+    <fieldset class="fieldset"><legend>Controls relied upon</legend>
+      <div class="f full"><label for="eCtrl">Control references</label>
+        <input id="eCtrl" value="${esc((v.controls || []).join(", "))}" placeholder="CC6.1, A.8.2, AC.L2-3.1.5">
+        <span class="note">Comma separated. Point at the control library, not at framework text.</span></div>
+      <div class="f full"><label for="eCtrlNote">How the controls actually operate</label><textarea id="eCtrlNote" style="min-height:52px" placeholder="Designed, implemented, tested — and where the gap is.">${esc(v.ctrlNote || "")}</textarea></div>
+    </fieldset>
+
+    <fieldset class="fieldset"><legend>Residual — controls as they operate today</legend>
+      <div class="fgrid">
+        <div class="f"><label for="eRl">Likelihood</label>${sel("eRl", v.rl, scale(), n => `${n} — ${L_LAB[n]}`)}</div>
+        <div class="f"><label for="eRi">Impact</label>${sel("eRi", v.ri, scale(), n => `${n} — ${I_LAB[n]}`)}</div>
+      </div>
+      <div class="calc" id="calcR"></div>
+    </fieldset>
+
+    <fieldset class="fieldset"><legend>Treatment</legend>
+      <div class="fgrid g3">
+        <div class="f"><label for="eTreat">Response</label>${sel("eTreat", v.treatment, TREATMENTS)}</div>
+        <div class="f"><label for="eStatus">Status</label>${sel("eStatus", v.status, STATUSES)}</div>
+        <div class="f"><label for="ePlanOwner">Accountable for the plan</label><input id="ePlanOwner" value="${esc(v.planOwner || "")}"></div>
+      </div>
+      <div class="f full"><label for="ePlan">Planned treatment</label><textarea id="ePlan" placeholder="What will be done, by whom, producing what evidence.">${esc(v.plan || "")}</textarea></div>
+      <div class="fgrid g4">
+        <div class="f"><label for="eTl">Target likelihood</label>${sel("eTl", v.tl, scale(), n => `${n} — ${L_LAB[n]}`)}</div>
+        <div class="f"><label for="eTi">Target impact</label>${sel("eTi", v.ti, scale(), n => `${n} — ${I_LAB[n]}`)}</div>
+        <div class="f"><label for="eDue">Target date</label><input type="date" id="eDue" value="${esc(v.due || "")}"></div>
+        <div class="f"><label for="eReview">Next review</label><input type="date" id="eReview" value="${esc(v.review || "")}"></div>
+      </div>
+      <div class="calc" id="calcT"></div>
+      <div class="f full" style="margin-top:12px"><label for="eEvid">Evidence this will produce</label><textarea id="eEvid" style="min-height:52px">${esc(v.evidence || "")}</textarea></div>
+      <div class="fgrid">
+        <div class="f"><label for="eOpened">Date opened</label><input type="date" id="eOpened" value="${esc(v.opened || "")}"></div>
+        <div class="f"><label for="eTrig">Review trigger</label><input id="eTrig" value="${esc(v.reviewTrigger || "")}" placeholder="Annual assessment">
+          <span class="note">Use where review is tied to an event rather than a calendar date.</span></div>
+      </div>
+      <div class="f full"><label for="eSf">Secureframe recording note</label><textarea id="eSf" style="min-height:52px" placeholder="How this risk is recorded in the platform of record.">${esc(v.secureframe || "")}</textarea></div>
+      <div class="f full"><label class="f-toggle" style="font-size:13px"><input type="checkbox" id="eEx" ${v.example ? "checked" : ""}> Retain as a worked example rather than a live entry</label></div>
+    </fieldset>`;
+
+  $("#mFoot").innerHTML =
+    (r ? `<button class="btn-x" id="eDel">Delete risk</button>` : "") +
+    `<button class="btn-d" id="eCancel">Cancel</button><button class="btn-s" id="eSave">${r ? "Save changes" : "Add to register"}</button>`;
+
+  const recalc = () => {
+    const put = (el, l, i, note) => {
+      const s = score($(l).value, $(i).value), b = band(s);
+      $(el).innerHTML = `<b>${$(l).value} × ${$(i).value} = ${s}</b> ${pill(s)} <span>${note}</span>`;
+    };
+    put("#calcI", "#eIl", "#eIi", "score is computed, not entered");
+    put("#calcR", "#eRl", "#eRi", score($("#eRl").value, $("#eRi").value) > APPETITE
+      ? "above the appetite line of 9 — needs a plan or a signed acceptance" : "within appetite");
+    put("#calcT", "#eTl", "#eTi", score($("#eTl").value, $("#eTi").value) > APPETITE
+      ? "target still sits above appetite" : "target lands within appetite");
+  };
+  ["#eIl","#eIi","#eRl","#eRi","#eTl","#eTi"].forEach(s => $(s).addEventListener("change", recalc));
+  recalc();
+
+  $("#eCancel").addEventListener("click", () => r ? openDetail(r.id) : closeModal());
+  if (r) $("#eDel").addEventListener("click", async () => {
+    if (!confirm(`Delete ${r.id}? A retired risk is usually better closed than deleted, so the history survives.`)) return;
+    RISKS = RISKS.filter(x => x.id !== r.id);
+    await save(); closeModal(); buildFilterOptions(); renderAll(); toast(`${r.id} deleted`);
+  });
+
+  $("#eSave").addEventListener("click", async () => {
+    const nid = $("#eId").value.trim().toUpperCase();
+    if (!nid){ toast("Give the risk an ID before saving"); $("#eId").focus(); return; }
+    if (!$("#eTitle").value.trim()){ toast("Give the risk a title before saving"); $("#eTitle").focus(); return; }
+    if (RISKS.some(x => x.id === nid && (!r || x.id !== r.id))){ toast(`${nid} is already in use`); $("#eId").focus(); return; }
+
+    const rec = {
+      id:nid, cat:$("#eCat").value, title:$("#eTitle").value.trim(), desc:$("#eDesc").value.trim(),
+      cause:$("#eCause").value.trim(), effect:$("#eEffect").value.trim(), asset:$("#eAsset").value.trim(),
+      owner:$("#eOwner").value.trim(),
+      il:+$("#eIl").value, ii:+$("#eIi").value, rl:+$("#eRl").value, ri:+$("#eRi").value,
+      tl:+$("#eTl").value, ti:+$("#eTi").value,
+      controls:$("#eCtrl").value.split(",").map(s => s.trim()).filter(Boolean),
+      ctrlNote:$("#eCtrlNote").value.trim(),
+      treatment:$("#eTreat").value, status:$("#eStatus").value,
+      plan:$("#ePlan").value.trim(), planOwner:$("#ePlanOwner").value.trim(),
+      due:$("#eDue").value, review:$("#eReview").value, opened:$("#eOpened").value,
+      evidence:$("#eEvid").value.trim(),
+      reviewTrigger:$("#eTrig").value.trim(),
+      secureframe:$("#eSf").value.trim(),
+      example:$("#eEx").checked
+    };
+    if (r){ RISKS[RISKS.findIndex(x => x.id === r.id)] = rec; } else { RISKS.push(rec); }
+    await save(); buildFilterOptions(); renderAll(); closeModal();
+    toast(r ? `${nid} saved` : `${nid} added to the register`);
+  });
+
+  $("#scrim").classList.add("on");
+  if (typeof $("#modal").scrollIntoView === "function") $("#modal").scrollIntoView({ block:"start" });
+}
+
+/* ============================================================
+   EXPORT / IMPORT
+   ============================================================ */
+function download(name, text, type){
+  const b = new Blob([text], { type });
+  const u = URL.createObjectURL(b);
+  const a = document.createElement("a");
+  a.href = u; a.download = name; document.body.appendChild(a); a.click();
+  document.body.removeChild(a); setTimeout(() => URL.revokeObjectURL(u), 800);
+}
+const stamp = () => new Date().toISOString().slice(0, 10);
+
+function exportJson(){
+  download(`risk-register-${stamp()}.json`, JSON.stringify(RISKS, null, 2), "application/json");
+  toast("Register exported as JSON");
+}
+
+function exportCsv(){
+  const cols = [
+    ["id","Risk ID"],["cat","Category code"],["catName","Category"],["title","Title"],["desc","Risk statement"],
+    ["cause","Cause"],["effect","Consequence"],["asset","Asset"],["owner","Risk owner"],
+    ["il","Inherent likelihood"],["ii","Inherent impact"],["iScore","Inherent score"],["iBand","Inherent rating"],
+    ["controls","Controls relied upon"],["ctrlNote","Control operating note"],
+    ["rl","Residual likelihood"],["ri","Residual impact"],["rScore","Residual score"],["rBand","Residual rating"],
+    ["effect2","Control effect (points)"],["pct","Control effect (%)"],
+    ["treatment","Treatment"],["status","Status"],["plan","Treatment plan"],["planOwner","Plan accountable"],
+    ["tScore","Target residual score"],["tBand","Target residual rating"],
+    ["due","Target date"],["opened","Opened"],["review","Next review"],["reviewTrigger","Review trigger"],
+    ["appetite","Within appetite"],["evidence","Evidence expected"],
+    ["secureframe","Secureframe recording note"],["exFlag","Worked example"]
+  ];
+  const q = s => `"${String(s == null ? "" : s).replace(/"/g, '""')}"`;
+  const lines = [cols.map(c => q(c[1])).join(",")];
+  RISKS.forEach(r => {
+    const m = {
+      ...r,
+      catName:(CAT[r.cat] || {}).name || r.cat,
+      controls:(r.controls || []).join("; "),
+      iScore:inh(r), iBand:band(inh(r)), rScore:res(r), rBand:band(res(r)),
+      tScore:tgt(r), tBand:band(tgt(r)),
+      effect2:inh(r) - res(r), pct:reduction(r) + "%",
+      appetite:res(r) <= APPETITE ? "Yes" : (r.status === "Accepted" ? "No — accepted" : "No"),
+      exFlag:r.example ? "Example" : "Live"
+    };
+    lines.push(cols.map(c => q(m[c[0]])).join(","));
+  });
+  download(`risk-register-${stamp()}.csv`, "\uFEFF" + lines.join("\r\n"), "text/csv;charset=utf-8");
+  toast("Register exported as CSV");
+}
+
+function importJson(e){
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  const rd = new FileReader();
+  rd.onload = async () => {
+    try {
+      const data = JSON.parse(rd.result);
+      if (!Array.isArray(data) || !data.length) throw new Error("shape");
+      const clean = data.filter(x => x && x.id && x.title).map(x => ({
+        ...x,
+        cat:CAT[x.cat] ? x.cat : "GOV",
+        il:+x.il || 1, ii:+x.ii || 1, rl:+x.rl || 1, ri:+x.ri || 1,
+        tl:+x.tl || +x.rl || 1, ti:+x.ti || +x.ri || 1,
+        controls:Array.isArray(x.controls) ? x.controls : String(x.controls || "").split(/[;,]/).map(s => s.trim()).filter(Boolean),
+        status:STATUSES.includes(x.status) ? x.status : "Open",
+        treatment:TREATMENTS.includes(x.treatment) ? x.treatment : "Mitigate"
+      }));
+      if (!clean.length) throw new Error("empty");
+      RISKS = clean; await save(); buildFilterOptions(); renderAll();
+      toast(`Imported ${clean.length} risks`);
+    } catch (err) {
+      toast("That file could not be read. Expected a JSON array of risk records.");
+    }
+    e.target.value = "";
+  };
+  rd.onerror = () => { toast("The file could not be opened."); e.target.value = ""; };
+  rd.readAsText(f);
+}
+
+/* ============================================================
+   PROGRAMMATIC HOOK
+   The register is addressable from the console or from an
+   automation harness, so it can be diffed between periods or
+   validated in a pipeline rather than eyeballed.
+   ============================================================ */
+window.RiskRegister = {
+  get risks(){ return RISKS.slice(); },
+  get categories(){ return CATS.slice(); },
+  score, band, appetite: APPETITE,
+  inherent: inh, residual: res, target: tgt,
+  aboveAppetite(){ return RISKS.filter(r => res(r) > APPETITE && r.status !== "Accepted" && r.status !== "Closed"); },
+  overdue(){ return RISKS.filter(r => isOverdue(r.review) && r.status !== "Closed"); },
+  async load(arr){ RISKS = arr; await save(); buildFilterOptions(); renderAll(); },
+  refresh: renderAll
+};
+
+
+/* ============================================================
+   BOOT — deliberately defensive.
+
+   Rules, in order of importance:
+   1. The first render is SYNCHRONOUS and happens before any storage
+      call. Nothing asynchronous can prevent the register appearing.
+   2. Each boot step is isolated. A failure in one does not stop the
+      others, so a broken control never yields a blank page.
+   3. Any uncaught error paints a visible banner instead of nothing.
+   4. Storage is a later enhancement, never a precondition.
+   ============================================================ */
+function bootBanner(msg){
+  try {
+    let el = document.getElementById("bootErr");
+    if (!el){
+      el = document.createElement("div");
+      el.id = "bootErr";
+      el.style.cssText = "margin:14px 26px;padding:12px 14px;border:1px solid #eeb0ac;"+
+        "background:#fbe3e1;color:#a3201b;border-radius:8px;font-size:13px;line-height:1.5";
+      const host = document.getElementById("p-register") || document.body;
+      host.prepend(el);
+    }
+    el.textContent = msg;
+  } catch(e){ /* nothing further can be done */ }
+}
+
+window.addEventListener("error", e => {
+  bootBanner("Script error: " + (e.message || e.error) + "  —  press Reset, or reload with ?fresh=1 on the URL.");
+});
+window.addEventListener("unhandledrejection", e => {
+  bootBanner("Unhandled promise rejection: " + (e.reason && e.reason.message ? e.reason.message : e.reason));
+});
+
+function step(name, fn){
+  try { fn(); return true; }
+  catch (err){ console.error(name, err); bootBanner("Failed during " + name + ": " + (err && err.message ? err.message : err)); return false; }
+}
+
+function diag(){
+  const el = document.getElementById("diagLine");
+  if (!el) return;
+  el.textContent = "Storage: " + Store.mode + (Store.degraded ? " (degraded — session only)" : "") +
+                   "  ·  Risks loaded: " + (Array.isArray(RISKS) ? RISKS.length : 0) +
+                   "  ·  Seed: " + seed().length;
+}
+
+function setSub(){
+  const el = document.getElementById("mastSub");
+  if (!el) return;
+  const acc = RISKS.filter(r => r.status === "Accepted").length;
+  const open = RISKS.filter(r => r.status !== "Accepted" && r.status !== "Closed").length;
+  el.textContent = RISKS.length + " risks — " + acc + " accepted with compensating controls, " + open +
+    " open from the CC1 to CC9 gap assessment. " +
+    (Store.degraded ? "Storage unavailable; changes are held for this session only."
+     : Store.mode === "session" ? "Changes are held for this session only."
+     : "Changes are saved automatically.");
+}
+
+/* ---- synchronous first paint ---- */
+(function bootSync(){
+  RISKS = seed();
+  step("filter setup", buildFilterOptions);
+  step("render", renderAll);          /* render BEFORE wiring, so a bad listener cannot blank the page */
+  step("wiring", wire);
+  step("subtitle", setSub);
+  step("diagnostics", diag);
+})();
+
+/* ---- asynchronous hydrate, never blocking ---- */
+(async function hydrate(){
+  const fresh = /[?&]fresh=1/.test(location.search);
+  if (fresh){ try { await Store.clear(); } catch(e){} diag(); return; }
+  let saved = null;
+  try { saved = await Store.get(); } catch(e){ saved = null; }
+  if (Array.isArray(saved) && saved.length){
+    RISKS = saved;
+    step("re-render", renderAll);
+    step("filter refresh", buildFilterOptions);
+  } else {
+    try { await Store.set(RISKS); } catch(e){ Store.degraded = true; }
+  }
+  setSub(); diag();
+})();
+
+</script>
+</body>
+</html>
