@@ -1,1 +1,2178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What kind of leader are you, actually?</title>
+<style>
+:root{
+  --petrol:#1b4965;--petrol-deep:#123145;--petrol-mid:#2d6a8f;
+  --amber:#ffa500;--amber-soft:#fff4e0;
+  --bg:#f4f7f8;--card:#fff;--ink:#16232b;--muted:#61757f;--line:#dde5e9;--line-soft:#eef3f5;
+  --ok:#1a6e4c;--ok-soft:#e4f1ea;--ok-b:#9fcbb5;--warn:#b26a00;--bad:#a92e25;--bad-soft:#fbeceb;
+  --sans:'Inter','Calibri',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,'Cascadia Mono','Consolas','SF Mono',Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font-family:var(--sans);cursor:pointer}
+button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.in{max-width:1020px;margin:0 auto}
+.mast{background:var(--petrol);color:#fff;padding:24px 26px 20px}
+.mast h1{margin:0 0 6px;font-size:24px;font-weight:700;letter-spacing:-.015em}
+.mast p{margin:0;color:#bcd4e2;font-size:13.5px;max-width:800px}
+.tabs{background:var(--petrol-deep);padding:0 26px;border-bottom:3px solid var(--amber)}
+.tabs .in{display:flex;gap:2px;flex-wrap:wrap}
+.tab{background:none;border:0;color:#9fc0d2;font-size:13.5px;font-weight:600;padding:12px 17px;
+     border-bottom:3px solid transparent;margin-bottom:-3px}
+.tab:hover{color:#fff}
+.tab[aria-selected="true"]{color:#fff;border-bottom-color:var(--amber)}
+.tab[disabled]{color:#5d7f92;cursor:not-allowed}
+.bar{position:sticky;top:0;z-index:30;background:rgba(244,247,248,.96);border-bottom:1px solid var(--line);padding:10px 26px}
+.bar .in{display:flex;align-items:center;gap:13px}
+.bar b{font-family:var(--mono);font-size:12.5px;color:var(--petrol);white-space:nowrap}
+.track{flex:1;height:6px;background:#dde7eb;border-radius:3px;overflow:hidden}
+.track i{display:block;height:100%;background:var(--amber);width:0;transition:width .25s}
+.wrap{max-width:1020px;margin:0 auto;padding:20px 26px 70px}
+.note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:4px;
+      padding:13px 16px;margin-bottom:20px;font-size:13.5px;color:#3d525d}
+.note b{color:var(--petrol)}.note p{margin:0 0 7px}.note p:last-child{margin:0}
+.grp{margin-bottom:26px}
+.grp-h{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--petrol);font-weight:700;
+       padding-bottom:6px;border-bottom:2px solid var(--petrol);margin-bottom:11px;display:flex;
+       justify-content:space-between;align-items:baseline;gap:12px}
+.grp-h em{font-style:normal;text-transform:none;letter-spacing:0;font-weight:400;font-size:12px;color:var(--muted)}
+button.grp-h{width:100%;background:none;border:0;border-bottom:2px solid var(--petrol);cursor:pointer;
+  font-family:var(--sans);text-align:left;padding:0 0 6px}
+button.grp-h:hover{border-bottom-color:var(--petrol-mid)}
+button.grp-h:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.grp-h .tw{display:inline-block;font-size:10px;color:var(--petrol-mid);margin-right:7px;transition:transform .14s}
+.grp.shut .grp-h .tw{transform:rotate(-90deg)}
+.grp-h .bits{display:flex;align-items:center;gap:9px;margin-left:auto}
+.grp-h .mini2{width:52px;height:5px;background:#dde7eb;border-radius:3px;overflow:hidden;display:block}
+.grp-h .mini2 i{display:block;height:100%;background:var(--amber)}
+.grp.shut .q,.grp.shut .pat{display:none}
+.grp.shut .grp-h{margin-bottom:0}
+.gctl{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:16px;font-size:12.5px;color:var(--muted)}
+.gctl .chip{font-size:12px;padding:4px 11px;border:1px solid var(--line);background:#fff;border-radius:3px;
+  cursor:pointer;color:var(--muted);font-family:var(--sans)}
+.gctl .chip:hover{border-color:var(--petrol-mid);color:var(--petrol)}
+.gctl .chip[aria-pressed="true"]{background:var(--petrol);border-color:var(--petrol);color:#fff;font-weight:600}
+.gctl label{display:flex;align-items:center;gap:5px;cursor:pointer;color:var(--muted)}
+.q{background:var(--card);border:1px solid var(--line);border-radius:5px;padding:15px 17px 13px;margin-bottom:9px;scroll-margin-top:70px}
+.q.done{border-color:#c6dbe4}
+.q .n{font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.05em}
+.q h3{margin:3px 0 3px;font-size:16px;font-weight:650;letter-spacing:-.008em}
+.q .s{margin:0 0 12px;font-size:14px;color:var(--muted)}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{text-align:left;background:#fbfdfd;border:1px solid var(--line);border-radius:4px;padding:10px 13px;font-size:14.5px;color:var(--ink);line-height:1.45}
+.opt:hover{border-color:var(--petrol-mid);background:#f4f9fb}
+.opt.on{border-color:var(--petrol);background:#e9f2f7;font-weight:500}
+.btn{font-size:13.5px;padding:10px 20px;border:1px solid var(--petrol);background:var(--petrol);color:#fff;border-radius:4px;font-weight:600}
+.btn:hover{background:var(--petrol-deep)}
+.btn[disabled]{background:#b9c9d2;border-color:#b9c9d2;cursor:not-allowed}
+.btn.ghost{background:#fff;color:var(--petrol)}
+.btn.ghost:hover{background:var(--line-soft)}
+.btn.sm{padding:7px 14px;font-size:12.5px}
+.btn.danger{background:#fff;color:var(--bad);border-color:#e0b4ae}
+.btn.danger:hover{background:var(--bad-soft)}
+.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.center{text-align:center;margin:24px 0}
+.stats{display:flex;flex-wrap:wrap;gap:26px;background:var(--petrol-deep);color:#cfe0ea;border-radius:5px;padding:14px 20px;margin-bottom:16px}
+.stat b{display:block;font-size:20px;color:#fff;font-weight:700;line-height:1.2}
+.stat span{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:#8fb2c6}
+.portrait{background:var(--petrol);color:#fff;border-radius:5px;padding:26px;margin-bottom:16px}
+.portrait .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.14em;color:#8fb6cc}
+.portrait h2{font-size:29px;margin:7px 0 11px;letter-spacing:-.02em;line-height:1.12}
+.portrait p{font-size:15.5px;color:#d3e4ee;margin:0}
+.verdict{border-radius:5px;padding:20px 22px;margin-bottom:16px;border:1px solid}
+.verdict h3{font-size:11px;text-transform:uppercase;letter-spacing:.11em;margin:0 0 7px;font-weight:700}
+.verdict h2{font-size:22px;margin:0 0 9px;letter-spacing:-.015em}
+.verdict p{margin:0;font-size:14.5px}
+.v-good{background:var(--ok-soft);border-color:var(--ok-b)}
+.v-good h3,.v-good h2{color:var(--ok)}.v-good p{color:#2a4d3c}
+.v-mid{background:var(--amber-soft);border-color:#f0d5a8}
+.v-mid h3,.v-mid h2{color:#8a5a08}.v-mid p{color:#5c3a00}
+.v-bad{background:var(--bad-soft);border-color:#e0b4ae}
+.v-bad h3,.v-bad h2{color:var(--bad)}.v-bad p{color:#5e211c}
+.sec{background:var(--card);border:1px solid var(--line);border-radius:5px;padding:20px 22px;margin-bottom:14px}
+.sec h3{font-size:11px;text-transform:uppercase;letter-spacing:.11em;color:var(--petrol);font-weight:700;margin:0 0 6px}
+.sec .lead{font-size:13.5px;color:var(--muted);margin:0 0 17px}
+.mq{position:relative;height:430px;border:1px solid #B9C6CD;border-radius:5px;overflow:hidden;background:#fff}
+.mqc{position:absolute;width:50%;height:50%}
+.mq-tl{top:0;left:0;background:#FAF0E1}.mq-tr{top:0;right:0;background:#E2F0E7}
+.mq-bl{bottom:0;left:0;background:#F1F1EE}.mq-br{bottom:0;right:0;background:#E8F0F7}
+.mqrule{position:absolute;background:#8FA3AE;z-index:1}
+.mqrule.v{left:calc(50% - 1px);top:0;bottom:0;width:2px}
+.mqrule.h{top:calc(50% - 1px);left:0;right:0;height:2px}
+.mqn{position:absolute;bottom:10px;font-size:11.5px;text-transform:uppercase;letter-spacing:.09em;font-weight:700;z-index:2}
+.mq-tl .mqn,.mq-bl .mqn{left:13px}.mq-tr .mqn,.mq-br .mqn{right:13px;text-align:right}
+.mq-tl .mqn{color:#7A4212}.mq-tr .mqn{color:#175E3D}.mq-bl .mqn{color:#4E4E48}.mq-br .mqn{color:#17456A}
+.mqn em{display:block;font-style:normal;text-transform:none;letter-spacing:0;font-size:11.5px;font-weight:400;margin-top:3px;max-width:190px;color:#3A4750;line-height:1.35}
+.mq-tr .mqn em,.mq-br .mqn em{margin-left:auto}
+.mqzone{position:absolute;border:2px dashed #2E7D5B;background:rgba(46,125,91,.05);border-radius:4px;z-index:2}
+.mqzone i{position:absolute;top:6px;left:8px;font-size:9.5px;font-style:normal;letter-spacing:.06em;text-transform:uppercase;
+  color:#175E3D;font-weight:700;background:#fff;border:1px solid #A9CDBB;padding:1px 6px;border-radius:3px}
+.me{position:absolute;transform:translate(-50%,-50%);text-align:center;z-index:4}
+.me i{display:block;width:20px;height:20px;border-radius:50%;background:var(--amber);border:3px solid #123145;margin:0 auto}
+.me b{display:block;font-size:11.5px;font-weight:700;color:#123145;white-space:nowrap;background:#fff;border:2px solid var(--amber);padding:1px 7px;margin-top:5px;border-radius:3px}
+.mqax{display:flex;justify-content:space-between;font-size:11.5px;color:#43555F;margin-top:8px;font-weight:600}
+.mqy{font-size:11.5px;color:#43555F;margin-bottom:6px;font-weight:600}
+.axis{margin-bottom:22px}.axis:last-child{margin-bottom:0}
+.axis .top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:7px}
+.axis .top b{font-size:15px;font-weight:650}
+.axis .top em{font-style:normal;font-size:12px;color:var(--muted);text-align:right}
+.rail{position:relative;height:36px;background:#f1f5f7;border:1px solid #e2eaee;border-radius:5px}
+.good{position:absolute;top:-1px;bottom:-1px;background:var(--ok-soft);border:1px solid var(--ok-b);border-radius:4px}
+.good i{position:absolute;top:-9px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;font-style:normal;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--ok);background:#fff;border:1px solid var(--ok-b);padding:1px 6px;border-radius:8px;white-space:nowrap}
+.pin{position:absolute;top:8px;width:20px;height:20px;border-radius:50%;transform:translateX(-50%);border:2px solid #fff;z-index:3;
+  background:var(--amber);box-shadow:0 0 0 1px #b06d00}
+.pin.sm2{width:13px;height:13px;top:11px;border-width:2px}
+.ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:5px}
+.tl{position:relative;padding-left:25px}
+.tl:before{content:"";position:absolute;left:5px;top:7px;bottom:7px;width:2px;background:linear-gradient(var(--ok-b),var(--amber),var(--bad))}
+.step{position:relative;margin-bottom:16px}.step:last-child{margin-bottom:0}
+.step:before{content:"";position:absolute;left:-24px;top:3px;width:11px;height:11px;border-radius:50%;background:#fff;border:2.5px solid var(--muted)}
+.step.s0:before{border-color:var(--ok)}.step.s1:before{border-color:var(--amber)}.step.s2:before{border-color:var(--bad)}
+.step h4{margin:0 0 3px;font-size:10.5px;text-transform:uppercase;letter-spacing:.1em}
+.step.s0 h4{color:var(--ok)}.step.s1 h4{color:#a06400}.step.s2 h4{color:var(--bad)}
+.step p{margin:0;font-size:14.5px;color:#3d525d;line-height:1.5}
+.gets{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:5px;overflow:hidden;margin-top:9px}
+.gets>div{padding:12px 14px}
+.gets .g{background:var(--ok-soft);border-right:1px solid var(--line)}
+.gets .p{background:var(--bad-soft)}
+.gets h4{font-size:10px;text-transform:uppercase;letter-spacing:.1em;margin:0 0 4px;font-weight:700}
+.gets .g h4{color:var(--ok)}.gets .p h4{color:var(--bad)}
+.gets p{margin:0;font-size:13.5px;color:#3d525d;line-height:1.45}
+.ah{font-weight:650;font-size:14.5px;margin:16px 0 0}.ah.f{margin-top:0}
+.try{background:var(--amber-soft);border:1px solid #f0d5a8;border-radius:5px;padding:16px 18px;margin-bottom:14px}
+.try h3{color:#8a5a08;font-size:11px;text-transform:uppercase;letter-spacing:.11em;margin:0 0 6px;font-weight:700}
+.try p{margin:0;font-size:14.5px;color:#5c3a00}
+button.sec-h{width:100%;background:none;border:0;cursor:pointer;font-family:var(--sans);text-align:left;
+  font-size:11px;text-transform:uppercase;letter-spacing:.11em;color:var(--petrol);font-weight:700;padding:0 0 6px;
+  display:flex;align-items:center;gap:8px}
+button.sec-h:hover{color:var(--petrol-deep)}
+button.sec-h:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+button.sec-h .tw{font-size:10px;color:var(--petrol-mid);transition:transform .14s}
+.sec.shut button.sec-h .tw,.anon.shut button.sec-h .tw,.try.shut button.sec-h .tw{transform:rotate(-90deg)}
+.sec.shut .sec-b,.anon.shut .sec-b,.try.shut .sec-b{display:none}
+.sec.shut,.anon.shut,.try.shut{padding-bottom:14px}
+.foldbar{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:14px;font-size:12.5px;color:var(--muted)}
+.foldbar .chip{font-size:12px;padding:4px 11px;border:1px solid var(--line);background:#fff;border-radius:3px;
+  cursor:pointer;color:var(--muted);font-family:var(--sans)}
+.foldbar .chip:hover{border-color:var(--petrol-mid);color:var(--petrol)}
+button.pat-h{width:100%;background:none;border:0;cursor:pointer;font-family:var(--sans);text-align:left;
+  padding:0;display:grid;grid-template-columns:18px 1fr 120px;gap:11px;align-items:center}
+button.pat-h:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+.pat-h .tw{font-size:10px;color:var(--petrol-mid);transition:transform .14s}
+.pat.shut .pat-h .tw{transform:rotate(-90deg)}
+.pat.shut .pbody{display:none}
+.pat-h .mini{margin:0}
+.pbody{margin-top:11px}
+.pat{background:var(--card);border:1px solid var(--line);border-radius:5px;padding:16px 18px;margin-bottom:10px}
+.pat.mine{border-color:var(--amber);border-left:4px solid var(--amber);background:#fffdf9}
+.pat h4{margin:0 0 3px;font-size:16px;font-weight:650}
+.pat .tag{font-family:var(--mono);font-size:10.5px;color:var(--petrol-mid);letter-spacing:.04em}
+.pat .yours{font-size:10px;text-transform:uppercase;letter-spacing:.09em;font-weight:700;color:#8a5a08;background:var(--amber-soft);border:1px solid #f0d5a8;padding:2px 8px;border-radius:10px;margin-left:8px}
+.pat p{margin:7px 0 0;font-size:14px;color:#3d525d}
+.pat .mini{position:relative;height:16px;background:#f1f5f7;border:1px solid #e2eaee;border-radius:4px;margin:10px 0 5px}
+.pat .mini .gd{position:absolute;top:-1px;bottom:-1px;background:var(--ok-soft);border:1px solid var(--ok-b);border-radius:3px}
+.pat .mini .dot{position:absolute;top:2px;width:10px;height:10px;border-radius:50%;background:var(--petrol);transform:translateX(-50%);z-index:2;border:2px solid #fff;box-shadow:0 0 0 1px var(--petrol-deep)}
+.pat .mend{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+.pat .cost{margin-top:9px;font-size:13.5px;color:#5e211c;background:var(--bad-soft);border:1px solid #e0b4ae;border-radius:4px;padding:9px 12px}
+.pat .cost b{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--bad);margin-bottom:3px}
+.refs{list-style:none;padding:0;margin:0;counter-reset:r}
+.refs li{counter-increment:r;padding:13px 0 13px 34px;border-top:1px solid var(--line-soft);position:relative;font-size:13.5px;color:#3d525d}
+.refs li:first-child{border-top:0}
+.refs li:before{content:counter(r);position:absolute;left:0;top:14px;width:23px;height:23px;border-radius:50%;
+  background:var(--petrol);color:#fff;font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.reflink{display:inline-block;margin-top:5px;font-family:var(--mono);font-size:11.5px;color:var(--petrol-mid);
+  text-decoration:none;border-bottom:1px solid #b7d0dd;word-break:break-all}
+.reflink:hover{color:var(--petrol-deep);border-bottom-color:var(--petrol)}
+.refs b{display:block;color:var(--petrol-deep);font-size:14px;margin-bottom:3px}
+.foot{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px;margin-top:22px;line-height:1.6}
 
+/* --- one at a time --- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:26px 26px 22px;box-shadow:0 1px 6px rgba(20,45,60,.05)}
+.card .n{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.05em}
+.card h2{margin:7px 0 6px;font-size:22px;font-weight:700;letter-spacing:-.015em;color:var(--petrol-deep)}
+.card .s{margin:0 0 18px;font-size:16px;color:#3d525d;line-height:1.5}
+.dots{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin:0 0 18px}
+.dots i{width:16px;height:4px;border-radius:2px;background:#d8e3e8;display:block}
+.dots i.d{background:var(--petrol)}.dots i.c{background:var(--amber)}
+.fb{margin-top:16px;background:var(--amber-soft);border:1px solid #f0d5a8;border-radius:6px;padding:14px 16px}
+.fb b{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:#8a5a08;margin-bottom:4px}
+.fb p{margin:0;font-size:15px;color:#5c3a00;line-height:1.5}
+.picked{margin-top:14px;font-size:13.5px;color:var(--muted)}
+.picked b{color:var(--petrol);font-weight:600}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:10px;flex-wrap:wrap}
+.link{background:none;border:0;color:var(--muted);font-size:13.5px;padding:6px 2px;text-decoration:underline}
+.link:hover{color:var(--petrol)}
+.dots i{cursor:default}
+.dots i.click{cursor:pointer}
+.dots i.click:hover{background:var(--petrol-mid)}
+.rev{background:var(--card);border:1px solid var(--line);border-radius:5px;padding:13px 16px;margin-bottom:8px;
+     display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+.rev.blank{border-style:dashed;background:#fbfcfd}
+.rev .t{font-size:14.5px;font-weight:650;color:var(--ink)}
+.rev .t em{font-style:normal;font-family:var(--mono);font-size:10.5px;color:var(--muted);display:block;letter-spacing:.04em}
+.rev .a{font-size:14px;color:#3d525d;margin-top:4px}
+.rev .a.none{color:#a0b0b8;font-style:italic}
+.chip2 button{border:0;background:none;color:var(--bad);cursor:pointer;font-size:13px;padding:0 0 0 6px;line-height:1}
+.warn{background:#fff;border:1px solid #e0b4ae;border-left:3px solid var(--bad);border-radius:4px;padding:12px 15px;
+      margin-bottom:18px;font-size:13px;color:#5e211c}
+.warn b{color:var(--bad)}
+.anon{background:#eef4f7;border:1px solid #c7dae4;border-radius:5px;padding:18px 20px;margin-bottom:14px}
+.anon h3{color:var(--petrol);font-size:11px;text-transform:uppercase;letter-spacing:.11em;margin:0 0 6px;font-weight:700}
+.anon p{margin:0 0 11px;font-size:14px;color:#3d525d}
+.anon input[type=text]{width:100%;max-width:320px;padding:9px 12px;border:1px solid var(--line);border-radius:4px;
+  font-family:var(--sans);font-size:14px;color:var(--ink);margin-bottom:9px}
+.anon textarea{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:4px;font-family:var(--mono);
+  font-size:12.5px;color:#3d525d;background:#fbfdfd;min-height:56px;resize:vertical}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.chip2{font-family:var(--mono);font-size:11px;background:#fff;border:1px solid var(--line);border-radius:3px;padding:4px 9px;color:var(--petrol)}
+.locked{background:#f6f8f9;border:1px dashed #b9c9d2;border-radius:5px;padding:16px 18px;font-size:13.5px;color:#43555F;margin-top:12px}
+.locked b{color:var(--petrol)}
+.pin.them2{background:var(--petrol);box-shadow:0 0 0 1px #0f2e42;z-index:2}
+.key{display:flex;gap:17px;flex-wrap:wrap;font-size:12px;color:#3d525d;margin-bottom:18px}
+.key span{display:flex;align-items:center;gap:6px}
+.key i{width:12px;height:12px;border-radius:50%;display:block}
+.key i.y{background:var(--amber);box-shadow:0 0 0 1px #b06d00}
+.key i.t{background:var(--petrol)}
+.key i.g{background:var(--ok-soft);border:1px solid var(--ok-b);border-radius:3px}
+
+.ws{background:#fff;border:1px solid var(--line);border-left:3px solid var(--petrol);border-radius:5px;
+    padding:14px 17px;margin-bottom:18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.ws label{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:#43555F;font-weight:700}
+.ws input{flex:1;min-width:200px;max-width:340px;padding:8px 12px;border:1px solid var(--line);border-radius:4px;
+  font-family:var(--sans);font-size:14px;color:var(--ink)}
+.ws em{font-style:normal;font-size:12px;color:var(--muted)}
+.qfb{margin-top:10px;background:var(--amber-soft);border:1px solid #f0d5a8;border-radius:4px;padding:10px 13px}
+.qfb b{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#8a5a08;margin-bottom:3px}
+.qfb p{margin:0;font-size:13.5px;color:#5c3a00;line-height:1.45}
+.hist{margin-top:6px}
+.hrow{display:grid;grid-template-columns:210px 1fr 62px;gap:12px;align-items:center;margin-bottom:9px}
+.hrow .hl{font-size:13.5px;color:#2E3F49}
+.hrow .hl em{font-style:normal;display:block;font-size:11.5px;color:var(--muted);margin-top:1px}
+.hbar{position:relative;height:22px;background:#f1f5f7;border:1px solid #e2eaee;border-radius:3px;overflow:hidden}
+.hbar i{position:absolute;left:0;top:0;bottom:0;border-radius:2px}
+.h-good i{background:var(--ok)}.h-mid i{background:var(--petrol-mid)}
+.h-warn i{background:#d69100}.h-bad i{background:var(--bad)}
+.hval{font-family:var(--mono);font-size:13px;color:var(--petrol);text-align:right;font-weight:700}
+.hsub{font-size:12.5px;color:var(--muted);margin:14px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--line-soft);
+  text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.hsub:first-child{margin-top:0}
+.hnote{font-size:13px;color:#43555F;background:#f6f8f9;border:1px solid var(--line);border-radius:4px;padding:11px 14px;margin-top:14px}
+.hnote b{color:var(--petrol)}
+.psum{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px;margin-bottom:18px}
+.psum div{background:#E8F0F7;border:0;border-radius:8px;padding:15px 17px}
+.psum div b{display:block;font-size:25px;color:var(--petrol-deep);font-weight:700;line-height:1.15;letter-spacing:-.02em}
+.psum div span{display:block;font-size:12.5px;color:#43555F;margin-top:5px;line-height:1.35}
+.zrow{border:1px solid var(--line);border-radius:5px;margin-bottom:7px;background:#fff;overflow:hidden}
+.zhead{display:grid;grid-template-columns:22px 1fr 130px 100px;gap:11px;align-items:center;padding:11px 14px;
+  width:100%;background:none;border:0;text-align:left;font-family:var(--sans);cursor:pointer}
+.zhead:hover{background:#fafcfd}
+.zrow.open .zhead{border-bottom:1px solid var(--line-soft)}
+.znm{font-size:14.5px;font-weight:650;color:var(--ink)}
+.znm em{font-style:normal;display:block;font-size:12px;color:var(--muted);font-weight:400;margin-top:2px}
+.zbar{position:relative;height:16px;background:#f1f5f7;border:1px solid #e2eaee;border-radius:3px;overflow:hidden}
+.zbar i{position:absolute;left:0;top:0;bottom:0;border-radius:2px}
+.z-good i{background:var(--ok)}.z-ok i{background:var(--petrol-mid)}
+.z-warn i{background:#d69100}.z-bad i{background:var(--bad)}
+.ztag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:3px;text-align:center;white-space:nowrap}
+.ztag.z-good{background:var(--ok-soft);color:var(--ok)}
+.ztag.z-ok{background:#e9f2f7;color:var(--petrol)}
+.ztag.z-warn{background:var(--amber-soft);color:#8a5a08}
+.ztag.z-bad{background:var(--bad-soft);color:var(--bad)}
+.zbody{padding:13px 15px 15px;background:#fbfdfd;font-size:14px;color:#3d525d}
+.zbody p{margin:0 0 9px}.zbody p:last-child{margin:0}
+.zwhy{background:#fff;border:1px solid var(--line);border-radius:4px;padding:10px 13px;margin:9px 0;font-size:13.5px}
+.zwhy b{color:var(--petrol);font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:3px}
+.redo{background:#fff;border:1px solid #e0b4ae;border-left:3px solid var(--bad);border-radius:5px;padding:14px 17px;margin-top:14px}
+.redo h4{margin:0 0 5px;font-size:11px;text-transform:uppercase;letter-spacing:.11em;color:var(--bad);font-weight:700}
+.redo p{margin:0 0 11px;font-size:13.5px;color:#3d525d}
+.simctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.simctl .chip{font-size:12.5px;padding:5px 12px;border:1px solid var(--line);background:#fff;border-radius:3px;
+  cursor:pointer;color:var(--muted);font-family:var(--sans)}
+.simctl .chip[aria-pressed="true"]{background:var(--petrol);border-color:var(--petrol);color:#fff;font-weight:600}
+.simrow{border:1px solid var(--line);border-radius:5px;margin-bottom:6px;background:#fff;overflow:hidden}
+.simrow.mine{border-color:var(--amber);border-left:4px solid var(--amber)}
+.simhead{display:grid;grid-template-columns:22px 1fr 150px 52px;gap:10px;align-items:center;padding:9px 13px;
+  width:100%;background:none;border:0;text-align:left;font-family:var(--sans);cursor:pointer}
+.simhead:hover{background:#fafcfd}
+.simrow.open .simhead{border-bottom:1px solid var(--line-soft)}
+.simtw{font-size:10px;color:var(--petrol-mid);transition:transform .14s}
+.simrow.open .simtw{transform:rotate(90deg)}
+.simnm{font-size:14.5px;font-weight:650;color:var(--ink)}
+.simnm em{font-style:normal;display:block;font-family:var(--mono);font-size:9.5px;color:var(--muted);letter-spacing:.04em}
+.simspec{position:relative;height:14px;background:#f1f5f7;border:1px solid #e2eaee;border-radius:3px}
+.simspec .gd{position:absolute;top:-1px;bottom:-1px;background:var(--ok-soft);border:1px solid var(--ok-b);border-radius:3px}
+.simspec .dt{position:absolute;top:1px;width:9px;height:9px;border-radius:50%;background:var(--petrol);
+  transform:translateX(-50%);border:2px solid #fff;box-shadow:0 0 0 1px var(--petrol-deep)}
+.simbar{position:relative;height:16px;background:#f1f5f7;border-radius:3px;overflow:hidden}
+.simbar i{position:absolute;left:0;top:0;bottom:0;background:var(--petrol-mid);border-radius:3px}
+.simpct{font-family:var(--mono);font-size:11.5px;color:var(--petrol);text-align:right}
+.simbody{padding:13px 15px 15px;background:#fbfdfd}
+.simbody .d{font-size:14px;color:#3d525d;margin:0 0 10px}
+.mqex{position:absolute;transform:translate(-50%,-50%);z-index:4;cursor:pointer;text-align:center}
+.mqex i{display:block;width:15px;height:15px;background:#123145;border:3px solid #fff;margin:0 auto;transform:rotate(45deg)}
+.mqex b{display:block;font-size:10px;font-weight:700;color:#fff;background:#123145;white-space:nowrap;
+  padding:1px 7px;border-radius:3px;margin-top:6px}
+.mqex:hover i{background:var(--amber)}
+.exbox{border:1px solid var(--line);border-radius:5px;margin-top:14px;overflow:hidden}
+.exbox>div{display:grid;grid-template-columns:150px 1fr;gap:14px;padding:12px 15px;border-top:1px solid var(--line-soft)}
+.exbox>div:first-child{border-top:0}
+.exbox .who{font-size:13.5px;font-weight:650;color:var(--petrol-deep)}
+.exbox .who em{font-style:normal;display:block;font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px}
+.exbox p{margin:0;font-size:13.5px;color:#3d525d;line-height:1.45}
+.mqdot{position:absolute;transform:translate(-50%,-50%);z-index:3;cursor:pointer;text-align:center}
+.mqdot i{display:block;width:10px;height:10px;border-radius:50%;background:var(--petrol);border:2px solid #fff;
+  box-shadow:0 0 0 1px var(--petrol-deep);margin:0 auto}
+.mqdot b{display:block;font-size:8.5px;font-weight:600;color:#123145;white-space:nowrap;background:rgba(255,255,255,.88);
+  padding:0 3px;border-radius:2px;margin-top:2px}
+.mqdot:hover i{background:var(--amber);box-shadow:0 0 0 1px #b06d00}
+.fitgrid{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:5px;overflow:hidden;margin-top:9px}
+.fitgrid>div{padding:12px 14px}
+.fitgrid .yes{background:var(--ok-soft);border-right:1px solid var(--line)}
+.fitgrid .no{background:var(--bad-soft)}
+.fitgrid h4{font-size:10px;text-transform:uppercase;letter-spacing:.1em;margin:0 0 4px;font-weight:700}
+.fitgrid .yes h4{color:var(--ok)}.fitgrid .no h4{color:var(--bad)}
+.fitgrid p{margin:0;font-size:13.5px;color:#3d525d;line-height:1.45}
+.hire{background:#f6f8f9;border:1px solid var(--line);border-top:0;border-radius:0 0 5px 5px;padding:10px 14px;
+      font-size:13px;color:#43555F}
+.hire b{color:var(--petrol);font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:3px}
+.man{background:#fff;border:1px solid var(--line);border-radius:5px;overflow:hidden;margin-top:10px}
+.man li{list-style:none;padding:11px 15px;border-top:1px solid var(--line-soft);font-size:14.5px;color:#2E3F49;line-height:1.5}
+.man li:first-child{border-top:0}
+.man li em{font-style:normal;display:block;font-family:var(--mono);font-size:9.5px;color:var(--muted);
+  letter-spacing:.05em;text-transform:uppercase;margin-bottom:3px}
+.man ul{margin:0;padding:0}
+.stp{border:1px solid var(--line);border-radius:5px;overflow:hidden;margin-top:9px}
+.stp>div{display:grid;grid-template-columns:104px 1fr;gap:12px;padding:11px 14px;border-top:1px solid var(--line-soft);align-items:start}
+.stp>div:first-child{border-top:0}
+.stp .w{font-size:10px;text-transform:uppercase;letter-spacing:.09em;font-weight:700;padding-top:2px}
+.stp .w0{color:var(--ok)}.stp .w1{color:#a06400}.stp .w2{color:var(--petrol)}
+.stp p{margin:0;font-size:14px;color:#3d525d;line-height:1.45}
+.stp0{background:var(--ok-soft)}.stp1{background:var(--amber-soft)}.stp2{background:#eef4f7}
+@media (max-width:640px){
+  .mast,.tabs,.bar,.wrap{padding-left:14px;padding-right:14px}
+  .portrait h2{font-size:23px}.gets{grid-template-columns:1fr}
+  .gets .g{border-right:0;border-bottom:1px solid var(--line)}
+  .mq{height:340px}.mqn em{display:none}
+}
+@media print{.tabs,.bar,.center,.opt:not(.on){display:none}.sec,.q,.pat{break-inside:avoid}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="mast"><div class="in">
+  <h1>What kind of leader are you, actually?</h1>
+  <p id="sub">Twenty-two moments you have definitely had. One at a time, with a read on each answer as you go.</p>
+</div></header>
+<nav class="tabs"><div class="in">
+  <button class="tab" data-m="q" aria-selected="true">1 &nbsp;Answer</button>
+  <button class="tab" data-m="r" aria-selected="false" disabled>2 &nbsp;Your result</button>
+  <button class="tab" data-m="p" aria-selected="false">All patterns</button>
+  <button class="tab" data-m="sim" aria-selected="false">Simulation</button>
+  <button class="tab" data-m="x" aria-selected="false">References</button>
+</div></nav>
+<div class="bar" id="pbar"><div class="in">
+  <b id="cnt">0 / 22</b>
+  <span class="track"><i id="fill"></i></span>
+  <span id="hint" style="font-size:12px;color:#61757f">nothing is saved anywhere</span>
+</div></div>
+<div class="wrap"><div id="app"></div></div>
+<script>
+const AX = {
+ grip: {n:"Grip",          lo:"Hands off",      hi:"Hands on",           good:[30,58], g:"How you hold the work",        wp:0.6, we:0.9},
+ cmd:  {n:"Command",       lo:"Laissez-faire",  hi:"Militaristic",       good:[30,58], g:"How you hold the work",        wp:0.5, we:0.9},
+ say:  {n:"Candour",       lo:"Just nice",      hi:"Blunt",              good:[52,80], g:"How you say hard things",      wp:0.9, we:0.5},
+ conf: {n:"Conflict",      lo:"Lets it run",    hi:"Steps in fast",      good:[40,68], g:"How you say hard things",      wp:0.5, we:0.7},
+ grow: {n:"Growth",        lo:"All of them",    hi:"All of you",         good:[25,52], g:"Who you build",                wp:0.9, we:0.2},
+ light:{n:"Spotlight",     lo:"Gives it away",  hi:"Takes it",           good:[18,46], g:"Who you build",                wp:0.8, we:0.2},
+ wx:   {n:"Weather",       lo:"Flat calm",      hi:"Storm front",        good:[18,46], g:"How you show up",              wp:1.0, we:0.4},
+ wake: {n:"Wake",          lo:"Leaves scars",   hi:"Creates dependence", good:[55,82], g:"How you show up",              wp:1.0, we:0.1},
+ self: {n:"Self-interest", lo:"Never yourself", hi:"Yourself first",     good:[22,52], g:"What you are like underneath", wp:0.9, we:0.2},
+ out:  {n:"Outlook",       lo:"Nothing is good enough", hi:"Everything is fine", good:[35,62], g:"How you show up",              wp:0.8, we:0.3},
+ fair: {n:"Even-handed",   lo:"Over-corrects",  hi:"Has favourites",     good:[25,55], g:"What you are like underneath", wp:0.9, we:0.2}
+};
+
+const Q = [
+{ax:"grip", t:"The draft",
+ s:"Work comes back close to what you had in mind. Not quite. It goes out Monday.",
+ o:[["You take it home and finish it yourself.",4,"The work gets better tonight. The person does not."],
+    ["You send it back with everything you would change.",3,"Thorough. A long list is also hard to read priorities from."],
+    ["You name the two things that matter and leave the rest.",2,"That is the version somebody can actually act on."],
+    ["You send it on as it is.",1,"Quick. Worth knowing whether they were clear where the bar was."]]},
+{ax:"grip", t:"Away for the week",
+ s:"You are on leave. Something comes up that you would normally decide.",
+ o:[["You answer the message.",4,"They got an answer. They also learned to ask."],
+    ["You hear about it after and say what you would have done.",3,"The correction arrives after the fact, which is the expensive moment for it."],
+    ["You had left a note on how to weigh decisions like that one.",2,"Direction without presence. That is the kind that travels."],
+    ["You find out on your return. It was handled.",1,"They coped. Worth knowing whether they felt equipped or just brave."]]},
+
+{ax:"cmd", t:"Reopening it",
+ s:"Something was settled last week. Someone wants to go back to it.",
+ o:[["You say it is decided and we are moving.",4,"Clear. Possibly also the last time they raise something like this."],
+    ["You listen, then confirm it stands.",3,"They were heard. Whether they felt heard is a separate question."],
+    ["You ask what has changed since.",2,"That question is the whole control. It separates new information from second thoughts."],
+    ["You reopen it.",1,"Buy-in matters. So does the cost of nothing ever being settled."]]},
+{ax:"cmd", t:"Monday morning",
+ s:"Think about how work actually gets pointed at your team.",
+ o:[["There is a plan, and you would notice a departure from it.",4,"Nobody is confused. Some of them have stopped thinking."],
+    ["There is a plan and you walk through it together each week.",3,"Shared, if a little ritual."],
+    ["There are priorities. They work out the order.",2,"Direction from you, method from them. Usually the sweet spot."],
+    ["They know the goal. The rest is theirs.",1,"Freeing for the confident. Quiet for everybody else."]]},
+
+{ax:"say", t:"The thing they cannot see",
+ s:"Someone is doing something that will cost them in about a year. They have no idea.",
+ o:[["You say it this week, and stay in the conversation afterwards.",4,"Early and specific. The one that feels expensive and costs least."],
+    ["You say it, then spend a while taking the edge off.",3,"It was said. Some of it may not have survived the softening."],
+    ["You gesture at it and hope.",2,"Hinting puts the decoding on the person least able to do it."],
+    ["You keep it for the review.",1,"There is a proper place for it. There is also a year between now and then."]]},
+{ax:"say", t:"The work is not good",
+ s:"Someone hands you what you asked for. It does not do the job.",
+ o:[["\u201cThis is not there yet. Here is what is missing.\u201d",4,"Direct and usable. The second half is what makes the first half land."],
+    ["\u201cGood start.\u201d Then a long list.",3,"The list is the message. The opener may be working against it."],
+    ["You thank them and quietly repair the worst of it.",2,"Kind in the moment. They will do it exactly the same way next time."],
+    ["You thank them and ask someone else.",1,"The work gets fixed. They find out later, from somebody else, or never."]]},
+
+{ax:"conf", t:"The two of them",
+ s:"Two people on your team have gone cool with each other. It shows in meetings.",
+ o:[["You get them both in a room this week.",4,"Decisive. It is also now your conflict rather than theirs."],
+    ["You speak to each of them separately first.",3,"Sensible sequencing, as long as it does not stop there."],
+    ["You give it a fortnight, then step in.",2,"Space with a deadline on it. That is a strategy rather than an absence of one."],
+    ["You leave it. They are adults.",1,"Often true. The times it is not true are the expensive ones."]]},
+{ax:"conf", t:"The third time",
+ s:"Someone comes to you about a colleague. It is the third time this quarter.",
+ o:[["You go to the colleague today.",4,"Fast. The person who came to you has also learned they never need to say it themselves."],
+    ["You bring the two of them together.",3,"Resolved, with you as the mechanism."],
+    ["You ask what they have already said to them directly.",2,"That question builds something. It is also the least comfortable answer to have to give."],
+    ["You listen properly and keep watching.",1,"Three times is usually past the point where watching counts as the intervention."]]},
+
+{ax:"grow", t:"The one free day",
+ s:"You get a day a month with nothing in it.",
+ o:[["Your own learning, or your own network.",4,"Necessary. Nobody else is going to put it in your calendar."],
+    ["Split between reading and time with the team.",3,"Reasonable. Split days have a way of becoming neither."],
+    ["Coaching the two who need it most.",2,"About the clearest return you will get on a day."],
+    ["It goes to the team. It always goes to the team.",1,"Generous. Also how leaders quietly go out of date."]]},
+{ax:"grow", t:"The visible project",
+ s:"Something high-profile lands. You could do it, or hand it to someone who would learn from it.",
+ o:[["You take it. It is visible and you need that at the moment.",4,"Honest. Worth noticing how often that turns out to be the answer."],
+    ["You take it and bring someone along to watch.",3,"Watching is not doing. Useful, and not the same thing."],
+    ["You give it to them and stay close.",2,"Stretch with a net under it. That is what development actually looks like."],
+    ["You give it to them and step away.",1,"Trusting. Check they know where to find you."]]},
+
+{ax:"light", t:"The room is impressed",
+ s:"Your team's work lands well. Senior people are there. So are you.",
+ o:[["You take the questions. You know the answers.",4,"Efficient. The only name that room now knows is yours."],
+    ["You say the team did it, without names.",3,"Generous in tone, anonymous in effect."],
+    ["You name the two people who did it.",2,"Names are what senior people retain. That was the whole moment."],
+    ["You name them and hand the next question over.",1,"You gave away the room. That is the part they will remember."]]},
+{ax:"light", t:"It failed publicly",
+ s:"Something your team owns has gone wrong in the open. Someone senior asks how.",
+ o:[["You answer honestly about who did what.",4,"Accurate. It will be repeated back to them for a long time."],
+    ["You say the team got it wrong.",3,"Collective, which spreads it thinly rather than removing it."],
+    ["You say it was your call.",2,"That is the version that buys you something later."],
+    ["You say it was your call \u2014 having already told them so first.",1,"The order matters. Telling them first is what makes it true rather than tactical."]]},
+
+{ax:"wx", t:"An expensive mistake",
+ s:"Someone tells you about something they got wrong. It is going to cost real money.",
+ o:[["You ask how it was allowed to happen.",4,"A fair question, asked in a way that sets how long you wait for the next one."],
+    ["You say less than usual for a day or so.",3,"You did not say anything. They read it anyway."],
+    ["You say it is fine, and move on.",2,"Kind. Nothing changed either, which they also noticed."],
+    ["You ask what happened and what they need.",1,"That order is why you will hear about the next one early."]]},
+{ax:"wx", t:"The risk you already dismissed",
+ s:"Someone raises something you considered three weeks ago and set aside.",
+ o:[["It is clear you have been here before.",4,"They will think twice before raising the next one."],
+    ["\u201cWe have got it.\u201d And on.",3,"Closed without being explained, which reads as dismissal even when it is not."],
+    ["You explain why you set it aside.",2,"Costs a minute. Buys the next risk somebody spots."],
+    ["You go back through it with them.",1,"Generous with your time. Occasionally you will change your mind, which is the point."]]},
+
+{ax:"wake", t:"They move on",
+ s:"Someone leaves your team for another job. Think about the last few who did.",
+ o:[["They still route decisions past you months later, and you still answer.",4,"Flattering. They have not entirely left, and neither have you."],
+    ["You stayed in touch, and you would hire them tomorrow.",3,"About the healthiest version of an ending there is."],
+    ["Professional. Best wishes, and that was that.",2,"Clean. Neutral endings are common, and they are not free."],
+    ["They were quiet at the end, and you heard the reason later.",1,"The quiet is the information. It usually means the conversation felt unavailable."]]},
+{ax:"wake", t:"What they say about you",
+ s:"Someone is considering joining your team and asks a current member what you are like.",
+ o:[["\u201cYou will not want to work for anyone else afterwards.\u201d",4,"High praise, with a shadow inside it."],
+    ["\u201cYou will learn a lot.\u201d",3,"The thing most people want from a manager and rarely get."],
+    ["\u201cThey are fine.\u201d",2,"Fine is not a criticism. It is also not a reason to join."],
+    ["\u201cKeep your head down.\u201d",1,"That sentence has a history behind it."]]},
+
+{ax:"out", t:"The quarter is over",
+ s:"Most of it went well. One thing did not.",
+ o:[["You lead with the thing that did not, and stay there.",1,"Accurate. Also the only part anybody will remember from the meeting."],
+    ["You mention the wins in a sentence, then spend the hour on the problem.",2,"The proportions in a meeting are the message, whatever the words are."],
+    ["You name what went well specifically, then work the problem properly.",3,"Both things are true and both got said. That is harder than it sounds."],
+    ["You celebrate the quarter. The problem can wait for another day.",4,"Morale now, at the cost of a problem that will be older when you get to it."]]},
+{ax:"out", t:"A plan you think might fail",
+ s:"Someone brings you something they are keen on. You can see a real chance it does not work.",
+ o:[["You go through everything that could go wrong. They should know.",1,"Thorough. They will bring you the next one already braced, or not at all."],
+    ["You name the two biggest risks and ask how they would handle them.",2,"Their plan, your concerns, still their problem to solve. That is the useful shape."],
+    ["You say it could work, and ask what would tell them early if it is not.",3,"Backing with a tripwire in it. Cheap insurance."],
+    ["You back it. Enthusiasm is what gets things over the line.",4,"Momentum is real. So is the conversation you have just deferred."]]},
+
+{ax:"self", t:"It went badly",
+ s:"Something you sponsored has failed. There is a meeting about it.",
+ o:[["You make sure the room understands which calls were not yours.",4,"Accurate, and your team heard every word of it."],
+    ["You describe what happened, lightly on who.",3,"Neutral. In that particular room, neutral reads as distance."],
+    ["You say it was your call.",2,"Costly in the moment. It is also what people stay for."],
+    ["You take on parts that were not yours.",1,"Protective. Some of that was a lesson somebody needed to have."]]},
+{ax:"self", t:"Competing for the same money",
+ s:"A colleague's project is up against yours for the same funding. You happen to know something about theirs that would not help them.",
+ o:[["You make sure the right person hears it.",4,"It works. It is also the sort of thing remembered by everyone except the person who did it."],
+    ["You mention it if asked \u2014 and you make sure you are asked.",3,"Deniable, and entirely deliberate."],
+    ["You leave it. Your case should stand on its own.",2,"Harder. Also the only version you could repeat out loud afterwards."],
+    ["You tell them you know, so they can get ahead of it.",1,"Rare. Costs you something now for something you cannot yet see."]]},
+
+{ax:"fair", t:"Same work, different feelings",
+ s:"Two of them did roughly equivalent work. You get on much better with one.",
+ o:[["The one you get on with gets the better project next.",4,"Understandable, and entirely visible to the person who did not get it."],
+    ["You are aware of the pull, and it probably still shows.",3,"Awareness without a mechanism does not usually change the outcome."],
+    ["You split the next opportunity deliberately.",2,"That is what awareness looks like once it has teeth."],
+    ["You give the better one to the other person.",1,"Correcting past the middle is still not fair. It is just unfair in a direction that feels better."]]},
+{ax:"fair", t:"The one you cannot replace",
+ s:"One person is genuinely hard to replace. Two others have told you, separately, that they are difficult to work with.",
+ o:[["You keep it to yourself. You cannot afford to lose them.",4,"You have just shown two people what the exchange rate is here."],
+    ["You mention it to them gently, and leave it there.",3,"Gentle enough that nothing follows from it, which the other two will also notice."],
+    ["You have the same conversation you would have with anyone.",2,"Being hard to replace buys latitude on the work, not on how people get treated."],
+    ["You come down harder on them, because they should know better.",1,"Also uneven \u2014 just in the other direction."]]}
+];
+const TYPE = {
+ grip_hi:{n:"The Micromanager",
+  d:"You do not let go, and the work is genuinely better for it more often than anyone admits. The cost is that your team brings you drafts instead of decisions, and you slowly become the ceiling on everything you touch.",
+  tl:["People bring you work to be checked rather than to be used. Your calendar is full of approvals only you can give.",
+      "Your best person stops proposing things. They have learned their version gets rewritten, so they wait for yours instead.",
+      "The strongest people leave, because autonomy is available elsewhere and they know it. You are left with the ones who prefer being told \u2014 and now you genuinely cannot delegate, which proves you were right all along."]},
+ grip_lo:{n:"The Absentee",
+  d:"You give people room and the strong ones flourish in it. But room without a target is not freedom, it is fog \u2014 and the people who most need a steer are the least likely to ask you for one.",
+  tl:["Work drifts in directions you did not intend, and you find out late enough that correcting it costs a fortnight.",
+      "People stop asking, because asking has not been useful. Two of them are quietly solving the same problem separately.",
+      "Someone capable fails publicly at something you could have steered in ten minutes. They will read it as their own failure. You will both be wrong about that."]},
+ cmd_hi:{n:"The Commander",
+  d:"Nobody is confused about what to do or who decides, and in a crisis that is worth an enormous amount. The rest of the time you are paying for it in the ideas that never reach you.",
+  tl:["Instructions get followed precisely, including the ones that were wrong.",
+      "People stop telling you a plan will not work. They execute it and let it fail, because that is safer than arguing with you about it.",
+      "You are surrounded by people who do exactly what they are told, and you cannot work out why nobody brings you anything any more. You will conclude you hired badly."]},
+ cmd_lo:{n:"The Laissez-Faire Leader",
+  d:"You trust people to find their own way and the self-directed ones love working for you. But direction is not the same as control, and you have quietly stopped providing either.",
+  tl:["Everyone is busy, and no two people on your team would describe the top priority the same way.",
+      "Real effort goes into things that turn out not to matter. The people who chose well feel lucky rather than led.",
+      "Your team is judged on an outcome nobody was ever explicitly pointed at, and you cannot defend them \u2014 because to defend them you would have to show what you asked for, and you never asked."]},
+ say_hi:{n:"The Blunt Instrument",
+  d:"People know exactly where they stand with you, which is rarer and worth more than it sounds. Watch the delivery rather than the content: if they spend the conversation defending themselves, the true thing you said never actually arrived.",
+  tl:["People brace slightly before conversations with you. The information is accurate; the reception is not.",
+      "They start pre-filtering what they bring you, to reduce the odds of getting the sharp version.",
+      "You are the last to know about problems in your own team. You will read that as people hiding things, rather than as something you built."]},
+ say_lo:{n:"The Nice One",
+  d:"You are careful with people and they can feel it, and there is real value in a manager nobody is frightened of. But nice is not the same as kind. Withheld truth is the most expensive kindness there is.",
+  tl:["Somebody is walking towards a wall right now with no idea it is there. You can see it clearly.",
+      "It grows until someone else raises it, and now it is a formal conversation instead of the quiet one you could have had months ago.",
+      "You are managing someone out for a pattern you first noticed two years ago and never named. They will say nobody ever told them. They will be right, and everyone watching will know it."]},
+ conf_hi:{n:"The Referee",
+  d:"Friction does not fester on your watch, and people are grateful for that in the moment. The problem is that it gets resolved by you, every time, which means nobody else ever learns how.",
+  tl:["Disagreements get sorted quickly, and always with you in the room.",
+      "People bring you their conflicts rather than having them, because that is now simply how it works here.",
+      "Nobody on your team can hold a hard conversation without you present. You are the bottleneck on every relationship you manage, and it looks like being needed."]},
+ conf_lo:{n:"The Postponer",
+  d:"You give people space to sort things out themselves, and adults often do. But some conflicts do not resolve, they just go quiet \u2014 and the quiet is what fools you.",
+  tl:["Two people are not talking properly, and everyone has noticed except, officially, you.",
+      "The rest of the team starts routing around it. The workarounds cost more than the conversation would have.",
+      "One of them leaves. It is the one you would have kept. The other stays, and so does the behaviour, and now the next person inherits it."]},
+ grow_hi:{n:"The Ladder Climber",
+  d:"You invest in your own trajectory, and there is nothing shameful in that \u2014 a leader with no standing cannot protect anyone. But right now the investment is running one way.",
+  tl:["Your own progression looks healthy. You are learning, visible and well connected.",
+      "Nobody under you has moved in a while, and at least one of them has worked out the pattern.",
+      "You get the next role, and your team is not the reason. They stopped investing in you the moment they realised they were the vehicle rather than the point."]},
+ grow_lo:{n:"The Selfless One",
+  d:"You pour it into other people and they get better because of you. The blind spot is that you have stopped topping yourself up, and a leader eventually runs out of things to give.",
+  tl:["Your team is developing. You are running on what you knew two years ago.",
+      "You are giving advice that has quietly gone out of date, and you have no way of telling.",
+      "You have no standing left to spend on their behalf, because standing needs replenishing \u2014 and the people you developed have moved past you and know it."]},
+ light_hi:{n:"The Spotlight Taker",
+  d:"You carry the room, and your team benefits from having someone who can. But senior people can only promote names they have heard \u2014 and right now the only name they have heard is yours.",
+  tl:["Senior people know your name and nobody else's on your team.",
+      "Someone is passed over for something they were ready for, because the people deciding have never seen them.",
+      "They leave for somewhere they will be visible. In the exit conversation they will be polite about the reason, and you will believe them."]},
+ light_lo:{n:"The Invisible Leader",
+  d:"You point at other people almost reflexively and they get seen because of it. The blind spot is your own standing \u2014 you cannot protect a team from a position nobody knows you hold.",
+  tl:["Your team gets noticed. You do not.",
+      "A budget round happens and your team's work is not in anyone's head when the lines get drawn.",
+      "You are asked to do more with less and have no standing to push back, because standing is built in the rooms you have been skipping."]},
+ wx_hi:{n:"The Weather System",
+  d:"You feel things and your team can read you, which at least means nobody is guessing. But when people check the forecast before they come to you, you stop hearing about problems early \u2014 and early is the only time problems are cheap.",
+  tl:["People check with each other before they come to you.",
+      "Bad news reaches you days after it happens, which is precisely when it stops being cheap to fix.",
+      "Something serious lands on you fully formed, and you discover three people knew a month ago and decided it was not worth the conversation."]},
+ wx_lo:{n:"The Flatliner",
+  d:"You are steady when it counts and people borrow calm from you. The flip side is that if nothing ever registers as urgent, nobody can tell what actually matters \u2014 including you, eventually.",
+  tl:["Nobody can tell what matters most to you, so they guess, and they guess differently from each other.",
+      "Your escalations stop being believed elsewhere, because everything from you arrives in the same register.",
+      "A genuine crisis reads as routine to your own team, and the response is a week slower than it needed to be."]},
+ wake_lo:{n:"The Scar Leaver",
+  d:"This is the hardest one to read about yourself, so read it slowly. People who work for you come out the other side smaller than they went in. You will not have meant any of it, and that changes nothing about the effect.",
+  tl:["People are careful around you in a way you have probably registered as professionalism.",
+      "Someone who left your team avoids you at an event, and you notice, and you decide they were always a bit difficult.",
+      "Your name is the reason a good candidate turns down a role on your team. Nobody will tell you that was the reason \u2014 they will say the timing was not right, and you will accept it."]},
+ wake_hi:{n:"The Guru",
+  d:"People find working for you genuinely transformative, and that is a real gift. The trap is that a leader who is irreplaceable has built something that cannot survive them, and has quietly made everyone else smaller in the process.",
+  tl:["People take your view as settled rather than as one input, and stop pressure-testing it.",
+      "Former team members still route decisions through you, and you enjoy it more than you admit.",
+      "You move on and the team cannot function. That will feel like a compliment for about a fortnight, and then it will look like what it is."]},
+ self_hi:{n:"The Self-Preserver",
+  d:"You protect your own position, and in a genuinely political organisation that is not irrational. But people can always tell where they sit in your priorities, and they price it in long before they say anything.",
+  tl:["In a difficult meeting, your team notices which decisions you distance yourself from.",
+      "They stop bringing you anything half-formed, because half-formed things are what get attributed to them when it goes wrong.",
+      "You are covered, correct and alone. Nobody will take a risk on your behalf, because the last three people who did are still carrying it."]},
+ self_lo:{n:"The Human Shield",
+  d:"You take the hits and your team feels genuinely protected, which buys more loyalty than almost anything else. But absorbing everything is not free, and you are the one paying.",
+  tl:["You are carrying blame for things that were not yours, and it is starting to show in how senior people talk about your judgement.",
+      "Your team is shielded from consequences they would have learned from, so they are not getting better at the hard parts.",
+      "You have taken enough hits that your own standing is thin, and now you cannot protect them from the one that actually matters."]},
+ out_lo:{n:"The Rain Cloud",
+  d:"Your read on what could go wrong is usually right, and a team with somebody like you in it walks into fewer walls. The cost is that nothing ever quite lands as good enough, and people stop bringing you the things they were proud of.",
+  tl:["Good work gets a nod and a caveat. People have quietly stopped telling you when something went well.",
+      "They start pre-empting your objection rather than doing the work, and the pre-empting takes longer than the work would have.",
+      "Your team has absorbed the belief that nothing they do is enough. The ones with options stop testing that belief and start testing the market."]},
+ out_hi:{n:"The Cheerleader",
+  d:"People are not dragged down by you, and momentum is a genuine asset when things are hard. But relentless sunshine is not the same as confidence, and it makes raising a problem feel like a character flaw.",
+  tl:["Problems get reframed as opportunities before anyone has finished describing them.",
+      "People stop raising concerns, because raising one now means being the person who is not on board.",
+      "Something predictable goes badly wrong, and afterwards it turns out four people saw it coming and could not find a way to say so that would not have sounded disloyal."]},
+ fair_hi:{n:"The Favouritist",
+  d:"You have an inner circle, and they get the best of you \u2014 which is why they will defend you. Everyone else has worked out the rules, and they are working to a different set from the one written down.",
+  tl:["Two people on your team have quietly concluded there is an in-group, and they are not in it.",
+      "They stop competing for the interesting work, because they have decided the outcome is already known.",
+      "You lose someone good who never once complained, and you will be surprised, and the rest of the team will not be."]},
+ fair_lo:{n:"The Over-Corrector",
+  d:"You are so determined not to play favourites that you have started penalising the people you rate, to prove something to yourself. They notice. It is a strange kind of unfairness and it is still unfairness.",
+  tl:["Your strongest performer gets held to a standard nobody else is held to.",
+      "They work out that being good is what earns the harder treatment, and they stop volunteering.",
+      "You have levelled the team downward, and the person who could have been exceptional has decided to be adequate somewhere they are not being corrected for it."]},
+ balanced:{n:"The Balanced Operator",
+  d:"Nothing you do sits at an extreme, which is harder than it looks and is how most good leadership actually gets done. The thing to watch is drift: nobody ever left a job because their manager was too balanced, but plenty have left because they could not tell what their manager stood for.",
+  tl:["Not much is going wrong, which is a real achievement and also exactly why it is easy to stop paying attention to it.",
+      "One of the eleven slips while you are busy. It will be whichever one you are least naturally inclined toward, and you will not notice it happening.",
+      "You are respected and slightly taken for granted, and the team is fine rather than good. Fine is a long way from where you could have been."]}
+};
+
+const READ = {
+ grip:{hi:{g:"Quality control. Very little rubbish leaves your team, and people know you will catch it.",
+           p:"Their judgement never gets exercised, so it never gets better. And you are working evenings someone else could have worked.",
+           t:"Pick one thing this week you would normally review, and do not review it. Tell the person you are not. Then watch what actually happens."},
+       lo:{g:"Room. People own their work properly, and the strong ones grow fast in that space.",
+           p:"The ones who needed a steer did not get one, and found out they were off course much later than they should have.",
+           t:"Pick whoever is struggling most quietly. Give them one specific target this week. Not autonomy \u2014 a target."}},
+ cmd:{hi:{g:"Clarity and speed. In a crisis nobody wastes a second working out who decides.",
+          p:"You only ever hear the plan you already had. Dissent gets expressed as slow execution rather than as an argument.",
+          t:"Ask one person this week to tell you why your plan is wrong, and thank them properly for the answer, whatever it is."},
+      lo:{g:"Trust. Self-directed people do their best work for you because you are not in the way.",
+          p:"Nobody can say what the top priority is, so effort goes wherever each person guessed.",
+          t:"Write the one thing that matters most this quarter in a single sentence. Say it in your next team meeting. Say it again the week after."}},
+ say:{hi:{g:"Clarity. Nobody is guessing where they stand, which removes an enormous amount of background anxiety.",
+          p:"When it lands as an attack it gets defended against rather than absorbed, and you have spent the relationship for nothing.",
+          t:"Next time you say the hard thing, add one sentence: why you are saying it, and what you think they are capable of."},
+      lo:{g:"Safety. People are not braced around you, and that is worth more than most leaders realise.",
+          p:"Someone is heading for a wall right now and you have decided not to be the one to mention it.",
+          t:"Write down the sentence you have been avoiding. Say it in the next one-to-one. Just that one sentence."}},
+ conf:{hi:{g:"Nothing festers. Problems between people get named and dealt with rather than left to rot.",
+           p:"They never build the muscle themselves, so every future disagreement needs you in the room.",
+           t:"Next time someone brings you a complaint about a colleague, ask what they have already said to that person. If the answer is nothing, that is the first move, not yours."},
+       lo:{g:"Space. People sort out their own differences, and grown-ups often do exactly that.",
+           p:"The ones that do not resolve go underground, and the whole team pays for the workarounds.",
+           t:"Name the tension you have been pretending not to see. Out loud, to one of the people in it, this week."}},
+ grow:{hi:{g:"Standing. You are building the credibility that lets you protect and resource a team.",
+           p:"The people under you are not moving, and at least one of them has noticed which way the investment flows.",
+           t:"Name one person and one role you will sponsor them into, even if it costs you them. Then tell them you are doing it."},
+       lo:{g:"Development. People genuinely get better working for you, and they know that is because of you.",
+           p:"You are running down your own capital, and eventually you have nothing left to teach or to spend.",
+           t:"Book the thing you keep postponing for yourself. Half a day. Put it in the calendar as if it were someone else's."}},
+ light:{hi:{g:"Cover. You take the heat, you handle the room, and your team does not have to.",
+            p:"Nobody senior can name a single person on your team, which quietly decides promotions two years from now.",
+            t:"Give away the next visible moment. Spend your prep coaching them for the room instead of rehearsing yourself."},
+        lo:{g:"Visibility for them. Your people get seen, named and remembered.",
+            p:"You are invisible too \u2014 and an invisible leader cannot get a team resourced or defended when it counts.",
+            t:"Say one thing this month, in a senior room, about what your team is doing and why it matters. In their language, not yours."}},
+ wx:{hi:{g:"Honesty. Nobody has to guess how you feel, and when you say something is urgent it is believed.",
+         p:"People manage your mood before they manage the problem, so bad news reaches you late and expensive.",
+         t:"Next time someone brings you something bad, respond to the timing before the content. \u201cThank you for telling me now.\u201d Then react."},
+     lo:{g:"Steadiness. You are the same person in a crisis as on a Tuesday, and people borrow that from you.",
+         p:"When everything is the same temperature nobody can tell what is serious, so your escalations do not land elsewhere either.",
+         t:"Pick the one thing this quarter that genuinely matters. Say out loud that it matters. Then do not say it about anything else."}},
+ wake:{hi:{g:"Energy. People find working for you genuinely formative and they will tell others so.",
+           p:"They defer to you rather than test you, and the team cannot run without you in it.",
+           t:"Ask your team to make one decision this month without checking it with you, and then live with whatever they decide."},
+       lo:{g:"Nothing that is worth what it costs. This is the one end of one trait where there is no upside to report.",
+           p:"People come out of your team smaller than they went in, and they take that into the next job with them.",
+           t:"Ask one person who left your team, in writing, what it was actually like. Then read the answer twice and reply only with thank you."}},
+ self:{hi:{g:"Durability. You are still here, and a leader who has been removed protects nobody.",
+           p:"They know where they sit in your priorities and they have already priced it in. Nobody will take a risk for you.",
+           t:"Take public responsibility for one thing this month that you could plausibly have attributed elsewhere. Do it where your team can see."},
+       lo:{g:"Loyalty. Your team knows you will stand in front of them, and that buys more than almost anything else.",
+           p:"You absorb consequences they needed to feel, and you spend standing you will want later.",
+           t:"Pick one thing your team owns and let them report on it themselves, including the part that went badly."}},
+ out:{hi:{g:"Energy. Nobody is dragged down by you, and momentum is a real asset when a quarter is going badly.",
+           p:"Problems get dressed up before they get solved, and raising one costs social capital nobody wants to spend.",
+           t:"Next time someone brings you a risk, sit in it for a full minute before you say anything reassuring."},
+       lo:{g:"Realism. Nobody is being sold a story, and your read on what could go wrong is usually the accurate one.",
+           p:"Good work goes unacknowledged, so people stop showing you the good work — which leaves you seeing only problems, which confirms the outlook.",
+           t:"Tell one person, specifically, what they did well this week. Add nothing after it. No caveat, no next time."}},
+ fair:{hi:{g:"Depth with a few people. Your inner circle get the best of you and they know it.",
+           p:"Everyone else has worked out there is a circle, and is competing for a prize they believe is already allocated.",
+           t:"List your team in order of how much you enjoy working with them. Then look at who got the last three good projects. Sit with the overlap."},
+       lo:{g:"Consistency, at least on the surface. Nobody can accuse you of running a court.",
+           p:"You are hardest on the people you rate most, to prove a point to yourself, and they can feel it.",
+           t:"Give your strongest performer exactly the feedback you would give anyone else on the same work. No more."}}
+};
+/* Small steps. Deliberately small \u2014 one visible change beats five invisible intentions. */
+const STEPS = {
+ grip:{hi:[["This week","Pick one thing you would normally review and do not review it. Tell the person you are not reviewing it, so it reads as trust rather than oversight."],
+           ["This month","On the next piece of work, say the outcome and the two constraints that matter, then stop talking. Write down what you would have added, and see afterwards whether it would have mattered."],
+           ["This quarter","Name one decision that currently needs you and give it away permanently. Tell the team it has moved. If it comes back to you, that is information about how you responded the first time."]],
+       lo:[["This week","Give the person who is struggling most quietly one specific target. Not encouragement \u2014 a target, with a date."],
+           ["This month","Before the next piece of work starts, say out loud what good would look like. Ten minutes at the front saves the fortnight at the back."],
+           ["This quarter","Set two checkpoints into anything that runs longer than a month. Not status meetings \u2014 points where you say whether it is on track."]]},
+ cmd:{hi:[["This week","Ask one person to tell you why your plan is wrong. Thank them properly for the answer, whatever it is, and do it where others can see."],
+          ["This month","On the next decision, say who owns it before you gather input. People argue less about outcomes when they knew the rules going in."],
+          ["This quarter","Pick one recurring decision and hand the whole thing over \u2014 the call, not the recommendation. Live with the first version you disagree with."]],
+      lo:[["This week","Write the one thing that matters most this quarter in a single sentence. Say it in your next team meeting."],
+          ["This month","Say it again. The second and third time are what make it real; the first time is just an announcement."],
+          ["This quarter","Put the priorities in writing where the team can see them, in order. Ambiguity about sequence is where most wasted effort comes from."]]},
+ say:{hi:[["This week","Next time you say the hard thing, add one sentence: why you are saying it, and what you think they are capable of."],
+          ["This month","Ask one person how your feedback tends to land. Do not explain or correct their answer."],
+          ["This quarter","Separate the standard from the disappointment. Say the standard plainly and keep how you feel about it out of the conversation entirely."]],
+      lo:[["This week","Write down the sentence you have been avoiding. Say it in the next one-to-one. Just that one sentence."],
+          ["This month","Move corrective feedback to within 48 hours of the thing itself. Late feedback lands as a verdict rather than a correction."],
+          ["This quarter","Have the conversation you have been putting off for months. It will be smaller than it has become in your head, and it will not get smaller by waiting."]]},
+ conf:{hi:[["This week","Next time someone complains about a colleague, ask what they have already said to that person directly."],
+           ["This month","Let one disagreement run for a fortnight without you in it. Set a date to check, and hold to it rather than intervening early."],
+           ["This quarter","Coach one person through a hard conversation instead of having it for them. Prepare with them, then stay out of the room."]],
+       lo:[["This week","Name the tension you have been pretending not to see. Out loud, to one of the people in it."],
+           ["This month","Put a date on it. Space with a deadline is a strategy; space without one is avoidance wearing a strategy's clothes."],
+           ["This quarter","If it has not resolved, get both people in a room. Two quarters of quiet is not two quarters of resolution."]]},
+ grow:{hi:[["This week","Name one person and one role you will sponsor them into. Tell them you are doing it."],
+           ["This month","Give away one thing you were keeping because it was visible. Coach the person through it rather than watching."],
+           ["This quarter","Put one person in front of someone senior who has never met them. Prepare them properly and then say nothing in the room."]],
+       lo:[["This week","Book the thing you keep postponing for yourself. Half a day. Put it in the calendar as if it belonged to somebody else."],
+           ["This month","Have one conversation outside your own function. Standing is built in rooms you are not required to be in."],
+           ["This quarter","Ask for something for yourself \u2014 a course, a project, a sponsor. A leader with nothing left to spend cannot protect anyone."]]},
+ light:{hi:[["This week","Give away the next visible moment. Spend your preparation coaching them for the room instead of rehearsing yourself."],
+            ["This month","Name two people by name in a senior forum, specifically, for something specific. Not \u201cthe team\u201d."],
+            ["This quarter","Take one person to a meeting they would not normally attend, and let them answer the question you could answer faster."]],
+        lo:[["This week","Say one thing, in a senior room, about what your team is doing and why it matters. In their language, not yours."],
+            ["This month","Translate one piece of your team's work into cost avoided, risk carried or revenue enabled, and put it in front of someone who decides budgets."],
+            ["This quarter","Accept one piece of visible credit without immediately redirecting it. Invisible leaders cannot defend anybody."]]},
+ wx:{hi:[["This week","When someone brings you something bad, respond to the timing before the content. \u201cThank you for telling me now.\u201d Then react."],
+          ["This month","Notice what your team does in the ten seconds before they raise something. If they are reading you, that is the cost."],
+          ["This quarter","Take the reaction offline. Feel it, then come back to the content separately. The gap between the two is the whole skill."]],
+      lo:[["This week","Pick the one thing this quarter that genuinely matters and say out loud that it matters."],
+          ["This month","Do not say it about anything else. A signal only works if it is scarce."],
+          ["This quarter","When something is actually urgent, let it show. Your team cannot calibrate against a flat line."]]},
+ wake:{hi:[["This week","Ask your team to make one decision without checking it with you, and live with whatever they decide."],
+           ["This month","Disagree with yourself out loud in front of them. People stop testing a leader who is never wrong."],
+           ["This quarter","Take a fortnight where you are genuinely uncontactable. What breaks is the thing you built to need you."]],
+       lo:[["This week","Ask one person who left your team what it was actually like. In writing, so they can be honest, and reply only with thank you."],
+           ["This month","Read that answer again. Do not build a case against it \u2014 that reflex is the thing being described."],
+           ["This quarter","Get help from outside the reporting line. A coach, a peer, a therapist. This is not a style adjustment and it will not respond to one."]]},
+ self:{hi:[["This week","Take public responsibility for one thing you could plausibly have attributed elsewhere. Do it where your team can see."],
+           ["This month","In the next difficult meeting, say \u201cthat was my call\u201d once, and do not follow it with context."],
+           ["This quarter","Back one person on something that costs you. Loyalty is only visible when it is expensive."]],
+       lo:[["This week","Let one person report on something they own, including the part that went badly."],
+           ["This month","Say what you want out loud, once, to someone who can give it to you."],
+           ["This quarter","Stop taking blame that is not yours. It reads as protection to your team and as poor judgement to everyone above you."]]},
+ out:{hi:[["This week","When someone raises a risk, ask two follow-up questions before you say anything reassuring."],
+          ["This month","Say out loud what could go wrong with your own plan, in front of the team, before anyone else has to."],
+          ["This quarter","Put a standing slot in your team meeting for what is not working, and go first every time."]],
+      lo:[["This week","Tell one person exactly what they did well. Stop the sentence there — no caveat, no “next time”."],
+          ["This month","Open one meeting with what went right and let it stand for a full minute before moving on."],
+          ["This quarter","Count how often your first response to news is a caveat. If it is most of the time, your team worked that out long ago."]]},
+ fair:{hi:[["This week","List your team in the order you enjoy working with them. Then look at who got the last three good projects. Sit with the overlap."],
+           ["This month","Give the next good opportunity to someone outside your first two names."],
+           ["This quarter","Have the same conversation with the person you cannot afford to lose that you would have with anyone else. Being indispensable buys latitude on the work, not on how people are treated."]],
+       lo:[["This week","Give your strongest performer exactly the feedback you would give anyone else on the same work. No more."],
+           ["This month","Notice where you are being hardest, and check whether it tracks the work or your own discomfort."],
+           ["This quarter","Fairness is the same standard for everyone. Correcting past the middle is still uneven, just in a direction that feels better to you."]]}
+};
+
+const REFS = [
+ {t:"Blake & Mouton, The Managerial Grid (1964)",
+  d:"The original two-axis reading of leadership \u2014 concern for people against concern for production \u2014 and the direct ancestor of the quadrant used here. Their point still holds: neither axis alone describes a leader, and the interesting failures live in the corners."},
+ {t:"Lewin, Lippitt & White, 'Patterns of Aggressive Behavior in Experimentally Created Social Climates', Journal of Social Psychology (1939)",
+  d:"The study that gave us autocratic, democratic and laissez-faire as distinct styles, and found laissez-faire groups produced less work of poorer quality than either alternative. The Command trait here is a direct descendant.", u:"https://doi.org/10.1080/00224545.1939.9713366"},
+ {t:"Gallup, State of the American Manager (2015); State of the Global Workplace (2026)",
+  d:"Managers account for at least 70% of the variance in team engagement between business units. Global engagement fell to 20% in 2025, with 64% not engaged. About 1 in 10 people have high natural talent to manage, and a further 2 in 10 reach a high standard with real investment.", u:"https://www.gallup.com/workplace/231593/why-great-managers-rare.aspx"},
+ {t:"Porath & Pearson, 'The Price of Incivility', Harvard Business Review (2013)",
+  d:"Of 800 people polled across 17 industries who were on the receiving end of workplace rudeness, 48% intentionally reduced their effort, 38% intentionally reduced quality, 80% lost work time worrying about it, and 12% left over it. Witnesses showed a performance drop too. This is the evidence behind the Weather and Wake traits.", u:"https://hbr.org/2013/01/the-price-of-incivility"},
+ {t:"Edmondson, 'Psychological Safety and Learning Behavior in Work Teams', Administrative Science Quarterly (1999); Google Project Aristotle (2016)",
+  d:"Psychological safety was the strongest single predictor of team effectiveness in Google's internal research, and is the mechanism by which errors get reported rather than concealed. It is what the Weather timeline is describing.", u:"https://doi.org/10.2307/2666999"},
+ {t:"Tepper, 'Consequences of Abusive Supervision', Academy of Management Journal (2000)",
+  d:"Sustained hostile supervision predicts depression, anxiety and emotional exhaustion in subordinates, and the effects persist after the person leaves the role. The Scar Leaver pattern is not a metaphor.", u:"https://doi.org/10.2307/1556375"},
+ {t:"Kim Scott, Radical Candor (2017)",
+  d:"Care personally and challenge directly. Caring without challenging produces ruinous empathy; challenging without caring produces obnoxious aggression. The Candour trait is this idea as a spectrum, which is why its healthy band sits above the midpoint.", u:"https://www.radicalcandor.com/"},
+ {t:"Jim Collins, Good to Great (2001)",
+  d:"The window and the mirror: the strongest leaders look out of the window to attribute success and into the mirror to apportion responsibility for failure. Behind both the Spotlight and Self-interest traits.", u:"https://www.jimcollins.com/books.html"},
+ {t:"Deci & Ryan, Self-Determination Theory",
+  d:"Autonomy, competence and relatedness are the conditions for sustained intrinsic motivation, and controlling supervision reliably suppresses it. Autonomy is not a perk, which is why the Grip band does not sit at the hands-on end.", u:"https://selfdeterminationtheory.org/theory/"},
+ {t:"Zenger & Folkman, HBR research on feedback (2014)",
+  d:"A clear majority report that corrective feedback improves their performance, and many prefer it to praise \u2014 when it is specific, timely and separated from the appraisal process.", u:"https://hbr.org/2014/01/your-employees-want-the-negative-feedback-you-hate-to-give"},
+ {t:"Atwater, Ostroff, Yammarino & Fleenor (1998), N=1,460 managers",
+  d:"Leadership effectiveness was highest where self and other ratings were both high, and where self-ratings sat below other ratings. It was lowest for over-estimators. Which is the standing caution on any self-assessment, including this one."},
+ {t:"Graen & Uhl-Bien, Leader\u2013Member Exchange theory (1995)",
+  d:"Leaders form differentiated relationships with subordinates, producing an in-group and an out-group whether or not anyone intends it. Out-group members receive less information, less latitude and fewer opportunities. The Even-handed trait is measuring exactly this.", u:"https://doi.org/10.1016/1048-9843(95)90036-5"},
+ {t:"Monte Carlo simulation — method note",
+  d:"The Simulation tab runs twenty thousand synthetic answer sets through exactly the functions that score a real response, in your browser, at the moment you open it. It is a property test of the instrument rather than evidence about leaders: it shows which patterns the scoring makes easy or hard to land on, not how common they are in the world. It found a real defect during development, where four traits fed only the delivery axis and a volatile micromanager could therefore score 84 out of 100 on whether people would work for them again."},
+ {t:"Herzberg, 'One More Time: How Do You Motivate Employees?', HBR (1968)",
+  d:"Supervision quality is a hygiene factor: getting it right does not motivate anyone, but getting it wrong reliably drives dissatisfaction. Useful for reading the middle of any of these spectrums.", u:"https://hbr.org/2003/01/one-more-time-how-do-you-motivate-employees"}
+];
+/* ---------------------------------------------------------------------------
+   A very small PDF writer. No libraries, no CDN, no print dialog \u2014 this builds
+   real PDF bytes in the browser and hands them over as a download.
+   Text only, Helvetica and Helvetica-Bold, with the real AFM widths so that
+   word wrapping lands where it should.
+   --------------------------------------------------------------------------- */
+const HW=[278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556,1015,667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,667,778,722,667,611,722,667,944,667,667,611,278,278,278,469,556,333,556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,556,556,333,500,278,556,500,722,500,500,500,334,260,334,584];
+const HB=[278,333,474,556,556,889,722,238,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,333,333,584,584,584,611,975,722,722,722,722,667,611,778,722,278,556,722,611,833,722,778,667,778,722,667,611,722,667,944,667,667,611,333,278,333,584,556,333,556,611,556,611,556,333,611,611,278,278,556,278,889,611,611,611,611,389,556,333,611,556,778,556,556,500,389,280,389,584];
+
+/* PDF strings are WinAnsi; flatten the typography rather than risk mojibake. */
+function flat(s){
+  return String(s==null?"":s)
+    .replace(/[\u2018\u2019\u201A]/g,"'").replace(/[\u201C\u201D\u201E]/g,'"')
+    .replace(/[\u2013\u2014]/g,"-").replace(/\u2026/g,"...").replace(/[\u00b7\u2022]/g,"-")
+    .replace(/\u00a0/g," ").replace(/[\u2192\u25b6\u25b2\u25c6]/g,">")
+    .replace(/[^\x20-\x7e]/g,"");
+}
+const wOf=(ch,bold)=>{const c=ch.charCodeAt(0);
+  if(c<32||c>126)return 500;return (bold?HB:HW)[c-32]};
+const textW=(s,size,bold)=>{let t=0;for(let i=0;i<s.length;i++)t+=wOf(s[i],bold);return t*size/1000};
+
+function wrap(s,size,bold,maxW){
+  const words=flat(s).split(/\s+/).filter(Boolean),out=[];let line="";
+  words.forEach(w=>{
+    const t=line?line+" "+w:w;
+    if(textW(t,size,bold)<=maxW)line=t;
+    else{if(line)out.push(line);
+      if(textW(w,size,bold)>maxW){/* break a very long token */
+        let cur="";for(const ch of w){if(textW(cur+ch,size,bold)>maxW){out.push(cur);cur=ch}else cur+=ch}line=cur}
+      else line=w}});
+  if(line)out.push(line);
+  return out.length?out:[""];
+}
+const esc=s=>flat(s).replace(/\\/g,"\\\\").replace(/\(/g,"\\(").replace(/\)/g,"\\)");
+
+function PDF(){
+  const W=595.28,H=841.89,M=56,MAXW=W-M*2;   /* A4 portrait */
+  let pages=[],cur=[],y=H-M;
+  const nl=h=>{y-=h;if(y<M+24){pages.push(cur);cur=[];y=H-M}};
+  const put=(s,x,yy,size,bold,r,g,b)=>{cur.push("BT /"+(bold?"F2":"F1")+" "+size+" Tf "+
+    (r!==undefined?(r+" "+g+" "+b+" rg "):"0 0 0 rg ")+x.toFixed(1)+" "+yy.toFixed(1)+" Td ("+esc(s)+") Tj ET")};
+  const api={
+    space(h){nl(h)},
+    rule(){cur.push("0.78 0.83 0.86 RG 0.8 w "+M+" "+(y+4).toFixed(1)+" m "+(W-M)+" "+(y+4).toFixed(1)+" l S");nl(10)},
+    text(s,o){o=o||{};const size=o.size||10.5,bold=!!o.bold,ind=o.indent||0;
+      const lines=wrap(s,size,bold,MAXW-ind);
+      lines.forEach(L=>{if(y<M+size+10){pages.push(cur);cur=[];y=H-M}
+        put(L,M+ind,y,size,bold,o.r,o.g,o.b);y-=size*1.42});
+      y-=(o.after===undefined?4:o.after)},
+    bar(p,g0,g1){ /* a spectrum line with the healthy band and your position */
+      if(y<M+30){pages.push(cur);cur=[];y=H-M}
+      const x0=M,w=MAXW,yy=y-4;
+      cur.push("0.93 0.95 0.96 rg "+x0+" "+(yy-2).toFixed(1)+" "+w+" 9 re f");
+      cur.push("0.89 0.945 0.915 rg "+(x0+w*g0/100).toFixed(1)+" "+(yy-2).toFixed(1)+" "+(w*(g1-g0)/100).toFixed(1)+" 9 re f");
+      cur.push("0.62 0.80 0.71 RG 0.7 w "+(x0+w*g0/100).toFixed(1)+" "+(yy-2).toFixed(1)+" "+(w*(g1-g0)/100).toFixed(1)+" 9 re S");
+      const px=x0+w*Math.max(2,Math.min(98,p))/100;
+      cur.push("1 0.62 0 rg "+(px-3).toFixed(1)+" "+(yy-4).toFixed(1)+" 6 13 re f");
+      cur.push("0.11 0.18 0.26 RG 0.6 w "+(px-3).toFixed(1)+" "+(yy-4).toFixed(1)+" 6 13 re S");
+      y-=20},
+    ends(l,r){if(y<M+16){pages.push(cur);cur=[];y=H-M}
+      put(l,M,y,8,false,0.42,0.5,0.55);
+      const rw=textW(flat(r),8,false);
+      put(r,W-M-rw,y,8,false,0.42,0.5,0.55);y-=14},
+    build(){
+      pages.push(cur);
+      const objs=[],add=s=>{objs.push(s);return objs.length};
+      const kidIds=[];
+      const contentIds=pages.map(p=>{
+        const st=p.join("\n");
+        return add("<< /Length "+st.length+" >>\nstream\n"+st+"\nendstream")});
+      const fontA=add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>");
+      const fontB=add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>");
+      const pagesId=objs.length+pages.length+1;
+      pages.forEach((_,i)=>{kidIds.push(add("<< /Type /Page /Parent "+pagesId+" 0 R /MediaBox [0 0 "+
+        W.toFixed(2)+" "+H.toFixed(2)+"] /Resources << /Font << /F1 "+fontA+" 0 R /F2 "+fontB+
+        " 0 R >> >> /Contents "+contentIds[i]+" 0 R >>"))});
+      const pid=add("<< /Type /Pages /Kids ["+kidIds.map(k=>k+" 0 R").join(" ")+"] /Count "+kidIds.length+" >>");
+      const cat=add("<< /Type /Catalog /Pages "+pid+" 0 R >>");
+      let out="%PDF-1.4\n",offs=[];
+      objs.forEach((o,i)=>{offs.push(out.length);out+=(i+1)+" 0 obj\n"+o+"\nendobj\n"});
+      const xref=out.length;
+      out+="xref\n0 "+(objs.length+1)+"\n0000000000 65535 f \n";
+      offs.forEach(o=>{out+=String(o).padStart(10,"0")+" 00000 n \n"});
+      out+="trailer\n<< /Size "+(objs.length+1)+" /Root "+cat+" 0 R >>\nstartxref\n"+xref+"\n%%EOF";
+      const bytes=new Uint8Array(out.length);
+      for(let i=0;i<out.length;i++)bytes[i]=out.charCodeAt(i)&0xff;
+      return new Blob([bytes],{type:"application/pdf"})}
+  };
+  return api;
+}
+
+/* Who fits, who struggles, and the line you can hand your team up front. */
+const FIT = {
+ grip:{hi:{t:"People who want a clear standard and do not mind being edited \u2014 early career, or anyone new to the domain.",
+           s:"Senior specialists who came for autonomy. They read your involvement as a verdict on their competence and are usually gone inside a year.",
+           h:"You can afford to hire less experienced people and grow them. What you cannot afford is a senior hire who expects to be left alone."},
+       lo:{t:"Self-starters who work out the target themselves and check in when they choose to.",
+           s:"Anyone new, anyone changing discipline, and anyone who reads silence as approval. They travel a long way in the wrong direction before either of you notices.",
+           h:"Hire for judgement and self-direction, or build a deliberate onboarding structure \u2014 you will not provide one instinctively."}},
+ cmd:{hi:{t:"People who want clarity above everything and are content to execute well. In a crisis they will outperform anyone.",
+          s:"Independent thinkers, and anyone whose value is their judgement. You get compliance from them and never their best idea.",
+          h:"If you need invention, you will have to hire for it deliberately and then protect it from yourself."},
+      lo:{t:"Experienced people with a strong internal compass who find direction constraining.",
+          s:"Anyone who needs to know what matters most. They work hard on the wrong thing and are surprised when it does not count.",
+          h:"Hire people who set their own priorities well, or accept that you have to write the priorities down."}},
+ say:{hi:{t:"People who would rather know where they stand than be handled gently.",
+          s:"Anyone who needs a moment to absorb before responding, and anyone from a culture where directness reads as hostility.",
+          h:"Watch for a team that is uniformly thick-skinned. That usually means the others already left."},
+      lo:{t:"People who are hard enough on themselves already and would be crushed by more.",
+          s:"Anyone who needs explicit feedback to improve. They think they are doing fine right up until the review.",
+          h:"You accumulate people who are comfortable rather than stretching. Notice who has not visibly improved in a year."}},
+ conf:{hi:{t:"People who dislike conflict and are relieved that somebody else handles it.",
+           s:"Anyone who wants to resolve their own disputes. They will find you in the middle of their conversation.",
+           h:"You will build a team that cannot self-regulate. Hire at least one person who will go straight to a colleague."},
+       lo:{t:"Mature people who handle their own differences and would rather not be managed through them.",
+           s:"Anyone in an asymmetric conflict \u2014 juniors, new joiners, anyone with less standing. They cannot fix it themselves and you are their only route.",
+           h:"Watch the quiet ones. Your model assumes people raise things, and the ones who most need you to step in are the least likely to ask."}},
+ grow:{hi:{t:"Independent people who run their own careers and do not expect sponsorship.",
+           s:"Anyone who needs an advocate. They do good work and stay invisible.",
+           h:"You will lose ambitious people to managers who campaign for them."},
+       lo:{t:"People who want to be developed and will take everything you give them.",
+           s:"Nobody, in the short run. The risk here is to you rather than to them.",
+           h:"Your team will outgrow what you can teach. Get your own input from outside it."}},
+ light:{hi:{t:"People who genuinely dislike visibility and are happy to do the work while you carry the room.",
+            s:"Anyone ambitious. Their progression depends on being seen, and at the moment they are not.",
+            h:"You retain the modest and lose the ambitious, which is a quiet way of levelling a team down."},
+        lo:{t:"Ambitious people who want exposure and will use it well.",
+            s:"Anyone who needed cover. There will have been moments when they wanted you to take the room and you handed it to them.",
+            h:"Make sure somebody is protecting you, because you are not doing it."}},
+ wx:{hi:{t:"People who read a room well and are not thrown by mood.",
+         s:"Anxious people, and anyone who has had a volatile manager before. They spend energy on you rather than on the work.",
+         h:"You select for resilience without meaning to, and lose good people who simply needed calm."},
+     lo:{t:"People who bring their own urgency and want a steady counterweight to it.",
+         s:"Anyone who reads the temperature to work out what matters. They treat everything as routine.",
+         h:"Hire at least one person who visibly cares when things are going wrong."}},
+ wake:{hi:{t:"People early in a career who want to be shaped, and who will genuinely be shaped.",
+           s:"Anyone who needs to build their own judgement. They keep checking with you long after they should have stopped.",
+           h:"Count how many people can make a real decision without you. If it is few, that is the finding."},
+       lo:{t:"Nobody. This is the one trait where there is no matching profile to report, and pretending otherwise would be dishonest.",
+           s:"Everyone, in ways they will not tell you about while they still work for you.",
+           h:"The hiring question is not who fits. It is what changes before the next person arrives."}},
+ out:{hi:{t:"People who bring their own realism and are not deflated by a hard quarter.",
+          s:"Anyone who needs a problem acknowledged before they can work on it. They feel unheard and stop mentioning things.",
+          h:"Hire someone comfortable being the bearer of bad news, and protect them visibly when they are."},
+      lo:{t:"People secure in their own assessment who do not need external validation.",
+          s:"Anyone who needs to hear that something went well. They conclude that nothing they do lands.",
+          h:"You lose people who were doing fine and never knew it."}},
+ self:{hi:{t:"Politically fluent people who understand the game and play it themselves.",
+           s:"Anyone who expects to be backed. They find out once, and after that they stop extending themselves.",
+           h:"You attract people who are similarly careful, which is a team that never takes a risk."},
+       lo:{t:"People who benefit from cover, which is most people.",
+           s:"Anyone who needs to feel the consequence of their own work in order to get better at it.",
+           h:"Your standing thins out. Make sure somebody senior knows what you have been absorbing."}},
+ fair:{hi:{t:"The people already in your circle. They get the best of you and they know it.",
+           s:"Everybody else, and they worked out the rules a while ago.",
+           h:"Watch who puts themselves forward for the interesting work. If the same names have stopped, that is your answer."},
+       lo:{t:"People who are indifferent to comparison and just want to get on with it.",
+           s:"Your strongest performer, who is being held to a standard nobody else is held to.",
+           h:"Check whether your best person is getting the hardest treatment. If so they will leave, and you will not see it coming."}}
+};
+
+/* First person, ready to be said out loud or pasted into a document. */
+const MANUAL = {
+ grip:{hi:"I will want to see things earlier than you expect. That is about how I hold risk, not a verdict on your work \u2014 tell me when it is slowing you down and I will back off that piece.",
+       lo:"I will give you a lot of room. If you would rather have a clearer target, ask me for one. I will not think less of you; I just default to leaving people alone."},
+ cmd:{hi:"I decide quickly and then expect us to move. If you think I am wrong, say so before we commit \u2014 after that I will want us pulling the same way.",
+      lo:"I will rarely tell you what to do. If you are unsure what matters most, ask me directly. I will have a view, I just do not volunteer it."},
+ say:{hi:"I will tell you plainly when something is not working. It is not a judgement on you, and if it lands harder than I meant it to, say so and I will put it differently.",
+      lo:"I find hard conversations difficult, so I probably under-state things. If you want the blunt version, ask me for it and you will get it."},
+ conf:{hi:"I tend to step into friction quickly. If you would rather sort something out with the person yourself first, tell me and I will stay out of it.",
+       lo:"I will usually let people work things out between them. If something is not resolving, come to me explicitly, because I will not always spot it."},
+ grow:{hi:"I am not a natural career-campaigner. If you want something, tell me plainly and I will push for it. I will not always notice on my own.",
+       lo:"I will spend a lot of time on your development. Tell me when you would rather just get on with the job."},
+ light:{hi:"I tend to front things. If you want a visible moment, tell me and it is yours \u2014 I would rather prepare you for the room than take it.",
+        lo:"I will put you in front of people. If you would rather I took a particular room, say so and I will not read it as reluctance."},
+ wx:{hi:"You will be able to tell when I am under pressure. It is rarely about you. Bring me things anyway, because late news costs far more than a short reaction does.",
+     lo:"I stay level whatever is going on. If you cannot tell whether something is serious, ask me directly and I will tell you straight."},
+ wake:{hi:"Do not check with me as much as you think you need to. If you are eighty per cent sure, go.",
+       lo:"There is no line to give your team here. Get help from outside the reporting line first."},
+ out:{hi:"I default to optimism. If I am glossing over something that matters to you, push back. I would rather hear it twice than not at all.",
+      lo:"I am quick to spot problems and slow to say when something is good. If you are unsure where you stand, ask \u2014 the answer is usually better than my silence suggests."},
+ self:{hi:"I am careful about how things land upward. Tell me when you need me to take something on and I will.",
+       lo:"I will take the hit for the team. Tell me when you would rather own something publicly yourself."},
+ fair:{hi:"Tell me if you think you are getting a worse deal than somebody else here. I would rather hear it than not know.",
+       lo:"I try hard to be even-handed and sometimes overcorrect. If I am being harder on you than on others, say so."}
+};
+
+/* Nothing is written to storage of any kind. This lives in the open tab only. */
+let S={m:"q",a:[],ws:"",codes:[],zopen:null,demo:false,shut:{},gsort:"default",autoshut:false,pshut:{},gshut:{},secShut:{}};
+/* If this file was downloaded from the tool, pick its answers back up. */
+(function(){try{const t=document.getElementById("saved-state");if(!t)return;
+  const o=JSON.parse(t.textContent||"{}");
+  if(Array.isArray(o.a)&&o.a.filter(Boolean).length){
+    S.a=o.a;S.ws=o.ws||"";S.codes=Array.isArray(o.codes)?o.codes:[];S.demo=!!o.demo;
+    if(S.a.filter(Boolean).length===Q.length)S.m="r"}
+}catch(e){}})();
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const esc2=x=>String(x==null?"":x).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+const done=()=>S.a.filter(Boolean).length;
+const NQ={};Object.keys(AX).forEach(k=>NQ[k]=Q.filter(q=>q.ax===k).length);
+const scoreOf=a=>{const o={};Object.keys(AX).forEach(k=>{
+  const v=Q.map((q,i)=>q.ax===k?a[i]:null).filter(Boolean);
+  o[k]=v.length===NQ[k]?v.reduce((x,y)=>x+y,0):null});return o};
+const pct=(k,v)=>v===null?null:Math.round(((v-NQ[k])/(3*NQ[k]))*100);
+const midOf=k=>2.5*NQ[k];
+function typeOf(sc){let b=null,d=0;
+  Object.keys(sc).forEach(k=>{if(sc[k]===null)return;
+    const x=Math.abs(sc[k]-midOf(k))/NQ[k];if(x>d){d=x;b=k}});
+  if(!b||d<0.83)return{axis:null,side:null,t:TYPE.balanced,key:"balanced"};
+  const side=sc[b]>midOf(b)?"hi":"lo";return{axis:b,side:side,t:TYPE[b+"_"+side],key:b+"_"+side}}
+/* Every trait feeds both axes, with a weight. An earlier version put each trait on
+   exactly one axis, which meant a volatile micromanager could score 84/100 on
+   "would they work for you again" — because grip and weather only touched delivery.
+   They are two of the most common reasons people actually leave. */
+const health=(k,v)=>{const p=pct(k,v),g=AX[k].good,c=(g[0]+g[1])/2;
+  const beyond=p<g[0]?g[0]-p:(p>g[1]?p-g[1]:0);
+  return beyond===0?100-Math.abs(p-c)*0.3:Math.max(0,86-beyond*1.3)};
+const axisScore=(sc,which)=>{
+  const ks=Object.keys(AX).filter(k=>sc[k]!==null);
+  if(!ks.length)return null;
+  const wt=k=>which==="p"?AX[k].wp:AX[k].we;
+  let num=0,den=0;ks.forEach(k=>{num+=health(k,sc[k])*wt(k);den+=wt(k)});
+  const mean=num/den;
+  /* the worst trait that genuinely counts for this axis, not the worst overall */
+  const heavy=ks.filter(k=>wt(k)>=0.5);
+  const worst=heavy.length?Math.min.apply(null,heavy.map(k=>health(k,sc[k]))):mean;
+  const w=which==="p"?0.6:0.45;
+  return Math.round(mean*(1-w)+worst*w)};
+const encode=a=>btoa(JSON.stringify({a:a})).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+function decode(c){let b=String(c||"").trim().replace(/\s+/g,"").replace(/-/g,"+").replace(/_/g,"/");
+  while(b.length%4)b+="=";const o=JSON.parse(atob(b));
+  if(!Array.isArray(o.a)||o.a.length!==Q.length)throw new Error("bad");return o.a}
+const MINR=3;
+const outOf=sc=>Object.keys(AX).filter(k=>sc[k]!==null)
+  .map(k=>{const p=pct(k,sc[k]),g=AX[k].good;
+    return {k:k,side:sc[k]>midOf(k)?"hi":"lo",d:p<g[0]?g[0]-p:(p>g[1]?p-g[1]:0)}})
+  .filter(x=>x.d>0).sort((a,b)=>b.d-a.d);
+
+let ABOUT="";
+(function(){const m=(location.hash||"").match(/[#&]about=([^&]*)/);
+ if(m){try{ABOUT=decodeURIComponent(m[1]).slice(0,40)}catch(e){}}})();
+
+/* ---------- all questions, one page ---------- */
+function ask(){
+  const w=el("div");
+  const n=el("div","note");
+  n.innerHTML=ABOUT
+    ? "<p><b>"+esc2(ABOUT)+" asked for this.</b> Twenty-two moments. Pick what actually happens, not what should. At the end you get a short code to send back \u2014 twenty-two numbers and nothing else. No name, no date, nothing that says it came from you.</p><p>They cannot see any of it until at least three people have replied.</p>"
+    : "<p><b>There are no right answers.</b> Every option is something a decent leader did last week. Both ends of all eleven traits are a real way to fail, so a middling answer is often the accurate one rather than the diplomatic one.</p><p>Each answer gives you a short read underneath it. It is not a score \u2014 it is what that choice tends to buy and what it tends to cost.</p>";
+  w.appendChild(n);
+  const warn=el("div","warn");
+  warn.innerHTML="<b>Nothing is saved anywhere \u2014 not even in this browser.</b> Refreshing loses it. It takes about six minutes, so do it in one sitting, and download the PDF at the end if you want to keep it.";
+  w.appendChild(warn);
+
+  if(!ABOUT&&done()===0){
+    const ex=el("div","anon");
+    ex.appendChild(el("h3",null,"Not sure what you get at the end?"));
+    ex.appendChild(el("p",null,"Look at a worked example first \u2014 a real-shaped profile with three anonymous replies already in, so every part of the result is filled in. It takes nothing away; clearing it puts you back here with a blank set."));
+    const r=el("div","row");r.style.marginTop="0";
+    const b=el("button","btn sm","See an example result");b.type="button";
+    b.addEventListener("click",loadExample);r.appendChild(b);
+    ex.appendChild(r);w.appendChild(ex)}
+
+  if(!ABOUT){
+    const ws=el("div","ws");
+    ws.appendChild(el("label",null,"Name this"));
+    const i=document.createElement("input");i.type="text";i.id="wsname";i.value=S.ws;
+    i.placeholder="Your name, or a label like \u201cH1 review\u201d";
+    i.addEventListener("input",e=>{S.ws=e.target.value.slice(0,50)});
+    ws.appendChild(i);
+    ws.appendChild(el("em",null,"Labels the PDF and the invite. Nothing leaves this page."));
+    w.appendChild(ws)}
+
+  const groups=[];Object.keys(AX).forEach(k=>{if(groups.indexOf(AX[k].g)<0)groups.push(AX[k].g)});
+  const idxOf=g=>{const keys=Object.keys(AX).filter(k=>AX[k].g===g),o=[];
+    Q.forEach((q,i)=>{if(keys.indexOf(q.ax)>=0)o.push(i)});return o};
+  const nDone=g=>idxOf(g).filter(i=>S.a[i]).length;
+
+  const gc=el("div","gctl");
+  gc.appendChild(el("span",null,"Sections:"));
+  [["default","In order"],["todo","Unanswered first"],["done","Answered first"],["az","A to Z"]].forEach(pr=>{
+    const b=el("button","chip",pr[1]);b.type="button";
+    b.setAttribute("aria-pressed",S.gsort===pr[0]?"true":"false");
+    b.addEventListener("click",()=>{S.gsort=pr[0];render()});gc.appendChild(b)});
+  const ea=el("button","chip","Expand all");ea.type="button";
+  ea.addEventListener("click",()=>{S.shut={};render()});
+  const ca=el("button","chip","Collapse all");ca.type="button";
+  ca.addEventListener("click",()=>{groups.forEach(g=>S.shut[g]=true);render()});
+  gc.appendChild(ea);gc.appendChild(ca);
+  const lb=document.createElement("label");
+  const cbx=document.createElement("input");cbx.type="checkbox";cbx.checked=S.autoshut;
+  cbx.addEventListener("change",e=>{S.autoshut=e.target.checked;
+    if(S.autoshut)groups.forEach(g=>{if(nDone(g)===idxOf(g).length)S.shut[g]=true});
+    render()});
+  lb.appendChild(cbx);lb.appendChild(document.createTextNode("Fold a section when it is finished"));
+  gc.appendChild(lb);
+  w.appendChild(gc);
+
+  const ordered=groups.slice();
+  if(S.gsort==="todo")ordered.sort((a,b)=>(idxOf(b).length-nDone(b))-(idxOf(a).length-nDone(a))||groups.indexOf(a)-groups.indexOf(b));
+  else if(S.gsort==="done")ordered.sort((a,b)=>nDone(b)-nDone(a)||groups.indexOf(a)-groups.indexOf(b));
+  else if(S.gsort==="az")ordered.sort((a,b)=>a.localeCompare(b));
+
+  ordered.forEach(g=>{
+    const idx=idxOf(g),dn=nDone(g);
+    const shut=!!S.shut[g];
+    const sec=el("div","grp"+(shut?" shut":""));
+    const h=document.createElement("button");h.className="grp-h";h.type="button";
+    h.setAttribute("aria-expanded",shut?"false":"true");
+    const inner=el("span");inner.style.cssText="display:flex;align-items:baseline;gap:0;width:100%";
+    inner.appendChild(el("span","tw","\u25be"));
+    inner.appendChild(document.createTextNode(g));
+    const bits=el("span","bits");
+    const mb=el("span","mini2");const fi=el("i");fi.style.width=(dn/idx.length*100)+"%";mb.appendChild(fi);
+    bits.appendChild(mb);
+    bits.appendChild(el("em",null,dn+" of "+idx.length));
+    inner.appendChild(bits);
+    h.appendChild(inner);
+    h.addEventListener("click",()=>{S.shut[g]=!S.shut[g];render()});
+    sec.appendChild(h);
+    idx.forEach(i=>{
+      const q=Q[i],c=el("div","q"+(S.a[i]?" done":""));c.id="q"+i;
+      c.appendChild(el("div","n","Moment "+(i+1)+" of "+Q.length+"  \u00b7  "+AX[q.ax].n));
+      c.appendChild(el("h3",null,q.t));
+      c.appendChild(el("p","s",q.s));
+      const o=el("div","opts");
+      q.o.forEach(pair=>{
+        const b=el("button","opt"+(S.a[i]===pair[1]?" on":""),pair[0]);b.type="button";
+        b.addEventListener("click",()=>{
+          if(S.demo){S={m:"q",a:[],ws:"",codes:[],zopen:null,demo:false}}
+          if(S.a[i]===pair[1])delete S.a[i];else S.a[i]=pair[1];
+          if(S.autoshut){const g2=AX[q.ax].g,ix=[];Q.forEach((qq,j)=>{if(AX[qq.ax].g===g2)ix.push(j)});
+            if(ix.every(j=>S.a[j]))S.shut[g2]=true;else delete S.shut[g2]}
+          render();const t=document.getElementById("q"+i);if(t)t.scrollIntoView({block:"nearest"})});
+        o.appendChild(b)});
+      c.appendChild(o);
+      if(S.a[i]){
+        const chosen=q.o.filter(p=>p[1]===S.a[i])[0];
+        const fb=el("div","qfb");fb.innerHTML="<b>What that tends to mean</b>";
+        fb.appendChild(el("p",null,chosen[2]));c.appendChild(fb)}
+      sec.appendChild(c)});
+    w.appendChild(sec)});
+
+  if(!ABOUT&&done()>0){
+    const tools=el("div","anon");
+    tools.appendChild(el("h3",null,"Keep it, or ask your team"));
+    tools.appendChild(el("p",null,"Both of these work from here, and again from your result. Downloads happen in this page \u2014 nothing is uploaded. Codes your team sends back stay sealed until "+MINR+" have arrived."));
+    const rr=el("div","row");rr.style.marginTop="0";
+    if(done()===Q.length){
+      const pdf=el("button","btn sm","Download the PDF");pdf.type="button";
+      pdf.addEventListener("click",()=>{const sc=scoreOf(S.a);
+        makePDF(sc,typeOf(sc),axisScore(sc,"p"),axisScore(sc,"e"),null)});
+      rr.appendChild(pdf)}
+    else{const hint=el("span");hint.style.cssText="font-size:12.5px;color:var(--muted)";
+      hint.textContent="The PDF needs all "+Q.length+" answered \u2014 "+done()+" so far.";rr.appendChild(hint)}
+    const pg=el("button","btn sm ghost","Download this page");pg.type="button";
+    pg.addEventListener("click",downloadSelf);rr.appendChild(pg);
+    tools.appendChild(rr);
+
+    const nm2=document.createElement("input");nm2.type="text";nm2.placeholder="Your name";nm2.value=S.ws;
+    nm2.style.marginTop="14px";
+    const lk2=()=>/^https?:/i.test(location.href)
+      ? location.href.replace(/#.*$/,"")+"#about="+encodeURIComponent(S.ws||"your manager")
+      : "Open the attached file. It will ask about "+(S.ws||"your manager")+".";
+    nm2.addEventListener("input",e=>{S.ws=e.target.value.slice(0,50);
+      const l=document.getElementById("lnk2");if(l)l.value=lk2();
+      const w2=document.getElementById("wsname");if(w2&&w2!==e.target)w2.value=S.ws});
+    tools.appendChild(nm2);
+    const lt2=document.createElement("textarea");lt2.id="lnk2";lt2.readOnly=true;lt2.style.minHeight="44px";lt2.value=lk2();
+    tools.appendChild(lt2);
+    const r3=el("div","row");
+    const cl2=el("button","btn sm","Copy the link for your team");cl2.type="button";
+    cl2.addEventListener("click",()=>copyFrom("lnk2",cl2,"Copy the link for your team"));
+    r3.appendChild(cl2);tools.appendChild(r3);
+    const pl2=el("p",null,"Paste each code they send back:");pl2.style.margin="15px 0 8px";tools.appendChild(pl2);
+    const pt2=document.createElement("textarea");pt2.id="paste2";pt2.placeholder="Paste a code";tools.appendChild(pt2);
+    const r4=el("div","row");
+    const ad2=el("button","btn sm ghost","Add this reply");ad2.type="button";
+    ad2.addEventListener("click",()=>{const bx=document.getElementById("paste2");let n2=0;
+      bx.value.split(/\s+/).map(x=>x.trim()).filter(Boolean).forEach(ch=>{try{S.codes.push(decode(ch));n2++}catch(e){}});
+      if(!n2)window.alert("That did not read as a code. Copy the whole thing, including the very end.");
+      render();window.scrollTo({top:0})});
+    r4.appendChild(ad2);tools.appendChild(r4);
+    const rd=el("div","redo");
+    rd.appendChild(el("h4",null,"Start again"));
+    rd.appendChild(el("p",null,"Clearing your own answers takes you back to the first moment with all "+Q.length+" blank. Your name and any replies from your team are untouched unless you choose the second one."));
+    const rdr=el("div","row");rdr.style.marginTop="0";
+    const r1=el("button","btn sm ghost","Redo all "+Q.length+" answers");r1.type="button";
+    r1.addEventListener("click",()=>{
+      if(!window.confirm("Clear all "+done()+" of your answers and start the whole set again?\n\nYour name and your team\u2019s replies stay."))return;
+      S.a=[];S.m="q";render();window.scrollTo({top:0})});
+    const r2b=el("button","btn sm danger","Wipe everything and start over");r2b.type="button";
+    r2b.addEventListener("click",()=>{
+      if(!window.confirm("Clear everything \u2014 all "+Q.length+" answers, your name, and every reply from your team?\n\nThis cannot be undone and nothing is stored, so there is no copy."))return;
+      S={m:"q",a:[],ws:"",codes:[],zopen:null,demo:false,shut:{},gsort:S.gsort||"default",autoshut:S.autoshut,pshut:{},gshut:{},secShut:{}};render();window.scrollTo({top:0})});
+    rdr.appendChild(r1);rdr.appendChild(r2b);rd.appendChild(rdr);
+    tools.appendChild(rd);
+
+    if(S.codes.length){
+      const ch2=el("div","chips");
+      S.codes.forEach((_,i)=>{const sp=el("span","chip2","Reply "+(i+1)+" ");
+        const x=el("button",null,"\u00d7");x.type="button";x.title="Remove";
+        x.addEventListener("click",()=>{S.codes.splice(i,1);render();window.scrollTo({top:0})});
+        sp.appendChild(x);ch2.appendChild(sp)});
+      tools.appendChild(ch2);
+      const st2=el("div","locked");
+      st2.innerHTML=S.codes.length>=MINR
+        ? "<b>"+S.codes.length+" replies in \u2014 released.</b> Their median sits next to yours on every spectrum in your result."
+        : "<b>Held until "+MINR+" replies.</b> "+S.codes.length+" so far. With fewer than that you could work out who wrote what.";
+      tools.appendChild(st2)}
+    w.appendChild(tools)}
+
+  const ctr=el("div","center");
+  const b=el("button","btn");b.type="button";b.disabled=done()<Q.length;
+  b.textContent=done()<Q.length?("Answer all "+Q.length+" \u2014 "+done()+" so far"):(ABOUT?"Get my code":"See my result");
+  b.addEventListener("click",()=>{S.m="r";render();window.scrollTo({top:0})});
+  ctr.appendChild(b);
+  if(done()>0){
+    const cl=el("button","btn ghost","Clear my answers");cl.type="button";cl.style.marginLeft="9px";
+    cl.addEventListener("click",()=>{if(!window.confirm("Clear all "+done()+" answers?"))return;
+      S.a=[];render();window.scrollTo({top:0})});
+    ctr.appendChild(cl)}
+  w.appendChild(ctr);
+  return w}
+
+/* ---------- shared ---------- */
+function axisRow(k,mine,theirs){
+  const a=AX[k],box=el("div","axis"),top=el("div","top");
+  const l=el("span");l.appendChild(el("b",null,a.n));top.appendChild(l);
+  top.appendChild(el("em",null,theirs===null
+    ?((mine>=a.good[0]&&mine<=a.good[1])?"in the healthy zone":"outside the healthy zone")
+    :(Math.abs(mine-theirs)>=20?"you differ by "+Math.abs(mine-theirs)+" points":"you broadly agree")));
+  box.appendChild(top);
+  const rail=el("div","rail");
+  const g=el("div","good");g.style.left=a.good[0]+"%";g.style.width=(a.good[1]-a.good[0])+"%";
+  g.appendChild(el("i",null,"what good looks like"));rail.appendChild(g);
+  if(theirs!==null){const t=el("div","pin them2 sm2");t.style.left=Math.max(4,Math.min(96,theirs))+"%";
+    t.title="Your team";rail.appendChild(t)}
+  const y=el("div","pin");y.style.left=Math.max(4,Math.min(96,mine))+"%";y.title="You";rail.appendChild(y);
+  box.appendChild(rail);
+  const e=el("div","ends");e.appendChild(el("span",null,a.lo));e.appendChild(el("span",null,a.hi));
+  box.appendChild(e);return box}
+
+function quadrant(P,E){
+  const q=el("div","sec");
+  q.appendChild(el("h3",null,"The quadrant"));
+  q.appendChild(el("p","lead","Your eleven traits on two axes, in the tradition of Blake and Mouton's managerial grid. Across: whether people would choose to work for you again. Up: whether things actually land."));
+  q.appendChild(el("div","mqy","\u25b2  Things land"));
+  const box=el("div","mq");
+  [["mq-tl","Challengers","Delivers hard, and people are counting the months."],
+   ["mq-tr","Leaders","Delivers through people who would follow you again. The only quadrant that compounds."],
+   ["mq-bl","Niche players","Neither landing the work nor keeping anyone. Usually a support problem, not a character one."],
+   ["mq-br","Visionaries","Loved, trusted, and the work does not land."]].forEach(c=>{
+    const cell=el("div","mqc "+c[0]);const lab=el("div","mqn",c[1]);
+    lab.appendChild(el("em",null,c[2]));cell.appendChild(lab);box.appendChild(cell)});
+  box.appendChild(el("div","mqrule v"));box.appendChild(el("div","mqrule h"));
+  const z=el("div","mqzone");z.style.cssText="left:62%;top:0;width:38%;height:38%";
+  z.appendChild(el("i",null,"aim here"));box.appendChild(z);
+  if(P!==null&&E!==null){const me=el("div","me");me.style.left=P+"%";me.style.top=(100-E)+"%";
+    me.appendChild(el("i"));me.appendChild(el("b",null,"You \u00b7 "+P+"/"+E));box.appendChild(me)}
+  q.appendChild(box);
+  const ax=el("div","mqax");
+  ax.appendChild(el("span",null,"They are counting the months"));
+  ax.appendChild(el("span",null,"They would follow you  \u25b6"));
+  q.appendChild(ax);return q}
+
+const VERD=[
+ [78,"They would follow you to your next job.","On the traits that decide whether people re-enlist, you are in good shape. The risk from here is complacency rather than a cliff \u2014 a reputation like this is built slowly and spent quickly, usually in one bad quarter when you were under pressure and stopped noticing."],
+ [62,"They would work for you again.","Not with a banner, but genuinely \u2014 if you called them in two years, most would take the meeting. Look at whichever trait sits furthest outside its healthy zone, because that is the one quietly deciding whether this holds."],
+ [45,"They would think about it.","You are not the reason anyone is leaving, and not the reason anyone is staying either. That sounds neutral and is not: the strongest people choose their manager, and you are currently not a factor in that choice. Nothing here is broken, which is exactly why it goes unaddressed for years."],
+ [28,"Probably not, and they would be polite about why.","People are managing around you rather than working with you. Nobody will say this to your face \u2014 the exit conversations will mention timing, or a stretch opportunity, or being ready for something new. Read the timeline and notice how much has already happened."],
+ [0,"They think about you outside work, and not fondly.","This is the honest reading and it is worth sitting with rather than arguing with. The pattern is doing real damage to people who cannot say so, and the fact that none of it was intended does not reduce the effect by a single point. One conversation with somebody who left your team would tell you more than the rest of this page."]];
+const verdOf=P=>VERD.filter(v=>P>=v[0])[0];
+function verdict(P){const v=verdOf(P);
+  const d=el("div","verdict "+(P>=70?"v-good":P>=45?"v-mid":"v-bad"));
+  d.appendChild(el("h3",null,"Would they work for you again?"));
+  d.appendChild(el("h2",null,v[1]));d.appendChild(el("p",null,v[2]));return d}
+
+function stepsFor(sc){
+  const o=outOf(sc);
+  const picks=(o.length?o.slice(0,3):Object.keys(AX).filter(k=>sc[k]!==null)
+    .map(k=>({k:k,side:sc[k]>midOf(k)?"hi":"lo",d:0}))
+    .sort((a,b)=>Math.abs(sc[b.k]-midOf(b.k))-Math.abs(sc[a.k]-midOf(a.k))).slice(0,2));
+  return picks}
+
+/* ---------- result ---------- */
+function results(){
+  const w=el("div"),sc=scoreOf(S.a),T=typeOf(sc);
+  const P=axisScore(sc,"p"),E=axisScore(sc,"e");
+  const teamOK=S.codes.length>=MINR;
+  const th=teamOK?(function(){const acc={};Object.keys(AX).forEach(k=>acc[k]=[]);
+    S.codes.forEach(a=>{const s=scoreOf(a);Object.keys(AX).forEach(k=>{if(s[k]!==null)acc[k].push(s[k])})});
+    const o={};Object.keys(AX).forEach(k=>{const v=acc[k];if(!v.length){o[k]=null;return}
+      const s2=[...v].sort((x,y)=>x-y),m=Math.floor(s2.length/2);
+      o[k]=s2.length%2?s2[m]:(s2[m-1]+s2[m])/2});return o})():null;
+
+  if(ABOUT){
+    const p=el("div","portrait");
+    p.appendChild(el("div","k","That is it \u2014 thank you"));
+    p.appendChild(el("h2",null,"Send this code back to "+ABOUT));
+    p.appendChild(el("p",null,"Twenty-two numbers and nothing else. No name, no timestamp. They will not see any of it until at least three people have replied."));
+    w.appendChild(p);
+    const s=el("div","anon");s.appendChild(el("h3",null,"Your code"));
+    const ta=document.createElement("textarea");ta.id="code";ta.readOnly=true;ta.value=encode(S.a);
+    s.appendChild(ta);
+    const r=el("div","row");
+    const cp=el("button","btn sm","Copy the code");cp.type="button";
+    cp.addEventListener("click",()=>copyFrom("code",cp,"Copy the code"));
+    const bk=el("button","btn sm ghost","Change an answer");bk.type="button";
+    bk.addEventListener("click",()=>{S.m="q";render();window.scrollTo({top:0})});
+    const so=el("button","btn sm ghost","Start over");so.type="button";
+    so.addEventListener("click",()=>{if(!window.confirm("Clear your answers and start again?"))return;
+      S={m:"q",a:[],ws:"",codes:[]};render();window.scrollTo({top:0})});
+    r.appendChild(cp);r.appendChild(bk);r.appendChild(so);s.appendChild(r);w.appendChild(s);
+    w.appendChild(el("div","foot","Nothing was uploaded and nothing was saved. Closing this tab loses the code, so send it before you do."));
+    return w}
+
+  const inZone=Object.keys(AX).filter(k=>pct(k,sc[k])>=AX[k].good[0]&&pct(k,sc[k])<=AX[k].good[1]).length;
+  const quad=(E>=50?(P>=50?"Leaders":"Challengers"):(P>=50?"Visionaries":"Niche players"));
+  const st=el("div","stats");
+  [[inZone+"/11","In the healthy zone"],[quad,"Quadrant"],[P+"/"+E,"People / Delivery"],
+   [S.codes.length,S.codes.length===1?"Anonymous reply":"Anonymous replies"]].forEach(p=>{
+    const d=el("div","stat");d.appendChild(el("b",null,String(p[0])));d.appendChild(el("span",null,p[1]));st.appendChild(d)});
+  w.appendChild(st);
+
+  if(S.demo){
+    const dm=el("div","note");dm.style.borderLeftColor="var(--petrol)";
+    dm.innerHTML="<p><b>This is the worked example, not your result.</b> A delivery-focused leader with a people-side gap, and three anonymous replies that see the grip and the spotlight rather differently from the way they do. Every section below is filled in so you can see what a finished result looks like.</p>";
+    const r0=el("div","row");r0.style.marginTop="4px";
+    const cb=el("button","btn sm","Clear it and answer for myself");cb.type="button";
+    cb.addEventListener("click",()=>{S={m:"q",a:[],ws:"",codes:[],zopen:null,demo:false,shut:{},gsort:S.gsort||"default",autoshut:S.autoshut,pshut:{},gshut:{},secShut:{}};
+      render();window.scrollTo({top:0})});
+    r0.appendChild(cb);dm.appendChild(r0);w.appendChild(dm)}
+
+  const warn=el("div","warn");
+  warn.innerHTML=S.demo
+    ? "<b>Nothing here is saved.</b> This example lives in the page like any other answer set \u2014 refreshing loses it."
+    : "<b>Nothing here is saved.</b> Download the PDF if you want to keep it \u2014 it has your answers, your pattern and the steps.";
+  w.appendChild(warn);
+
+  const dlrow=el("div","row");dlrow.style.marginTop="0";
+  const pdf=el("button","btn","Download the PDF");pdf.type="button";
+  pdf.addEventListener("click",()=>makePDF(sc,T,P,E,th));
+  dlrow.appendChild(pdf);
+  const pg=el("button","btn ghost","Download this page");pg.type="button";
+  pg.addEventListener("click",downloadSelf);dlrow.appendChild(pg);
+  w.appendChild(dlrow);
+
+  const p=el("div","portrait");
+  p.appendChild(el("div","k",S.ws?esc2(S.ws):"Your pattern"));
+  p.appendChild(el("h2",null,T.t.n));
+  p.appendChild(el("p",null,T.t.d));
+  w.appendChild(p);
+  w.appendChild(verdict(P));
+
+  /* --- small steps --- */
+  const sp=el("div","sec");
+  sp.appendChild(el("h3",null,"Small steps"));
+  sp.appendChild(el("p","lead","Deliberately small. One visible change beats five invisible intentions, and your team will notice the first one long before they notice the plan behind it. Take the top block first and leave the rest alone until it has stuck."));
+  stepsFor(sc).forEach((x,n)=>{
+    sp.appendChild(el("div","ah"+(n===0?" f":""),AX[x.k].n+" \u2014 "+(x.side==="hi"?AX[x.k].hi.toLowerCase():AX[x.k].lo.toLowerCase())+(x.d>0?"":" (nearest the edge)")));
+    const box=el("div","stp");
+    STEPS[x.k][x.side].forEach((s2,i)=>{
+      const r=el("div","stp"+i);
+      r.appendChild(el("div","w w"+i,s2[0]));
+      r.appendChild(el("p",null,s2[1]));box.appendChild(r)});
+    sp.appendChild(box)});
+  w.appendChild(sp);
+
+  /* --- who fits --- */
+  const fitSec=el("div","sec");
+  fitSec.appendChild(el("h3",null,"Who thrives under you, and who quietly does not"));
+  fitSec.appendChild(el("p","lead","Every leadership style suits some people and costs others. This is not about hiring people who agree with you \u2014 it is about knowing which of your current team is paying for the way you work, and what you have to compensate for deliberately."));
+  const fitPicks=stepsFor(sc);
+  fitPicks.forEach((x,n)=>{
+    const f=FIT[x.k][x.side];
+    fitSec.appendChild(el("div","ah"+(n===0?" f":""),AX[x.k].n+" \u2014 "+(x.side==="hi"?AX[x.k].hi.toLowerCase():AX[x.k].lo.toLowerCase())));
+    const g=el("div","fitgrid");
+    const a=el("div","yes");a.innerHTML="<h4>Thrives with you</h4>";a.appendChild(el("p",null,f.t));
+    const b=el("div","no");b.innerHTML="<h4>Struggles, quietly</h4>";b.appendChild(el("p",null,f.s));
+    g.appendChild(a);g.appendChild(b);fitSec.appendChild(g);
+    const h=el("div","hire");h.innerHTML="<b>What to do about it</b>";
+    h.appendChild(document.createTextNode(f.h));fitSec.appendChild(h)});
+  w.appendChild(fitSec);
+
+  /* --- tell them up front --- */
+  const manSec=el("div","sec");
+  manSec.appendChild(el("h3",null,"What to tell your team, up front"));
+  manSec.appendChild(el("p","lead","Eleven sentences, one per trait, written from where you actually sit. Most of the damage a leadership style does comes from people having to work it out by trial and error. Saying it out loud on day one removes about half of that, and costs you nothing but the discomfort of saying it."));
+  const ul=el("ul");
+  const manLines=Object.keys(AX).map(k=>{const side=sc[k]>midOf(k)?"hi":"lo";
+    return {k:k,label:AX[k].n+" \u00b7 "+(side==="hi"?AX[k].hi.toLowerCase():AX[k].lo.toLowerCase()),text:MANUAL[k][side]}});
+  manLines.forEach(m=>{const li=document.createElement("li");
+    li.appendChild(el("em",null,m.label));li.appendChild(document.createTextNode(m.text));ul.appendChild(li)});
+  const mw=el("div","man");mw.appendChild(ul);manSec.appendChild(mw);
+  const mr=el("div","row");
+  const cpm=el("button","btn sm","Copy all eleven");cpm.type="button";
+  cpm.addEventListener("click",()=>{
+    const ta=document.createElement("textarea");
+    ta.value="How I work \u2014 "+(S.ws||"a note for the team")+"\n\n"+manLines.map(m=>"\u2022 "+m.text).join("\n\n");
+    ta.style.cssText="position:fixed;left:-9999px";document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");cpm.textContent="Copied";setTimeout(()=>cpm.textContent="Copy all eleven",1600)}catch(e){}
+    document.body.removeChild(ta)});
+  mr.appendChild(cpm);
+  const mn=el("span");mn.style.cssText="font-size:12.5px;color:var(--muted)";
+  mn.textContent="Say the two or three that matter most rather than reading all eleven at somebody.";
+  mr.appendChild(mn);manSec.appendChild(mr);
+  w.appendChild(manSec);
+
+  /* --- compatibility zones --- */
+  const cz=el("div","sec");
+  cz.appendChild(el("h3",null,"Compatibility zones"));
+  cz.appendChild(el("p","lead","Eight kinds of person, scored against what each of them actually needs from a manager. This is not about hiring people who agree with you \u2014 a team of only the top two rows would be a very comfortable team that never argued with you. It is about knowing where the friction is before somebody works it out on their own and leaves."));
+  compatOf(sc).forEach(c=>{
+    const z=zoneOf(c.score),k=c.p.k;
+    const row=el("div","zrow"+(S.zopen===k?" open":""));
+    const hd=el("button","zhead");hd.type="button";
+    hd.appendChild(el("span","simtw","\u25b8"));
+    const nm=el("span","znm",c.p.n);nm.appendChild(el("em",null,c.p.d.split(".")[0]+"."));
+    hd.appendChild(nm);
+    const bar=el("div","zbar "+z[2]);const fi=el("i");fi.style.width=Math.max(4,c.score)+"%";bar.appendChild(fi);
+    hd.appendChild(bar);
+    hd.appendChild(el("span","ztag "+z[2],z[1]+"  "+c.score));
+    hd.addEventListener("click",()=>{S.zopen=S.zopen===k?null:k;render()});
+    row.appendChild(hd);
+    if(S.zopen===k){
+      const b=el("div","zbody");
+      b.appendChild(el("p",null,c.p.d));
+      b.appendChild(el("p",null,z[3]));
+      const good=el("div","zwhy");good.innerHTML="<b>What works</b>";
+      good.appendChild(document.createTextNode("Your "+AX[c.best.k].n.toLowerCase()+" suits them \u2014 they want it "+
+        (c.best.end==="mid"?"near the middle":c.best.end==="lo"?AX[c.best.k].lo.toLowerCase():AX[c.best.k].hi.toLowerCase())+
+        ", and that is roughly where you sit."));
+      b.appendChild(good);
+      if(c.worst.m<0.66){
+        const bad=el("div","zwhy");bad.style.borderLeft="3px solid var(--bad)";bad.innerHTML="<b>Where the friction is</b>";
+        bad.appendChild(document.createTextNode("They need your "+AX[c.worst.k].n.toLowerCase()+" to be "+
+          (c.worst.end==="mid"?"nearer the middle":c.worst.end==="lo"?AX[c.worst.k].lo.toLowerCase():AX[c.worst.k].hi.toLowerCase())+
+          ", and it is not. That single mismatch is doing more damage to this pairing than everything else combined."));
+        b.appendChild(bad)}
+      const w2=el("div","zwhy");w2.style.borderLeft="3px solid var(--amber)";w2.innerHTML="<b>What to do with them</b>";
+      w2.appendChild(document.createTextNode(c.p.watch));
+      b.appendChild(w2);
+      row.appendChild(b)}
+    cz.appendChild(row)});
+  w.appendChild(cz);
+
+  w.appendChild(quadrant(P,E));
+
+  const an=el("div","anon");
+  an.appendChild(el("h3",null,"Ask your team, anonymously"));
+  an.appendChild(el("p",null,"They answer the same twenty-two moments about you. The code they send back holds twenty-two numbers and nothing else. Nothing appears until at least "+MINR+" have replied, so you cannot work out who said what from the first one in."));
+  const nm=document.createElement("input");nm.type="text";nm.placeholder="Your name";nm.value=S.ws;
+  nm.addEventListener("input",e=>{S.ws=e.target.value.slice(0,50);
+    const l=document.getElementById("lnk");if(l)l.value=linkText()});
+  an.appendChild(nm);
+  const linkText=()=>/^https?:/i.test(location.href)
+    ? location.href.replace(/#.*$/,"")+"#about="+encodeURIComponent(S.ws||"your manager")
+    : "Open the attached file. It will ask about "+(S.ws||"your manager")+".";
+  const lt=document.createElement("textarea");lt.id="lnk";lt.readOnly=true;lt.style.minHeight="44px";lt.value=linkText();
+  an.appendChild(lt);
+  const r1=el("div","row");
+  const cl=el("button","btn sm","Copy the link");cl.type="button";
+  cl.addEventListener("click",()=>copyFrom("lnk",cl,"Copy the link"));
+  r1.appendChild(cl);an.appendChild(r1);
+  const pl=el("p",null,"Paste each code they send back:");pl.style.margin="16px 0 8px";an.appendChild(pl);
+  const pt=document.createElement("textarea");pt.id="paste";pt.placeholder="Paste a code";an.appendChild(pt);
+  const r2=el("div","row");
+  const ad=el("button","btn sm ghost","Add this reply");ad.type="button";
+  ad.addEventListener("click",()=>{const box=document.getElementById("paste");let n=0;
+    box.value.split(/\s+/).map(x=>x.trim()).filter(Boolean).forEach(ch=>{try{S.codes.push(decode(ch));n++}catch(e){}});
+    if(!n)window.alert("That did not read as a code. Copy the whole thing, including the very end.");
+    render();window.scrollTo({top:0})});
+  r2.appendChild(ad);an.appendChild(r2);
+  if(S.codes.length){const ch=el("div","chips");
+    S.codes.forEach((_,i)=>{const s2=el("span","chip2","Reply "+(i+1)+" ");
+      const x=el("button",null,"\u00d7");x.type="button";x.title="Remove";
+      x.addEventListener("click",()=>{S.codes.splice(i,1);render();window.scrollTo({top:0})});
+      s2.appendChild(x);ch.appendChild(s2)});
+    const rm=el("button","btn sm ghost","Remove all");rm.type="button";
+    rm.style.cssText="padding:4px 10px;font-size:11.5px";
+    rm.addEventListener("click",()=>{if(!window.confirm("Remove all replies?"))return;S.codes=[];render()});
+    ch.appendChild(rm);an.appendChild(ch)}
+  if(S.codes.length&&!teamOK){const lk=el("div","locked");
+    lk.innerHTML="<b>Held until "+MINR+" replies.</b> "+S.codes.length+" so far. With fewer than that you could work out who wrote what, which is the reason anyone answers honestly in the first place.";
+    an.appendChild(lk)}
+  w.appendChild(an);
+
+  const s1=el("div","sec");
+  s1.appendChild(el("h3",null,"Where you sit on all eleven"));
+  s1.appendChild(el("p","lead","The green band is where the research points. It is deliberately not always the middle \u2014 on candour, conflict and wake, erring past centre beats falling short of it; on the rest, it does not."));
+  if(th){const key=el("div","key");
+    [["y","You"],["t","Your team, median of "+S.codes.length],["g","What good looks like"]].forEach(pr=>{
+      const s2=el("span");s2.appendChild(el("i",pr[0]));s2.appendChild(document.createTextNode(pr[1]));key.appendChild(s2)});
+    s1.appendChild(key)}
+  Object.keys(AX).forEach(k=>s1.appendChild(axisRow(k,pct(k,sc[k]),th?pct(k,th[k]):null)));
+  w.appendChild(s1);
+
+  if(th){
+    const gaps=Object.keys(AX).map(k=>({k:k,d:pct(k,sc[k])-pct(k,th[k])}))
+      .filter(x=>Math.abs(x.d)>=20).sort((a,b)=>Math.abs(b.d)-Math.abs(a.d));
+    const g=el("div","gap");
+    if(!gaps.length)g.appendChild(el("p",null,"You and your team place you in much the same spot on all ten. That is rarer than you would think, and it means whatever you decide to change will land roughly where you intend it to."));
+    else{const x=gaps[0],dir=x.d>0?AX[x.k].hi.toLowerCase():AX[x.k].lo.toLowerCase();
+      g.appendChild(el("p",null,"The biggest difference is "+AX[x.k].n.toLowerCase()+". You put yourself further toward "+dir+" than they do"+
+        (gaps.length>1?", with smaller gaps on "+gaps.slice(1).map(y=>AX[y.k].n.toLowerCase()).join(" and "):"")+"."));
+      g.appendChild(el("p",null,"A gap does not mean they are right and you are wrong. It means what you intend is turning into something else on the way, so every adjustment you make is aimed at a version of you only you can see. Worth one honest conversation, not a defence."))}
+    w.appendChild(g)}
+
+  const s2=el("div","sec");
+  s2.appendChild(el("h3",null,"Where this ends up if nothing changes"));
+  s2.appendChild(el("p","lead","Not a prediction. This is the ordinary path for your pattern, and the only reason to look at it is that all three stages are still avoidable today."));
+  const tl=el("div","tl");
+  ["Already happening","Within six months","Within two years"].forEach((h,i)=>{
+    const s3=el("div","step s"+i);s3.appendChild(el("h4",null,h));
+    s3.appendChild(el("p",null,T.t.tl[i]));tl.appendChild(s3)});
+  s2.appendChild(tl);w.appendChild(s2);
+
+  const s4=el("div","sec");
+  s4.appendChild(el("h3",null,"What your team gets, and what they pay for it"));
+  let first=true;
+  Object.keys(AX).forEach(k=>{const side=sc[k]>midOf(k)?"hi":"lo",r=READ[k][side];
+    s4.appendChild(el("div","ah"+(first?" f":""),AX[k].n+" \u2014 "+(side==="hi"?AX[k].hi.toLowerCase():AX[k].lo.toLowerCase())));
+    first=false;
+    const gp=el("div","gets");
+    const a=el("div","g");a.innerHTML="<h4>They get</h4>";a.appendChild(el("p",null,r.g));
+    const b=el("div","p");b.innerHTML="<h4>They pay</h4>";b.appendChild(el("p",null,r.p));
+    gp.appendChild(a);gp.appendChild(b);s4.appendChild(gp)});
+  w.appendChild(s4);
+
+  const r=el("div","row");
+  [["Review or change my answers",()=>{S.m="q";render();window.scrollTo({top:0})}],
+   ["See all patterns",()=>{S.m="p";render();window.scrollTo({top:0})}],
+   ["Print",()=>window.print()],
+   ["Redo all "+Q.length+" answers",()=>{if(!window.confirm("Clear all "+Q.length+" of your answers and start the whole set again?\n\nYour name and your team\u2019s replies stay."))return;
+     S.a=[];S.m="q";render();window.scrollTo({top:0})}],
+   ["Wipe everything",()=>{if(!window.confirm("Clear everything \u2014 all "+Q.length+" answers, your name, and every reply?\n\nThis cannot be undone and nothing is stored, so there is no copy."))return;
+     S={m:"q",a:[],ws:"",codes:[],zopen:null};render();window.scrollTo({top:0})}]
+  ].forEach(pair=>{const b=el("button","btn sm ghost",pair[0]);b.type="button";
+    b.addEventListener("click",pair[1]);r.appendChild(b)});
+  w.appendChild(r);
+  w.appendChild(el("div","foot","Nothing here is uploaded and nothing is stored. The PDF is generated in this page \u2014 it never goes anywhere either."));
+  return w}
+
+/* ---------- PDF ---------- */
+function makePDF(sc,T,P,E,th){
+  const d=PDF(),v=verdOf(P);
+  const title=S.ws?S.ws:"Leadership check";
+  d.text(title,{size:21,bold:true,after:2});
+  d.text((S.demo?"WORKED EXAMPLE, not a real result  -  ":"")+"Leadership self-assessment  -  "+
+    new Date().toISOString().slice(0,10)+"  -  twenty-two moments, eleven traits",
+    {size:9.5,r:0.42,g:0.5,b:0.55,after:8});
+  d.rule();
+  d.text("YOUR PATTERN",{size:9,bold:true,r:0.42,g:0.5,b:0.55,after:2});
+  d.text(T.t.n,{size:17,bold:true,after:3});
+  d.text(T.t.d,{size:10.5,after:10});
+  d.text("WOULD THEY WORK FOR YOU AGAIN?",{size:9,bold:true,r:0.42,g:0.5,b:0.55,after:2});
+  d.text(v[1],{size:13,bold:true,after:3});
+  d.text(v[2],{size:10.5,after:6});
+  d.text("Quadrant: "+(E>=50?(P>=50?"Leaders":"Challengers"):(P>=50?"Visionaries":"Niche players"))+
+    "   -   people "+P+"/100, delivery "+E+"/100"+(th?"   -   "+S.codes.length+" anonymous replies included":""),
+    {size:10,bold:true,after:12});
+
+  d.rule();
+  d.text("WHERE YOU SIT",{size:9,bold:true,r:0.42,g:0.5,b:0.55,after:2});
+  d.text("The shaded band is the healthy range. The marker is you.",{size:9.5,r:0.42,g:0.5,b:0.55,after:8});
+  Object.keys(AX).forEach(k=>{
+    const p=pct(k,sc[k]),a=AX[k],inb=p>=a.good[0]&&p<=a.good[1];
+    d.text(a.n+"  -  "+p+"/100"+(inb?"  (in the healthy zone)":"  (outside the healthy zone)")+
+      (th?"   |   your team: "+pct(k,th[k]):""),{size:10.5,bold:true,after:2});
+    d.bar(p,a.good[0],a.good[1]);
+    d.ends(a.lo,a.hi)});
+
+  d.space(6);d.rule();
+  d.text("SMALL STEPS",{size:9,bold:true,r:0.42,g:0.5,b:0.55,after:2});
+  d.text("Take the first block and leave the rest until it has stuck.",{size:9.5,r:0.42,g:0.5,b:0.55,after:8});
+  stepsFor(sc).forEach(x=>{
+    d.text(AX[x.k].n+" - "+(x.side==="hi"?AX[x.k].hi.toLowerCase():AX[x.k].lo.toLowerCase()),{size:11.5,bold:true,after:3});
+    STEPS[x.k][x.side].forEach(s2=>{
+      d.text(s2[0],{size:9,bold:true,indent:8,after:1});
+      d.text(s2[1],{size:10.5,indent:8,after:6})});
+    d.space(4)});
+
+  d.rule();
+  d.text("WHO THRIVES UNDER YOU, AND WHO DOES NOT",{size:9,bold:true,r:0.42,g:0.5,b:0.55,after:6});
+  stepsFor(sc).forEach(x=>{const f=FIT[x.k][x.side];
+    d.text(AX[x.k].n+" - "+(x.side==="hi"?AX[x.k].hi.toLowerCase():AX[x.k].lo.toLowerCase()),{size:11.5,bold:true,after:3});
+    d.text("Thrives with you",{size:9,bold:true,indent:8,after:1});
+    d.text(f.t,{size:10.5,indent:8,after:5});
+    d.text("Struggles, quietly",{size:9,bold:true,indent:8,after:1});
+    d.text(f.s,{size:10.5,indent:8,after:5});
+    d.text("What to do about it",{size:9,bold:true,indent:8,after:1});
+    d.text(f.h,{size:10.5,indent:8,after:9})});
+
+  d.rule();
+  d.text("COMPATIBILITY ZONES",{size:9,bold:true,r:0.42,g:0.5,b:0.55,after:2});
+  d.text("Eight kinds of person, scored against what each needs from a manager. A team made only of the top rows would be very comfortable and would never argue with you.",
+    {size:9.5,r:0.42,g:0.5,b:0.55,after:8});
+  compatOf(sc).forEach(c=>{const z=zoneOf(c.score);
+    d.text(c.p.n+" - "+z[1]+" ("+c.score+"/100)",{size:11,bold:true,after:2});
+    d.bar(c.score,ZONES[1][0],100);
+    d.text(c.p.d,{size:10,indent:8,after:3});
+    if(c.worst.m<0.66)d.text("Friction: they need your "+AX[c.worst.k].n.toLowerCase()+" to be "+
+      (c.worst.end==="mid"?"nearer the middle":c.worst.end==="lo"?AX[c.worst.k].lo.toLowerCase():AX[c.worst.k].hi.toLowerCase())+
+      ", and it is not.",{size:10,indent:8,after:3});
+    d.text(c.p.watch,{size:10,indent:8,after:9})});
+
+  d.rule();
+  d.text("WHAT TO TELL YOUR TEAM, UP FRONT",{size:9,bold:true,r:0.42,g:0.5,b:0.55,after:2});
+  d.text("One sentence per trait, from where you actually sit. Say the two or three that matter most rather than reading all eleven at somebody.",
+    {size:9.5,r:0.42,g:0.5,b:0.55,after:8});
+  Object.keys(AX).forEach(k=>{const side=sc[k]>midOf(k)?"hi":"lo";
+    d.text(AX[k].n+" - "+(side==="hi"?AX[k].hi.toLowerCase():AX[k].lo.toLowerCase()),{size:9,bold:true,after:1});
+    d.text("\u201c"+MANUAL[k][side]+"\u201d",{size:10.5,indent:8,after:7})});
+
+  d.rule();
+  d.text("IF NOTHING CHANGES",{size:9,bold:true,r:0.42,g:0.5,b:0.55,after:4});
+  ["Already happening","Within six months","Within two years"].forEach((h,i)=>{
+    d.text(h,{size:9.5,bold:true,after:1});d.text(T.t.tl[i],{size:10.5,after:7})});
+
+  d.rule();
+  d.text("YOUR ANSWERS",{size:9,bold:true,r:0.42,g:0.5,b:0.55,after:6});
+  Q.forEach((q,i)=>{
+    const ch=q.o.filter(o=>o[1]===S.a[i])[0];
+    d.text((i+1)+". "+q.t+"  ("+AX[q.ax].n+")",{size:10,bold:true,after:1});
+    d.text(q.s,{size:9.5,r:0.42,g:0.5,b:0.55,after:2});
+    d.text("You chose: "+ch[0],{size:10.5,indent:8,after:1});
+    d.text(ch[2],{size:9.5,indent:8,r:0.42,g:0.5,b:0.55,after:8})});
+
+  d.rule();
+  d.text("Nothing in this assessment was uploaded anywhere. It was generated in the browser from answers held only in that page. It is a self-assessment, and self-assessments are systematically kinder than the people being assessed.",
+    {size:9,r:0.42,g:0.5,b:0.55});
+
+  const blob=d.build();
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="leadership-check"+(S.ws?"-"+S.ws.replace(/[^a-z0-9]+/gi,"-").replace(/^-|-$/g,"").toLowerCase():"")+".pdf";
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(a.href),3000)}
+
+/* A downloaded copy is a document you chose to keep, not a session. It carries its
+   answers in a data island so the file actually reopens as itself. Nothing is written
+   to storage at any point, so closing the tab without downloading loses everything. */
+function downloadSelf(){
+  const old=document.getElementById("saved-state");if(old)old.remove();
+  const tag=document.createElement("script");
+  tag.type="application/json";tag.id="saved-state";
+  tag.textContent=JSON.stringify({a:S.a,ws:S.ws,codes:S.codes,demo:!!S.demo});
+  document.head.appendChild(tag);
+  const doc="<!DOCTYPE html>\n"+document.documentElement.outerHTML;
+  tag.remove();
+  const b=new Blob([doc],{type:"text/html;charset=utf-8"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(b);
+  a.download="leadership-check"+(S.ws?"-"+S.ws.replace(/[^a-z0-9]+/gi,"-").replace(/^-|-$/g,"").toLowerCase():"")+".html";
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
+function copyFrom(id,btn,label){const t=document.getElementById(id);t.readOnly=false;t.select();
+  try{document.execCommand("copy");btn.textContent="Copied";setTimeout(()=>btn.textContent=label,1500)}catch(e){}
+  t.readOnly=true}
+
+/* Real-world distribution, not the simulation. Sources listed under the chart. */
+const HIST=[
+ {h:"How managerial talent is distributed",
+  rows:[["High natural talent to manage","about 1 in 10 people",10,"h-good"],
+        ["Enough talent to do it well with real investment","a further 2 in 10",20,"h-mid"],
+        ["Neither, and usually promoted anyway","the remaining 7 in 10",70,"h-bad"]]},
+ {h:"What that produces, measured at the other end",
+  rows:[["Employees engaged at work","globally, 2025",20,"h-good"],
+        ["Not engaged","present, doing the job, nothing more",64,"h-warn"],
+        ["Actively disengaged","working against it",16,"h-bad"]]},
+ {h:"Four numbers about the managers themselves",
+  rows:[["Employees who trust their immediate manager","down from 46% in 2022",29,"h-bad"],
+        ["Managers who are themselves engaged","down from 31% in 2022",22,"h-bad"],
+        ["Managers engaged in best-practice organisations","the same job, a different setting",79,"h-good"],
+        ["Manager appointments that pick the wrong candidate","by Gallup's own analytics",82,"h-bad"]]}];
+const HREFS=[
+ ["https://www.gallup.com/workplace/231593/why-great-managers-rare.aspx",
+  "Gallup, State of the American Manager (2015). About one in ten people have high natural talent to manage, and a further two in ten have enough to reach a high standard with real investment. The same work found that companies fail to pick the candidate with the right talent 82% of the time, and that managers account for at least 70% of the variance in team engagement between business units."],
+ ["https://www.gallup.com/workplace/349484/state-of-the-global-workplace.aspx",
+  "Gallup, State of the Global Workplace 2026. Global employee engagement fell to 20% in 2025, its lowest since 2020, with 64% not engaged and 16% actively disengaged. Manager engagement itself fell from 31% in 2022 to 22% in 2025 \u2014 while in organisations Gallup classifies as best practice it stood at 79%."],
+ ["https://www.ddi.com/research/global-leadership-forecast-2025",
+  "DDI, Global Leadership Forecast 2025 (2,185 HR professionals and 10,796 leaders across more than 50 countries). Trust in immediate managers fell to 29%, down from 46% in 2022. Departure intent among high-potential individual contributors rose from 13% in 2020 to 21% in 2024, and they were roughly four times more likely to leave where their manager did not regularly provide growth opportunities."]];
+
+/* A worked example: a delivery-focused leader with a people-side gap, plus three
+   anonymous replies that see the grip and the spotlight rather differently. */
+const EXAMPLE={
+ ws:"Alex Mercer (worked example)",
+ a:[4,3, 3,3, 3,3, 3,2, 3,3, 3,2, 2,2, 3,3, 3,2, 2,2, 2,2],
+ r:[[4,4, 4,3, 2,2, 3,3, 4,3, 4,4, 3,3, 2,2, 2,2, 3,3, 3,3],
+    [4,4, 3,4, 2,3, 3,2, 3,4, 4,3, 3,2, 2,3, 3,2, 3,2, 3,3],
+    [3,4, 3,3, 2,2, 2,3, 3,3, 3,4, 2,3, 3,2, 2,3, 2,3, 2,3]]};
+function loadExample(){
+  S={m:"r",a:EXAMPLE.a.slice(),ws:EXAMPLE.ws,codes:EXAMPLE.r.map(x=>x.slice()),zopen:null,demo:true,shut:{},gsort:S.gsort||"default",autoshut:S.autoshut,pshut:{},gshut:{},secShut:{}};
+  render();window.scrollTo({top:0})}
+
+/* ---------- compatibility zones ----------
+   Eight kinds of person, and what each of them needs from the traits above.
+   end: "lo" wants that trait low, "hi" wants it high, "mid" wants it near centre.
+   The weight is how much that trait decides whether the pairing works. */
+const PEOPLE=[
+ {k:"start",n:"The Self-Starter",
+  d:"Wants the goal and then to be left alone. Does the best work of their career when nobody is checking, and reads supervision as doubt.",
+  needs:[["grip","lo",3],["cmd","lo",3],["conf","lo",1],["light","mid",1],["wake","mid",1]],
+  watch:"Give them the outcome and the constraints in one conversation, then genuinely go away. Check in on a date you both agreed rather than when you feel like it."},
+ {k:"appr",n:"The Apprentice",
+  d:"New to the work or the domain. Needs a visible standard and correction close to the event, and cannot yet tell good from nearly-good.",
+  needs:[["grip","hi",3],["cmd","hi",2],["say","hi",3],["grow","lo",3],["conf","hi",1]],
+  watch:"They will not ask for the thing they most need. Book the time rather than leaving the door open, and say what good looks like before they start, not after."},
+ {k:"craft",n:"The Craftsperson",
+  d:"Deep specialist. Their judgement is the thing you hired and they know more than you do about their part of it.",
+  needs:[["grip","lo",3],["cmd","lo",3],["say","hi",2],["light","lo",2],["fair","mid",2]],
+  watch:"Argue with their conclusions, never with their method. If you find yourself explaining their own discipline back to them, you have already lost some of the reason they joined."},
+ {k:"climb",n:"The Climber",
+  d:"Ambitious and open about it. Wants visibility, a route upward, and a manager who will spend capital on them.",
+  needs:[["light","lo",3],["grow","lo",3],["self","lo",2],["say","hi",2],["wake","mid",1]],
+  watch:"Be explicit about the timeline, including when it is not soon. Ambitious people cope with a no far better than with a maybe that never resolves."},
+ {k:"steady",n:"The Steady Operator",
+  d:"Reliable, low drama, carries a lot without complaint. Wants a predictable week more than an exciting one.",
+  needs:[["wx","lo",3],["cmd","hi",1],["out","mid",2],["conf","hi",1],["fair","mid",2]],
+  watch:"They are the easiest person on your team to take for granted, and the one whose leaving will surprise you most. Notice them out loud, on a schedule if you have to."},
+ {k:"chall",n:"The Challenger",
+  d:"Argues, tests decisions, and brings you the dissent nobody else will. Expensive to manage and the reason you avoid a bad quarter.",
+  needs:[["cmd","lo",3],["say","hi",2],["wx","lo",2],["wake","mid",2],["out","mid",1]],
+  watch:"Separate the challenge from the decision. Thank them properly for the argument in front of others, and then be clear that the call is made and you expect them behind it."},
+ {k:"quiet",n:"The Quiet One",
+  d:"Very capable and will not self-advocate. Will not raise a problem unprompted, and will absorb far more than is reasonable before saying anything.",
+  needs:[["light","lo",3],["say","hi",2],["conf","hi",2],["wx","lo",3],["fair","mid",2]],
+  watch:"Silence from them is not agreement and it is not contentment. Ask specific questions rather than open ones, and put their name in rooms they are not in."},
+ {k:"anx",n:"The Anxious High Performer",
+  d:"Excellent work and a permanent low hum of worry about it. Reads your mood accurately and over-interprets it.",
+  needs:[["wx","lo",3],["say","hi",2],["out","mid",2],["wake","mid",2],["fair","mid",2],["grip","mid",1]],
+  watch:"Say where they stand more often than feels necessary, and be careful with silence \u2014 they will fill it with the worst available reading. A short bad mood from you costs them a day."}
+];
+
+const ZONES=[[66,"Strong fit","z-good","They will do some of the best work of their time with you, and they will know why."],
+             [54,"Workable","z-ok","This works with a little deliberate effort from you. Nothing here is structural."],
+             [42,"Friction","z-warn","Not a mismatch exactly, but they are spending energy on managing you as well as on the work."],
+             [0,"Poor fit","z-bad","One of you changes or they leave. Worth naming out loud rather than hoping it settles."]];
+const zoneOf=v=>ZONES.filter(z=>v>=z[0])[0];
+
+/* Not a plain weighted mean. If you fail the thing that matters most to
+   someone, being fine on the rest does not rescue the pairing — an anxious
+   high performer under a volatile manager is not saved by good candour. */
+function compatOf(sc){
+  return PEOPLE.map(pp=>{
+    let num=0,den=0,best=null,worst=null,heavy=[];
+    pp.needs.forEach(([k,end,w])=>{
+      const p=pct(k,sc[k]);
+      const m=end==="lo"?(100-p)/100:end==="hi"?p/100:1-Math.abs(p-50)/50;
+      num+=m*w;den+=w;
+      if(w>=2)heavy.push(m);
+      if(!best||m>best.m)best={k:k,m:m,end:end};
+      if(!worst||m<worst.m)worst={k:k,m:m,end:end};
+    });
+    const mean=num/den, low=heavy.length?Math.min.apply(null,heavy):mean;
+    return {p:pp,score:Math.round(100*(mean*0.6+low*0.4)),best:best,worst:worst}})
+   .sort((a,b)=>b.score-a.score)}
+
+/* ---------- the tool simulating itself ----------
+   The same scoring code the result uses, run over synthetic answer sets. Nothing
+   is fetched or precomputed \u2014 change a question and the distribution changes. */
+const WEIGHTS={
+ rand:{l:"Answering at random",w:[0.25,0.25,0.25,0.25],
+   d:"No self-image at all. Useful as a control: it shows what the instrument does before any human tendency touches it."},
+ real:{l:"Realistically",w:[0.10,0.32,0.38,0.20],
+   d:"A slight pull toward the moderate options, which is how people actually fill these in."},
+ kind:{l:"Kind to yourself",w:[0.04,0.28,0.48,0.20],
+   d:"A deliberate flattering skew. Worth comparing against the middle column \u2014 it moves the people score far less than you would expect."}};
+let SIMSTATE={mode:"real",n:20000,cache:{},open:null};
+
+function runSim(mode,n){
+  const w=WEIGHTS[mode].w,c=w.map((_,i)=>w.slice(0,i+1).reduce((a,b)=>a+b,0));
+  const pick=()=>{const r=Math.random();for(let i=0;i<4;i++)if(r<c[i])return i+1;return 4};
+  const pat={},quad={},verd={};let sp=0,se=0,sz=0;
+  for(let i=0;i<n;i++){
+    const a=[];for(let j=0;j<Q.length;j++)a[j]=pick();
+    const sc=scoreOf(a),T=typeOf(sc),P=axisScore(sc,"p"),E=axisScore(sc,"e");
+    pat[T.key]=(pat[T.key]||0)+1;
+    const qd=E>=50?(P>=50?"Leaders":"Challengers"):(P>=50?"Visionaries":"Niche players");
+    quad[qd]=(quad[qd]||0)+1;
+    const v=verdOf(P)[1];verd[v]=(verd[v]||0)+1;
+    sp+=P;se+=E;sz+=Object.keys(AX).filter(k=>pct(k,sc[k])>=AX[k].good[0]&&pct(k,sc[k])<=AX[k].good[1]).length;
+  }
+  return {pat:pat,quad:quad,verd:verd,n:n,P:sp/n,E:se/n,zone:sz/n}}
+
+/* Four worked composites, one per quadrant. A single trait pushed to an extreme
+   almost never lands you in Visionaries or Niche players — those take a
+   combination, so the corners need real examples rather than forced dots. */
+const EXEMPLAR=[
+ {k:"lead",n:"Leaders",a:[2,2,2,2,3,3,3,3,2,2,2,2,2,2,3,3,2,2,2,2,2,2],
+  d:"Nothing at an extreme. Every trait sits inside or close to its healthy band, which is unremarkable to be around and extremely hard to do for four years running."},
+ {k:"chal",n:"Challengers",a:[2,2,2,2,3,3,3,3,4,4,4,4,2,2,1,1,2,2,4,4,4,4],
+  d:"Direction, candour and conflict all handled well. Growth, spotlight, self-interest and even-handedness all pointed at themselves. The work lands and the people are keeping their options open."},
+ {k:"vis",n:"Visionaries",a:[4,4,4,4,3,3,4,4,2,2,2,2,2,2,3,3,2,2,2,2,2,2],
+  d:"Genuinely good to work for on every people trait, and holding the work far too tightly. Liked, trusted, and quietly the bottleneck on everything the team ships."},
+ {k:"niche",n:"Niche players",a:[4,4,4,4,1,1,4,4,4,4,4,4,4,4,1,1,1,1,4,4,4,4],
+  d:"Everything at an extreme at once. In practice this is almost always a support problem rather than a character one — nobody arrives like this, they get there."}];
+
+/* the canonical profile for a pattern: that trait at the extreme, the rest middling */
+function canonical(key){
+  const a=Array(Q.length).fill(0).map((_,i)=>i%2?2:3);
+  if(key!=="balanced"){const k=key.slice(0,key.lastIndexOf("_")),side=key.slice(key.lastIndexOf("_")+1);
+    Q.forEach((q,i)=>{if(q.ax===k)a[i]=side==="hi"?4:1})}
+  const sc=scoreOf(a);return {sc:sc,P:axisScore(sc,"p"),E:axisScore(sc,"e")}}
+
+function simulation(){
+  const w=el("div"),have=done()===Q.length,mine=have?typeOf(scoreOf(S.a)).key:null;
+  const n=el("div","note");
+  n.innerHTML="<p><b>The tool run against itself.</b> Twenty thousand synthetic leaders answer the same twenty-two moments, scored by exactly the code that scored you. Nothing here is precomputed \u2014 change a question and this changes with it.</p><p>Click any pattern to see what it does to a team and who works well under it.</p>";
+  w.appendChild(n);
+
+  const ctl=el("div","simctl");
+  ctl.appendChild(el("span",null,"How the simulated leaders answer:")).style.cssText="font-size:12.5px;color:var(--muted)";
+  Object.keys(WEIGHTS).forEach(k=>{
+    const b=el("button","chip",WEIGHTS[k].l);b.type="button";
+    b.setAttribute("aria-pressed",SIMSTATE.mode===k?"true":"false");
+    b.addEventListener("click",()=>{SIMSTATE.mode=k;render();window.scrollTo({top:0})});
+    ctl.appendChild(b)});
+  w.appendChild(ctl);
+  const dsc=el("p","lead",WEIGHTS[SIMSTATE.mode].d);dsc.style.cssText="font-size:13.5px;color:#3d525d;margin:-8px 0 16px";
+  w.appendChild(dsc);
+
+  if(!SIMSTATE.cache[SIMSTATE.mode])SIMSTATE.cache[SIMSTATE.mode]=runSim(SIMSTATE.mode,SIMSTATE.n);
+  const R=SIMSTATE.cache[SIMSTATE.mode];
+
+  const st=el("div","stats");
+  [[R.P.toFixed(0)+"/"+R.E.toFixed(0),"Mean people / delivery"],[R.zone.toFixed(1)+"/11","Traits in the healthy zone"],
+   [Object.entries(R.quad).sort((a,b)=>b[1]-a[1])[0][0],"Commonest quadrant"],
+   [(R.n/1000)+"k","Simulated leaders"]].forEach(p=>{
+    const d=el("div","stat");d.appendChild(el("b",null,String(p[0])));d.appendChild(el("span",null,p[1]));st.appendChild(d)});
+  w.appendChild(st);
+
+  const vs=el("div","sec");
+  vs.appendChild(el("h3",null,"Where they land"));
+  vs.appendChild(el("p","lead","The verdict is the answer to \u201cwould they work for you again\u201d. The centre of gravity sits on the middle band, which is fitting \u2014 that is the verdict about being neither the reason people stay nor the reason they go."));
+  Object.entries(R.verd).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{
+    const row=el("div");row.style.cssText="display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:center;margin-bottom:7px";
+    row.appendChild(el("span",null,(100*v/R.n).toFixed(1)+"%")).style.cssText="font-family:var(--mono);font-size:12px;color:var(--petrol);text-align:right";
+    const bx=el("div");bx.style.cssText="display:flex;align-items:center;gap:10px";
+    const bar=el("div","simbar");bar.style.width="150px";
+    const fi=el("i");fi.style.width=(100*v/R.n*2.2)+"%";bar.appendChild(fi);
+    bx.appendChild(bar);bx.appendChild(el("span",null,k)).style.cssText="font-size:13.5px;color:#3d525d";
+    row.appendChild(bx);vs.appendChild(row)});
+  w.appendChild(vs);
+
+  const ps=el("div","sec");
+  ps.appendChild(el("h3",null,"Every pattern, by how often it comes up"));
+  ps.appendChild(el("p","lead","The small spectrum shows where each pattern sits on its own trait, against the healthy band. Click a row for what it does to a team and who thrives under it."));
+  const max=Math.max.apply(null,Object.values(R.pat));
+  Object.entries(R.pat).sort((a,b)=>b[1]-a[1]).forEach(([key,v])=>{
+    const T=TYPE[key],isB=key==="balanced";
+    const k=isB?null:key.slice(0,key.lastIndexOf("_")),side=isB?null:key.slice(key.lastIndexOf("_")+1);
+    const row=el("div","simrow"+(SIMSTATE.open===key?" open":"")+(mine===key?" mine":""));
+    const hd=el("button","simhead");hd.type="button";
+    hd.appendChild(el("span","simtw","\u25b8"));
+    const nm=el("span","simnm",T.n);
+    nm.appendChild(el("em",null,isB?"all eleven near the middle":AX[k].n+" \u00b7 "+(side==="hi"?AX[k].hi:AX[k].lo)+(mine===key?"  \u2014 your pattern":"")));
+    hd.appendChild(nm);
+    if(isB)hd.appendChild(el("span"));
+    else{const sp=el("div","simspec");
+      const gd=el("div","gd");gd.style.left=AX[k].good[0]+"%";gd.style.width=(AX[k].good[1]-AX[k].good[0])+"%";sp.appendChild(gd);
+      const dt=el("div","dt");dt.style.left=(side==="hi"?92:8)+"%";sp.appendChild(dt);
+      hd.appendChild(sp)}
+    const pc=el("span","simpct",(100*v/R.n).toFixed(1)+"%");hd.appendChild(pc);
+    hd.addEventListener("click",()=>{SIMSTATE.open=SIMSTATE.open===key?null:key;render()});
+    row.appendChild(hd);
+    if(SIMSTATE.open===key){
+      const b=el("div","simbody");
+      b.appendChild(el("p","d",T.d));
+      if(!isB){
+        const f=FIT[k][side];
+        const g=el("div","fitgrid");
+        const a1=el("div","yes");a1.innerHTML="<h4>Thrives under them</h4>";a1.appendChild(el("p",null,f.t));
+        const a2=el("div","no");a2.innerHTML="<h4>Struggles, quietly</h4>";a2.appendChild(el("p",null,f.s));
+        g.appendChild(a1);g.appendChild(a2);b.appendChild(g);
+        const h=el("div","hire");h.innerHTML="<b>What to do about it</b>";
+        h.appendChild(document.createTextNode(f.h));b.appendChild(h);
+        const r2=READ[k][side];
+        const g2=el("div","gets");
+        const c1=el("div","g");c1.innerHTML="<h4>The team gets</h4>";c1.appendChild(el("p",null,r2.g));
+        const c2=el("div","p");c2.innerHTML="<h4>The team pays</h4>";c2.appendChild(el("p",null,r2.p));
+        g2.appendChild(c1);g2.appendChild(c2);b.appendChild(g2);
+        const m=el("div","hire");m.style.cssText="border-radius:5px;border-top:1px solid var(--line);margin-top:9px";
+        m.innerHTML="<b>What they could say up front</b>";
+        m.appendChild(document.createTextNode("\u201c"+MANUAL[k][side]+"\u201d"));b.appendChild(m);
+      }
+      const tl=el("div","tl");tl.style.marginTop="12px";
+      ["Already happening","Within six months","Within two years"].forEach((hh,i)=>{
+        const s2=el("div","step s"+i);s2.appendChild(el("h4",null,hh));
+        s2.appendChild(el("p",null,T.tl[i]));tl.appendChild(s2)});
+      b.appendChild(tl);
+      row.appendChild(b)}
+    ps.appendChild(row)});
+  w.appendChild(ps);
+  w.appendChild(el("div","foot","Every figure on this tab was computed in your browser just now, from the same functions that scored your own answers. Re-running gives slightly different numbers, which is what a simulation is."));
+  return w}
+
+function patternQuadrant(mine){
+  const q=el("div","sec");
+  q.appendChild(el("h3",null,"What good looks like, and where you are"));
+  q.appendChild(el("p","lead","Every pattern placed on Blake and Mouton's two axes, each one scored as if that trait alone were pushed to an extreme and everything else sat near the middle. The dashed corner is where the research says to aim. If you have answered, your own position is the amber marker."));
+  q.appendChild(el("div","mqy","\u25b2  Things land"));
+  const box=el("div","mq");
+  [["mq-tl","Challengers","Delivers hard, and people are counting the months."],
+   ["mq-tr","Leaders","Delivers through people who would follow you again."],
+   ["mq-bl","Niche players","Neither landing the work nor keeping anyone."],
+   ["mq-br","Visionaries","Loved, trusted, and the work does not land."]].forEach(c=>{
+    const cell=el("div","mqc "+c[0]);const lab=el("div","mqn",c[1]);
+    lab.appendChild(el("em",null,c[2]));cell.appendChild(lab);box.appendChild(cell)});
+  box.appendChild(el("div","mqrule v"));box.appendChild(el("div","mqrule h"));
+  const z=el("div","mqzone");z.style.cssText="left:62%;top:0;width:38%;height:38%";
+  z.appendChild(el("i",null,"aim here"));box.appendChild(z);
+  const pts=Object.keys(TYPE).map(k=>{const c=canonical(k);return {k:k,P:c.P,E:c.E,n:TYPE[k].n}});
+  pts.forEach((p,i)=>{
+    const d=el("div","mqdot");
+    d.style.left=Math.max(4,Math.min(96,p.P))+"%";
+    d.style.top=Math.max(5,Math.min(95,100-p.E+((i%3)-1)*2.4))+"%";
+    d.title=p.n+"  \u2014  people "+p.P+", delivery "+p.E;
+    d.appendChild(el("i"));
+    d.appendChild(el("b",null,p.n.replace(/^The /,"")));
+    d.addEventListener("click",()=>{const t=document.getElementById("pat-"+p.k);
+      if(t)t.scrollIntoView({block:"center"})});
+    box.appendChild(d)});
+  EXEMPLAR.forEach(x=>{
+    const sc=scoreOf(x.a),P=axisScore(sc,"p"),E=axisScore(sc,"e");
+    x._P=P;x._E=E;
+    const d=el("div","mqex");
+    d.style.left=Math.max(6,Math.min(94,P))+"%";d.style.top=Math.max(8,Math.min(92,100-E))+"%";
+    d.title=x.n+" \u2014 people "+P+", delivery "+E;
+    d.appendChild(el("i"));d.appendChild(el("b",null,x.n));
+    d.addEventListener("click",()=>{const t=document.getElementById("ex-"+x.k);
+      if(t)t.scrollIntoView({block:"center"})});
+    box.appendChild(d)});
+  if(mine&&done()===Q.length){
+    const sc=scoreOf(S.a),P=axisScore(sc,"p"),E=axisScore(sc,"e");
+    const me=el("div","me");me.style.left=P+"%";me.style.top=(100-E)+"%";
+    me.appendChild(el("i"));me.appendChild(el("b",null,(S.demo?"Example \u00b7 ":"You \u00b7 ")+P+"/"+E));box.appendChild(me)}
+  q.appendChild(box);
+  const ax=el("div","mqax");
+  ax.appendChild(el("span",null,"They are counting the months"));
+  ax.appendChild(el("span",null,"They would follow you  \u25b6"));
+  q.appendChild(ax);
+  const note=el("p","lead");note.style.margin="14px 0 0";
+  note.innerHTML="Round dots are single traits pushed to an extreme; they cluster right of centre because one bad trait costs people more than it costs output. The four dark diamonds are worked composites \u2014 what it actually takes to sit in each corner.";
+  q.appendChild(note);
+  const ex=el("div","exbox");
+  EXEMPLAR.forEach(x=>{
+    const row=el("div");row.id="ex-"+x.k;
+    const who=el("div","who",x.n);
+    who.appendChild(el("em",null,"people "+x._P+" / delivery "+x._E));
+    row.appendChild(who);row.appendChild(el("p",null,x.d));ex.appendChild(row)});
+  q.appendChild(ex);
+  return q}
+
+function patterns(){
+  const w=el("div"),have=done()===Q.length,mine=have?typeOf(scoreOf(S.a)).key:null;
+  const n=el("div","note");
+  n.innerHTML="<p><b>Every pattern, and what it does to a team.</b> Twenty-two are one end of one trait, plus the one you get when nothing is extreme. Nobody is only one of them \u2014 you will recognise yourself in three or four.</p>";
+  const sum=el("div","psum");
+  [["23","patterns \u2014 one per end of each trait, plus the balanced middle"],
+   ["11","traits, both ends of each a real way to fail"],
+   ["3 in 10","people have the talent to manage well, with investment"],
+   ["82%","of manager appointments pick the wrong candidate"]].forEach(x=>{
+    const d=document.createElement("div");d.appendChild(el("b",null,x[0]));d.appendChild(el("span",null,x[1]));sum.appendChild(d)});
+  w.appendChild(sum);
+  w.appendChild(n);
+  w.appendChild(patternQuadrant(mine));
+  const groups=[];Object.keys(AX).forEach(k=>{if(groups.indexOf(AX[k].g)<0)groups.push(AX[k].g)});
+  const pc=el("div","gctl");
+  pc.appendChild(el("span",null,"Patterns:"));
+  [["Open all",()=>{S.pshut={};Object.keys(TYPE).forEach(k2=>S.pshut[k2]=false);S.gshut={};render()}],
+   ["Close all",()=>{S.pshut={};Object.keys(TYPE).forEach(k2=>S.pshut[k2]=true);render()}],
+   ["Fold the sections",()=>{groups.forEach(g=>S.gshut[g]=true);S.gshut["When nothing is extreme"]=true;render()}],
+   ["Unfold the sections",()=>{S.gshut={};render()}]].forEach(pr=>{
+    const b=el("button","chip",pr[0]);b.type="button";b.addEventListener("click",pr[1]);pc.appendChild(b)});
+  if(mine&&S.demo){const wn=el("span");wn.style.cssText="font-size:12px;color:#8a5a08;background:var(--amber-soft);border:1px solid #f0d5a8;padding:3px 10px;border-radius:3px";
+    wn.textContent="Highlighted below is the worked example\u2019s pattern, not yours";pc.appendChild(wn)}
+  if(mine){const my=el("button","chip",S.demo?"Jump to the example\u2019s":"Jump to mine");my.type="button";
+    my.addEventListener("click",()=>{S.pshut[mine]=false;
+      const g2=mine==="balanced"?"When nothing is extreme":AX[mine.slice(0,mine.lastIndexOf("_"))].g;
+      delete S.gshut[g2];render();
+      setTimeout(()=>{const t=document.getElementById("pat-"+mine);if(t)t.scrollIntoView({block:"center"})},0)});
+    pc.appendChild(my)}
+  w.appendChild(pc);
+  groups.forEach(g=>{
+    const gshut=!!S.gshut[g];
+    const sec=el("div","grp"+(gshut?" shut":""));
+    const gh=document.createElement("button");gh.className="grp-h";gh.type="button";
+    gh.setAttribute("aria-expanded",gshut?"false":"true");
+    const gi=el("span");gi.style.cssText="display:flex;align-items:baseline;width:100%";
+    gi.appendChild(el("span","tw","\u25be"));gi.appendChild(document.createTextNode(g));
+    const gb=el("span","bits");
+    gb.appendChild(el("em",null,(Object.keys(AX).filter(k2=>AX[k2].g===g).length*2)+" patterns"));
+    gi.appendChild(gb);gh.appendChild(gi);
+    gh.addEventListener("click",()=>{S.gshut[g]=!gshut;render()});
+    sec.appendChild(gh);
+    Object.keys(AX).filter(k=>AX[k].g===g).forEach(k=>{["lo","hi"].forEach(side=>{
+      const T=TYPE[k+"_"+side],a=AX[k];
+      const key=k+"_"+side, isMine=mine===key, shut=S.pshut[key]!==undefined?S.pshut[key]:!isMine;
+      const c=el("div","pat"+(isMine?" mine":"")+(shut?" shut":""));c.id="pat-"+key;
+      const hb=document.createElement("button");hb.className="pat-h";hb.type="button";
+      hb.setAttribute("aria-expanded",shut?"false":"true");
+      hb.appendChild(el("span","tw","\u25be"));
+      const lft=el("span");
+      lft.appendChild(el("div","tag",a.n+"  \u00b7  "+(side==="hi"?a.hi:a.lo)));
+      const h=el("h4",null,T.n);
+      if(isMine)h.appendChild(el("span","yours",S.demo?"the example\u2019s pattern":"your pattern"));
+      lft.appendChild(h);hb.appendChild(lft);
+      const m=el("div","mini");
+      const gd=el("div","gd");gd.style.left=a.good[0]+"%";gd.style.width=(a.good[1]-a.good[0])+"%";m.appendChild(gd);
+      const dot=el("div","dot");dot.style.left=(side==="hi"?92:8)+"%";m.appendChild(dot);
+      hb.appendChild(m);
+      hb.addEventListener("click",()=>{S.pshut[key]=!shut;render()});
+      c.appendChild(hb);
+      const body=el("div","pbody");
+      body.appendChild(el("p",null,T.d));
+      const me=el("div","mend");me.appendChild(el("span",null,a.lo));me.appendChild(el("span",null,a.hi));body.appendChild(me);
+      const cost=el("div","cost");cost.innerHTML="<b>What the team carries</b>";
+      cost.appendChild(document.createTextNode(T.tl[2]));body.appendChild(cost);
+      c.appendChild(body);sec.appendChild(c)})});
+    w.appendChild(sec)});
+  const lshut=!!S.gshut["When nothing is extreme"];
+  const sec=el("div","grp"+(lshut?" shut":""));
+  const lh=document.createElement("button");lh.className="grp-h";lh.type="button";
+  lh.setAttribute("aria-expanded",lshut?"false":"true");
+  const li2=el("span");li2.style.cssText="display:flex;align-items:baseline;width:100%";
+  li2.appendChild(el("span","tw","\u25be"));li2.appendChild(document.createTextNode("When nothing is extreme"));
+  const lb2=el("span","bits");lb2.appendChild(el("em",null,"1 pattern"));li2.appendChild(lb2);
+  lh.appendChild(li2);
+  lh.addEventListener("click",()=>{S.gshut["When nothing is extreme"]=!lshut;render()});
+  sec.appendChild(lh);
+  const bMine=mine==="balanced", bShut=S.pshut.balanced!==undefined?S.pshut.balanced:!bMine;
+  const c=el("div","pat"+(bMine?" mine":"")+(bShut?" shut":""));c.id="pat-balanced";
+  const bh=document.createElement("button");bh.className="pat-h";bh.type="button";
+  bh.setAttribute("aria-expanded",bShut?"false":"true");
+  bh.appendChild(el("span","tw","\u25be"));
+  const bl=el("span");bl.appendChild(el("div","tag","All eleven near the middle"));
+  const h=el("h4",null,TYPE.balanced.n);
+  if(bMine)h.appendChild(el("span","yours",S.demo?"the example\u2019s pattern":"your pattern"));
+  bl.appendChild(h);bh.appendChild(bl);bh.appendChild(el("span"));
+  bh.addEventListener("click",()=>{S.pshut.balanced=!bShut;render()});
+  c.appendChild(bh);
+  const cwrap=el("div","pbody");cwrap.appendChild(el("p",null,TYPE.balanced.d));
+  const cost=el("div","cost");cost.innerHTML="<b>What the team carries</b>";
+  cost.appendChild(document.createTextNode(TYPE.balanced.tl[2]));
+  cwrap.appendChild(cost);c.appendChild(cwrap);sec.appendChild(c);w.appendChild(sec);
+
+  const hs=el("div","sec");
+  hs.appendChild(el("h3",null,"How leaders are actually distributed in companies"));
+  hs.appendChild(el("p","lead","The patterns above are shapes, not frequencies \u2014 nothing in this tool can tell you how common each one is in the world. What the research does say is blunter and worth having in front of you: good managers are rare, most people in the job were never selected for it, and the effect shows up at the other end in engagement."));
+  const hist=el("div","hist");
+  HIST.forEach(block=>{
+    hist.appendChild(el("div","hsub",block.h));
+    block.rows.forEach(r=>{
+      const row=el("div","hrow");
+      const l=el("div","hl",r[0]);l.appendChild(el("em",null,r[1]));row.appendChild(l);
+      const bar=el("div","hbar "+r[3]);const fi=el("i");fi.style.width=r[2]+"%";bar.appendChild(fi);
+      row.appendChild(bar);row.appendChild(el("div","hval",r[2]+"%"));
+      hist.appendChild(row)})});
+  hs.appendChild(hist);
+  const hn=el("div","hnote");
+  hn.innerHTML="<b>The line worth sitting with.</b> Roughly three in ten people can do this job well, and roughly eight in ten appointments pick somebody else. That is not an argument for fatalism \u2014 two of those three in ten get there through investment rather than instinct, which is the entire case for taking something like this seriously. It is an argument against assuming you are in the good third because nobody has told you otherwise.";
+  hs.appendChild(hn);
+  const hr=document.createElement("div");hr.style.marginTop="18px";
+  hr.appendChild(el("div","hsub","Sources for the figures above"));
+  const ol=document.createElement("ol");ol.className="refs";
+  HREFS.forEach(pair=>{const u=pair[0],t=pair[1];const li=document.createElement("li");
+    const i=t.indexOf(".");li.appendChild(el("b",null,t.slice(0,i)));
+    li.appendChild(document.createTextNode(t.slice(i+1)));
+    const a=document.createElement("a");a.href=u;a.target="_blank";a.rel="noopener noreferrer";
+    a.className="reflink";a.textContent=u.replace(/^https?:\/\//,"");
+    li.appendChild(document.createElement("br"));li.appendChild(a);
+    ol.appendChild(li)});
+  hr.appendChild(ol);hs.appendChild(hr);
+  const hf=el("p","lead");hf.style.margin="12px 0 0";
+  hf.textContent="Figures were current at the time of writing. Gallup and DDI both publish annually, so check the latest edition before quoting any of them in a room that matters.";
+  hs.appendChild(hf);
+  w.appendChild(hs);
+  return w}
+
+function references(){
+  const w=el("div");const n=el("div","note");
+  n.innerHTML="<p><b>Where the healthy bands come from.</b> None of the positions here are invented. The bands lean where the evidence leans, which is why candour sits above the midpoint and spotlight sits below it.</p><p>Links go to the publisher\u2019s page or a DOI. Two entries have no link because no stable public one exists \u2014 they are books, and the method note is about this tool rather than an outside source.</p>";
+  w.appendChild(n);
+  const s=el("div","sec");s.appendChild(el("h3",null,"References"));
+  const ol=el("ol","refs");
+  REFS.forEach(r=>{const li=document.createElement("li");
+    li.appendChild(el("b",null,r.t));li.appendChild(document.createTextNode(r.d));
+    if(r.u){const a=document.createElement("a");a.href=r.u;a.target="_blank";a.rel="noopener noreferrer";
+      a.className="reflink";a.textContent=r.u.replace(/^https?:\/\//,"").replace(/\/$/,"");
+      li.appendChild(document.createElement("br"));li.appendChild(a)}
+    ol.appendChild(li)});
+  s.appendChild(ol);w.appendChild(s);return w}
+
+/* Every panel with its own heading folds, on every tab. Applied once after the
+   view is built rather than woven through each builder. */
+function foldable(root){
+  [...root.querySelectorAll(".sec, .anon, .try")].forEach(sec=>{
+    const h=[...sec.children].filter(c=>c.tagName==="H3")[0];
+    if(!h)return;
+    const key=h.textContent.trim();
+    const shut=!!S.secShut[key];
+    const btn=document.createElement("button");btn.className="sec-h";btn.type="button";
+    btn.setAttribute("aria-expanded",shut?"false":"true");
+    btn.appendChild(el("span","tw","\u25be"));
+    btn.appendChild(document.createTextNode(key));
+    btn.addEventListener("click",()=>{S.secShut[key]=!shut;render()});
+    const body=document.createElement("div");body.className="sec-b";
+    while(h.nextSibling)body.appendChild(h.nextSibling);
+    sec.replaceChild(btn,h);sec.appendChild(body);
+    if(shut)sec.classList.add("shut")})}
+
+function foldBar(root){
+  const names=[...root.querySelectorAll(".sec, .anon, .try")]
+    .map(x=>[...x.children].filter(c=>c.tagName==="H3")[0]).filter(Boolean).map(h=>h.textContent.trim());
+  if(names.length<2)return null;
+  const bar=el("div","foldbar");
+  bar.appendChild(el("span",null,"Panels:"));
+  const a=el("button","chip","Expand all");a.type="button";
+  a.addEventListener("click",()=>{names.forEach(n=>delete S.secShut[n]);render()});
+  const b=el("button","chip","Collapse all");b.type="button";
+  b.addEventListener("click",()=>{names.forEach(n=>S.secShut[n]=true);render()});
+  bar.appendChild(a);bar.appendChild(b);
+  return bar}
+
+function render(){
+  const n=done();
+  document.getElementById("cnt").textContent=n+" / "+Q.length;
+  document.getElementById("fill").style.width=(n/Q.length*100)+"%";
+  document.getElementById("pbar").style.display=(S.m==="q")?"":"none";
+  document.querySelectorAll(".tab").forEach(t=>{
+    t.setAttribute("aria-selected",t.dataset.m===S.m?"true":"false");
+    if(t.dataset.m==="r")t.disabled=n<Q.length});
+  if(ABOUT)document.getElementById("sub").textContent="Twenty-two moments. Pick what actually happens, not what should.";
+  const app=document.getElementById("app");app.innerHTML="";
+  const view=S.m==="sim"?simulation():S.m==="p"?patterns():S.m==="x"?references():(S.m==="r"&&n===Q.length)?results():ask();
+  const bar=foldBar(view);
+  foldable(view);
+  if(bar)view.insertBefore(bar,view.firstChild);
+  app.appendChild(view)}
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+  if(t.disabled)return;S.m=t.dataset.m;render();window.scrollTo({top:0})}));
+window.addEventListener("beforeunload",e=>{if(done()>0){e.preventDefault();e.returnValue=""}});
+render();
+
+</script>
+</body>
+</html>
