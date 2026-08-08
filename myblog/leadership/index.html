@@ -150,6 +150,25 @@ button.grp-h:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 .try{background:var(--amber-soft);border:1px solid #f0d5a8;border-radius:5px;padding:16px 18px;margin-bottom:14px}
 .try h3{color:#8a5a08;font-size:11px;text-transform:uppercase;letter-spacing:.11em;margin:0 0 6px;font-weight:700}
 .try p{margin:0;font-size:14.5px;color:#5c3a00}
+/* one frame for everything above the questions */
+.intro{background:#fff;border:1px solid var(--line);border-radius:6px;margin-bottom:20px;overflow:hidden}
+.ib{border-top:1px solid var(--line-soft)}
+.ib:first-child{border-top:0}
+.ib>button{width:100%;background:none;border:0;cursor:pointer;font-family:var(--sans);text-align:left;
+  padding:12px 16px;display:grid;grid-template-columns:16px 1fr auto;gap:10px;align-items:center}
+.ib>button:hover{background:#fafcfd}
+.ib>button:focus-visible{outline:2px solid var(--amber);outline-offset:-2px}
+.ib .tw{font-size:10px;color:var(--petrol-mid);transition:transform .14s}
+.ib.shut .tw{transform:rotate(-90deg)}
+.ib .ttl{font-size:13.5px;font-weight:650;color:var(--petrol-deep)}
+.ib .hint{font-size:12px;color:var(--muted);text-align:right}
+.ib .ibody{padding:0 16px 15px;font-size:13.5px;color:#3d525d;line-height:1.55}
+.ib .ibody p{margin:0 0 8px}.ib .ibody p:last-child{margin:0}
+.ib.shut .ibody{display:none}
+.ib.warnrow .ttl{color:var(--bad)}
+.ib .ibody input[type=text]{width:100%;max-width:330px;padding:9px 12px;border:1px solid var(--line);
+  border-radius:4px;font-family:var(--sans);font-size:14px;color:var(--ink);margin:2px 0 7px}
+.ib .ibody em{font-style:normal;display:block;font-size:12px;color:var(--muted)}
 button.sec-h{width:100%;background:none;border:0;cursor:pointer;font-family:var(--sans);text-align:left;
   font-size:11px;text-transform:uppercase;letter-spacing:.11em;color:var(--petrol);font-weight:700;padding:0 0 6px;
   display:flex;align-items:center;gap:8px}
@@ -157,7 +176,71 @@ button.sec-h:hover{color:var(--petrol-deep)}
 button.sec-h:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
 button.sec-h .tw{font-size:10px;color:var(--petrol-mid);transition:transform .14s}
 .sec.shut button.sec-h .tw,.anon.shut button.sec-h .tw,.try.shut button.sec-h .tw{transform:rotate(-90deg)}
-.sec.shut .sec-b,.anon.shut .sec-b,.try.shut .sec-b{display:none}
+.sec.shut .sec-b,.anon.shut .sec-b,.try.shut .sec-b,
+.note.shut .sec-b,.warn.shut .sec-b,.ws.shut .sec-b,.redo.shut .sec-b{display:none}
+.note.shut button.sec-h .tw,.warn.shut button.sec-h .tw,.ws.shut button.sec-h .tw,.redo.shut button.sec-h .tw{transform:rotate(-90deg)}
+.note button.sec-h,.ws /* one frame for everything above the questions */
+.intro{background:#fff;border:1px solid var(--line);border-radius:6px;margin-bottom:20px;overflow:hidden}
+.ib{border-top:1px solid var(--line-soft)}
+.ib:first-child{border-top:0}
+.ib>button{width:100%;background:none;border:0;cursor:pointer;font-family:var(--sans);text-align:left;
+  padding:12px 16px;display:grid;grid-template-columns:16px 1fr auto;gap:10px;align-items:center}
+.ib>button:hover{background:#fafcfd}
+.ib>button:focus-visible{outline:2px solid var(--amber);outline-offset:-2px}
+.ib .tw{font-size:10px;color:var(--petrol-mid);transition:transform .14s}
+.ib.shut .tw{transform:rotate(-90deg)}
+.ib .ttl{font-size:13.5px;font-weight:650;color:var(--petrol-deep)}
+.ib .hint{font-size:12px;color:var(--muted);text-align:right}
+.ib .ibody{padding:0 16px 15px;font-size:13.5px;color:#3d525d;line-height:1.55}
+.ib .ibody p{margin:0 0 8px}.ib .ibody p:last-child{margin:0}
+.ib.shut .ibody{display:none}
+.ib.warnrow .ttl{color:var(--bad)}
+.ib .ibody input[type=text]{width:100%;max-width:330px;padding:9px 12px;border:1px solid var(--line);
+  border-radius:4px;font-family:var(--sans);font-size:14px;color:var(--ink);margin:2px 0 7px}
+.ib .ibody em{font-style:normal;display:block;font-size:12px;color:var(--muted)}
+button.sec-h{color:var(--petrol)}
+.warn /* one frame for everything above the questions */
+.intro{background:#fff;border:1px solid var(--line);border-radius:6px;margin-bottom:20px;overflow:hidden}
+.ib{border-top:1px solid var(--line-soft)}
+.ib:first-child{border-top:0}
+.ib>button{width:100%;background:none;border:0;cursor:pointer;font-family:var(--sans);text-align:left;
+  padding:12px 16px;display:grid;grid-template-columns:16px 1fr auto;gap:10px;align-items:center}
+.ib>button:hover{background:#fafcfd}
+.ib>button:focus-visible{outline:2px solid var(--amber);outline-offset:-2px}
+.ib .tw{font-size:10px;color:var(--petrol-mid);transition:transform .14s}
+.ib.shut .tw{transform:rotate(-90deg)}
+.ib .ttl{font-size:13.5px;font-weight:650;color:var(--petrol-deep)}
+.ib .hint{font-size:12px;color:var(--muted);text-align:right}
+.ib .ibody{padding:0 16px 15px;font-size:13.5px;color:#3d525d;line-height:1.55}
+.ib .ibody p{margin:0 0 8px}.ib .ibody p:last-child{margin:0}
+.ib.shut .ibody{display:none}
+.ib.warnrow .ttl{color:var(--bad)}
+.ib .ibody input[type=text]{width:100%;max-width:330px;padding:9px 12px;border:1px solid var(--line);
+  border-radius:4px;font-family:var(--sans);font-size:14px;color:var(--ink);margin:2px 0 7px}
+.ib .ibody em{font-style:normal;display:block;font-size:12px;color:var(--muted)}
+button.sec-h{color:var(--bad)}
+.redo /* one frame for everything above the questions */
+.intro{background:#fff;border:1px solid var(--line);border-radius:6px;margin-bottom:20px;overflow:hidden}
+.ib{border-top:1px solid var(--line-soft)}
+.ib:first-child{border-top:0}
+.ib>button{width:100%;background:none;border:0;cursor:pointer;font-family:var(--sans);text-align:left;
+  padding:12px 16px;display:grid;grid-template-columns:16px 1fr auto;gap:10px;align-items:center}
+.ib>button:hover{background:#fafcfd}
+.ib>button:focus-visible{outline:2px solid var(--amber);outline-offset:-2px}
+.ib .tw{font-size:10px;color:var(--petrol-mid);transition:transform .14s}
+.ib.shut .tw{transform:rotate(-90deg)}
+.ib .ttl{font-size:13.5px;font-weight:650;color:var(--petrol-deep)}
+.ib .hint{font-size:12px;color:var(--muted);text-align:right}
+.ib .ibody{padding:0 16px 15px;font-size:13.5px;color:#3d525d;line-height:1.55}
+.ib .ibody p{margin:0 0 8px}.ib .ibody p:last-child{margin:0}
+.ib.shut .ibody{display:none}
+.ib.warnrow .ttl{color:var(--bad)}
+.ib .ibody input[type=text]{width:100%;max-width:330px;padding:9px 12px;border:1px solid var(--line);
+  border-radius:4px;font-family:var(--sans);font-size:14px;color:var(--ink);margin:2px 0 7px}
+.ib .ibody em{font-style:normal;display:block;font-size:12px;color:var(--muted)}
+button.sec-h{color:var(--bad)}
+.note.shut,.warn.shut,.ws.shut,.redo.shut{padding-bottom:12px}
+.note .sec-b p:last-child,.warn .sec-b p:last-child{margin-bottom:0}
 .sec.shut,.anon.shut,.try.shut{padding-bottom:14px}
 .foldbar{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:14px;font-size:12.5px;color:var(--muted)}
 .foldbar .chip{font-size:12px;padding:4px 11px;border:1px solid var(--line);background:#fff;border-radius:3px;
@@ -244,7 +327,8 @@ button.pat-h:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
 .key i.g{background:var(--ok-soft);border:1px solid var(--ok-b);border-radius:3px}
 
 .ws{background:#fff;border:1px solid var(--line);border-left:3px solid var(--petrol);border-radius:5px;
-    padding:14px 17px;margin-bottom:18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    padding:14px 17px;margin-bottom:18px}
+.ws .sec-b{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .ws label{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:#43555F;font-weight:700}
 .ws input{flex:1;min-width:200px;max-width:340px;padding:8px 12px;border:1px solid var(--line);border-radius:4px;
   font-family:var(--sans);font-size:14px;color:var(--ink)}
@@ -1019,7 +1103,7 @@ const MANUAL = {
 };
 
 /* Nothing is written to storage of any kind. This lives in the open tab only. */
-let S={m:"q",a:[],ws:"",codes:[],zopen:null,demo:false,shut:{},gsort:"default",autoshut:false,pshut:{},gshut:{},secShut:{}};
+let S={m:"q",a:[],ws:"",codes:[],zopen:null,demo:false,shut:{},gsort:"default",autoshut:false,pshut:{},gshut:{},secShut:{},introShut:{}};
 /* If this file was downloaded from the tool, pick its answers back up. */
 (function(){try{const t=document.getElementById("saved-state");if(!t)return;
   const o=JSON.parse(t.textContent||"{}");
@@ -1076,33 +1160,53 @@ let ABOUT="";
 /* ---------- all questions, one page ---------- */
 function ask(){
   const w=el("div");
-  const n=el("div","note");
-  n.innerHTML=ABOUT
-    ? "<p><b>"+esc2(ABOUT)+" asked for this.</b> Twenty-two moments. Pick what actually happens, not what should. At the end you get a short code to send back \u2014 twenty-two numbers and nothing else. No name, no date, nothing that says it came from you.</p><p>They cannot see any of it until at least three people have replied.</p>"
-    : "<p><b>There are no right answers.</b> Every option is something a decent leader did last week. Both ends of all eleven traits are a real way to fail, so a middling answer is often the accurate one rather than the diplomatic one.</p><p>Each answer gives you a short read underneath it. It is not a score \u2014 it is what that choice tends to buy and what it tends to cost.</p>";
-  w.appendChild(n);
-  const warn=el("div","warn");
-  warn.innerHTML="<b>Nothing is saved anywhere \u2014 not even in this browser.</b> Refreshing loses it. It takes about six minutes, so do it in one sitting, and download the PDF at the end if you want to keep it.";
-  w.appendChild(warn);
+  const frame=el("div","intro");
+  const irow=(key,title,hint,build,openByDefault,cls)=>{
+    const shut=S.introShut[key]!==undefined?S.introShut[key]:!openByDefault;
+    const row=el("div","ib"+(shut?" shut":"")+(cls?" "+cls:""));
+    const b=document.createElement("button");b.type="button";
+    b.setAttribute("aria-expanded",shut?"false":"true");
+    b.appendChild(el("span","tw","\u25be"));
+    b.appendChild(el("span","ttl",title));
+    const hintEl=el("span","hint",hint||"");hintEl.id="hint-"+key;b.appendChild(hintEl);
+    b.addEventListener("click",()=>{S.introShut[key]=!shut;render()});
+    row.appendChild(b);
+    const body=el("div","ibody");build(body);row.appendChild(body);
+    frame.appendChild(row)};
+
+  irow("intro",ABOUT?"Why you are being asked":"Before you start",
+    ABOUT?"about six minutes":"no right answers", body=>{
+      body.innerHTML=ABOUT
+        ? "<p><b>"+esc2(ABOUT)+" asked for this.</b> Twenty-two moments. Pick what actually happens, not what should. At the end you get a short code to send back \u2014 twenty-two numbers and nothing else. No name, no date, nothing that says it came from you.</p><p>They cannot see any of it until at least three people have replied.</p>"
+        : "<p><b>There are no right answers.</b> Every option is something a decent leader did last week. Both ends of all eleven traits are a real way to fail, so a middling answer is often the accurate one rather than the diplomatic one.</p><p>Each answer gives you a short read underneath it. It is not a score \u2014 it is what that choice tends to buy and what it tends to cost.</p>"},
+    true);
+
+  irow("saved","Nothing is saved","not even in this browser", body=>{
+      body.innerHTML="<p><b>Nothing is stored anywhere \u2014 no cookies, no browser storage, no server.</b> Refreshing loses your answers, and nothing carries from one visit to the next.</p><p>It takes about six minutes, so do it in one sitting. If you want to keep the result, download the PDF at the end.</p>"},
+    false,"warnrow");
 
   if(!ABOUT&&done()===0){
-    const ex=el("div","anon");
-    ex.appendChild(el("h3",null,"Not sure what you get at the end?"));
-    ex.appendChild(el("p",null,"Look at a worked example first \u2014 a real-shaped profile with three anonymous replies already in, so every part of the result is filled in. It takes nothing away; clearing it puts you back here with a blank set."));
-    const r=el("div","row");r.style.marginTop="0";
-    const b=el("button","btn sm","See an example result");b.type="button";
-    b.addEventListener("click",loadExample);r.appendChild(b);
-    ex.appendChild(r);w.appendChild(ex)}
+    irow("example","Not sure what you get at the end?","see a worked example", body=>{
+      const p1=document.createElement("p");
+      p1.textContent="A real-shaped profile with three anonymous replies already in, so every part of the result is filled in. It takes nothing away \u2014 clearing it puts you back here with a blank set, and answering any question clears it for you.";
+      body.appendChild(p1);
+      const r=el("div","row");r.style.marginTop="4px";
+      const b=el("button","btn sm","See an example result");b.type="button";
+      b.addEventListener("click",loadExample);r.appendChild(b);
+      body.appendChild(r)},
+    false)}
 
   if(!ABOUT){
-    const ws=el("div","ws");
-    ws.appendChild(el("label",null,"Name this"));
-    const i=document.createElement("input");i.type="text";i.id="wsname";i.value=S.ws;
-    i.placeholder="Your name, or a label like \u201cH1 review\u201d";
-    i.addEventListener("input",e=>{S.ws=e.target.value.slice(0,50)});
-    ws.appendChild(i);
-    ws.appendChild(el("em",null,"Labels the PDF and the invite. Nothing leaves this page."));
-    w.appendChild(ws)}
+    irow("name","Name this",S.ws?S.ws:"optional", body=>{
+      const i=document.createElement("input");i.type="text";i.id="wsname";i.value=S.ws;
+      i.placeholder="Your name, or a label like \u201cH1 review\u201d";
+      i.addEventListener("input",e=>{S.ws=e.target.value.slice(0,50);
+        const hh=document.getElementById("hint-name");if(hh)hh.textContent=S.ws||"optional"});
+      body.appendChild(i);
+      body.appendChild(el("em",null,"Labels the PDF and the invite link. Nothing leaves this page."))},
+    false)}
+
+  w.appendChild(frame);
 
   const groups=[];Object.keys(AX).forEach(k=>{if(groups.indexOf(AX[k].g)<0)groups.push(AX[k].g)});
   const idxOf=g=>{const keys=Object.keys(AX).filter(k=>AX[k].g===g),o=[];
@@ -1215,7 +1319,7 @@ function ask(){
       render();window.scrollTo({top:0})});
     r4.appendChild(ad2);tools.appendChild(r4);
     const rd=el("div","redo");
-    rd.appendChild(el("h4",null,"Start again"));
+    rd.appendChild(el("h3",null,"Start again"));
     rd.appendChild(el("p",null,"Clearing your own answers takes you back to the first moment with all "+Q.length+" blank. Your name and any replies from your team are untouched unless you choose the second one."));
     const rdr=el("div","row");rdr.style.marginTop="0";
     const r1=el("button","btn sm ghost","Redo all "+Q.length+" answers");r1.type="button";
@@ -1225,7 +1329,7 @@ function ask(){
     const r2b=el("button","btn sm danger","Wipe everything and start over");r2b.type="button";
     r2b.addEventListener("click",()=>{
       if(!window.confirm("Clear everything \u2014 all "+Q.length+" answers, your name, and every reply from your team?\n\nThis cannot be undone and nothing is stored, so there is no copy."))return;
-      S={m:"q",a:[],ws:"",codes:[],zopen:null,demo:false,shut:{},gsort:S.gsort||"default",autoshut:S.autoshut,pshut:{},gshut:{},secShut:{}};render();window.scrollTo({top:0})});
+      S={m:"q",a:[],ws:"",codes:[],zopen:null,demo:false,shut:{},gsort:S.gsort||"default",autoshut:S.autoshut,pshut:{},gshut:{},secShut:{},introShut:{}};render();window.scrollTo({top:0})});
     rdr.appendChild(r1);rdr.appendChild(r2b);rd.appendChild(rdr);
     tools.appendChild(rd);
 
@@ -1361,7 +1465,7 @@ function results(){
     dm.innerHTML="<p><b>This is the worked example, not your result.</b> A delivery-focused leader with a people-side gap, and three anonymous replies that see the grip and the spotlight rather differently from the way they do. Every section below is filled in so you can see what a finished result looks like.</p>";
     const r0=el("div","row");r0.style.marginTop="4px";
     const cb=el("button","btn sm","Clear it and answer for myself");cb.type="button";
-    cb.addEventListener("click",()=>{S={m:"q",a:[],ws:"",codes:[],zopen:null,demo:false,shut:{},gsort:S.gsort||"default",autoshut:S.autoshut,pshut:{},gshut:{},secShut:{}};
+    cb.addEventListener("click",()=>{S={m:"q",a:[],ws:"",codes:[],zopen:null,demo:false,shut:{},gsort:S.gsort||"default",autoshut:S.autoshut,pshut:{},gshut:{},secShut:{},introShut:{}};
       render();window.scrollTo({top:0})});
     r0.appendChild(cb);dm.appendChild(r0);w.appendChild(dm)}
 
@@ -1700,7 +1804,7 @@ const EXAMPLE={
     [4,4, 3,4, 2,3, 3,2, 3,4, 4,3, 3,2, 2,3, 3,2, 3,2, 3,3],
     [3,4, 3,3, 2,2, 2,3, 3,3, 3,4, 2,3, 3,2, 2,3, 2,3, 2,3]]};
 function loadExample(){
-  S={m:"r",a:EXAMPLE.a.slice(),ws:EXAMPLE.ws,codes:EXAMPLE.r.map(x=>x.slice()),zopen:null,demo:true,shut:{},gsort:S.gsort||"default",autoshut:S.autoshut,pshut:{},gshut:{},secShut:{}};
+  S={m:"r",a:EXAMPLE.a.slice(),ws:EXAMPLE.ws,codes:EXAMPLE.r.map(x=>x.slice()),zopen:null,demo:true,shut:{},gsort:S.gsort||"default",autoshut:S.autoshut,pshut:{},gshut:{},secShut:{},introShut:{}};
   render();window.scrollTo({top:0})}
 
 /* ---------- compatibility zones ----------
@@ -2097,7 +2201,7 @@ function references(){
 /* Every panel with its own heading folds, on every tab. Applied once after the
    view is built rather than woven through each builder. */
 function foldable(root){
-  [...root.querySelectorAll(".sec, .anon, .try")].forEach(sec=>{
+  [...root.querySelectorAll(".sec, .anon, .try, .redo")].forEach(sec=>{
     const h=[...sec.children].filter(c=>c.tagName==="H3")[0];
     if(!h)return;
     const key=h.textContent.trim();
@@ -2113,15 +2217,19 @@ function foldable(root){
     if(shut)sec.classList.add("shut")})}
 
 function foldBar(root){
-  const names=[...root.querySelectorAll(".sec, .anon, .try")]
+  const names=[...root.querySelectorAll(".sec, .anon, .try, .redo")]
     .map(x=>[...x.children].filter(c=>c.tagName==="H3")[0]).filter(Boolean).map(h=>h.textContent.trim());
-  if(names.length<2)return null;
+  const nIntro=[...root.querySelectorAll(".ib")].length;
+  if(names.length+nIntro<2)return null;
+  const intro=[...root.querySelectorAll(".ib")].length>0;
   const bar=el("div","foldbar");
   bar.appendChild(el("span",null,"Panels:"));
   const a=el("button","chip","Expand all");a.type="button";
-  a.addEventListener("click",()=>{names.forEach(n=>delete S.secShut[n]);render()});
+  a.addEventListener("click",()=>{names.forEach(n=>delete S.secShut[n]);
+    if(intro)["intro","saved","example","name"].forEach(k=>S.introShut[k]=false);render()});
   const b=el("button","chip","Collapse all");b.type="button";
-  b.addEventListener("click",()=>{names.forEach(n=>S.secShut[n]=true);render()});
+  b.addEventListener("click",()=>{names.forEach(n=>S.secShut[n]=true);
+    if(intro)["intro","saved","example","name"].forEach(k=>S.introShut[k]=true);render()});
   bar.appendChild(a);bar.appendChild(b);
   return bar}
 
