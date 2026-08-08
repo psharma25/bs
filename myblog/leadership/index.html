@@ -824,6 +824,8 @@ const REFS = [
   d:"Leadership effectiveness was highest where self and other ratings were both high, and where self-ratings sat below other ratings. It was lowest for over-estimators. Which is the standing caution on any self-assessment, including this one."},
  {t:"Graen & Uhl-Bien, Leader\u2013Member Exchange theory (1995)",
   d:"Leaders form differentiated relationships with subordinates, producing an in-group and an out-group whether or not anyone intends it. Out-group members receive less information, less latitude and fewer opportunities. The Even-handed trait is measuring exactly this.", u:"https://doi.org/10.1016/1048-9843(95)90036-5"},
+ {t:"On the prevalence of these patterns specifically",
+  d:"There is no study that distributes managers across the twenty-three patterns in this tool, because the taxonomy was written for this tool rather than drawn from research. Good work exists on individual behaviours — micromanagement, abusive supervision, favouritism — but those studies measure different things on incompatible definitions: some ask about a whole career and some about the past year, some ask the manager and some the team. They do not add up to a distribution, and presenting them as one would imply a precision that does not exist. What can be said is narrower, and is in the two Gallup entries above: roughly three in ten people can do this job well, and roughly eight in ten appointments pick somebody else."},
  {t:"Monte Carlo simulation — method note",
   d:"The Simulation tab runs twenty thousand synthetic answer sets through exactly the functions that score a real response, in your browser, at the moment you open it. It is a property test of the instrument rather than evidence about leaders: it shows which patterns the scoring makes easy or hard to land on, not how common they are in the world. It found a real defect during development, where four traits fed only the delivery axis and a volatile micromanager could therefore score 84 out of 100 on whether people would work for them again."},
  {t:"Herzberg, 'One More Time: How Do You Motivate Employees?', HBR (1968)",
@@ -1688,28 +1690,6 @@ function copyFrom(id,btn,label){const t=document.getElementById(id);t.readOnly=f
   try{document.execCommand("copy");btn.textContent="Copied";setTimeout(()=>btn.textContent=label,1500)}catch(e){}
   t.readOnly=true}
 
-/* Real-world distribution, not the simulation. Sources listed under the chart. */
-const HIST=[
- {h:"How managerial talent is distributed",
-  rows:[["High natural talent to manage","about 1 in 10 people",10,"h-good"],
-        ["Enough talent to do it well with real investment","a further 2 in 10",20,"h-mid"],
-        ["Neither, and usually promoted anyway","the remaining 7 in 10",70,"h-bad"]]},
- {h:"What that produces, measured at the other end",
-  rows:[["Employees engaged at work","globally, 2025",20,"h-good"],
-        ["Not engaged","present, doing the job, nothing more",64,"h-warn"],
-        ["Actively disengaged","working against it",16,"h-bad"]]},
- {h:"Four numbers about the managers themselves",
-  rows:[["Employees who trust their immediate manager","down from 46% in 2022",29,"h-bad"],
-        ["Managers who are themselves engaged","down from 31% in 2022",22,"h-bad"],
-        ["Managers engaged in best-practice organisations","the same job, a different setting",79,"h-good"],
-        ["Manager appointments that pick the wrong candidate","by Gallup's own analytics",82,"h-bad"]]}];
-const HREFS=[
- ["https://www.gallup.com/workplace/231593/why-great-managers-rare.aspx",
-  "Gallup, State of the American Manager (2015). About one in ten people have high natural talent to manage, and a further two in ten have enough to reach a high standard with real investment. The same work found that companies fail to pick the candidate with the right talent 82% of the time, and that managers account for at least 70% of the variance in team engagement between business units."],
- ["https://www.gallup.com/workplace/349484/state-of-the-global-workplace.aspx",
-  "Gallup, State of the Global Workplace 2026. Global employee engagement fell to 20% in 2025, its lowest since 2020, with 64% not engaged and 16% actively disengaged. Manager engagement itself fell from 31% in 2022 to 22% in 2025 \u2014 while in organisations Gallup classifies as best practice it stood at 79%."],
- ["https://www.ddi.com/research/global-leadership-forecast-2025",
-  "DDI, Global Leadership Forecast 2025 (2,185 HR professionals and 10,796 leaders across more than 50 countries). Trust in immediate managers fell to 29%, down from 46% in 2022. Departure intent among high-potential individual contributors rose from 13% in 2020 to 21% in 2024, and they were roughly four times more likely to leave where their manager did not regularly provide growth opportunities."]];
 
 /* A worked example: a delivery-focused leader with a people-side gap, plus three
    anonymous replies that see the grip and the spotlight rather differently. */
@@ -1989,7 +1969,7 @@ function patterns(){
   const sum=el("div","psum");
   [["23","patterns \u2014 one per end of each trait, plus the balanced middle"],
    ["11","traits, both ends of each a real way to fail"],
-   ["3 in 10","people have the talent to manage well, with investment"],
+   ["3 in 10","people have the talent to manage well, with investment \u2014 see References"],
    ["82%","of manager appointments pick the wrong candidate"]].forEach(x=>{
     const d=document.createElement("div");d.appendChild(el("b",null,x[0]));d.appendChild(el("span",null,x[1]));sum.appendChild(d)});
   w.appendChild(sum);
@@ -2076,35 +2056,27 @@ function patterns(){
   cwrap.appendChild(cost);c.appendChild(cwrap);sec.appendChild(c);w.appendChild(sec);
 
   const hs=el("div","sec");
-  hs.appendChild(el("h3",null,"How leaders are actually distributed in companies"));
-  hs.appendChild(el("p","lead","The patterns above are shapes, not frequencies \u2014 nothing in this tool can tell you how common each one is in the world. What the research does say is blunter and worth having in front of you: good managers are rare, most people in the job were never selected for it, and the effect shows up at the other end in engagement."));
-  const hist=el("div","hist");
-  HIST.forEach(block=>{
-    hist.appendChild(el("div","hsub",block.h));
-    block.rows.forEach(r=>{
-      const row=el("div","hrow");
-      const l=el("div","hl",r[0]);l.appendChild(el("em",null,r[1]));row.appendChild(l);
-      const bar=el("div","hbar "+r[3]);const fi=el("i");fi.style.width=r[2]+"%";bar.appendChild(fi);
-      row.appendChild(bar);row.appendChild(el("div","hval",r[2]+"%"));
-      hist.appendChild(row)})});
-  hs.appendChild(hist);
-  const hn=el("div","hnote");
-  hn.innerHTML="<b>The line worth sitting with.</b> Roughly three in ten people can do this job well, and roughly eight in ten appointments pick somebody else. That is not an argument for fatalism \u2014 two of those three in ten get there through investment rather than instinct, which is the entire case for taking something like this seriously. It is an argument against assuming you are in the good third because nobody has told you otherwise.";
-  hs.appendChild(hn);
-  const hr=document.createElement("div");hr.style.marginTop="18px";
-  hr.appendChild(el("div","hsub","Sources for the figures above"));
-  const ol=document.createElement("ol");ol.className="refs";
-  HREFS.forEach(pair=>{const u=pair[0],t=pair[1];const li=document.createElement("li");
-    const i=t.indexOf(".");li.appendChild(el("b",null,t.slice(0,i)));
-    li.appendChild(document.createTextNode(t.slice(i+1)));
-    const a=document.createElement("a");a.href=u;a.target="_blank";a.rel="noopener noreferrer";
-    a.className="reflink";a.textContent=u.replace(/^https?:\/\//,"");
-    li.appendChild(document.createElement("br"));li.appendChild(a);
-    ol.appendChild(li)});
-  hr.appendChild(ol);hs.appendChild(hr);
-  const hf=el("p","lead");hf.style.margin="12px 0 0";
-  hf.textContent="Figures were current at the time of writing. Gallup and DDI both publish annually, so check the latest edition before quoting any of them in a room that matters.";
-  hs.appendChild(hf);
+  hs.appendChild(el("h3",null,"Why there is no distribution here"));
+  const p1=el("p","lead");
+  p1.textContent="You would reasonably expect this page to end with a chart of how common each pattern is in real companies. There is not one, and the reason is worth stating rather than papering over.";
+  hs.appendChild(p1);
+  const b1=el("div","hnote");
+  b1.innerHTML="<b>Nobody has measured it, because this taxonomy is not a research instrument.</b> These twenty-three patterns were written for this tool. No study distributes managers across them, so any pie chart claiming to would be invented.";
+  hs.appendChild(b1);
+  const b2=el("div","hnote");
+  b2.innerHTML="<b>The nearest available figures do not add up to a distribution.</b> There is good work on single behaviours \u2014 micromanagement, abusive supervision, favouritism \u2014 but the studies measure different things. Some ask whether you have ever experienced it in a whole career, others whether it happened this year. Some ask the manager, others the team. They overlap, they use incompatible definitions, and they do not partition a population. Laying them side by side in one chart would imply a precision that is not there.";
+  hs.appendChild(b2);
+  const b3=el("div","hnote");
+  b3.innerHTML="<b>What can honestly be said about prevalence is on the References tab.</b> Roughly one in ten people have high natural talent to manage and a further two in ten reach a high standard with real investment; manager appointments pick the wrong candidate about 82% of the time; global engagement sits at 20%. Those are about how many managers are good, not about which pattern they fall into \u2014 a distinction worth keeping.";
+  hs.appendChild(b3);
+  const b4=el("div","hnote");
+  b4.style.cssText="background:#eef4f7;border-color:#c7dae4";
+  b4.innerHTML="<b>There is a real distribution in this tool, on the Simulation tab.</b> It shows how often each pattern comes up when twenty thousand synthetic answer sets are scored by the same code that scored you. That is a property of the instrument rather than a fact about the world, and the tab says so.";
+  const r=el("div","row");r.style.marginTop="10px";
+  const gb=el("button","btn sm","Open the Simulation tab");gb.type="button";
+  gb.addEventListener("click",()=>{S.m="sim";render();window.scrollTo({top:0})});
+  r.appendChild(gb);b4.appendChild(r);
+  hs.appendChild(b4);
   w.appendChild(hs);
   return w}
 
