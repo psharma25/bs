@@ -3,266 +3,328 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Security, AI and the People Who Have to Live With Both</title>
-<meta name="description" content="Practical control maps for agentic AI and enterprise data, a model AI governance policy, and what actually moves cyber culture.">
+<meta name="robots" content="noindex, nofollow">
+<title>regmap.ai — security tooling index</title>
 <style>
-:root{
-  --petrol:#1b4965; --petrol-lt:#2a6e86;
-  --ink:#1c2126; --ink-soft:#4a555e; --ink-faint:#7b8790;
-  --rule:#e2e8ea; --wash:#f4f7f8;
-  --aisec:#3872e0; --gov:#9031aa; --culture:#457c3c; --deck:#d55c26; --controls:#0f766e;
-  --shadow:0 2px 10px rgba(20,40,55,.08);
-  --shadow-hi:0 6px 20px rgba(20,40,55,.13);
-}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0}
-body{
-  background:#fbfcfd;color:var(--ink);
-  font-family:Inter,Calibri,"Segoe UI",Helvetica,Arial,sans-serif;
-  font-size:16.5px;line-height:1.65;-webkit-font-smoothing:antialiased;
-}
-.wrap{max-width:960px;margin:0 auto;padding:0 24px}
-a{color:var(--petrol-lt)}
+ :root{--petrol:#1b4965;--petrol-dk:#123449;--petrol-lt:#5fa8d3;--mist:#cae9ff;--paper:#f6f8fa;
+  --line:#d8dee4;--ink:#1c2530;--soft:#5a6a78;--ctrl:#FFA500;--amber-ink:#7a4d00;--amber-soft:#fff4e0;
+  --green:#0f6e56;--green-soft:#e3f1eb;--red:#9b1c1c;
+  --sans:'Inter','Calibri','Segoe UI',system-ui,-apple-system,sans-serif;
+  --mono:ui-monospace,'Cascadia Mono','Consolas','SF Mono',Menlo,monospace;}
 
-header.top{padding:52px 0 8px}
-header.top .eyebrow{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--petrol-lt);font-weight:600}
-header.top h1{margin:12px 0 0;font-size:38px;line-height:1.16;letter-spacing:-.022em}
-header.top .stand{margin:16px 0 0;font-size:18.5px;line-height:1.55;color:var(--ink-soft);max-width:74ch}
-hr.rule{border:0;border-top:1.75px solid #003767;margin:26px 0 0}
+ *{box-sizing:border-box}
+ html{-webkit-text-size-adjust:100%}
+ body{margin:0;font-family:var(--sans);background:var(--paper);color:var(--ink);
+  font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 
-.note{margin:24px 0 0;padding:15px 20px;background:#fff;border:1.5px solid var(--rule);
-  border-left:4px solid var(--petrol);border-radius:8px;box-shadow:var(--shadow);
-  font-size:15px;line-height:1.6;color:var(--ink-soft)}
-.note b{color:var(--ink)}
+ /* ---------- masthead ---------- */
+ header{background:var(--petrol);color:#fff;padding:22px 26px 18px}
+ header h1{margin:0;font-size:19px;font-weight:650;letter-spacing:.2px}
+ header h1 span{color:var(--mist);font-weight:400}
+ header p{margin:6px 0 0;font-size:12.5px;color:var(--mist);max-width:70ch}
+ .strip{background:var(--petrol-dk);color:#cfe0ea;padding:9px 26px;border-bottom:3px solid var(--ctrl);
+  font-size:11.5px;display:flex;gap:20px;flex-wrap:wrap;align-items:center}
+ .strip b{color:#fff;font-weight:600}
 
-/* ---------- contents ---------- */
-.toc{margin:26px 0 0;background:#fff;border:1.5px solid var(--rule);border-radius:10px;
-  box-shadow:var(--shadow);padding:20px 24px}
-.toc h4{margin:0 0 14px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--petrol)}
-.toc ol{margin:0;padding:0;list-style:none;counter-reset:toc}
-.toc > ol > li{counter-increment:toc;margin:0 0 16px;padding-left:36px;position:relative}
-.toc > ol > li:last-child{margin-bottom:0}
-.toc > ol > li::before{content:counter(toc);position:absolute;left:0;top:2px;
-  width:24px;height:24px;border-radius:50%;background:var(--petrol);color:#fff;
-  font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
-.toc .sect{font-weight:700;font-size:15.5px;color:var(--ink);text-decoration:none}
-.toc .sect:hover{color:var(--petrol-lt)}
-.toc .path{font-size:12px;color:var(--ink-faint);font-weight:400;margin-left:8px}
-.toc ul{margin:7px 0 0;padding:0;list-style:none}
-.toc ul li{margin:5px 0;font-size:14px;color:var(--ink-faint);line-height:1.5}
-.toc ul a{text-decoration:none;font-weight:600}
-.toc ul a:hover{text-decoration:underline}
-.toc .fmt{display:inline-block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;
-  color:#fff;border-radius:9px;padding:1px 8px;margin-right:8px;min-width:44px;text-align:center}
-.f-web{background:var(--aisec)}
-.f-gov{background:var(--gov)}
-.f-cul{background:var(--culture)}
-.f-deck{background:var(--deck)}
-.f-cont{background:var(--controls)}
-.f-img{background:#7b8790}
+ /* ---------- toolbar ---------- */
+ .bar{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);
+  padding:11px 26px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;
+  box-shadow:0 1px 4px rgba(20,45,60,.06)}
+ input[type=search]{flex:1;min-width:210px;padding:8px 11px;border:1px solid var(--line);border-radius:4px;
+  font-family:var(--sans);font-size:13.5px;color:var(--ink);background:#fff}
+ input[type=search]:focus{outline:2px solid var(--petrol-lt);outline-offset:1px;border-color:var(--petrol)}
+ .chips{display:flex;gap:6px;flex-wrap:wrap}
+ .chip{font-family:var(--sans);font-size:12px;padding:5px 11px;border:1px solid var(--line);
+  background:#fff;color:var(--soft);border-radius:14px;cursor:pointer;font-weight:500}
+ .chip:hover{background:var(--paper)}
+ .chip[aria-pressed="true"]{background:var(--mist);border-color:var(--petrol);color:var(--petrol);font-weight:600}
+ .chip:focus-visible,a:focus-visible{outline:2px solid var(--petrol);outline-offset:2px}
+ .count{font-size:11.5px;color:var(--soft);margin-left:auto;white-space:nowrap}
 
-h2{margin:46px 0 4px;font-size:15px;letter-spacing:.1em;text-transform:uppercase}
-h2 .fold{font-size:11.5px;letter-spacing:.06em;text-transform:none;color:var(--ink-faint);
-  font-weight:400;margin-left:10px}
-h2 + p{margin:0 0 4px;font-size:14.5px;color:var(--ink-faint)}
-#s-aisec{color:var(--aisec)} #s-gov{color:var(--gov)} #s-culture{color:var(--culture)} #s-decks{color:var(--deck)}
+ /* ---------- grid ---------- */
+ main{padding:22px 26px 46px;max-width:1180px}
+ .sect{margin:0 0 12px;font-size:11px;letter-spacing:.9px;text-transform:uppercase;
+  color:var(--petrol);font-weight:650}
+ .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(288px,1fr));gap:13px;margin-bottom:32px}
 
-.cards{display:grid;gap:14px;margin:18px 0 0}
-.two{grid-template-columns:1fr 1fr}
-.card{display:block;background:#fff;border:1.5px solid var(--rule);border-radius:9px;padding:20px 22px;
-  text-decoration:none;color:inherit;box-shadow:var(--shadow);
-  transition:border-color .12s, box-shadow .12s, transform .12s}
-.card:hover{box-shadow:var(--shadow-hi);transform:translateY(-2px)}
-.card .kind{display:inline-block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
-  color:#fff;padding:3px 10px;border-radius:11px;margin-bottom:10px}
-.k-web{background:var(--aisec)}
-.k-gov{background:var(--gov)}
-.k-cul{background:var(--culture)}
-.k-deck{background:var(--deck)}
-.k-cont{background:var(--controls)}
-.card h3{margin:0 0 6px;font-size:19px;letter-spacing:-.012em}
-.card p{margin:0;font-size:14.5px;color:var(--ink-soft);line-height:1.55}
-.card .meta{margin-top:10px;font-size:12.5px;color:var(--ink-faint)}
-.card .go{margin-top:12px;font-size:13.5px;font-weight:600;color:var(--petrol-lt)}
+ .card{position:relative;display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);
+  border-left:3px solid var(--ctrl);border-radius:0 7px 7px 0;padding:14px 16px 12px;
+  text-decoration:none;color:inherit;transition:box-shadow .13s,transform .13s,border-color .13s}
+ .card:hover{box-shadow:0 3px 12px rgba(20,45,60,.11);transform:translateY(-1px);border-left-color:var(--petrol)}
+ .card.folder{border-left-color:var(--petrol);background:linear-gradient(180deg,#fff 0%,#fbfdfe 100%)}
+ .card.doc{border-left-color:var(--green)}
+ .card.ext{border-left-color:var(--petrol-lt)}
+ .card.ext h3::after{content:" ↗";color:var(--petrol-lt);font-weight:400}
+ .card.ext .path::after{content:" — opens in a new tab";color:#9aa8b1;font-family:var(--sans);font-size:10.5px}
+ .card.doc .path::after{content:" — downloads";color:#9aa8b1;font-family:var(--sans);font-size:10.5px}
+ .card h3{margin:0 0 5px;font-size:14.5px;font-weight:650;color:var(--petrol);padding-right:62px}
+ .card p{margin:0 0 10px;font-size:12.5px;color:var(--soft);flex:1}
+ .path{font-family:var(--mono);font-size:11px;color:#7d8b95;word-break:break-all;
+  border-top:1px dashed var(--line);padding-top:7px}
+ .tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px}
+ .tag{font-size:10.5px;padding:2px 7px;border-radius:3px;background:#eef3f6;color:#41606f;font-weight:500}
 
-footer{margin:52px 0 0;padding:22px 0 64px;border-top:1px solid var(--rule);
-  font-size:13px;color:var(--ink-faint);line-height:1.6}
-footer .disc{font-style:italic;margin:0 0 14px}
+ .acc{position:absolute;top:13px;right:14px;font-size:10px;font-weight:650;letter-spacing:.5px;
+  text-transform:uppercase;padding:2px 7px;border-radius:3px}
+ .acc.pub{background:var(--green-soft);color:var(--green)}
+ .acc.res{background:var(--amber-soft);color:var(--amber-ink)}
 
-@media (max-width:760px){
-  header.top h1{font-size:28px}
-  .two{grid-template-columns:1fr}
-}
+ .seen{font-size:10.5px;color:var(--petrol-lt);font-weight:600;margin-top:6px}
+
+ .empty{padding:34px 4px;color:var(--soft);font-size:13px}
+ footer{border-top:1px solid var(--line);padding:16px 26px 30px;font-size:11.5px;color:var(--soft);
+  background:#fff}
+ footer code{font-family:var(--mono);font-size:11px;background:#eef3f5;padding:1px 4px;border-radius:2px}
+
+ @media (max-width:560px){
+  header,.strip,.bar,main,footer{padding-left:16px;padding-right:16px}
+  .count{margin-left:0}
+ }
+ @media (prefers-reduced-motion:reduce){
+  .card{transition:none}.card:hover{transform:none}
+ }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-<header class="top">
-  <div class="eyebrow">Security &middot; AI &middot; Governance &middot; Culture</div>
-  <h1>Security, AI, and the People Who Have to Live With Both</h1>
-  <p class="stand">Control maps you can work from, a model policy you can adapt, and the part everyone skips &mdash; why people do what they do when the tooling is not watching. Everything here is a single file you can open, print or hand to someone else.</p>
+<header>
+  <h1>regmap<span>.ai</span> — security tooling index</h1>
+  <p>Single-file working tools for security governance, assurance and architecture. Each one runs entirely
+     in the browser; nothing is sent anywhere.</p>
 </header>
-<hr class="rule">
 
-<div class="note">
-  <b>Where to start.</b> If the question is &ldquo;should we turn Copilot on&rdquo;, or &ldquo;how do we share data without it training somebody&rsquo;s model&rdquo;, start with the enterprise data map. If it is &ldquo;we are giving an agent write access to production&rdquo;, start with the agentic control map. If the question is which of ten thousand findings to fix, or how to prove a control worked without assembling screenshots, start with security controls. If you are writing the policy, start with governance. If the controls exist and people still route around them, the answer is in culture.
+<div class="strip">
+  <span><b id="sTools">0</b> tools</span>
+  <span><b id="sPub">0</b> open</span>
+  <span><b id="sRes">0</b> sign-in required</span>
+  <span>BitSense LLC</span>
 </div>
 
-<!-- ============ CONTENTS ============ -->
-<nav class="toc" aria-label="Contents">
-  <h4>Contents</h4>
-  <ol>
-    <li>
-      <a class="sect" href="#s-aisec">AI security</a><span class="path">/aisec</span>
-      <ul>
-        <li><span class="fmt f-web">Web</span><a href="aisec/enterprise-ai-data-protection.html">Protecting Enterprise Data in the Age of AI</a> &mdash; Copilot, paid accounts, shadow AI, data you sell</li>
-        <li><span class="fmt f-web">Web</span><a href="aisec/agentic-ai-system.html">Agentic AI control map</a> &mdash; four layers, 24 risks, tools by stack</li>
-        <li><span class="fmt f-web">Read</span><a href="aisec/agentic-ai-insights.html">Securing Agentic AI Without Slowing It Down</a> &mdash; about 12 minutes</li>
-        <li><span class="fmt f-web">Read</span><a href="aisec/aibom-vs-sbom.html">AI-BOM vs SBOM </a> &mdash; about 7 minutes</li>  
-      </ul>
-    </li>
-    <li>
-      <a class="sect" href="#s-controls">Security controls</a><span class="path">/security</span>
-      <ul>
-        <li><span class="fmt f-cont">Read</span><a href="security/prodsec-without-gates.html">Building Product Security Without the Gates</a> &mdash; where bugs, cost and friction originate, and the continuous lifecycle that replaces them</li>
-        <li><span class="fmt f-cont">Read</span><a href="security/future-of-it-controls.html">The Future of IT Controls</a> &mdash; break attack paths, not just patches; controls that generate their own evidence</li>
-      </ul>
-    </li>
-    <li>
-      <a class="sect" href="#s-gov">Governance</a><span class="path">/governance</span>
-      <ul>
-        <li><span class="fmt f-gov">Web</span><a href="governance/ai-governance-policy.html">AI Governance Is Not Data Governance</a> &mdash; what differs, what good looks like, and a model policy</li>
-      </ul>
-    </li>
-    <li>
-      <a class="sect" href="#s-culture">Culture</a><span class="path">/culture</span>
-      <ul>
-        <li><span class="fmt f-cul">Web</span><a href="culture/index.html">Cyber Culture - Part I &mdash; what it is, and how to move it</a> &mdash; friction, four levers, an operating plan</li>
-        <li><span class="fmt f-cul">Web</span><a href="https://www.linkedin.com/feed/update/urn:li:activity:7490033360736514048/" >Cyber Culture - Part II: Truly Understand the Business Drivers, Then Reduce Friction by Paving the Road</a></li>
-     
-      </ul>
-    </li>
-    <li>
-      <a class="sect" href="#s-decks">Decks and visuals</a><span class="path">/aisec</span>
-      <ul>
-        <li><span class="fmt f-deck">PPTX</span><a href="aisec/enterprise-ai-data-protection.pptx">Protecting Enterprise Data in the Age of AI</a> &mdash; 4 slides</li>
-        <li><span class="fmt f-deck">PPTX</span><a href="aisec/agentic-ai-system.pptx">Agentic AI &mdash; risk, control and tooling</a> &mdash; 7 slides</li>
-        <li><span class="fmt f-deck">1 page</span><a href="aisec/ai-innovation-lanes.pptx">Keep It Safe Without Slowing People Down</a> &mdash; single-slide visual</li>
-        <li><span class="fmt f-img">PNG</span><a href="aisec/ai-innovation-lanes.png">Lanes visual, full size</a> &middot; <a href="aisec/ai-innovation-lanes-square.png">square for social</a></li>
-      </ul>
-    </li>
-  </ol>
-</nav>
-
-<!-- ============ AI SECURITY ============ -->
-<h2 id="s-aisec">1 &middot; AI security<span class="fold">/aisec</span></h2>
-<p>What actually goes wrong, and what to configure. Filterable, searchable, works offline.</p>
-<div class="cards">
-  <a class="card" href="aisec/enterprise-ai-data-protection.html" style="border-color:#3872e0">
-    <span class="kind k-web">Interactive</span>
-    <h3>Protecting Enterprise Data in the Age of AI</h3>
-    <p>The four ways company data meets AI &mdash; Copilot inside your own systems, paid Claude or ChatGPT accounts, personal logins nobody told you about, and data you license to other people. For each: what to change in your settings, which tools do the work and what they actually do, how to spot it, stop it and keep it fixed &mdash; plus the real gaps none of it solves.</p>
-    <div class="meta">Six views &middot; a real-life example on every tab &middot; gaps flagged in red</div>
-    <div class="go">Open it &rarr;</div>
-  </a>
-  <a class="card" href="aisec/agentic-ai-system.html" style="border-color:#3872e0">
-    <span class="kind k-web">Interactive</span>
-    <h3>Agentic AI control map</h3>
-    <p>The system diagram, the five CISA / ASD ACSC risk categories, a tool matrix arranged by the stack you already run, and each of the four layers with 24 risks &mdash; every one carrying its preventive control, detective control, configuration and example tooling, mapped to OWASP, MITRE ATLAS and NIST AI RMF.</p>
-    <div class="meta">Seven views &middot; filter by OWASP category &middot; free-text search</div>
-    <div class="go">Open it &rarr;</div>
-  </a>
-  <a class="card" href="aisec/agentic-ai-insights.html" style="border-color:#3872e0">
-    <span class="kind k-web">Long read</span>
-    <h3>Securing Agentic AI Without Slowing It Down</h3>
-    <p>Layer by layer &mdash; inputs, training, the agent itself, outputs &mdash; each risk mapped to three frameworks, with the preventive control, the detective control and the configuration that makes both real. Closes on where the trade-off between innovation and control actually sits.</p>
-    <div class="meta">About 12 minutes &middot; 24 risks &middot; six control categories by stack</div>
-    <div class="go">Read it &rarr;</div>
-  </a>
+<div class="bar">
+  <input type="search" id="q" placeholder="Filter by name, description or tag…" aria-label="Filter tools">
+  <div class="chips" id="chips" role="group" aria-label="Filter by category"></div>
+  <span class="count" id="count"></span>
 </div>
 
-<!-- ============ SECURITY CONTROLS ============ -->
-<h2 id="s-controls">2 &middot; Security controls<span class="fold">/security</span></h2>
-<p>Two halves of the same argument: controls engineers do not route around, and controls that generate their own evidence. Both start from the same observation &mdash; the queue is the control.</p>
-<div class="cards two">
-  <a class="card" href="security/prodsec-without-gates.html" style="border-color:#0f766e">
-    <span class="kind k-cont">Long read</span>
-    <h3>Building Product Security Without the Gates</h3>
-    <p>Where bugs, cost and friction originate across the lifecycle, and why shift-left fails when it moves the review without removing the wait. The continuous, no-gates model stage by stage &mdash; threat model the delta, ratchet rather than gate, exceptions that expire &mdash; plus what to do about components fielded for twenty years.</p>
-    <div class="meta">Eight sections &middot; seven diagrams &middot; sixteen references with a provenance note</div>
-    <div class="go">Read it &rarr;</div>
-  </a>
-  <a class="card" href="security/future-of-it-controls.html" style="border-color:#0f766e">
-    <span class="kind k-cont">Long read</span>
-    <h3>The Future of IT Controls</h3>
-    <p>Finding count is not risk &mdash; attackers need one path. Why the queue never ends and keeps expanding, the attack graph and the eight ways to break a link, risk-based prioritization, moving controls from activity to outcome, where AI genuinely helps and where it must not, and a ninety-day sequence.</p>
-    <div class="meta">Seven sections &middot; thirteen panels &middot; sixteen references</div>
-    <div class="go">Read it &rarr;</div>
-  </a>
-</div>
-
-<!-- ============ GOVERNANCE ============ -->
-<h2 id="s-gov">3 &middot; Governance<span class="fold">/governance</span></h2>
-<p>The policy layer, and what to do before you write it.</p>
-<div class="cards">
-  <a class="card" href="governance/ai-governance-policy.html" style="border-color:#9031aa">
-    <span class="kind k-gov">Interactive</span>
-    <h3>AI Governance Is Not Data Governance</h3>
-    <p>Data governance is about a noun; AI governance is about a verb. Where the line actually sits and why one depends on the other. Twelve things a good AI policy does, twelve failure patterns to avoid, the eleven pieces of pre-work worth doing before you write a word &mdash; and a short model policy you can copy and adapt.</p>
-    <div class="meta">Six views &middot; model policy with copy and print &middot; anti-patterns flagged in red</div>
-    <div class="go">Open it &rarr;</div>
-  </a>
-</div>
-
-<!-- ============ CULTURE ============ -->
-<h2 id="s-culture">4 &middot; Culture<span class="fold">/culture</span></h2>
-<p>Why people route around good controls, and what changes that.</p>
-<div class="cards">
-  <a class="card" href="culture/cyber-culture.html" style="border-color:#457c3c">
-    <span class="kind k-cul">Interactive</span>
-    <h3>Cyber Culture &mdash; what it is, and how to move it</h3>
-    <p>Culture is what people do when no one is watching. Friction decides most of it: make the safe route the easy route and behaviour follows, no matter what the policy says. Four levers that actually shift it, and an operating plan for doing so.</p>
-    <div class="meta">Three parts &middot; the mechanism, four levers, an operating plan</div>
-    <div class="go">Open it &rarr;</div>
-  </a>
-</div>
-
-<!-- ============ DECKS ============ -->
-<h2 id="s-decks">5 &middot; Decks and visuals<span class="fold">/aisec</span></h2>
-<p>4:3 PowerPoint, ready to use or adapt.</p>
-<div class="cards two">
-  <a class="card" href="aisec/enterprise-ai-data-protection.pptx" style="border-color:#d55c26">
-    <span class="kind k-deck">Deck</span>
-    <h3>Protecting Enterprise Data in the Age of AI</h3>
-    <p>Four slides: the four situations with what to do in each, what to set up and which tools do it, sharing licensed data without it becoming training corpus, and a four-week runbook.</p>
-    <div class="meta">PowerPoint &middot; 4 slides</div>
-    <div class="go">Download &rarr;</div>
-  </a>
-  <a class="card" href="aisec/agentic-ai-system.pptx" style="border-color:#d55c26">
-    <span class="kind k-deck">Deck</span>
-    <h3>Agentic AI &mdash; risk, control and tooling</h3>
-    <p>Seven slides: the system diagram, what goes wrong and what covers most of it, the four layers one at a time, and references.</p>
-    <div class="meta">PowerPoint &middot; 7 slides</div>
-    <div class="go">Download &rarr;</div>
-  </a>
-</div>
-<div class="cards">
-  <a class="card" href="aisec/ai-innovation-lanes.pptx" style="border-color:#d55c26">
-    <span class="kind k-deck">One-page visual</span>
-    <h3>Keep It Safe Without Slowing People Down</h3>
-    <p>A single slide for the innovation conversation. Three lanes sorted by what the work can actually break &mdash; just go, quick check, proper review &mdash; with what each one is, what happens, and how long it takes. Plus the four things that keep the top lane full.</p>
-    <div class="meta">PowerPoint &middot; 1 slide &middot; also as <a href="aisec/ai-innovation-lanes.png">PNG</a> and <a href="aisec/ai-innovation-lanes-square.png">square PNG</a> for social</div>
-    <div class="go">Download &rarr;</div>
-  </a>
-</div>
+<main>
+  <div id="out"></div>
+</main>
 
 <footer>
-  <p class="disc">The views expressed here are my own. They do not represent the views of any employer, client, or other organisation with which I am or have been associated, and nothing here should be taken as legal advice.</p>
-  Built in part on <em>Careful Adoption of Agentic AI Services</em> &mdash; ASD&rsquo;s ACSC, CISA, NSA, the Canadian Centre for Cyber Security, NCSC-NZ and NCSC-UK, 30 April 2026. Diagram redrawn from Figure 1. &copy; Commonwealth of Australia 2026, licensed CC BY 4.0.<br><br>
-  OWASP and MITRE ATLAS identifiers change between published versions &mdash; verify against the current release before using them in an assessment. NIST AI RMF subcategory mappings are a derivation, not an official crosswalk. Products named are examples of a control category, not recommendations or an endorsement. The model policy is a starting point, not a compliant document.
+  Entries are defined in the <code>ITEMS</code> array at the top of this file's script block — edit there to add,
+  rename or re-tag a tool. Items marked <strong>sign-in required</strong> sit behind Cloudflare Access;
+  everything else is world-readable.
 </footer>
 
-</div>
+<script>
+/* ------------------------------------------------------------------
+   Edit this array to change the index. No build step, no dependencies.
+   access: "public"    — anyone with the URL
+           "restricted" — behind Cloudflare Access
+   ------------------------------------------------------------------ */
+const ITEMS = [
+  { name:"Secure SDLC",
+    file:"sdlc.html",
+    group:"Architecture",
+    desc:"Editable lifecycle diagram — phases, gates and control placement across the development pipeline.",
+    tags:["SDLC","Diagram","Editable"],
+    access:"public" },
+
+  { name:"Agentic reference architecture",
+    file:"agentic-reference-architecture.html",
+    group:"Architecture",
+    desc:"Reference view of an agentic AI system with trust boundaries and control points called out.",
+    tags:["AI","Architecture"],
+    access:"public" },
+
+  { name:"Control-to-policy map & gap assessment",
+    file:"control-policy-map.html",
+    group:"Assurance",
+    desc:"Cross-walk from controls to the policy that carries them, and where the gaps sit — controls with no owning document, and policies covering nothing.",
+    tags:["Mapping","Policy","Gap assessment"],
+    access:"public" },
+
+  { name:"Trust Center",
+    file:"https://thebitsense.com/trustcenter/",
+    group:"Assurance",
+    desc:"Published security posture and evidence summary. Choose PromptHalo from the Product selector to see their view.",
+    tags:["Trust Center","External","Customer-facing"],
+    access:"public",
+    external:true },
+
+  { name:"Enterprise risk register",
+    file:"risk-register.html",
+    group:"Assurance",
+    desc:"Risks with owner, inherent and residual scoring, treatment plans and appetite. Tabs for the register, risk map, categories, methodology and backup.",
+    tags:["Risk","Register","Treatment","CC3"],
+    access:"restricted" },
+
+  { name:"SOC 2 programme tracker",
+    file:"soc2-programme-tracker.html",
+    group:"Assurance",
+    desc:"Programme-level view of readiness: control register, policy activities, evidence and open gaps.",
+    tags:["SOC 2","Tracker"],
+    access:"restricted" },
+
+  { name:"SOC 2 self-assessment",
+    file:"soc2-assess.index.html",
+    group:"Assurance",
+    desc:"Walk the Common Criteria and record a position against each one before an auditor does it for you.",
+    tags:["SOC 2","Assessment"],
+    access:"restricted" },
+
+  { name:"Secureframe evidence tracker",
+    file:"secureframe-evidence-tracker.html",
+    group:"Assurance",
+    desc:"Tracks which artefact satisfies which requirement, and whether it is current enough to submit.",
+    tags:["Evidence","SOC 2"],
+    access:"restricted" },
+
+  { name:"Third-party assessments",
+    file:"../tprm/tprm-secureframe.html",
+    group:"Assurance",
+    desc:"Folder — vendor and third-party assessment packs; the source folder Secureframe evidence requests point at.",
+    tags:["Folder","Third-party","Secureframe","Evidence"],
+    access:"restricted",
+    folder:true },
+
+  { name:"SOC 2 programme map",
+    file:"PromptHalo_Programme_Map.xlsx",
+    group:"Assurance",
+    desc:"Seven workstreams and 42 tasks on a week-by-week roadmap, with milestones, blockers and capacity.",
+    tags:["XLSX","Roadmap","SOC 2"],
+    access:"restricted",
+    doc:true },
+
+  { name:"Common Criteria control plan",
+    file:"PromptHalo_Common_Criteria_Control_Plan.xlsx",
+    group:"Assurance",
+    desc:"160 controls across CC1–CC9 with policy mapping, governance log, evidence calendar and dashboard.",
+    tags:["XLSX","Controls","SOC 2"],
+    access:"restricted",
+    doc:true },
+
+  { name:"GitHub hardening tracker",
+    file:"github-hardening-tracker.html",
+    group:"Engineering",
+    desc:"Repository and organisation settings checklist — branch protection, secrets, actions, access reviews.",
+    tags:["GitHub","Hardening"],
+    access:"public" },
+
+  { name:"Cloud security",
+    file:"cloudsecurity/aws-ai",
+    group:"Engineering",
+    desc:"Folder — cloud posture and configuration material.",
+    tags:["Folder","Cloud"],
+    access:"public",
+    folder:true }
+];
+
+const GROUPS = ["Architecture","Assurance","Engineering"];
+const KEY = "regmap.index.seen.v1";
+
+let seen = {};
+try { seen = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { seen = {}; }
+
+let activeGroup = "All";
+const out   = document.getElementById("out");
+const qEl   = document.getElementById("q");
+const chips = document.getElementById("chips");
+
+/* ---- category chips ---- */
+["All", ...GROUPS].forEach(g => {
+  const b = document.createElement("button");
+  b.className = "chip";
+  b.type = "button";
+  b.textContent = g;
+  b.setAttribute("aria-pressed", g === "All" ? "true" : "false");
+  b.addEventListener("click", () => {
+    activeGroup = g;
+    [...chips.children].forEach(c => c.setAttribute("aria-pressed", c === b ? "true" : "false"));
+    render();
+  });
+  chips.appendChild(b);
+});
+
+function ago(ts){
+  const d = Math.floor((Date.now() - ts) / 86400000);
+  if (d <= 0) return "opened today";
+  if (d === 1) return "opened yesterday";
+  if (d < 30)  return "opened " + d + " days ago";
+  return "opened " + Math.floor(d / 30) + " months ago";
+}
+
+function esc(s){
+  return String(s).replace(/[&<>\"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+}
+
+function card(it){
+  const a = document.createElement("a");
+  a.className = "card" + (it.folder ? " folder" : "") + (it.doc ? " doc" : "") + (it.external ? " ext" : "");
+  a.href = it.file;
+  if (it.doc) a.setAttribute("download", "");
+  if (it.external){ a.target = "_blank"; a.rel = "noopener noreferrer"; }
+  a.addEventListener("click", () => {
+    seen[it.file] = Date.now();
+    try { localStorage.setItem(KEY, JSON.stringify(seen)); } catch (e) {}
+  });
+
+  const badge = it.access === "restricted"
+    ? '<span class="acc res" title="Behind Cloudflare Access">Sign-in</span>'
+    : '<span class="acc pub" title="Publicly readable">Open</span>';
+
+  a.innerHTML =
+    badge +
+    "<h3>" + esc(it.name) + "</h3>" +
+    "<p>" + esc(it.desc) + "</p>" +
+    '<div class="tags">' + it.tags.map(t => '<span class="tag">' + esc(t) + "</span>").join("") + "</div>" +
+    '<div class="path">' + esc(it.file) + "</div>" +
+    (seen[it.file] ? '<div class="seen">' + ago(seen[it.file]) + "</div>" : "");
+
+  return a;
+}
+
+function render(){
+  const q = qEl.value.trim().toLowerCase();
+
+  const match = ITEMS.filter(it => {
+    if (activeGroup !== "All" && it.group !== activeGroup) return false;
+    if (!q) return true;
+    return (it.name + " " + it.desc + " " + it.tags.join(" ") + " " + it.file).toLowerCase().includes(q);
+  });
+
+  out.textContent = "";
+
+  if (!match.length){
+    const d = document.createElement("div");
+    d.className = "empty";
+    d.textContent = "Nothing matches that filter.";
+    out.appendChild(d);
+  } else {
+    GROUPS.forEach(g => {
+      const inGroup = match.filter(it => it.group === g);
+      if (!inGroup.length) return;
+      const h = document.createElement("h2");
+      h.className = "sect";
+      h.textContent = g;
+      out.appendChild(h);
+      const grid = document.createElement("div");
+      grid.className = "grid";
+      inGroup.forEach(it => grid.appendChild(card(it)));
+      out.appendChild(grid);
+    });
+  }
+
+  document.getElementById("count").textContent =
+    match.length + " of " + ITEMS.length + " shown";
+}
+
+document.getElementById("sTools").textContent = ITEMS.filter(i => !i.folder).length;
+document.getElementById("sPub").textContent   = ITEMS.filter(i => i.access === "public").length;
+document.getElementById("sRes").textContent   = ITEMS.filter(i => i.access === "restricted").length;
+
+qEl.addEventListener("input", render);
+render();
+</script>
 </body>
 </html>
