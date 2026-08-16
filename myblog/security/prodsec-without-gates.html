@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building Product Security Without the Gates</title>
+<style>
+  :root{
+    --petrol:#1B4965; --petrol-mid:#3E7797; --amber:#B45309;
+    --body:#28414F; --muted:#6E7F89; --line:#E1E8ED;
+    --bg:#F4F7F9; --card:#FFFFFF;
+    --sh:0 1px 2px rgba(27,73,101,.06),0 8px 22px rgba(27,73,101,.09);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--body);
+    font-family:Inter,Calibri,"Segoe UI",system-ui,sans-serif;
+    font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1240px;margin:0 auto;padding:52px 24px 80px}
+  .prose{max-width:760px;margin:0 auto}
+  .wide{max-width:1240px;margin:28px auto 0}
+
+  .eyebrow{font-size:11.5px;letter-spacing:.17em;text-transform:uppercase;color:var(--amber);
+    font-weight:700;margin:0 0 12px;text-align:center}
+  h1{font-size:44px;line-height:1.08;margin:0 0 12px;color:var(--petrol);font-weight:800;
+    letter-spacing:-.022em;text-align:center}
+  .deck{font-size:19px;color:var(--muted);margin:0;text-align:center;line-height:1.4}
+  .rule{height:4px;width:60px;background:var(--amber);border-radius:2px;margin:24px auto 40px}
+
+  h2{font-size:26px;color:var(--petrol);font-weight:800;letter-spacing:-.012em;
+    margin:56px 0 14px;line-height:1.22}
+  h3{font-size:17.5px;color:var(--petrol);font-weight:800;margin:26px 0 8px}
+  p{margin:0 0 15px}
+  strong{color:var(--petrol);font-weight:700}
+  sup{font-size:11px;color:var(--amber);font-weight:700;vertical-align:super}
+
+  .pull{border-left:4px solid var(--amber);background:var(--card);border-radius:0 12px 12px 0;
+    padding:20px 24px;margin:26px 0;box-shadow:var(--sh)}
+  .pull p{margin:0;font-size:20px;line-height:1.35;color:var(--petrol);font-weight:700;letter-spacing:-.01em}
+  .pull span{display:block;margin-top:8px;font-size:15px;color:var(--body);font-weight:400;line-height:1.5}
+
+  figure{margin:0}
+  figcaption{font-size:13px;color:var(--muted);margin:12px auto 0;max-width:880px;text-align:center}
+
+  .grid8{display:grid;grid-template-columns:repeat(8,1fr);gap:12px}
+  .grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+
+  .phase{border-radius:10px;padding:10px 8px;text-align:center}
+  .pn{font-size:10px;font-weight:700;opacity:.7;margin:0 0 2px}
+  .pt{font-size:12.5px;font-weight:700;margin:0;line-height:1.22}
+
+  .strip{background:var(--card);border-radius:14px;box-shadow:var(--sh);padding:15px 18px;margin:12px 0 0}
+  .slab{display:flex;align-items:baseline;gap:9px;margin:0 0 10px;flex-wrap:wrap}
+  .slab h4{font-size:13px;margin:0;color:var(--petrol);font-weight:800;letter-spacing:.01em}
+  .slab span{font-size:11.5px;color:var(--muted)}
+  .cell{text-align:center}
+  .big{font-size:19px;font-weight:800;margin:0 0 6px;letter-spacing:-.01em}
+  .track{height:7px;border-radius:4px;overflow:hidden}
+  .fill{height:100%;border-radius:4px}
+  .why{font-size:11.6px;color:#41555F;text-align:left;line-height:1.35}
+
+  .co{background:var(--card);border-radius:14px;box-shadow:var(--sh);padding:14px 16px;border-top:4px solid var(--amber)}
+  .co b{color:var(--petrol);display:block;font-size:13.5px;margin:0 0 4px}
+  .co p{margin:0;font-size:12.4px;color:#41555F;line-height:1.4}
+
+  .band{background:var(--petrol);color:#fff;border-radius:12px;padding:12px 20px;margin:0 0 12px;
+    display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+  .band b{font-size:16px;font-weight:800;letter-spacing:.01em}
+  .band span{font-size:12.5px;opacity:.86}
+
+  .stage{background:var(--card);border-radius:14px;box-shadow:var(--sh);overflow:hidden;padding:0 0 12px}
+  .cap{height:5px}
+  .sh{padding:11px 13px 7px}
+  .sn{font-size:10px;font-weight:800;letter-spacing:.12em;color:var(--muted);margin:0 0 2px}
+  .st{font-size:13.5px;font-weight:800;color:var(--petrol);margin:0;line-height:1.2}
+  .stage ul{margin:0;padding:0 13px 0 26px}
+  .stage li{font-size:12px;color:#41555F;margin:0 0 5px;line-height:1.32}
+  .ai{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:.08em;color:var(--amber);
+    background:#FBEDDD;border-radius:20px;padding:2px 7px;margin:2px 13px 0}
+
+  .en{background:var(--card);border-radius:12px;box-shadow:var(--sh);padding:14px 15px;border-left:4px solid var(--petrol-mid)}
+  .en b{display:block;font-size:13px;color:var(--petrol);font-weight:800;margin:0 0 5px;line-height:1.2}
+  .en p{margin:0;font-size:12.2px;color:#41555F;line-height:1.38}
+
+  .met{background:var(--card);border-radius:12px;box-shadow:var(--sh);overflow:hidden}
+  .met .mb{padding:13px 15px 14px}
+  .met b{display:block;font-size:13px;color:var(--petrol);margin:0 0 5px}
+  .met p{margin:0 0 9px;font-size:12.2px;color:#41555F;line-height:1.38}
+  .chip{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:3px 10px}
+
+  .oc{background:var(--card);border-radius:12px;box-shadow:var(--sh);padding:13px 15px;border-top:4px solid #1D9E75}
+  .oc b{display:block;font-size:13px;color:var(--petrol);margin:0 0 3px}
+  .oc span{font-size:12px;color:#41555F;line-height:1.35}
+
+  .refs{background:var(--card);border-radius:14px;box-shadow:var(--sh);padding:24px 28px;margin:34px auto 0;max-width:1000px}
+  .refs h2{margin:0 0 12px;font-size:20px}
+  .refs ol{margin:0;padding-left:22px;columns:2;column-gap:36px}
+  .refs li{font-size:12.4px;color:#41555F;margin:0 0 9px;break-inside:avoid;line-height:1.42}
+  .caveat{font-size:12.4px;color:#7A5A2E;background:#FCF2E4;border-radius:10px;padding:13px 15px;
+    margin:13px 0 0;line-height:1.45}
+
+  .final{background:var(--petrol);color:#fff;border-radius:14px;padding:24px 30px;margin:34px auto 0;max-width:1000px;text-align:center}
+  .final b{font-size:21px;font-weight:800;display:block;margin:0 0 6px}
+  .final span{font-size:15px;opacity:.9}
+
+  @media(max-width:1000px){
+    .grid8{grid-template-columns:repeat(4,1fr)}
+    .grid5,.grid4{grid-template-columns:repeat(2,1fr)}
+    .grid3{grid-template-columns:1fr}
+    .refs ol{columns:1}
+    h1{font-size:32px}h2{font-size:22px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<p class="eyebrow">Product security</p>
+<h1>Building Product Security Without the Gates</h1>
+<p class="deck">Making the secure path the easiest path</p>
+<div class="rule"></div>
+
+<div class="prose">
+<h2>1. The problem: we find vulnerabilities too late, and it costs too much</h2>
+<p>Research on defect origins has been consistent for three decades. Most defects are introduced early — roughly 70 to 80 percent in requirements, architecture, and code.<sup>1</sup> Fixing in production runs 50 to 100 times more expensive than fixing in requirements.<sup>7</sup></p>
+<p>The gap between those two facts is widening. Meanwhile only 26 percent of CISA Known Exploited Vulnerabilities were fully remediated.<sup>8</sup> Veracode's 2026 data puts average fix time at 252 days, up from 171 five years ago.<sup>9</sup></p>
+
+<h3>Friction is what connects the two</h3>
+<p>Late involvement, big-bang reviews, manual processes, unclear ownership, tool sprawl.</p>
+<p>We need a different model: continuous, integrated, environment-aware, and automation-first.</p>
+
+<h2>2. Where bugs, cost, and friction originate: why even shift-left could fail</h2>
+</div>
+
+<figure class="wide">
+  <div class="grid8" id="phases"></div>
+  <div class="strip">
+    <div class="slab"><h4>BUGS INTRODUCED</h4><span>share of total defect potential<sup>1</sup></span></div>
+    <div class="grid8" id="bugs"></div>
+  </div>
+  <div class="strip">
+    <div class="slab"><h4>COST TO FIX</h4><span>relative, square-root scale<sup>7</sup></span></div>
+    <div class="grid8" id="cost"></div>
+  </div>
+  <div class="strip">
+    <div class="slab"><h4>FRICTION</h4><span>none of these is a missing tool</span></div>
+    <div class="grid8" id="fric"></div>
+  </div>
+  <div class="grid3" id="callouts" style="margin-top:12px"></div>
+</figure>
+
+<div class="prose">
+<p>Defects mass on the left. Cost masses on the right. Friction is what carries a defect from one end to the other.</p>
+<p>A requirements defect is not intrinsically expensive. It becomes expensive because design decisions, code, tests, and eventually deployed instances got built on top of it. Cost is a function of delay.</p>
+
+<div class="pull"><p>The queue is the control.<span>Whatever your scanners find, your actual exposure is set by the interval between a defect being created and an engineer hearing about it. If you have never measured that interval, you do not know what your control is set to.</span></p></div>
+
+<h3>Why even shift-left fails</h3>
+<p>It moves the review earlier without removing the wait, producing an earlier bottleneck instead of a later one. What has to move left is <strong>feedback latency</strong>, not calendar position.</p>
+
+<h2>3. What we really need: the continuous, no-gates security model</h2>
+<p>Security needs to run in the flow of engineering, not next to it.</p>
+</div>
+
+<figure class="wide">
+  <div class="band"><b>SECURITY IN THE FLOW OF ENGINEERING</b><span>Feedback loops, not gates</span></div>
+  <div class="grid4" id="stages"></div>
+  <figcaption>Every finding updates the model, the template, and the test suite — so the same defect class cannot return the same way.</figcaption>
+</figure>
+
+<div class="prose">
+<p>Two mechanics do most of the work.</p>
+<p><strong>Ratchet, don't gate.</strong> Block only on new criticals in changed code. Nobody fixes the backlog to ship — they just cannot make it worse.</p>
+<p><strong>Exceptions expire.</strong> Named business risk owner, expiry date, compensating control. Exceptions security owns never close.</p>
+
+<h2>4. The enablers that make it real</h2>
+<p>None is a new class of tool. Same tools, moved off the calendar and onto the commit.</p>
+</div>
+
+<figure class="wide">
+  <div class="grid4" id="enablers"></div>
+</figure>
+
+<div class="prose">
+<h2>5. Release and maintenance of long-lasting components</h2>
+<p>A device fielded in 2026 is supported into the 2040s. Frozen toolchain, vendor BSP with no upstream, patches that may require regulatory action. Five mechanics.</p>
+</div>
+
+<figure class="wide">
+  <div class="grid5" id="longlife"></div>
+  <figcaption>Under FD&amp;C Act §524B the postmarket obligation is continuous<sup>16</sup> — the only evidence worth having is the evidence the process already generates.</figcaption>
+</figure>
+
+<div class="prose">
+<h2>6. Measure what matters</h2>
+<p>Risk reduction, speed, friction — not activity. Scans run and reviews completed are attendance metrics.</p>
+</div>
+
+<figure class="wide">
+  <div class="grid3" id="mets"></div>
+  <figcaption>Put these beside your DORA delivery metrics, not instead of them.<sup>14</sup> Recurrence rate is the honesty check: it only falls when a finding actually updated the model and the tests.</figcaption>
+</figure>
+
+<div class="prose">
+<h2>7. The outcome</h2>
+</div>
+
+<figure class="wide">
+  <div class="grid5" id="outcome"></div>
+</figure>
+
+<div class="prose">
+<p>The trade is real. You give up veto points, spend more engineering effort upfront, and accept residual risk in writing with a named owner. If every exception still routes back to security for a decision, you kept the gate and added paperwork.</p>
+<p><strong>Some things stay gates.</strong> Gate the irreversible and the legally attributable: a premarket submission, production access to patient data, the first agent with write authority into a system of record. No model sets a risk acceptance, closes a finding, or signs a regulated release.</p>
+<p>Most programs have it backwards — they gate the routine, where volume guarantees a workaround, and automate the exceptional, where a human decision was worth the wait.</p>
+<p>If you change one thing this quarter, measure your queues.</p>
+</div>
+
+<div class="final">
+  <b>Context, automation, feedback, and trust.</b>
+  <span>Make the secure path the easiest path.</span>
+</div>
+
+<div class="refs">
+  <h2 style="margin-top:0">8. References</h2>
+  <ol id="reflist"></ol>
+  <p class="caveat"><b>Provenance.</b> Cost-to-fix multipliers are widely reproduced and poorly documented. The escalation trend is well supported; the specific stops trace to IBM Systems Sciences Institute data whose methodology was never fully published. Boehm's original range is 6x–100x. Defect-origin shares come from function-point data on general quality defects, not security defects specifically. Treat both as directional.</p>
+</div>
+
+</div>
+
+<script>
+(function(){
+  var PAL=[["#E4EDF3","#2B5B78"],["#E3EAF5","#33518A"],["#E1EFEA","#1F6E58"],["#E9F1E1","#4A6B25"],
+           ["#FAF1DE","#8A6516"],["#FBE9DB","#9C5A22"],["#FADFDA","#9C3F34"],["#EFE6F2","#61407A"]];
+  var PH=["Requirements","Architecture","Implementation","Build & unit test",
+          "Integration","Pre-release","Release","Operate & maintain"];
+  var BUG=["20%","25%","35%","6%","4%","1%","1%","8%"],BUGN=[20,25,35,6,4,1,1,8];
+  var COST=["1x","2x","5x","10x","15x","20x","30x","50–100x"],COSTN=[1,2,5,10,15,20,30,75];
+  var WHY=["No testable criteria. No named owner.",
+    "Trust boundaries undecided. No model to diff.",
+    "Feedback lands days after the commit.",
+    "Flaky tests. Findings in a separate console.",
+    "Issues surface only when expensive.",
+    "Big-batch review. Scarce experts. Fixed calendar.",
+    "Manual sign-off. Evidence built by hand.",
+    "Drift, aging components, no named owner."];
+  var CALL=[["80% before build and test","Requirements, architecture, implementation — the three phases with the least automated coverage.","1"],
+    ["Cost is a function of delay","The defect did not get harder to fix. Things got built on top of it.","7"],
+    ["The queue is the control","Exposure = interval between defect created and engineer informed.","8,9"]];
+  var STAGES=[
+    ["Continuous requirements",["Abuse cases as acceptance criteria","Regulatory mapping on the story"],false],
+    ["Env-aware threat modeling",["Model once, then diff","Deployment context is a model variable","Every threat → a control or a test"],true],
+    ["Secure-by-default generation",["Generate from governed templates","Templates reviewed as controls"],true],
+    ["Continuous code testing",["SAST, secrets, IaC on every PR","Findings in the IDE, under 5 min","Ratchet on new criticals only"],true],
+    ["Integration & auto-testing",["DAST per preview environment","Threat-derived regression tests"],true],
+    ["Pre-release validation",["Policy-as-code, not a meeting","Pentest per release train"],false],
+    ["Release & deployment",["SBOM, VEX, provenance from the build","Automated rollback"],false],
+    ["Operate & maintain",["Watch list wired to KEV","Exceptions that expire"],true]];
+  var ENABLE=[
+    ["Requirements-integrated, env-aware threat modeling","Model once, diff forever. Trigger on trust boundary, data flow, privilege, or integration change. Deployment context is a variable, not an assumption."],
+    ["AI-assisted secure code generation","Governed templates only — they are the control. 85% of AI-generated code failed controlled XSS tests.<sup>9</sup>"],
+    ["Continuous SAST, DAST, secrets, IAST","Incremental against the diff, in the IDE and the PR, under five minutes. Full scans nightly, never blocking."],
+    ["Managed libraries, SBOM-driven SCA","Registry resolves approved versions by default. SBOM is a build artifact. 84% of alerts sit on unused dependencies — rank, don't close.<sup>10</sup>"],
+    ["Auto-testing at every stage","Every surviving threat produces a regression test. No test means the threat is not real or not understood."],
+    ["Attack-graph prioritization","4,000 findings is ~30 paths. Fix choke points — usually an exposure or a privilege, not a code change."],
+    ["Continuous remediation","Fix the base image, not 40 tickets. SLA by exploitability: KEV plus reachable in days, high EPSS in weeks."],
+    ["Long-lasting component strategy","Declare the horizon, contain what cannot be patched, let VEX answer, fund re-platforming."]];
+  var LONG=[
+    ["Declare","Support horizon recorded at selection. The failure is discovering in year nine that nobody chose year nine."],
+    ["Contain","No reachability, no untrusted input, small verified interface. Architecture outlives any patch cadence."],
+    ["Answer","Machine-generated VEX on a schedule. The recurring cost is responding, not fixing.<sup>15</sup>"],
+    ["Survey","Watch list wired to KEV and advisories, routed through coordinated disclosure with human decision points."],
+    ["Re-platform","Two or three planned migrations per ten-year product. Unfunded means unplanned, under breach pressure."]];
+  var METS=[
+    ["Vulnerability escape rate","Share first found in production.","Lower is better","#B45309","#FBEDDD","#eb6834"],
+    ["Mean vulnerable age","Reachable criticals only. Industry half-life 252 days.","Benchmark: 252 days","#0C447C","#E6F1FB","#2a78d6"],
+    ["Attack path reduction","Exploitable paths to crown jewels. Paths, not findings.","Lower is better","#3C3489","#EEEDFE","#7F77DD"],
+    ["Recurrence rate","Same defect class returning. The honesty check.","Lower is better","#791F1F","#FCEBEB","#E24B4A"],
+    ["Security coverage","Changes that received a threat model diff.","Higher is better","#085041","#E1F5EE","#1D9E75"],
+    ["Remediation latency","Assign to merged fix. The friction number.","Lower is better","#633806","#FAEEDA","#BA7517"]];
+  var OUT=[["Lower risk","Detection meets creation."],
+    ["Lower cost","The delay is gone, so the multiplier is too."],
+    ["Faster delivery","Queues deleted, not checks."],
+    ["Happier engineers","Secure stopped costing eighteen days."],
+    ["Stronger products","Defect classes do not return."]];
+  var REFS=[
+    "Capers Jones, <i>The Economics of Software Quality</i> (2011) — defect origin distribution.",
+    "NIST SP 800-218, <i>Secure Software Development Framework (SSDF) v1.1</i>.",
+    "NIST SP 800-218A, <i>SSDF Community Profile for Generative AI and Dual-Use Foundation Models</i> (2024).",
+    "NIST SP 800-53 Rev. 5.",
+    "NIST SP 800-160 Vol. 2 Rev. 1, <i>Developing Cyber-Resilient Systems</i>.",
+    "NIST SP 800-161r1, <i>Cybersecurity Supply Chain Risk Management Practices</i>.",
+    "Cost-to-fix multipliers: IBM Systems Sciences Institute via G. Tassey, NIST Planning Report 02-3 (2002); range from B. Boehm, <i>Software Engineering Economics</i> (1981). See provenance note.",
+    "Verizon, <i>2026 Data Breach Investigations Report</i> — vulnerability exploitation at 31% of initial access, leading vector for the first time; 26% of CISA KEV fully remediated.",
+    "Veracode, <i>2026 State of Software Security</i> — 82% of organizations in security debt, 60% critical; 252-day average fix time; 85% of AI-generated code failed controlled XSS tests.",
+    "N. Imtiaz et al., arXiv:2108.12078 — 84.2% of SCA alerts on dependencies the application never calls.",
+    "Microsoft Security Development Lifecycle.",
+    "OWASP SAMM and OWASP ASVS.",
+    "SEI CERT Secure Coding Standards.",
+    "DORA / Google Cloud DevOps Research and Assessment.",
+    "CISA/NTIA <i>Minimum Elements for an SBOM</i>; OASIS CSAF 2.0; OpenVEX.",
+    "FDA, <i>Cybersecurity in Medical Devices</i> — FD&amp;C Act §524B."];
+
+  function set(id,h){var e=document.getElementById(id); if(e) e.innerHTML=h;}
+  set("phases",PH.map(function(n,i){return '<div class="phase" style="background:'+PAL[i][0]+';color:'+PAL[i][1]+'"><p class="pn">'+(i+1)+'</p><p class="pt">'+n+'</p></div>';}).join(""));
+  set("bugs",BUG.map(function(v,i){return '<div class="cell"><p class="big" style="color:'+PAL[i][1]+'">'+v+'</p><div class="track" style="background:'+PAL[i][0]+'"><div class="fill" style="width:'+Math.round(BUGN[i]/35*100)+'%;background:'+PAL[i][1]+';opacity:.55"></div></div></div>';}).join(""));
+  set("cost",COST.map(function(v,i){return '<div class="cell"><p class="big" style="color:'+PAL[i][1]+'">'+v+'</p><div class="track" style="background:'+PAL[i][0]+'"><div class="fill" style="width:'+Math.round(Math.sqrt(COSTN[i]/75)*100)+'%;background:'+PAL[i][1]+';opacity:.55"></div></div></div>';}).join(""));
+  set("fric",WHY.map(function(t){return '<div class="why">'+t+'</div>';}).join(""));
+  set("callouts",CALL.map(function(c){return '<div class="co"><b>'+c[0]+'</b><p>'+c[1]+'<sup>'+c[2]+'</sup></p></div>';}).join(""));
+  set("stages",STAGES.map(function(s,i){return '<div class="stage"><div class="cap" style="background:'+PAL[i][1]+'"></div><div class="sh"><p class="sn">'+(i+1)+'</p><p class="st">'+s[0]+'</p></div><ul>'+s[1].map(function(b){return '<li>'+b+'</li>';}).join("")+'</ul>'+(s[2]?'<span class="ai">AI-ASSISTED</span>':'')+'</div>';}).join(""));
+  set("enablers",ENABLE.map(function(e){return '<div class="en"><b>'+e[0]+'</b><p>'+e[1]+'</p></div>';}).join(""));
+  set("longlife",LONG.map(function(l){return '<div class="en"><b>'+l[0]+'</b><p>'+l[1]+'</p></div>';}).join(""));
+  set("mets",METS.map(function(m){return '<div class="met"><div class="cap" style="background:'+m[5]+'"></div><div class="mb"><b>'+m[0]+'</b><p>'+m[1]+'</p><span class="chip" style="color:'+m[3]+';background:'+m[4]+'">'+m[2]+'</span></div></div>';}).join(""));
+  set("outcome",OUT.map(function(o){return '<div class="oc"><b>'+o[0]+'</b><span>'+o[1]+'</span></div>';}).join(""));
+  set("reflist",REFS.map(function(r){return '<li>'+r+'</li>';}).join(""));
+})();
+</script>
+</body>
+</html>
