@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Future of IT Controls</title>
+<style>
+  :root{
+    --petrol:#1B4965; --amber:#B45309; --red:#A32D2D; --green:#1D9E75;
+    --body:#28414F; --muted:#6E7F89; --line:#DFE7EC;
+    --bg:#F4F7F9; --card:#FFFFFF;
+    --sh:0 1px 2px rgba(27,73,101,.06),0 8px 22px rgba(27,73,101,.09);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--body);
+    font-family:Inter,Calibri,"Segoe UI",system-ui,sans-serif;
+    font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1240px;margin:0 auto;padding:46px 24px 70px}
+  .prose{max-width:780px;margin:0 auto}
+
+  .eyebrow{font-size:11.5px;letter-spacing:.17em;text-transform:uppercase;color:var(--amber);
+    font-weight:700;margin:0 0 11px;text-align:center}
+  h1{font-size:44px;line-height:1.05;margin:0 0 10px;color:var(--petrol);font-weight:800;
+    letter-spacing:-.022em;text-align:center}
+  .deck{font-size:19px;color:var(--muted);margin:0 0 20px;text-align:center;line-height:1.35}
+
+  .shift{background:var(--petrol);color:#fff;border-radius:12px;padding:15px 22px;
+    display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap}
+  .shift .lbl{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.6;font-weight:700}
+  .shift b{font-size:16px;font-weight:800;letter-spacing:-.005em}
+  .shift .to{color:#9FE1CB}
+  .shift .ar{color:var(--amber);font-weight:800;font-size:18px}
+  .rule{height:4px;width:56px;background:var(--amber);border-radius:2px;margin:32px auto 0}
+
+  h2{font-size:24px;color:var(--petrol);font-weight:800;letter-spacing:-.012em;margin:48px 0 10px;line-height:1.2}
+  p{margin:0 0 12px}
+  strong{color:var(--petrol);font-weight:700}
+  sup{font-size:10.5px;color:var(--amber);font-weight:700;vertical-align:super}
+
+  figure{margin:22px 0 0}
+  figcaption{font-size:12.5px;color:var(--muted);margin:11px auto 0;max-width:940px;text-align:center}
+
+  .row{display:grid;gap:14px}
+  .r2{grid-template-columns:repeat(2,1fr)}
+  .r3{grid-template-columns:repeat(3,1fr)}
+
+  .pnl{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--sh);padding:16px 15px}
+  .pnl h4{font-size:12.5px;color:var(--petrol);font-weight:800;letter-spacing:.03em;
+    text-transform:uppercase;margin:0 0 3px;text-align:center;line-height:1.25}
+  .pnl .sub{font-size:11.2px;color:var(--muted);text-align:center;margin:0 0 13px}
+
+  .item{border-left:3px solid var(--line);padding:0 0 0 10px;margin:0 0 10px}
+  .item b{display:block;font-size:11.9px;color:var(--petrol);font-weight:800;line-height:1.25;margin:0 0 2px}
+  .item p{margin:0;font-size:11.3px;color:#5C6E78;line-height:1.35}
+
+  .sgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+  .st{background:#EFF4F7;border-radius:9px;padding:9px 8px;text-align:center}
+  .st b{display:block;font-size:17px;font-weight:800;color:var(--petrol);letter-spacing:-.015em;line-height:1.1}
+  .st span{font-size:10.4px;color:#5C6E78;line-height:1.3;display:block;margin-top:3px}
+
+  .lyr{display:grid;gap:6px;margin:0 0 4px}
+  .nd{border-radius:8px;padding:7px 5px;text-align:center;font-size:11.2px;font-weight:700;line-height:1.2}
+  .nd em{display:block;font-style:normal;font-weight:400;font-size:10.2px;opacity:.85;margin-top:1px}
+  .dn{text-align:center;color:#9BAAB3;font-size:11px;line-height:1;margin:0 0 4px}
+  .insight{background:#EFF4F7;border-radius:9px;padding:10px 12px;margin:11px 0 0;text-align:center}
+  .insight b{display:block;font-size:10.8px;letter-spacing:.08em;text-transform:uppercase;color:var(--petrol);margin:0 0 3px}
+  .insight p{margin:0;font-size:11.2px;color:#41555F;line-height:1.38}
+
+  .lnk{border:1px solid var(--line);border-radius:8px;padding:7px 10px;margin:0 0 5px;border-left-width:4px}
+  .lnk b{display:block;font-size:11.3px;font-weight:800;color:var(--petrol);text-transform:uppercase;letter-spacing:.02em}
+  .lnk span{font-size:10.8px;color:#5C6E78}
+  .breakbar{background:#E4F3EC;border-radius:9px;padding:9px;text-align:center;margin:9px 0 0}
+  .breakbar b{display:block;font-size:11.5px;font-weight:800;color:#0F6E56;letter-spacing:.06em}
+  .breakbar span{font-size:10.6px;color:#2F7A64}
+
+  .fnl{display:flex;flex-direction:column;align-items:center;gap:4px}
+  .fnl div{border-radius:5px;padding:6px 7px;text-align:center;font-size:10.9px;font-weight:700;color:#fff;line-height:1.15}
+  .fnl div em{display:block;font-style:normal;font-weight:400;font-size:9.9px;opacity:.92}
+  .fdown{text-align:center;color:var(--petrol);font-size:13px;margin:7px 0 5px;line-height:1}
+  .rp{font-size:11px;color:var(--petrol);font-weight:800;text-transform:uppercase;letter-spacing:.06em;text-align:center;margin:0 0 7px}
+  .pr{display:grid;grid-template-columns:28px 1fr;gap:7px;align-items:start;
+    border:1px solid var(--line);border-radius:7px;padding:6px 8px;margin:0 0 5px;border-left-width:4px}
+  .pr .k{font-size:14px;font-weight:800;line-height:1.1}
+  .pr p{margin:0;font-size:10.7px;color:#41555F;line-height:1.3}
+
+  .swap{border-bottom:1px solid var(--line);padding:8px 0}
+  .swap:last-child{border-bottom:0}
+  .swap .old{font-size:11.2px;color:#94A3AB}
+  .swap .new{font-size:11.6px;color:var(--petrol);font-weight:700;margin-top:2px}
+  .swap .new::before{content:"→ ";color:var(--amber);font-weight:800}
+
+  .qr{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+    border-bottom:1px solid var(--line);padding:7px 0}
+  .qr:last-child{border-bottom:0}
+  .qr b{font-size:11.6px;color:var(--petrol);font-weight:700}
+  .qr span{font-size:13px;font-weight:800;color:var(--green)}
+  .qr.slow span{color:var(--red)}
+  .qnote{background:#FCEBEB;border-radius:8px;padding:9px 11px;margin:10px 0 0;text-align:center}
+  .qnote b{font-size:11.4px;color:#791F1F;font-weight:800;line-height:1.35}
+
+  .ai li{list-style:none;font-size:11.6px;color:#41555F;line-height:1.38;margin:0 0 9px;
+    padding-left:20px;position:relative}
+  .ai li::before{content:"";position:absolute;left:0;top:2px;width:12px;height:12px;
+    border:1.5px solid var(--green);border-radius:3px}
+  .ai li::after{content:"";position:absolute;left:3.5px;top:4.5px;width:4px;height:7px;
+    border:solid var(--green);border-width:0 1.5px 1.5px 0;transform:rotate(45deg)}
+  .ai{margin:0;padding:0}
+  .ainot{background:#FCEBEB;border-radius:9px;padding:10px 12px;margin:11px 0 0}
+  .ainot b{color:#791F1F;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+  .ainot p{margin:3px 0 0;font-size:11.3px;color:#7A3232;line-height:1.38}
+
+  .future{background:var(--petrol);color:#fff;border-radius:12px;padding:22px 24px;text-align:center}
+  .future h4{font-size:19px;font-weight:800;margin:0 0 5px}
+  .future .tag{font-size:13.5px;opacity:.86;margin:0 0 16px}
+  .fgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:0}
+  .fgrid div{padding:0 11px;font-size:11.8px;line-height:1.35;border-left:1px solid rgba(255,255,255,.18)}
+  .fgrid div:first-child{border-left:0}
+
+  .refs{background:var(--card);border-radius:12px;box-shadow:var(--sh);padding:22px 26px;margin:30px auto 0;max-width:1000px}
+  .refs h2{margin:0 0 10px;font-size:19px}
+  .refs ol{margin:0;padding-left:20px;columns:2;column-gap:34px}
+  .refs li{font-size:12.2px;color:#41555F;margin:0 0 8px;break-inside:avoid;line-height:1.4}
+
+  @media(max-width:1000px){
+    .r3,.r2{grid-template-columns:1fr}
+    .fgrid{grid-template-columns:repeat(2,1fr);gap:12px}
+    .fgrid div{border-left:0}
+    .refs ol{columns:1}
+    h1{font-size:31px}h2{font-size:21px}
+    .shift{flex-direction:column;gap:8px;text-align:center}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<p class="eyebrow">IT &amp; cloud controls</p>
+<h1>The Future of IT Controls</h1>
+<p class="deck">Not proving we patched everything. Proving attackers cannot easily reach what matters.</p>
+
+<div class="shift">
+  <span class="lbl">From</span><b>Find everything. Fix everything. Validate it.</b>
+  <span class="ar">&rarr;</span>
+  <span class="lbl">To</span><b class="to">Break the paths. Reduce the risk. Continuously validate it.</b>
+</div>
+<div class="rule"></div>
+
+<div class="prose">
+<h2>1. The problem: the queue never ends</h2>
+<p>Finding count is not risk. Attackers need one path.</p>
+</div>
+
+<figure>
+  <div class="row r3">
+    <div class="pnl"><h4>Why the queue never ends</h4><p class="sub">Structural, not effort</p><div id="whyEnds"></div></div>
+    <div class="pnl"><h4>Why it keeps expanding</h4><p class="sub">NVD moved to triage, April 2026<sup>1</sup></p><div class="sgrid" id="expand"></div></div>
+    <div class="pnl"><h4>Why patching is not the fix</h4><p class="sub">The bottleneck sits elsewhere</p><div id="notfix"></div></div>
+  </div>
+  <figcaption>Enrichment now covers 15–20 percent of incoming CVEs.<sup>1</sup> The prioritization work NIST stopped doing moved to your backlog.</figcaption>
+</figure>
+
+<div class="prose">
+<h2>2. Think like the attacker</h2>
+<p>Attackers traverse a graph. Every path is a chain, and a chain fails at its cheapest link.</p>
+</div>
+
+<figure>
+  <div class="row r3">
+    <div class="pnl">
+      <h4>Think like the attacker: attack graph</h4><p class="sub">How one path is built</p>
+      <div id="graph"></div>
+      <div class="insight"><b>Key insight</b><p>20,000 vulnerabilities may collapse into a few dozen meaningful attack paths. Break the right paths, not everything.</p></div>
+    </div>
+    <div class="pnl">
+      <h4>Break attack paths, not just patches</h4><p class="sub">There are many ways to break a path</p>
+      <div id="breaks"></div>
+      <div class="breakbar"><b>BREAK ANY LINK</b><span>Path becomes infeasible</span></div>
+    </div>
+    <div class="pnl">
+      <h4>Risk-based prioritization</h4><p class="sub">Focus on what matters most</p>
+      <div class="fnl" id="funnel"></div>
+      <div class="fdown">&darr;</div>
+      <p class="rp">Remediation priority</p>
+      <div id="prio"></div>
+    </div>
+  </div>
+  <figcaption>Patching is one of eight interventions, and often the most expensive. Reachability alone removes most noise: 84 percent of SCA alerts sit on dependencies the application never calls.<sup>8</sup></figcaption>
+</figure>
+
+<div class="prose">
+<h2>3. Modernize controls: from activity to outcome</h2>
+<p>Same objectives. Different evidence.</p>
+</div>
+
+<figure>
+  <div class="row r2">
+    <div class="pnl"><h4>Modernize controls</h4><p class="sub">Outdated (activity) &rarr; modern (risk-based, continuous)</p><div id="modernize"></div></div>
+    <div class="pnl"><h4>Exceptions done right</h4><p class="sub">Six questions, answered in writing</p><div id="exc"></div></div>
+  </div>
+  <figcaption>Managed exceptions are risk treatments. Unmanaged exceptions are incidents waiting to happen.</figcaption>
+</figure>
+
+<div class="prose">
+<h2>4. Make it easier with AI — not just automation</h2>
+<p>Automation runs a rule you wrote. AI handles the work between rules: correlating, summarizing, translating, drafting.<sup>16</sup></p>
+</div>
+
+<figure>
+  <div class="row r2">
+    <div class="pnl"><h4>Make it easier with AI</h4><p class="sub">Find and decide faster</p><ul class="ai" id="aiL"></ul></div>
+    <div class="pnl"><h4>…and easier to audit</h4><p class="sub">Translate and evidence</p><ul class="ai" id="aiR"></ul>
+      <div class="ainot"><b>Not this</b><p>No model accepts risk, closes a finding, approves privileged access, or signs an assertion.</p></div>
+    </div>
+  </div>
+</figure>
+
+<div class="prose">
+<h2>5. Auditable, practical, actionable</h2>
+<p>Six steps, each producing the evidence for the next.</p>
+</div>
+
+<figure>
+  <div class="row r3">
+    <div class="pnl"><h4>The operating model</h4><p class="sub">Control execution emits the evidence<sup>11,13</sup></p><div id="model"></div></div>
+    <div class="pnl"><h4>Measure the queues</h4><p class="sub">Then remove them</p><div id="queue"></div>
+      <div class="qnote"><b>The patch is rarely the problem. The queues are.</b></div>
+    </div>
+    <div class="pnl"><h4>The first 90 days</h4><p class="sub">In order — each enables the next</p><div id="days90"></div></div>
+  </div>
+  <figcaption>Queue times are an illustrative enterprise cadence. Two steps consume 14 of 16 days, and neither is technical.</figcaption>
+</figure>
+
+<div class="prose">
+<h2>6. Conclusion</h2>
+<p>Find everything and fix everything broke when supply outran capacity. No tooling restores it.</p>
+<p>Know the estate. Compute the paths. Break the cheapest link. Let the control emit its own proof. You are not claiming zero findings — you are showing the remaining ones do not connect to anything that matters.</p>
+</div>
+
+<figure>
+  <div class="future">
+    <h4>THE FUTURE OF IT CONTROLS</h4>
+    <p class="tag">Not proving we patched everything. Proving attackers can't easily reach what matters.</p>
+    <div class="fgrid" id="future"></div>
+  </div>
+</figure>
+
+<div class="refs">
+  <h2 style="margin-top:0">7. References</h2>
+  <ol id="reflist"></ol>
+</div>
+
+</div>
+
+<script>
+(function(){
+  var P={blue:["#E6F1FB","#0C447C"],purple:["#EEEDFE","#3C3489"],teal:["#E1F5EE","#085041"],
+         green:["#EAF3DE","#27500A"],amber:["#FAEEDA","#633806"],coral:["#FAECE7","#712B13"],
+         red:["#FCEBEB","#791F1F"],pink:["#FBEAF0","#72243E"]};
+
+  var WHY_ENDS=[
+    ["Vulnerabilities grow every day","48,185 CVEs published in 2025 — about 131 a day.<sup>2</sup>"],
+    ["Aging systems and new assets","Legacy that cannot be patched, plus cloud assets created without a ticket."],
+    ["Poor asset inventory","You cannot patch what you do not know exists.<sup>7</sup>"],
+    ["Ownership ambiguity","The slowest step in remediation is finding who owns the asset."],
+    ["CVSS-only prioritization","Severity without reachability or exposure builds a backlog nobody clears.<sup>5,6</sup>"],
+    ["Exceptions become permanent","No owner, no expiry. They do not age — they accumulate."]];
+
+  var EXPAND=[["48,185","CVEs published in 2025<sup>2</sup>"],["+263%","submissions, 2020–2025<sup>1</sup>"],
+    ["~29,000","backlog 'Not Scheduled'<sup>1</sup>"],["15–20%","of CVEs NVD will enrich<sup>1</sup>"],
+    ["26%","of CISA KEV remediated<sup>3</sup>"],["252 days","average time to fix<sup>4</sup>"]];
+
+  var NOTFIX=[
+    ["Detection got noisier","NVD supplied CPE identifiers for only 41 percent of 2024 vulnerabilities — asset matching misses the majority.<sup>7</sup>"],
+    ["The estate churns faster than review","Ephemeral compute, IaC, and non-human identities change hourly. A quarterly review samples a population that already turned over."],
+    ["Patching is rarely the slow part","Median resolution is 43 days<sup>3</sup>; the fix half-life is 252 days<sup>4</sup>. Almost none of that is the patch itself."],
+    ["Finding count is not risk","Attackers need one path. Counting findings measures the scanner, not the exposure."]];
+
+  var GRAPH=[[["Internet","Exposed edge"]],
+    [["Web app",""],["VPN",""],["Bot / API",""]],
+    [["Vulnerability",""],["Identity",""],["Token",""]],
+    [["Workload / user",""]],[["Privilege",""]],[["Internal systems",""]],
+    [["Data",""],["Backups",""],["Control plane",""]]];
+  var GCOL=["red","coral","amber","green","teal","blue","purple"];
+
+  var BREAKS=[["Internet exposure","Remove exposure","red"],["Vulnerability","Patch / update","coral"],
+    ["Identity","MFA / credential protection","amber"],["Privilege","Least privilege / PAM / JIT","green"],
+    ["Network","Segmentation / firewalls","teal"],["Workload","EDR / runtime protection","blue"],
+    ["Data","Authorization / encryption","purple"],["Backup","Isolation / immutable / offline","pink"]];
+
+  var FUNNEL=[["KEV","Known exploited","#A32D2D",100],["EPSS","Exploit probability","#C25A28",92],
+    ["Reachability","Is it reachable?","#BA7517",84],["Exposure","Internet-facing?","#5C8A24",76],
+    ["Asset criticality","Business impact","#1F6E8C",68],["Compensating","Risk reduction","#5A4A9E",60]];
+
+  var PRIO=[["P0","Actively exploited, reachable, exposed, critical. Patch or contain now.","red"],
+    ["P1","High exploitability and reachable. Accelerated remediation.","coral"],
+    ["P2","Serious but constrained exposure. Normal patch cycle.","amber"],
+    ["P3","Not reachable, or strong compensating controls. Scheduled or accepted.","green"]];
+
+  var MODERNIZE=[["Quarterly firewall review","Continuously detect new exposure and risky network paths"],
+    ["Quarterly privileged access review","JIT access, auto-expiry, continuous path analysis<sup>12</sup>"],
+    ["Patch critical CVEs in 30 days","Break reachable paths involving KEV and high-risk vulnerabilities<sup>5,6</sup>"],
+    ["Annual restore test","Continuously verify backup integrity and test restore"],
+    ["Review service accounts","Continuously identify excessive and unused identities"],
+    ["Periodic configuration check","Policy-as-code with continuous drift detection<sup>11,14</sup>"],
+    ["Quarterly vendor access review","Automatically expire access unless renewed"]];
+
+  var EXC=[["Why can it not be remediated?","A specific technical or vendor constraint."],
+    ["Who owns the risk?","A named business owner. Security-owned exceptions never close."],
+    ["What compensating controls apply?","The alternative link you broke instead."],
+    ["What is the residual risk?","Sized, in business terms."],
+    ["When does it expire?","A date, not a status."],
+    ["What triggers reconsideration?","KEV listing, exposure change, a new path.<sup>5</sup>"]];
+
+  var AI_L=["Correlate findings across tools","Summarize attack paths",
+    "Recommend the lowest-friction break point","Generate remediation instructions","Identify obsolete controls"];
+  var AI_R=["Draft exception rationale","Map technical evidence to controls and frameworks",
+    "Explain evidence to auditors","Continuously reduce noise and prioritize risk"];
+
+  var MODEL=[["Discover","Continuously ingest assets, vulnerabilities, identities, cloud, network, agents, data."],
+    ["Graph","Connect asset, vulnerability, identity, privilege, network, data, business impact."],
+    ["Prioritize","KEV, EPSS, reachability, exposure, criticality, compensating controls.<sup>5,6,8</sup>"],
+    ["Break","Choose the cheapest effective intervention: patch, configure, isolate, restrict, monitor."],
+    ["Verify","Is the attack path actually broken? Validate with evidence."],
+    ["Evidence","Capture what, risk, decision, remediation, verification, residual risk, owner."]];
+
+  var QUEUE=[["Detect","1 hr",0],["Triage","4 hrs",0],["Find owner","8 days",1],["Decision","1 day",0],
+    ["Test","1 day",0],["CAB approve","6 days",1],["Deploy","2 hrs",0],["Verify","4 hrs",0]];
+
+  var DAYS90=[["1. Inventory","Join asset, identity, and ownership into one queryable graph."],
+    ["2. Instrument","Measure every step from detection to verification. Publish the numbers first."],
+    ["3. Prioritize","Layer KEV, EPSS, and reachability onto existing scanner output.<sup>5,6,8</sup>"],
+    ["4. Fix exceptions","Named owner and expiry on every open exception. Cheapest change, highest return."],
+    ["5. Emit evidence","Make one control produce its own artifact end to end, then scale it."]];
+
+  var FUTURE=["Fewer reachable attack paths","Shorter exposure windows","Less privileged access",
+    "Fewer permanent exceptions","Automatically generated evidence","Controls that measure risk, not activity"];
+
+  var REFS=[
+    "NIST, <i>NIST Updates NVD Operations to Address Record CVE Growth</i> (15 April 2026) — CVE submissions up 263% between 2020 and 2025; ~42,000 CVEs enriched in 2025; backlog CVEs published before 1 March 2026 reclassified 'Not Scheduled'; enrichment prioritized to KEV, federal software, and EO 14028 critical software (est. 15–20% of volume).",
+    "CVE Program / NVD published-vulnerability counts for 2025 — 48,185 CVEs, roughly 131 per day.",
+    "Verizon, <i>2026 Data Breach Investigations Report</i> — vulnerability exploitation leads initial access at 31%; 26% of CISA KEV fully remediated, down from 38%; median time to full resolution 43 days.",
+    "Veracode, <i>2026 State of Software Security</i> — 82% of organizations carry security debt, 60% critical; average fix time 252 days, up from 171.",
+    "CISA, <i>Known Exploited Vulnerabilities Catalog</i> and BOD 22-01.",
+    "FIRST, <i>Exploit Prediction Scoring System (EPSS)</i>.",
+    "VulnCheck analysis of the 2024 CVE corpus — NVD supplied CPE identifiers for 41.35% of published vulnerabilities.",
+    "N. Imtiaz et al., arXiv:2108.12078 — 84.2% of SCA alerts on dependencies the application never calls.",
+    "OASIS CSAF 2.0 and OpenVEX — machine-readable exploitability statements.",
+    "CISA/NTIA, <i>The Minimum Elements For a Software Bill of Materials</i>.",
+    "NIST SP 800-53 Rev. 5.",
+    "NIST SP 800-207, <i>Zero Trust Architecture</i>.",
+    "NIST, <i>Cybersecurity Framework 2.0</i> (2024).",
+    "CIS Controls v8.1 and CIS Benchmarks.",
+    "NIST SP 800-40 Rev. 4, <i>Guide to Enterprise Patch Management Planning</i>.",
+    "PCAOB AS 2201; ISACA COBIT 2019; AICPA Trust Services Criteria (2017, rev. 2022); NIST AI RMF 1.0 and ISO/IEC 42001 for governing the AI assistance itself."];
+
+  function set(id,h){var e=document.getElementById(id); if(e) e.innerHTML=h;}
+  function items(arr,col){return arr.map(function(x){
+    return '<div class="item"'+(col?' style="border-left-color:'+col+'"':'')+'><b>'+x[0]+'</b><p>'+x[1]+'</p></div>';}).join("");}
+
+  set("whyEnds",items(WHY_ENDS,"#A32D2D"));
+  set("expand",EXPAND.map(function(e){return '<div class="st"><b>'+e[0]+'</b><span>'+e[1]+'</span></div>';}).join(""));
+  set("notfix",items(NOTFIX,"#B45309"));
+
+  set("graph",GRAPH.map(function(L,i){
+    return '<div class="lyr" style="grid-template-columns:repeat('+L.length+',1fr)">'
+      + L.map(function(n){return '<div class="nd" style="background:'+P[GCOL[i]][0]+';color:'+P[GCOL[i]][1]+'">'
+          +n[0]+(n[1]?'<em>'+n[1]+'</em>':'')+'</div>';}).join("")
+      + '</div>' + (i<GRAPH.length-1?'<div class="dn">&darr;</div>':'');}).join(""));
+
+  set("breaks",BREAKS.map(function(b){
+    return '<div class="lnk" style="border-left-color:'+P[b[2]][1]+'"><b>'+b[0]+'</b><span>'+b[1]+'</span></div>';}).join(""));
+
+  set("funnel",FUNNEL.map(function(f){
+    return '<div style="background:'+f[2]+';width:'+f[3]+'%"><b>'+f[0]+'</b><em>'+f[1]+'</em></div>';}).join(""));
+
+  set("prio",PRIO.map(function(p){
+    return '<div class="pr" style="border-left-color:'+P[p[2]][1]+'"><span class="k" style="color:'+P[p[2]][1]+'">'
+      +p[0]+'</span><p>'+p[1]+'</p></div>';}).join(""));
+
+  set("modernize",MODERNIZE.map(function(m){
+    return '<div class="swap"><div class="old">'+m[0]+'</div><div class="new">'+m[1]+'</div></div>';}).join(""));
+
+  set("exc",items(EXC,"#B45309"));
+  set("aiL",AI_L.map(function(t){return '<li>'+t+'</li>';}).join(""));
+  set("aiR",AI_R.map(function(t){return '<li>'+t+'</li>';}).join(""));
+  set("model",items(MODEL,"#3E7797"));
+
+  set("queue",QUEUE.map(function(q){
+    return '<div class="qr'+(q[2]?' slow':'')+'"><b>'+q[0]+'</b><span>'+q[1]+'</span></div>';}).join(""));
+
+  set("days90",items(DAYS90,"#1D9E75"));
+  set("future",FUTURE.map(function(f){return '<div>'+f+'</div>';}).join(""));
+  set("reflist",REFS.map(function(r){return '<li>'+r+'</li>';}).join(""));
+})();
+</script>
+</body>
+</html>
