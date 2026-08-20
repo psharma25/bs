@@ -1,4 +1,3 @@
-html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,27 +26,8 @@ html
     -webkit-font-smoothing: antialiased;
   }
   main { max-width: 34rem; }
-  .Under Construction {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--amber);
-  }
-  .dot {
-    width: 0.45rem;
-    height: 0.45rem;
-    border-radius: 50%;
-    background: var(--amber);
-    animation: pulse 2.4s ease-in-out infinite;
-  }
-  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
-  @media (prefers-reduced-motion: reduce) { .dot { animation: none; } }
   h1 {
-    margin: 1.1rem 0 0;
+    margin: 0;
     font-size: clamp(2.4rem, 9vw, 4rem);
     font-weight: 300;
     line-height: 1.05;
@@ -69,10 +49,11 @@ html
 </head>
 <body>
   <main>
-    <div class="state"><span class="dot"></span>State</div>
     <h1>Come back again.</h1>
     <hr>
     <p>Nothing here yet. This page will fill in when there's something worth showing.</p>
   </main>
 </body>
 </html>
+
+One leftover: --amber is still declared in :root but nothing uses it now. Harmless, but I can strip it if you want the file clean.
