@@ -1,25 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Come back again</title>
-<style>
-  html, body { height: 100%; }
-  body {
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #ffffff;
-    color: #1d2b2c;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: clamp(1.5rem, 6vw, 2.5rem);
-    font-weight: 400;
-  }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BitSense — Index</title>
+  <style>
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      color: #1d2b2c;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      padding: 24px;
+    }
+    .wrap{max-width:860px}
+    h1{font-size:24px;margin:0 0 12px}
+    ul{padding-left:20px}
+    li{margin:10px 0}
+    a{color:#1b4965;text-decoration:none;font-weight:600}
+    a:hover{text-decoration:underline}
+    footer{margin-top:18px;color:#6b7a80;font-size:13px}
+  </style>
 </head>
 <body>
-  Come back again
+  <div class="wrap">
+    <h1>BitSense — Index</h1>
+    <p>A curated set of single-file tools, references and small apps.</p>
+    <ul>
+      <li><a href="myblog/">My Blog</a> — essays and single-file references on security, AI, governance, and incident response.</li>
+      <li><a href="CMMC/">CMMC training</a> — CCP exam prep and study materials covering the CMMC domains and practice questions.</li>
+      <li><a href="hospitaltracker/">Hospital Tracker</a> — install-base inference and hospital-device mapping for medical-device discovery.</li>
+      <li><a href="medrisk/">MedRisk</a> — medical-device risk assessment library and per-device threat models.</li>
+      <li><a href="tprm/">TPRM</a> — third‑party risk and vendor-assessment tools, questionnaires and scanners.</li>
+      <li><a href="trustcenter/">Trust Center</a> — published security posture, compliance and privacy information for products.</li>
+    </ul>
+    <footer>Repository: <a href="https://github.com/psharma25/bs">psharma25/bs</a></footer>
+  </div>
 </body>
 </html>
