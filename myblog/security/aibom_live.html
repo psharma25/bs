@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live AIBOM generator</title>
+<style>
+:root{--petrol:#1b4965;--petrol-d:#123449;--petrol-l:#3f7ba0;--amber:#B45309;
+--ink:#2b3440;--ink-2:#5b6774;--ink-3:#8a95a1;--line:#e3e8ed;--line-2:#f0f3f6;
+--bg:#f7f8fa;--card:#fff;--mint:#e8f4ef;--mint-b:#a8d6c2;--mint-t:#2f6b52;
+--sky:#e8f1fa;--sky-b:#a8c9e6;--sky-t:#2c5c86;--lilac:#f0ebf8;--lilac-b:#c4b5e2;--lilac-t:#5a4785;
+--blush:#fceded;--blush-b:#eebfba;--blush-t:#8f4a42;--butter:#fdf5e3;--butter-b:#e8d3a4;--butter-t:#856224;
+--peach:#fdefe6;--peach-b:#efc5a8;--peach-t:#8c5330;--raise:0 1px 2px rgba(27,73,101,.05),0 2px 6px rgba(27,73,101,.06)}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{font-family:Calibri,Inter,"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);
+font-size:15.5px;line-height:1.58;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px 56px}
+header{background:var(--card);border-bottom:1px solid var(--line);padding:22px 0 18px;margin-bottom:20px}
+h1{font-size:23px;font-weight:600;margin:0 0 4px;color:var(--petrol)}
+.sub{font-size:14.5px;color:var(--ink-2);margin:0;max-width:820px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--raise);
+margin-bottom:18px;overflow:hidden}
+.card .body{padding:17px 19px}.card .body>h2:first-child{margin-top:0}
+.strip{height:4px}.strip.mint{background:var(--mint-b)}.strip.sky{background:var(--sky-b)}
+.strip.blush{background:var(--blush-b)}.strip.butter{background:var(--butter-b)}.strip.lilac{background:var(--lilac-b)}
+h2{font-size:18px;font-weight:600;color:var(--petrol);margin:0 0 4px}
+h3{font-size:14.5px;font-weight:600;color:var(--petrol-d);margin:14px 0 5px}
+.eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--amber);margin:0 0 6px}
+p.hint{font-size:13.5px;color:var(--ink-2);margin:0 0 12px}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.f label{display:block;font-size:12px;font-weight:600;color:var(--ink-2);margin-bottom:3px}
+.f .req{color:var(--blush-t)}.f .opt{color:var(--ink-3);font-weight:400}
+.f input,.f select,.f textarea{font:inherit;font-size:14px;padding:7px 10px;border:1px solid var(--line);
+border-radius:8px;background:var(--card);color:var(--ink);width:100%}
+.f .why{font-size:11.5px;color:var(--ink-3);margin:3px 0 0}
+.f.wide{grid-column:1/-1}
+textarea{min-height:110px;font-family:Consolas,Menlo,monospace;font-size:11.5px}
+.actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-top:14px}
+button{font:inherit;font-size:13.5px;font-weight:600;padding:8px 16px;cursor:pointer;background:var(--card);
+border:1px solid var(--sky-b);color:var(--sky-t);border-radius:8px}
+button:hover{background:var(--sky)}
+button.go{background:var(--mint);border-color:var(--mint-b);color:var(--mint-t)}
+button.go:hover{background:#d9ede4}
+button:disabled{opacity:.5;cursor:not-allowed}
+.status{font-size:13px;color:var(--ink-3)}
+.status.err{color:var(--blush-t)}.status.ok{color:var(--mint-t)}
+.err-box{background:var(--blush);border:1px solid var(--blush-b);border-radius:10px;padding:13px 16px;
+margin-top:13px;color:var(--blush-t);font-size:13.5px}
+.err-box code,.mono{font-family:Consolas,Menlo,monospace;font-size:12px;background:rgba(255,255,255,.65);
+border:1px solid var(--blush-b);padding:1px 6px;border-radius:5px;display:inline-block;word-break:break-all}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;border:1px solid}
+.badge.critical{background:var(--blush);color:var(--blush-t);border-color:var(--blush-b)}
+.badge.high{background:var(--peach);color:var(--peach-t);border-color:var(--peach-b)}
+.badge.incident{background:var(--butter);color:var(--butter-t);border-color:var(--butter-b)}
+.badge.ecosystem{background:var(--lilac);color:var(--lilac-t);border-color:var(--lilac-b)}
+.badge.ok{background:var(--mint);color:var(--mint-t);border-color:var(--mint-b)}
+.adv{border:1px solid var(--line);border-radius:10px;padding:12px 15px;margin-bottom:10px;background:#fcfdfe}
+.adv.hit{background:var(--blush);border-color:var(--blush-b)}
+.adv .ah{display:flex;flex-wrap:wrap;gap:9px;align-items:baseline;margin-bottom:3px}
+.adv .aid{font-weight:600;font-size:14px;color:var(--petrol-d)}
+.adv .at{font-size:13.5px;color:var(--ink);margin:0 0 5px}
+.adv .ad{font-size:13px;color:var(--ink-2);margin:0 0 6px}
+.adv .av{font-size:12px;color:var(--ink-3);margin:0}
+.adv .aa{font-size:12.5px;color:var(--petrol-d);margin:6px 0 0}
+.adv a{color:var(--petrol-l);font-size:12px;word-break:break-all}
+.meterrow{display:flex;align-items:center;gap:10px;margin:12px 0}
+.meter{flex:1;height:20px;background:var(--line-2);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--mint-b);border-radius:20px}
+.mval{font-size:13px;font-weight:600;color:var(--petrol);font-variant-numeric:tabular-nums}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:12px 0}
+.fact{background:#fcfdfe;border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+.fact .fh{font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--amber);margin:0 0 3px}
+.fact .fv{font-size:13.5px;margin:0;color:var(--ink);word-break:break-word}
+.gapbox{background:var(--blush);border:1px solid var(--blush-b);border-radius:10px;padding:12px 15px;
+margin:12px 0;color:var(--blush-t);font-size:13px}
+.gapbox ul{margin:6px 0 0;padding-left:18px;columns:2;column-gap:22px}
+.gapbox li{margin-bottom:3px;break-inside:avoid}
+details{border:1px solid var(--line);border-radius:10px;margin-top:12px;background:var(--card)}
+summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:14px;color:var(--petrol-d)}
+summary:hover{background:var(--line-2)}
+pre{background:#fbfcfd;border-top:1px solid var(--line);margin:0;padding:14px;overflow-x:auto;max-height:460px;
+font-family:Consolas,Menlo,monospace;font-size:11.5px;line-height:1.5}
+.venntxt{background:#fbfcfd;border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;
+font-family:Consolas,Menlo,monospace;font-size:12px;line-height:1.45;color:var(--ink);white-space:pre}
+.hidden{display:none}
+@media(max-width:700px){.gapbox ul{columns:1}}
+</style></head><body>
+<header><div class="wrap">
+<h1>Live AIBOM generator</h1>
+<p class="sub">Type any Hugging Face model ID, supply the few facts the Hub cannot know, and generate a resolved CycloneDX 1.6 AIBOM against the live registry — then check it against the advisories that actually affect the loading stack.</p>
+</div></header>
+<div class="wrap">
+
+<div class="card"><div class="strip mint"></div><div class="body">
+<p class="eyebrow">Step 1</p><h2>What you need to provide</h2>
+<p class="hint">Only the model ID is required. Everything else either comes from the Hub, or is something the Hub structurally cannot know — jurisdiction and legal entity have no field in CycloneDX or SPDX, and no registry publishes them.</p>
+<div class="fields">
+  <div class="f wide"><label for="repo">Model ID <span class="req">required</span></label>
+    <input id="repo" type="text" placeholder="e.g. sentence-transformers/all-MiniLM-L6-v2" value="sentence-transformers/all-MiniLM-L6-v2">
+    <p class="why">The org/name path from the model's Hub URL.</p></div>
+  <div class="f"><label for="rev">Revision <span class="opt">optional</span></label>
+    <input id="rev" type="text" placeholder="main, a tag, or a commit SHA">
+    <p class="why">Leave blank to resolve the current head and pin whatever SHA it returns.</p></div>
+  <div class="f"><label for="owner">Owning legal entity <span class="opt">recommended</span></label>
+    <input id="owner" type="text" placeholder="e.g. Alibaba Cloud (Alibaba Group Holding Ltd)">
+    <p class="why">The Hub gives an org handle, not a legal person. Nobody to serve an advisory on otherwise.</p></div>
+  <div class="f"><label for="jur">Jurisdiction <span class="opt">recommended</span></label>
+    <input id="jur" type="text" placeholder="e.g. China, United States, France (EU)">
+    <p class="why">Decides whether hosted use is an export. No native field exists — it goes in as a property.</p></div>
+  <div class="f"><label for="app">Your application name <span class="opt">recommended</span></label>
+    <input id="app" type="text" placeholder="e.g. prompthalo-retrieval"><p class="why">The BOM subject.</p></div>
+  <div class="f"><label for="appv">Your application version <span class="opt">optional</span></label>
+    <input id="appv" type="text" placeholder="e.g. 2.4.1"></div>
+  <div class="f"><label for="deploy">Deployment <span class="opt">optional</span></label>
+    <select id="deploy"><option value="self-hosted">Self-hosted — weights inside your boundary</option>
+    <option value="vendor-hosted">Vendor-hosted API — weights are not yours</option></select></div>
+  <div class="f"><label for="tfver">Your transformers version <span class="opt">optional</span></label>
+    <input id="tfver" type="text" placeholder="e.g. 4.57.1"><p class="why">Used to check the advisories below. Nothing is sent anywhere.</p></div>
+</div>
+<div class="actions">
+  <button type="button" id="run" class="go">Fetch from Hugging Face and build</button>
+  <button type="button" id="toggleManual">Paste Hub JSON instead</button>
+  <span class="status" id="status"></span>
+</div>
+<div id="manual" class="hidden" style="margin-top:14px">
+  <div class="f wide"><label for="paste">Hub API response</label>
+    <textarea id="paste" placeholder="Paste the JSON here"></textarea>
+    <p class="why">If the live fetch is blocked, run the command below in a terminal and paste the output.</p></div>
+  <p class="mono" id="curl" style="margin-top:8px"></p>
+  <div class="actions"><button type="button" id="runPaste" class="go">Build from pasted JSON</button></div>
+</div>
+<div id="errbox"></div>
+</div></div>
+
+<div id="result" class="hidden">
+<div class="card"><div class="strip sky"></div><div class="body" id="resultBody"></div></div>
+<div class="card"><div class="strip blush"></div><div class="body" id="vulnBody"></div></div>
+</div>
+
+<div class="card"><div class="strip lilac"></div><div class="body">
+<p class="eyebrow">Reference</p><h2>Which bill of materials covers what</h2>
+<p class="hint">Every advisory in this tool sits in the SBOM and AIBOM overlap. That is the whole argument for merging them rather than filing an AIBOM and calling the job done.</p>
+<div class="venntxt">        SBOM                              AIBOM
+   packages, versions               weights, lineage
+   +-------------------+---------+-------------------+
+   |                   | loader  |                   |
+   |   syft, trivy     | stack   |  transformers     |
+   |   lockfiles       | &lt;- CVEs |  reads this       |
+   +---------+---------+---------+---------+---------+
+   |         | crypto  |   all   | signing |         |
+   |         |  libs   |  three  | sigstore|         |
+   +---------+---------+---------+---------+---------+
+             |            CBOM             |
+             |      algorithms, keys       |
+             +-----------------------------+
+
+  SBOM only     packages, versions, transitive dependencies
+  AIBOM only    weights, base-model lineage, training datasets
+  CBOM only     algorithms, key lengths, certificates
+  SBOM n AIBOM  the loader stack. EVERY published CVE lives here.
+  SBOM n CBOM   crypto libraries (openssl, cryptography)
+  AIBOM n CBOM  model signing and attestation
+  all three     a signed, pinned, verified artifact
+
+  Not shown, because they do not overlap:
+  HBOM          accelerator, firmware, country of origin
+  SaaSBOM       endpoints, trust boundaries, tools and MCP servers</div>
+</div></div>
+
+</div>
+<script>
+"use strict";
+var ADVISORIES = [{"id":"CVE-2026-4372","sev":"Critical","pkg":"transformers","affected":"4.56.0 – 5.2.x (with the optional kernels package)","fixed":"5.3.0","title":"RCE via poisoned config.json, bypassing trust_remote_code=False","detail":"A crafted _attn_implementation_internal field in a model's config.json executes arbitrary Python during a standard from_pretrained() call. No flags, no prompt, no warning. Introduced August 2025, patched March 2026 — roughly a six-month exposure window, during which vulnerable versions were downloaded about 232 million times.","applies":"transformers","action":"Upgrade to transformers >= 5.3.0. Auditing config.json is not a sufficient control on its own; the payload is a normal-looking field.","ref":"https://pluto.security/blog/unauthenticated-remote-code-execution-in-huggingface-transformers-via-config-injection/"},{"id":"CVE-2026-1839","sev":"High","pkg":"transformers","affected":"< 5.0.0rc3 on torch >= 2.2 and < 2.6","fixed":"5.0.0rc3","title":"Pickle deserialization RCE in Trainer checkpoint loading","detail":"_load_rng_state() calls torch.load() without safe-loading restrictions, so a malicious rng_state.pth in a checkpoint achieves arbitrary code execution. CWE-502.","applies":"training","action":"Upgrade transformers, and torch to >= 2.6. Only reachable in training or fine-tuning environments, not pure inference.","ref":"https://www.sentinelone.com/vulnerability-database/cve-2026-1839/"},{"id":"CVE-2024-11394","sev":"High (CVSS 8.8)","pkg":"transformers","affected":"Trax model handling","fixed":"see vendor advisory","title":"Trax model deserialization of untrusted data","detail":"Lack of validation of user-supplied model files results in deserialization of untrusted data and code execution in the context of the current user. CWE-502.","applies":"transformers","action":"Upgrade transformers. Avoid loading Trax-format checkpoints from untrusted sources.","ref":"https://www.ibm.com/support/pages/node/7229264"},{"id":"CVE-2025-32434","sev":"High","pkg":"torch","affected":"torch.load() with weights_only=True","fixed":"see vendor advisory","title":"weights_only=True did not prevent code execution","detail":"The mitigation the whole ecosystem was told to rely on was itself bypassable. This is the reason safetensors, not a loader flag, is the actual control.","applies":"torch","action":"Upgrade torch. Prefer safetensors weights over any pickle format regardless of loader flags.","ref":"https://equixly.com/blog/2026/01/14/can-ai-identify-0days/"},{"id":"Ultralytics PyPI compromise","sev":"Incident","pkg":"ultralytics","affected":"8.3.41, 8.3.42, 8.3.45, 8.3.46","fixed":"8.3.43, and 8.3.47 onward","title":"Build pipeline compromised, cryptominer shipped to PyPI","detail":"The project's GitHub Actions workflows and then its PyPI API token were compromised, shipping XMRig cryptomining malware. The malicious code existed only in the PyPI package, not the GitHub repository — a source review would have passed it. Removed from PyPI.","applies":"ultralytics","action":"Pin away from the four affected versions and verify installed artefacts against attestations, not against the source repo.","ref":"https://blog.pypi.org/posts/2024-12-11-ultralytics-attack-analysis/"},{"id":"Malicious Hub repositories","sev":"Ecosystem","pkg":"huggingface hub","affected":"any repository","fixed":"n/a","title":"The Hub is a distribution channel, not a trust boundary","detail":"Open-OSS/privacy-filter reached #1 trending with roughly 244,000 downloads and 667 likes in under 18 hours before takedown, carrying a Rust infostealer targeting browser data, Discord credentials, crypto wallets and SSH keys. Earlier, baller423/goober2 hid a payload in a pickle __reduce__ method.","applies":"all","action":"Pin a commit SHA, prefer safetensors, and scan before load. Trending rank is not a trust signal.","ref":"https://pluto.security/blog/unauthenticated-remote-code-execution-in-huggingface-transformers-via-config-injection/"}];
+var SCORED = ["commit_sha","declared_licence","pipeline_task","base_model","training_datasets",
+  "model_architecture","parameter_count","weight_file_hashes","safe_serialization",
+  "owner_entity","owner_jurisdiction","evaluation_results"];
+var PICKLE=[".bin",".pt",".pth",".ckpt"], SAFE=[".safetensors"], WEIGHT=PICKLE.concat(SAFE,[".gguf",".onnx"]);
+
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}
+function slug(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
+function uuid(){var h="0123456789abcdef",o="";for(var i=0;i<32;i++){o+=h.charAt(Math.floor(Math.random()*16));}
+  return o.slice(0,8)+"-"+o.slice(8,12)+"-4"+o.slice(13,16)+"-a"+o.slice(17,20)+"-"+o.slice(20,32);}
+function nowISO(){return new Date().toISOString().replace(/\.\d{3}Z$/,"Z");}
+function prop(n,v){return {name:n,value:String(v)};}
+function ends(name,list){for(var i=0;i<list.length;i++){if(name.slice(-list[i].length)===list[i])return true;}return false;}
+function val(id){return document.getElementById(id).value.trim();}
+function setStatus(t,cls){var s=document.getElementById("status");s.textContent=t;s.className="status"+(cls?" "+cls:"");}
+
+function buildAibom(repo, hub){
+  var UNRES="UNRESOLVED";
+  var card=(hub&&hub.cardData)||{}, cfg=(hub&&hub.config)||{}, sha=(hub&&hub.sha)||null;
+  var sibs=(hub&&(hub.siblings||[]))||[];
+  var files=[];
+  for(var i=0;i<sibs.length;i++){
+    var fn=sibs[i].rfilename||sibs[i].path||"";
+    if(!fn||!ends(fn,WEIGHT))continue;
+    var lfs=sibs[i].lfs||null;
+    files.push({filename:fn,size:sibs[i].size||(lfs&&lfs.size)||null,
+      sha256:(lfs&&(lfs.sha256||lfs.oid))||null,
+      format:ends(fn,PICKLE)?"pickle":(ends(fn,SAFE)?"safetensors":"other")});
+  }
+  var hasPickle=false,hasSafe=false,hashed=0;
+  for(var j=0;j<files.length;j++){
+    if(files[j].format==="pickle")hasPickle=true;
+    if(files[j].format==="safetensors")hasSafe=true;
+    if(files[j].sha256)hashed++;}
+
+  var cardLic=card.license||null, cardTask=card.pipeline_tag||hub&&hub.pipeline_tag||null;
+  var base=card.base_model||null, ds=card.datasets||null;
+  var arch=(cfg.architectures&&cfg.architectures[0])||card.model_type||null;
+  var pcount=(hub&&hub.safetensors&&hub.safetensors.total)||null;
+  var evals=card["model-index"]||card.model_index||null;
+
+  var owner=val("owner")||UNRES, jur=val("jur")||UNRES;
+  var present={commit_sha:!!sha,declared_licence:!!cardLic,pipeline_task:!!cardTask,
+    base_model:!!base,training_datasets:!!ds,model_architecture:!!arch,
+    parameter_count:pcount!==null,weight_file_hashes:hashed>0,safe_serialization:hasSafe,
+    owner_entity:owner!==UNRES,owner_jurisdiction:jur!==UNRES,evaluation_results:!!evals};
+  var missing=[];for(var k=0;k<SCORED.length;k++){if(!present[SCORED[k]])missing.push(SCORED[k]);}
+  var score=Math.round(100*(SCORED.length-missing.length)/SCORED.length);
+
+  var ref="model/"+slug(repo);
+  var props=[prop("atlas:owner:legalEntity",owner),prop("atlas:owner:jurisdiction",jur),
+    prop("atlas:deployment",val("deploy")),prop("atlas:resolution:status",sha?"resolved":"unresolved"),
+    prop("atlas:weights:fileCount",files.length),prop("atlas:weights:hashedCount",hashed),
+    prop("atlas:weights:serialization",
+      hasSafe&&!hasPickle?"safetensors":(hasSafe&&hasPickle?"mixed — pickle present":
+      (hasPickle?"pickle only — executes code on load":"other")))];
+  if(hasPickle)props.push(prop("atlas:finding:pickleWeights",
+    "Pickle-format weights present. Loading executes arbitrary code. Prefer the safetensors variant or sandbox the load."));
+  if(base)props.push(prop("atlas:lineage:baseModel",base));
+  if(!cardLic)props.push(prop("atlas:provenance:licence","Not declared on the upstream model card."));
+
+  var comp={type:"machine-learning-model","bom-ref":ref,name:repo,
+    version:sha||(UNRES+" — repo did not resolve"),
+    supplier:{name:owner},publisher:owner,
+    purl:"pkg:huggingface/"+repo+"@"+(sha||"UNRESOLVED-COMMIT-SHA"),
+    externalReferences:[{type:"distribution",url:"https://huggingface.co/"+repo}],
+    licenses:[{license:{name:cardLic||UNRES}}],
+    modelCard:{"bom-ref":"modelcard/"+slug(repo),
+      modelParameters:{task:cardTask||UNRES,modelArchitecture:arch||UNRES,
+        datasets:ds?(Array.isArray(ds)?ds:[ds]).map(function(x){return {type:"dataset",name:String(x)};})
+          :[{type:"other",name:"UNDISCLOSED — training data not published by owner"}]},
+      considerations:{technicalLimitations:["Generated from Hub metadata and the model card. Not evaluated in situ."]}},
+    properties:props};
+  if(pcount!==null)comp.modelCard.modelParameters.parameterCount=pcount;
+
+  var subs=files.map(function(f){return {type:"file","bom-ref":"file/"+slug(repo)+"/"+slug(f.filename),
+    name:f.filename,hashes:f.sha256?[{alg:"SHA-256",content:f.sha256}]:[],
+    properties:[prop("atlas:weights:format",f.format)].concat(f.size?[prop("atlas:weights:sizeBytes",f.size)]:[])};});
+
+  var bom={bomFormat:"CycloneDX",specVersion:"1.6",serialNumber:"urn:uuid:"+uuid(),version:1,
+    metadata:{timestamp:nowISO(),
+      tools:{components:[{type:"application",name:"live-aibom-generator",version:"1.0"}]},
+      component:{type:"application",name:val("app")||"REPLACE — your application name",
+        version:val("appv")||"0.0.0"},
+      supplier:{name:owner},
+      properties:[prop("atlas:artifact:status",sha?"RESOLVED — pinned to a commit SHA":"UNRESOLVED"),
+        prop("atlas:completeness:score",score+"%"),
+        prop("atlas:completeness:missing",missing.join(", ")||"none")]},
+    components:[comp].concat(subs),
+    dependencies:[{ref:ref,dependsOn:subs.map(function(s){return s["bom-ref"];})}]};
+  return {bom:bom,score:score,missing:missing,files:files,hasPickle:hasPickle,hasSafe:hasSafe,sha:sha};
+}
+
+function cmpVer(a,b){
+  var x=String(a).split(".").map(Number),y=String(b).split(".").map(Number);
+  for(var i=0;i<Math.max(x.length,y.length);i++){
+    var p=x[i]||0,q=y[i]||0; if(p!==q)return p<q?-1:1;}
+  return 0;}
+
+function checkAdvisories(res){
+  var tf=val("tfver"), out=[];
+  for(var i=0;i<ADVISORIES.length;i++){
+    var a=ADVISORIES[i],hit=false,why="";
+    if(a.pkg==="transformers"){
+      if(a.id==="CVE-2026-4372"){
+        if(!tf){hit=true;why="No transformers version given, so this cannot be ruled out. It affects 4.56.0 through 5.2.x.";}
+        else if(cmpVer(tf,"4.56.0")>=0&&cmpVer(tf,"5.3.0")<0){hit=true;why="Your transformers "+tf+" is in the affected range and below the 5.3.0 fix.";}
+        else{why="transformers "+tf+" is outside the affected range.";}
+      } else {
+        hit=!tf; why=tf?("Check "+tf+" against the affected range below."):"No transformers version given, so this cannot be ruled out.";
+      }
+    } else if(a.pkg==="torch"){
+      hit=res.hasPickle;
+      why=res.hasPickle?"This repo ships pickle-format weights, so the unsafe load path is reachable."
+        :"This repo ships safetensors only, so the pickle load path is not reached by these weights.";
+    } else if(a.pkg==="ultralytics"){
+      hit=/ultralytics|yolo/i.test(document.getElementById("repo").value);
+      why=hit?"This looks like an Ultralytics YOLO repository."
+        :"Not an Ultralytics package. Listed for completeness.";
+    } else {
+      hit=true; why="Applies to every Hub repository, including this one.";
+    }
+    out.push({a:a,hit:hit,why:why});
+  }
+  return out;}
+
+function render(repo,res){
+  var b=res.bom,h="";
+  h+="<p class='eyebrow'>Step 2</p><h2>"+esc(repo)+"</h2>";
+  h+="<p class='mono' style='background:var(--line-2);border-color:var(--line)'>"+esc(b.components[0].purl)+"</p>";
+  h+="<div class='meterrow'><span class='badge "+(res.sha?"ok":"critical")+"'>"
+    +(res.sha?"Resolved":"Unresolved")+"</span><div class='meter'><i style='width:"+res.score
+    +"%'></i></div><span class='mval'>"+res.score+"% complete</span></div>";
+  h+="<div class='facts'>";
+  h+="<div class='fact'><p class='fh'>Commit SHA</p><p class='fv'>"+esc(res.sha||"not resolved")+"</p></div>";
+  h+="<div class='fact'><p class='fh'>Weight files</p><p class='fv'>"+res.files.length
+    +" ("+res.files.filter(function(f){return f.sha256;}).length+" hashed)</p></div>";
+  h+="<div class='fact'><p class='fh'>Serialisation</p><p class='fv'>"
+    +(res.hasSafe&&!res.hasPickle?"safetensors":(res.hasPickle&&res.hasSafe?"mixed — pickle present":
+      (res.hasPickle?"pickle only":"none found")))+"</p></div>";
+  h+="<div class='fact'><p class='fh'>Licence on card</p><p class='fv'>"
+    +esc(b.components[0].licenses[0].license.name)+"</p></div>";
+  h+="</div>";
+  if(res.hasPickle){h+="<div class='gapbox'><b>Pickle weights present.</b> Loading these executes arbitrary "
+    +"code on your machine. Prefer the safetensors variant, or sandbox the load. This is a finding, not a note.</div>";}
+  h+="<div class='gapbox'><b>"+res.missing.length+" of 12 fields unfilled.</b> Read this as a vendor demand list, "
+    +"not a defect in the tool.<ul>";
+  for(var i=0;i<res.missing.length;i++){h+="<li><code>"+esc(res.missing[i])+"</code></li>";}
+  h+="</ul></div>";
+  h+="<div class='actions'><button type='button' id='dl' class='go'>Download AIBOM JSON</button>"
+    +"<button type='button' id='cp'>Copy JSON</button></div>";
+  h+="<details open><summary>CycloneDX 1.6 AIBOM</summary><pre>"+esc(JSON.stringify(b,null,2))+"</pre></details>";
+  document.getElementById("resultBody").innerHTML=h;
+  document.getElementById("dl").onclick=function(){
+    var blob=new Blob([JSON.stringify(b,null,2)],{type:"application/json"});
+    var u=URL.createObjectURL(blob),a=document.createElement("a");
+    a.href=u;a.download=slug(repo)+".aibom.json";document.body.appendChild(a);a.click();
+    document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u);},1200);};
+  document.getElementById("cp").onclick=function(){
+    var t=JSON.stringify(b,null,2);
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t);}
+    setStatus("AIBOM copied","ok");};
+
+  var checks=checkAdvisories(res),hits=0;
+  for(var c=0;c<checks.length;c++){if(checks[c].hit)hits++;}
+  var v="<p class='eyebrow'>Step 3</p><h2>Advisories affecting this model's loading stack</h2>";
+  v+="<p class='hint'><b>No CVE targets model weights.</b> Weights are data, not executable software, so nothing "
+    +"is published against them. Every advisory below sits in the loader — the SBOM and AIBOM overlap. "
+    +hits+" of "+checks.length+" apply or cannot be ruled out for this configuration.</p>";
+  for(var d=0;d<checks.length;d++){
+    var x=checks[d],a=x.a;
+    v+="<div class='adv"+(x.hit?" hit":"")+"'><div class='ah'><span class='aid'>"+esc(a.id)+"</span>"
+      +"<span class='badge "+a.sev.toLowerCase().split(" ")[0]+"'>"+esc(a.sev)+"</span>"
+      +"<span class='badge "+(x.hit?"critical":"ok")+"'>"+(x.hit?"applies or unproven":"not reached")+"</span></div>";
+    v+="<p class='at'><b>"+esc(a.title)+"</b></p><p class='ad'>"+esc(a.detail)+"</p>";
+    v+="<p class='av'>Package <b>"+esc(a.pkg)+"</b> \u00b7 affected "+esc(a.affected)+" \u00b7 fixed in "+esc(a.fixed)+"</p>";
+    v+="<p class='aa'>"+esc(x.why)+"</p>";
+    v+="<p class='aa'><b>Action:</b> "+esc(a.action)+"</p>";
+    v+="<p><a href='"+esc(a.ref)+"' target='_blank' rel='noopener'>"+esc(a.ref)+"</a></p></div>";}
+  document.getElementById("vulnBody").innerHTML=v;
+  document.getElementById("result").classList.remove("hidden");
+}
+
+function apiUrl(){
+  var repo=val("repo"),rev=val("rev");
+  return "https://huggingface.co/api/models/"+repo+(rev?"/revision/"+encodeURIComponent(rev):"")+"?blobs=true";}
+
+function showFallback(msg){
+  document.getElementById("errbox").innerHTML="<div class='err-box'><b>Live fetch did not complete.</b> "
+    +esc(msg)+" This is usually the browser blocking a cross-origin request, not a problem with the model ID. "
+    +"Run the command below and paste the output using the button above \u2014 the result is identical.</div>";
+  document.getElementById("manual").classList.remove("hidden");
+  document.getElementById("curl").textContent="curl -s '"+apiUrl()+"'";}
+
+document.getElementById("run").addEventListener("click",function(){
+  var repo=val("repo");
+  document.getElementById("errbox").innerHTML="";
+  if(!repo){setStatus("Enter a model ID first.","err");return;}
+  if(repo.indexOf("/")===-1){setStatus("A model ID looks like org/name.","err");return;}
+  setStatus("Fetching from Hugging Face\u2026");
+  this.disabled=true;
+  var btn=this;
+  fetch(apiUrl(),{headers:{"Accept":"application/json"}})
+    .then(function(r){
+      if(!r.ok){throw new Error("Hub returned HTTP "+r.status+(r.status===404?" — check the model ID.":""));}
+      return r.json();})
+    .then(function(j){
+      setStatus("Resolved.","ok");
+      render(repo,buildAibom(repo,j));})
+    .catch(function(e){setStatus("","");showFallback(e.message||String(e));})
+    .then(function(){btn.disabled=false;});
+});
+
+document.getElementById("toggleManual").addEventListener("click",function(){
+  var m=document.getElementById("manual");
+  m.classList.toggle("hidden");
+  document.getElementById("curl").textContent="curl -s '"+apiUrl()+"'";});
+
+document.getElementById("runPaste").addEventListener("click",function(){
+  var repo=val("repo"),txt=document.getElementById("paste").value.trim();
+  if(!txt){setStatus("Paste the Hub JSON first.","err");return;}
+  var j;try{j=JSON.parse(txt);}catch(e){setStatus("That is not valid JSON.","err");return;}
+  setStatus("Built from pasted response.","ok");
+  document.getElementById("errbox").innerHTML="";
+  render(repo,buildAibom(repo,j));});
+</script></body></html>
