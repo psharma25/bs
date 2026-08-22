@@ -131,6 +131,25 @@
     font-size:12px;padding:3px 10px;border-radius:14px;margin:3px 4px 0 0}
   .archdetail a.jump{display:inline-block;margin-top:10px;font-size:12.5px;color:var(--petrol);font-weight:600}
   .archhint{font-size:12.5px;color:var(--ink-3);text-align:center;margin:8px 0 0}
+  /* certificate lifecycle */
+  .lifecycle{display:flex;gap:0;overflow-x:auto;padding:8px 2px 4px;margin:10px 0}
+  .lc-node{flex:1;min-width:120px;position:relative;cursor:pointer;padding:0 4px}
+  .lc-node::before{content:"";position:absolute;top:16px;left:0;right:0;height:2px;background:var(--line);z-index:0}
+  .lc-node:first-child::before{left:50%}
+  .lc-node:last-child::before{right:50%}
+  .lc-dot{position:relative;z-index:1;width:34px;height:34px;border-radius:50%;margin:0 auto 7px;
+    background:#fff;border:2px solid var(--petrol);display:flex;align-items:center;justify-content:center;
+    font-size:14px;transition:all .2s}
+  .lc-node:hover .lc-dot{background:var(--petrol-l)}
+  .lc-node.active .lc-dot{background:var(--petrol);color:#fff}
+  .lc-nm{text-align:center;font-size:11.5px;font-weight:600;color:var(--petrol);line-height:1.25}
+  .lc-detail{border:1px solid var(--line);border-left:4px solid var(--petrol);border-radius:8px;
+    padding:14px 16px;margin:8px 0 4px;background:var(--card)}
+  .lc-detail h4{margin:0 0 6px;font-size:15.5px;color:var(--petrol)}
+  .lc-detail .risk{background:var(--red-l);color:#6d1f1f;border-radius:6px;padding:9px 12px;margin-top:10px;font-size:13px}
+  .lc-detail .risk b{display:block;margin-bottom:2px}
+  .lc-detail .good{background:var(--green);color:var(--green-t);border-radius:6px;padding:9px 12px;margin-top:8px;font-size:13px}
+  .lc-detail .good b{display:block;margin-bottom:2px}
   button:hover{background:var(--petrol-l)}
   button.primary{background:var(--petrol);color:#fff}
   button.primary:hover{background:var(--petrol-d)}
@@ -189,7 +208,8 @@
   <a href="#controls">6 · Controls &amp; tools</a>
   <a href="#incidents">7 · Real incidents</a>
   <a href="#medical">8 · Medical device</a>
-  <a href="#scorer">9 · Score your plant</a>
+  <a href="#certs">9 · Certificates &amp; PKI</a>
+  <a href="#scorer">10 · Score your plant</a>
 </nav>
 
 <main>
@@ -715,8 +735,106 @@
      changes who owns it, how it is funded, and which regulations apply.</div>
 </section>
 
+<section id="certs">
+  <h2><span class="n">9</span>Certificates &amp; PKI — the silent operational time bomb</h2>
+  <p class="lede">Digital certificates are how devices and systems prove who they are and encrypt what
+     they say. In a plant, and especially in a fielded medical device, a certificate is not just a
+     security control &mdash; it is a component with an <b>expiry date</b>, and when it expires, things
+     stop working. No attacker required. This is the risk almost nobody plans for until it fires.</p>
+
+  <details class="sub" open><summary>What a certificate actually does here</summary>
+  <div class="subbody">
+    <p>A certificate is a signed statement that says "this key belongs to this device/server, vouched
+       for by this authority (a CA)." It does three jobs across the architecture you saw in section 1:</p>
+    <p><b>Identity</b> &mdash; a device proves it is a genuine, authorized device before it is allowed
+       to connect (to the cloud, to a gateway, to another device). <b>Encryption</b> &mdash; TLS between
+       a device and the cloud, or between plant systems, is set up using certificates. <b>Integrity</b>
+       &mdash; firmware and software updates are <em>signed</em>, and the device checks that signature
+       with a certificate before installing, so only authentic code runs (the defense against the
+       Stuxnet-style attack).</p>
+    <div class="note"><b>Where this lives in the architecture.</b> Certificates sit at almost every
+       arrow in section 1's map: device&harr;cloud (IoT Core / device management), the remote-access
+       gateway in the DMZ, TLS on OT links, code-signing in the CI/CD pipeline, and IAM/KMS in the
+       cloud. PKI is the connective tissue &mdash; which is exactly why its failure is so wide-reaching.</div>
+  </div>
+  </details>
+
+  <details class="sub" open><summary>The lifecycle — click each stage to see how it becomes operational risk</summary>
+  <div class="subbody">
+    <p>A certificate is not "issue and forget." It moves through a lifecycle, and <b>every stage has a
+       way to become an outage or a security gap down the road.</b> Click through them.</p>
+
+    <div class="lifecycle" id="lc">
+      <div class="lc-node active" data-i="0"><div class="lc-dot">1</div><div class="lc-nm">Generate<br>key &amp; CSR</div></div>
+      <div class="lc-node" data-i="1"><div class="lc-dot">2</div><div class="lc-nm">Issue<br>from CA</div></div>
+      <div class="lc-node" data-i="2"><div class="lc-dot">3</div><div class="lc-nm">Provision<br>to device</div></div>
+      <div class="lc-node" data-i="3"><div class="lc-dot">4</div><div class="lc-nm">Operate<br>&amp; monitor</div></div>
+      <div class="lc-node" data-i="4"><div class="lc-dot">5</div><div class="lc-nm">Renew /<br>rotate</div></div>
+      <div class="lc-node" data-i="5"><div class="lc-dot">6</div><div class="lc-nm">Revoke</div></div>
+      <div class="lc-node" data-i="6"><div class="lc-dot">7</div><div class="lc-nm">Expire /<br>retire</div></div>
+    </div>
+
+    <div id="lcDetail"></div>
+  </div>
+  </details>
+
+  <details class="sub"><summary>Why this is worse for products in the field than for IT</summary>
+  <div class="subbody">
+    <p>An expired certificate on a web server is a bad afternoon: someone reissues it and restarts a
+       service. An expired certificate baked into <b>ten thousand medical devices already in hospitals</b>
+       is a different category of problem entirely, for reasons that compound:</p>
+    <p><b>You can't easily reach them.</b> The devices are on hospital networks, sometimes barely
+       connected, sometimes air-gapped. Pushing a new certificate to a fleet you don't physically control
+       is slow and sometimes impossible remotely.</p>
+    <p><b>The expiry is set years before it bites.</b> A device shipped today with a 5-year certificate
+       fails in year five &mdash; long after the engineer who chose that duration has moved on, and often
+       after the product line itself is in maintenance mode. The decision and the consequence are separated
+       by years, which is why it is so consistently missed.</p>
+    <p><b>Failure can be safety-relevant.</b> If a certificate expiry stops a device from communicating
+       with its monitoring service, or blocks a firmware fix from installing, that is not just downtime
+       &mdash; for a medical device it can be a clinical and regulatory event. The device didn't break;
+       its identity paperwork lapsed, and it refused to work correctly as designed.</p>
+    <p><b>The CA itself can expire.</b> The worst case: the root or intermediate CA that signed every
+       device's certificate has its own expiry. If that lapses, <em>every device that trusts it</em> can
+       fail at once &mdash; a fleet-wide outage from a single missed date. This has happened to major
+       products, taking out services for millions of users in one stroke.</p>
+    <div class="note red"><b>The through-line.</b> Certificate expiry is the rare failure that is
+       simultaneously certain (the date is known in advance), silent (nothing warns you until it fires),
+       and self-inflicted (no attacker involved). It is the purest example of a lifecycle decision made at
+       manufacture becoming an operational and safety risk years later.</div>
+  </div>
+  </details>
+
+  <details class="sub"><summary>How to manage it — designing the risk out</summary>
+  <div class="subbody">
+    <p>The good news: because the failure is predictable, it is preventable. The controls are about
+       <em>designing for the whole lifecycle at manufacture</em>, not reacting near expiry.</p>
+    <p><b>Inventory every certificate.</b> You cannot renew what you cannot see. Maintain a live inventory
+       of every certificate in the plant and every certificate shipped in a product &mdash; issuer, expiry,
+       what breaks if it lapses. This is the certificate equivalent of the asset inventory in section 6.</p>
+    <p><b>Automate renewal and rotation.</b> Manual calendar reminders fail at scale. Use automated
+       certificate lifecycle management (ACME-style protocols, cloud PKI, managed CA services) so renewal
+       happens without a human remembering. Design devices to <em>rotate</em> certificates in the field,
+       not just receive one at the factory.</p>
+    <p><b>Choose durations deliberately, and plan the CA hierarchy.</b> A longer device certificate reduces
+       renewal frequency but widens the blast radius if the key is compromised; shorter is safer but demands
+       reliable rotation. Give intermediate and root CAs lifetimes longer than any device that depends on
+       them, and plan their succession before they are ever deployed.</p>
+    <p><b>Build field-update capability first.</b> The ability to securely push a new certificate to a
+       fielded device is itself a security requirement &mdash; and it depends on a signed-update mechanism
+       that is trustworthy, which depends on&hellip; certificates. Get this working before the first device
+       ships, because retrofitting it to a deployed fleet is the nightmare scenario.</p>
+    <div class="note petrol"><b>For medical-device manufacturers specifically.</b> Certificate lifecycle
+       belongs in the device's design and risk-management file, not just IT operations. Treat "what happens
+       when this certificate expires in year N" as a design input with a documented mitigation, the same way
+       you would treat any other foreseeable failure mode. Regulators increasingly expect exactly this kind
+       of lifecycle thinking for the security of a marketed device.</div>
+  </div>
+  </details>
+</section>
+
 <section id="scorer">
-  <h2><span class="n">9</span>Score your plant</h2>
+  <h2><span class="n">10</span>Score your plant</h2>
   <p class="lede">Rate each control on a four-level maturity scale. Domain and overall scores update
      live, and the panel names your highest-priority gaps. Nothing is sent anywhere &mdash; it all
      runs in your browser. Skip any question that does not apply; it is simply left out of the math.</p>
@@ -793,6 +911,12 @@
       {id:"s2",weight:2,text:"Third-party integrators are security-assessed before plant access."},
       {id:"s3",weight:2,text:"Component provenance is tracked for security-relevant parts."},
       {id:"s4",weight:1,text:"A process exists to act on supplier vulnerability disclosures."}]},
+    {id:"pki",name:"Certificate & PKI lifecycle",weight:1.2,questions:[
+      {id:"k1",weight:3,text:"A live inventory of all certificates (plant and in-product) with expiry dates exists."},
+      {id:"k2",weight:3,text:"Certificate expiry is monitored with alerts well ahead of the date."},
+      {id:"k3",weight:2,text:"Certificate renewal/rotation is automated, not calendar-reminder driven."},
+      {id:"k4",weight:2,text:"Fielded devices can securely rotate certificates remotely."},
+      {id:"k5",weight:1,text:"CA (root/intermediate) lifetimes and succession are planned ahead of device expiry."}]},
     {id:"product",name:"Product integrity",weight:1.2,md:true,questions:[
       {id:"p1",weight:3,text:"Manufacturing systems that could alter device safety/quality are identified."},
       {id:"p2",weight:2,text:"Device firmware is signed and provisioned securely on the line."},
@@ -921,7 +1045,7 @@
   document.getElementById('fillDemo').addEventListener('click',function(){
     var demo={g1:2,g2:1,g3:1,g4:2, a1:2,a2:1,a3:0,a4:1, n1:2,n2:2,n3:1,n4:0,
       c1:1,c2:2,c3:2,c4:1, m1:1,m2:1,m3:1,m4:0, r1:2,r2:1,r3:2,r4:1,
-      s1:1,s2:2,s3:0,s4:1, p1:1,p2:1,p3:2,p4:0};
+      s1:1,s2:2,s3:0,s4:1, k1:1,k2:0,k3:0,k4:0,k5:0, p1:1,p2:1,p3:2,p4:0};
     answers={};
     Object.keys(demo).forEach(function(k){answers[k]=demo[k];});
     buildScorer();
@@ -1036,6 +1160,53 @@
     box.innerHTML='<h5>'+fn+'</h5><ul>'+DP[fn].map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul>';
     dpGrid.appendChild(box);
   });
+
+  // certificate lifecycle
+  var LC=[
+    {name:"Generate key & CSR",
+     what:"A private key is created (ideally in secure hardware) and a certificate signing request is sent to the CA. This is where device identity is born.",
+     risk:{t:"Operational risk",d:"If the private key is generated insecurely or the same key is reused across many devices, one compromise breaks the whole fleet's identity."},
+     good:{t:"Do this",d:"Generate keys in hardware (HSM/secure element), unique per device, never extractable."}},
+    {name:"Issue from CA",
+     what:"The Certificate Authority signs the request, vouching for the device's identity and setting the expiry date. That date is the time bomb's timer.",
+     risk:{t:"Operational risk",d:"The expiry duration is chosen HERE, years before it bites. Pick 5 years and forget it, and the fleet fails in year 5 \u2014 long after anyone remembers the decision."},
+     good:{t:"Do this",d:"Choose duration deliberately against your ability to renew; ensure the CA's own lifetime outlives every device that depends on it."}},
+    {name:"Provision to device",
+     what:"The certificate is installed onto the device on the manufacturing line \u2014 the secure-provisioning step in the device lifecycle.",
+     risk:{t:"Operational risk",d:"If provisioning is sloppy (shared certs, unsigned, no verification), you ship a fleet with weak or clonable identities you can never fully fix in the field."},
+     good:{t:"Do this",d:"Provision unique signed certificates on the line, with the key sealed in hardware. This is the medical-device 'secure provisioning' control."}},
+    {name:"Operate & monitor",
+     what:"The device uses its certificate every day \u2014 to connect, encrypt, and verify updates. Meanwhile the clock ticks toward expiry.",
+     risk:{t:"Operational risk",d:"Nothing warns you. A certificate works perfectly right up until the day it expires, then fails silently and completely. Without monitoring, the first symptom is the outage."},
+     good:{t:"Do this",d:"Monitor every certificate's expiry centrally, with alerts weeks and months ahead \u2014 the same discipline as the asset inventory."}},
+    {name:"Renew / rotate",
+     what:"Before expiry, the device gets a fresh certificate. For a fielded fleet this must happen remotely and reliably, at scale.",
+     risk:{t:"Operational risk",d:"This is where it breaks. If the device can't rotate certificates in the field \u2014 because that capability was never built \u2014 you face expiry with no remedy but a physical recall or on-site visit."},
+     good:{t:"Do this",d:"Automate renewal (ACME-style / managed PKI). Build field-rotation capability BEFORE the first device ships \u2014 retrofitting it to a deployed fleet is the nightmare."}},
+    {name:"Revoke",
+     what:"If a key is compromised or a device is decommissioned, its certificate must be revoked so it is no longer trusted.",
+     risk:{t:"Operational risk",d:"Revocation checking is often broken or disabled in constrained OT/device environments, so a revoked certificate may keep being accepted \u2014 a security gap that outlives the incident."},
+     good:{t:"Do this",d:"Design revocation checking that actually works for your devices (short-lived certs are one answer \u2014 they self-expire fast)."}},
+    {name:"Expire / retire",
+     what:"The certificate reaches end of life. Ideally it was renewed long before; if not, this is the failure event \u2014 and the CA above it eventually expires too.",
+     risk:{t:"The worst case",d:"If the intermediate or ROOT CA expires, EVERY device that trusts it can fail at once \u2014 a fleet-wide outage from a single missed date. This has taken down major products for millions of users in one stroke."},
+     good:{t:"Do this",d:"Plan CA succession years ahead. Treat 'what happens when this expires in year N' as a documented design input with a mitigation, in the device's risk file."}}
+  ];
+  var lcDetail=document.getElementById('lcDetail');
+  function showLC(i){
+    var c=LC[i];
+    document.querySelectorAll('#lc .lc-node').forEach(function(n,j){
+      n.className='lc-node'+(j===i?' active':'');
+    });
+    lcDetail.innerHTML='<div class="lc-detail"><h4>Stage '+(i+1)+' \u2014 '+c.name+'</h4>'
+      +'<div style="font-size:13.5px">'+c.what+'</div>'
+      +'<div class="risk"><b>'+c.risk.t+'</b>'+c.risk.d+'</div>'
+      +'<div class="good"><b>'+c.good.t+'</b>'+c.good.d+'</div></div>';
+  }
+  document.querySelectorAll('#lc .lc-node').forEach(function(n){
+    n.addEventListener('click',function(){showLC(parseInt(n.getAttribute('data-i'),10));});
+  });
+  showLC(0);
 
   // clickable timeline
   var TL=[
