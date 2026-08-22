@@ -147,12 +147,12 @@ table.tbl .det{font-size:12.5px;color:var(--ink-faint)}
 <header class="top">
   <div class="eyebrow">Security &middot; AI &middot; Governance &middot; Culture</div>
   <h1>Security, AI, and the People Who Have to Live With Both</h1>
-  <p class="stand">Control maps you can work from, a model policy you can adapt, and the part everyone skips &mdash; why people do what they do when the tooling is not watching. Everything here is a single file you can open, print or hand to someone else.</p>
+  <p class="stand">Control maps you can work from, a model policy you can adapt, and the part everyone skips &mdash; why people do what they do when the tooling is not watching. Everything here is actionable, nothing here is vendor marketing.</p>
 </header>
 <hr class="rule">
 
 <div class="note">
-  <b>Where to start.</b> If the question is &ldquo;should we turn Copilot on&rdquo;, or &ldquo;how do we share data without it training somebody&rsquo;s model&rdquo;, start with AI security. If it is &ldquo;which of ten thousand findings do we actually fix&rdquo;, or &ldquo;how do we prove a control worked without assembling screenshots&rdquo;, start with security controls. If you are writing the policy, start with governance. If a vendor is the exposure, start with third-party risk. And if the controls exist but people still route around them, the answer is in culture.
+  <b>Where to start.</b> If the question is &ldquo;should we turn Copilot on&rdquo;, or &ldquo;how do we share data without it training somebody&rsquo;s model&rdquo;, start with AI security. If it is &ldquo;what do we test&rdquo; or &ldquo;where do we really get hacked&rdquo;, start with the controls library and manufacturing security. Pick the section that matches your next conversation.
 </div>
 
 <!-- ============ CONTENTS ============ -->
@@ -163,20 +163,25 @@ table.tbl .det{font-size:12.5px;color:var(--ink-faint)}
       <a class="sect" href="#s-aisec">AI security</a><span class="path">/aisec</span>
       <ul>
         <li><span class="fmt f-web">Web</span><a href="aisec/enterprise-ai-data-protection.html">Protecting Company Data When Using AI</a> &mdash; Copilot, paid accounts, shadow AI, data you sell</li>
-        <li><span class="fmt f-web">Web</span><a href="aisec/copilot-data-protection.html">Protecting Critical Data in Copilot, Enterprise Chat and Shadow AI</a> &mdash; defaults, settings and the accounts nobody registered</li>
+        <li><span class="fmt f-web">Web</span><a href="aisec/copilot-data-protection.html">Protecting Critical Data in Copilot, Enterprise Chat and Shadow AI</a> &mdash; defaults, settings and the accounts you own</li>
         <li><span class="fmt f-web">Web</span><a href="aisec/agentic-ai-system.html">Agentic AI control map</a> &mdash; four layers, 24 risks, tools by stack</li>
-        <li><span class="fmt f-web">Read</span><a href="aisec/agentic-ai-insights.html">Securing Agentic AI Without Slowing It Down</a> &mdash; about 12 minutes</li>
+        <li><span class="fmt f-web">Web</span><a href="aisec/agentic-ai-insights.html">Securing Agentic AI Without Slowing It Down</a> &mdash; about 12 minutes</li>
+        <li><span class="fmt f-web">Web</span><a href="aisec/ai-redteam-workbench.html">AI Red Team Workbench</a> &mdash; OWASP LLM Top 10 and agentic testing</li>
+        <li><span class="fmt f-web">Web</span><a href="aisec/LLM-RAG.html">LLM, RAG, and Vector Databases</a> &mdash; a visual primer</li>
+        <li><span class="fmt f-web">Web</span><a href="aisec/prompt_injection_sandbox_v2.html">Prompt Injection Sandbox v2</a> &mdash; 18-technique library and automated campaigns</li>
         <li><span class="fmt f-web">Read</span><a href="aisec/aibom-vs-sbom.html">AI-BOM vs SBOM</a> &mdash; about 7 minutes</li>
       </ul>
     </li>
     <li>
       <a class="sect" href="#s-controls">Security controls</a><span class="path">/security &middot; /controls</span>
       <ul>
-        <li><span class="fmt f-cont">Read</span><a href="security/prodsec-without-gates.html">Building Product Security Without the Gates</a> &mdash; where bugs, cost and friction originate, and the lifecycle that replaces the gates</li>
+        <li><span class="fmt f-cont">Read</span><a href="security/prodsec-without-gates.html">Building Product Security Without the Gates</a> &mdash; where bugs, cost and friction originate, and the latch that holds it all</li>
         <li><span class="fmt f-cont">Read</span><a href="security/future-of-it-controls.html">The Future of IT Controls</a> &mdash; break attack paths, not just patches</li>
-        <li><span class="fmt f-cont">Web</span><a href="controls/it-controls.html">IT Security Control Library</a> &mdash; 800-53, RMF, 800-171 / 172, SSDF and IT SOX in one library</li>
-        <li><span class="fmt f-cont">Web</span><a href="controls/compliance-control-architecture.html">One Control Substrate, Seven Assertions</a> &mdash; seven assertions from one control substrate</li>
+        <li><span class="fmt f-cont">Read</span><a href="security/cicd-ai-secure-pipeline-guide.html">Traditional vs AI-Secure CI/CD Pipeline</a> &mdash; stage-by-stage guide</li>
+        <li><span class="fmt f-cont">Web</span><a href="security/aibom_live.html">Live AIBOM generator</a> &mdash; generate against Hugging Face registry</li>
+        <li><span class="fmt f-cont">Web</span><a href="security/aibom_workbench.html">AIBOM workbench</a> &mdash; 40 models with governance and live resolution</li>
         <li><span class="fmt f-cont">Read</span><a href="security/grc-fda-digital-manufacturing.html">What a Good GRC Program Looks Like</a> &mdash; FDA-regulated digital manufacturing</li>
+        <li><span class="fmt f-cont">Web</span><a href="security/manufacturing-security.html">Manufacturing &amp; Plant Security</a> &mdash; guide and maturity scorer</li>
       </ul>
     </li>
     <li>
@@ -188,7 +193,7 @@ table.tbl .det{font-size:12.5px;color:var(--ink-faint)}
     <li>
       <a class="sect" href="#s-tprm">Third-party risk</a><span class="path">/tprm</span>
       <ul>
-        <li><span class="fmt f-tprm">Read</span><a href="tprm/index.html">Every Generation of Vendor Assessment Solved the Last One's Problem</a> &mdash; five generations, and what the AI era asks for next</li>
+        <li><span class="fmt f-tprm">Read</span><a href="tprm/index.html">Every Generation of Vendor Assessment Solved the Last One's Problem</a> &mdash; five generations, and what the AI era asks for</li>
       </ul>
     </li>
     <li>
@@ -198,75 +203,23 @@ table.tbl .det{font-size:12.5px;color:var(--ink-faint)}
       </ul>
     </li>
     <li>
-      <a class="sect" href="#s-culture">Culture</a><span class="path">/culture</span>
+      <a class="sect" href="#s-lead">Leadership</a><span class="path">/leadership</span>
       <ul>
-        <li><span class="fmt f-cul">Web</span><a href="culture/index.html">Cyber Culture &mdash; what it is, and how to move it</a> &mdash; friction, four levers, an operating plan</li>
+        <li><span class="fmt f-lead">Read</span><a href="leadership/index.html">The Cyber Culture Question</a> &mdash; what actually moves the needle</li>
       </ul>
     </li>
     <li>
-      <a class="sect" href="#s-lead">Leadership and interviewing</a><span class="path">/leadership &middot; /interview</span>
+      <a class="sect" href="#s-decks">Decks</a><span class="path">/decks</span>
       <ul>
-        <li><span class="fmt f-lead">Web</span><a href="leadership/index.html">What Kind of Leader Are You, Actually?</a> &mdash; self-assessment that resists flattery</li>
-        <li><span class="fmt f-lead">Read</span><a href="leadership/leadership-signals.html">Reading Leadership &mdash; the single test, and everything under it</a> &mdash; the single test, and everything under it</li>
-        <li><span class="fmt f-lead">Web</span><a href="leadership/leadership-style-workbench.html">Reading the Room Above You</a> &mdash; how they decide, what to bring them</li>
-        <li><span class="fmt f-lead">Web</span><a href="interview/interview-answer-clock.html">Answer Clock</a> &mdash; read the room, answer inside the clock</li>
-      </ul>
-    </li>
-    <li>
-      <a class="sect" href="#s-decks">Decks and downloads</a><span class="path">/aisec</span>
-      <ul>
-        <li><span class="fmt f-deck">PPTX</span><a href="aisec/enterprise-ai-data-protection.pptx">Protecting Enterprise Data in the Age of AI</a> &mdash; 4 slides</li>
+        <li><span class="fmt f-deck">Deck</span><a href="aisec/enterprise-ai-data-protection.pptx">Protecting Enterprise Data in the Age of AI</a> &mdash; PowerPoint, 4 slides</li>
         <li><span class="fmt f-deck">PDF</span><a href="aisec/enterprise-ai-data-protection.pdf">Protecting Enterprise Data in the Age of AI &mdash; PDF</a> &mdash; 4 pages</li>
-        <li><span class="fmt f-deck">PPTX</span><a href="aisec/agentic-ai-system.pptx">Agentic AI &mdash; risk, control and tooling</a> &mdash; 7 slides</li>
-        <li><span class="fmt f-deck">PPTX</span><a href="aisec/copilot-data-protection.pptx">Protecting Critical Data in Copilot and Enterprise Chat</a> &mdash; Copilot and enterprise chat</li>
+        <li><span class="fmt f-deck">Deck</span><a href="aisec/agentic-ai-system.pptx">Agentic AI &mdash; risk, control and tooling</a> &mdash; 7 slides</li>
+        <li><span class="fmt f-deck">Deck</span><a href="aisec/copilot-data-protection.pptx">Protecting Critical Data in Copilot and Enterprise Chat</a> &mdash; PowerPoint</li>
       </ul>
     </li>
   </ol>
 </nav>
 
-<div class="viewbar">
-  <span class="lab">View</span>
-  <div class="seg">
-    <button id="bCards" class="on" type="button">Cards</button>
-    <button id="bTable" type="button">Table</button>
-  </div>
-  <input id="q" type="search" placeholder="Filter by title, section or type&hellip;" aria-label="Filter">
-  <span class="count" id="cnt"></span>
-</div>
-<div id="tableview">
-  <table class="tbl">
-    <thead><tr>
-      <th data-col="0">Title<span class="ar">&#9650;&#9660;</span></th>
-      <th data-col="1">Section<span class="ar">&#9650;&#9660;</span></th>
-      <th data-col="2" class="hide-s">Type<span class="ar">&#9650;&#9660;</span></th>
-      <th data-col="3">Format<span class="ar">&#9650;&#9660;</span></th>
-    </tr></thead>
-    <tbody id="tbody">
-      <tr><td data-s="protecting company data when using ai"><a href="aisec/enterprise-ai-data-protection.html">Protecting Company Data When Using AI</a><div class="det">Six views &middot; a real-life example on every tab &middot; gaps flagged in red</div></td><td data-s="1"><span class="pill" style="background:#3872e0">AI security</span></td><td data-s="interactive" class="hide-s">Interactive</td><td data-s="Web">Web</td></tr>
-      <tr><td data-s="protecting critical data in copilot, enterprise chat and shadow ai"><a href="aisec/copilot-data-protection.html">Protecting Critical Data in Copilot, Enterprise Chat and Shadow AI</a><div class="det">Configuration-first &middot; per-platform</div></td><td data-s="1"><span class="pill" style="background:#3872e0">AI security</span></td><td data-s="interactive" class="hide-s">Interactive</td><td data-s="Web">Web</td></tr>
-      <tr><td data-s="agentic ai control map"><a href="aisec/agentic-ai-system.html">Agentic AI control map</a><div class="det">Seven views &middot; filter by OWASP category &middot; free-text search</div></td><td data-s="1"><span class="pill" style="background:#3872e0">AI security</span></td><td data-s="interactive" class="hide-s">Interactive</td><td data-s="Web">Web</td></tr>
-      <tr><td data-s="securing agentic ai without slowing it down"><a href="aisec/agentic-ai-insights.html">Securing Agentic AI Without Slowing It Down</a><div class="det">About 12 minutes &middot; 24 risks &middot; six control categories by stack</div></td><td data-s="1"><span class="pill" style="background:#3872e0">AI security</span></td><td data-s="long read" class="hide-s">Long read</td><td data-s="Web">Web</td></tr>
-      <tr><td data-s="ai-bom vs sbom"><a href="aisec/aibom-vs-sbom.html">AI-BOM vs SBOM</a><div class="det">About 7 minutes &middot; scope, fit and limits</div></td><td data-s="1"><span class="pill" style="background:#3872e0">AI security</span></td><td data-s="long read" class="hide-s">Long read</td><td data-s="Web">Web</td></tr>
-      <tr><td data-s="building product security without the gates"><a href="security/prodsec-without-gates.html">Building Product Security Without the Gates</a><div class="det">Eight sections &middot; seven diagrams &middot; sixteen references with a provenance note</div></td><td data-s="2"><span class="pill" style="background:#0f766e">Security controls</span></td><td data-s="long read" class="hide-s">Long read</td><td data-s="Web">Web</td></tr>
-      <tr><td data-s="the future of it controls"><a href="security/future-of-it-controls.html">The Future of IT Controls</a><div class="det">Seven sections &middot; thirteen panels &middot; sixteen references</div></td><td data-s="2"><span class="pill" style="background:#0f766e">Security controls</span></td><td data-s="long read" class="hide-s">Long read</td><td data-s="Web">Web</td></tr>
-      <tr><td data-s="it security control library"><a href="controls/it-controls.html">IT Security Control Library</a><div class="det">Searchable library &middot; six frameworks cross-walked</div></td><td data-s="2"><span class="pill" style="background:#0f766e">Security controls</span></td><td data-s="reference" class="hide-s">Reference</td><td data-s="Web">Web</td></tr>
-      <tr><td data-s="one control substrate, seven assertions"><a href="controls/compliance-control-architecture.html">One Control Substrate, Seven Assertions</a><div class="det">Implementation guide &middot; seven assertions from one substrate</div></td><td data-s="2"><span class="pill" style="background:#0f766e">Security controls</span></td><td data-s="implementation guide" class="hide-s">Implementation guide</td><td data-s="Web">Web</td></tr>
-      <tr><td data-s="what a good grc program looks like"><a href="security/grc-fda-digital-manufacturing.html">What a Good GRC Program Looks Like</a><div class="det">FDA-regulated digital manufacturing</div></td><td data-s="2"><span class="pill" style="background:#0f766e">Security controls</span></td><td data-s="long read" class="hide-s">Long read</td><td data-s="Web">Web</td></tr>
-      <tr><td data-s="ai governance is not data governance"><a href="governance/ai-governance-policy.html">AI Governance Is Not Data Governance</a><div class="det">Six views &middot; model policy with copy and print &middot; anti-patterns flagged in red</div></td><td data-s="3"><span class="pill" style="background:#9031aa">Governance</span></td><td data-s="interactive" class="hide-s">Interactive</td><td data-s="Web">Web</td></tr>
-      <tr><td data-s="every generation of vendor assessment solved the last one's problem"><a href="tprm/index.html">Every Generation of Vendor Assessment Solved the Last One's Problem</a><div class="det">Five generations &middot; what the AI era changes</div></td><td data-s="4"><span class="pill" style="background:#b45309">Third-party risk</span></td><td data-s="long read" class="hide-s">Long read</td><td data-s="Web">Web</td></tr>
-      <tr><td data-s="incident field guide"><a href="incidents/incidents.html">Incident Field Guide</a><div class="det">Threats &middot; detection &middot; escalation &middot; reporting</div></td><td data-s="5"><span class="pill" style="background:#b02a37">Incidents</span></td><td data-s="field guide" class="hide-s">Field guide</td><td data-s="Web">Web</td></tr>
-      <tr><td data-s="cyber culture &mdash; what it is, and how to move it"><a href="culture/index.html">Cyber Culture &mdash; what it is, and how to move it</a><div class="det">Three parts &middot; the mechanism, four levers, an operating plan</div></td><td data-s="6"><span class="pill" style="background:#457c3c">Culture</span></td><td data-s="interactive" class="hide-s">Interactive</td><td data-s="Web">Web</td></tr>
-      <tr><td data-s="what kind of leader are you, actually?"><a href="leadership/index.html">What Kind of Leader Are You, Actually?</a><div class="det">Interactive assessment &middot; named patterns</div></td><td data-s="7"><span class="pill" style="background:#5a4a9e">Leadership and interviewing</span></td><td data-s="interactive" class="hide-s">Interactive</td><td data-s="Web">Web</td></tr>
-      <tr><td data-s="reading leadership &mdash; the single test, and everything under it"><a href="leadership/leadership-signals.html">Reading Leadership &mdash; the single test, and everything under it</a><div class="det">The single test &middot; and everything under it</div></td><td data-s="7"><span class="pill" style="background:#5a4a9e">Leadership and interviewing</span></td><td data-s="long read" class="hide-s">Long read</td><td data-s="Web">Web</td></tr>
-      <tr><td data-s="reading the room above you"><a href="leadership/leadership-style-workbench.html">Reading the Room Above You</a><div class="det">Style workbench &middot; how they decide, what to bring</div></td><td data-s="7"><span class="pill" style="background:#5a4a9e">Leadership and interviewing</span></td><td data-s="interactive" class="hide-s">Interactive</td><td data-s="Web">Web</td></tr>
-      <tr><td data-s="answer clock"><a href="interview/interview-answer-clock.html">Answer Clock</a><div class="det">Read the room &middot; answer in the time you have</div></td><td data-s="7"><span class="pill" style="background:#5a4a9e">Leadership and interviewing</span></td><td data-s="interactive" class="hide-s">Interactive</td><td data-s="Web">Web</td></tr>
-      <tr><td data-s="protecting enterprise data in the age of ai"><a href="aisec/enterprise-ai-data-protection.pptx">Protecting Enterprise Data in the Age of AI</a><div class="det">PowerPoint &middot; 4 slides</div></td><td data-s="8"><span class="pill" style="background:#d55c26">Decks and downloads</span></td><td data-s="deck" class="hide-s">Deck</td><td data-s="PPTX">PPTX</td></tr>
-      <tr><td data-s="protecting enterprise data in the age of ai &mdash; pdf"><a href="aisec/enterprise-ai-data-protection.pdf">Protecting Enterprise Data in the Age of AI &mdash; PDF</a><div class="det">PDF &middot; 4 pages</div></td><td data-s="8"><span class="pill" style="background:#d55c26">Decks and downloads</span></td><td data-s="pdf" class="hide-s">PDF</td><td data-s="PDF">PDF</td></tr>
-      <tr><td data-s="agentic ai &mdash; risk, control and tooling"><a href="aisec/agentic-ai-system.pptx">Agentic AI &mdash; risk, control and tooling</a><div class="det">PowerPoint &middot; 7 slides</div></td><td data-s="8"><span class="pill" style="background:#d55c26">Decks and downloads</span></td><td data-s="deck" class="hide-s">Deck</td><td data-s="PPTX">PPTX</td></tr>
-      <tr><td data-s="protecting critical data in copilot and enterprise chat"><a href="aisec/copilot-data-protection.pptx">Protecting Critical Data in Copilot and Enterprise Chat</a><div class="det">PowerPoint</div></td><td data-s="8"><span class="pill" style="background:#d55c26">Decks and downloads</span></td><td data-s="deck" class="hide-s">Deck</td><td data-s="PPTX">PPTX</td></tr>
-    </tbody>
-  </table>
-</div>
 <!-- ============ AI SECURITY ============ -->
 <section class="panel">
 <h2 id="s-aisec">1 &middot; AI security<span class="fold">/aisec</span></h2>
@@ -275,7 +228,7 @@ table.tbl .det{font-size:12.5px;color:var(--ink-faint)}
   <a class="card" href="aisec/enterprise-ai-data-protection.html" style="border-color:#3872e0">
     <span class="kind k-web">Interactive</span>
     <h3>Protecting Company Data When Using AI</h3>
-    <p>The four ways company data meets AI &mdash; Copilot inside your own systems, paid Claude or ChatGPT accounts, personal logins nobody told you about, and data you license to other people. For each: what to change in your settings, which tools do the work, how to spot it, stop it and keep it fixed &mdash; plus the real gaps none of it solves.</p>
+    <p>The four ways company data meets AI &mdash; Copilot inside your own systems, paid Claude or ChatGPT accounts, personal logins nobody told you about, and data you license to other people. For each one, what actually happens to your data and what to configure.</p>
     <div class="meta">Six views &middot; a real-life example on every tab &middot; gaps flagged in red</div>
     <div class="go">Open it &rarr;</div>
   </a>
@@ -289,21 +242,42 @@ table.tbl .det{font-size:12.5px;color:var(--ink-faint)}
   <a class="card" href="aisec/agentic-ai-system.html" style="border-color:#3872e0">
     <span class="kind k-web">Interactive</span>
     <h3>Agentic AI control map</h3>
-    <p>The system diagram, the five CISA / ASD ACSC risk categories, a tool matrix arranged by the stack you already run, and each of the four layers with 24 risks &mdash; every one carrying its preventive control, detective control, configuration and example tooling, mapped to OWASP, MITRE ATLAS and NIST AI RMF.</p>
+    <p>The system diagram, the five CISA / ASD ACSC risk categories, a tool matrix arranged by the stack you already run, and each of the four layers with 24 risks &mdash; every one carrying its preventive and detective controls and the tools that implement them.</p>
     <div class="meta">Seven views &middot; filter by OWASP category &middot; free-text search</div>
     <div class="go">Open it &rarr;</div>
   </a>
   <a class="card" href="aisec/agentic-ai-insights.html" style="border-color:#3872e0">
     <span class="kind k-web">Long read</span>
     <h3>Securing Agentic AI Without Slowing It Down</h3>
-    <p>Layer by layer &mdash; inputs, training, the agent itself, outputs &mdash; each risk mapped to three frameworks, with the preventive control, the detective control and the configuration that makes both real. Closes on where the trade-off between innovation and control actually sits.</p>
+    <p>Layer by layer &mdash; inputs, training, the agent itself, outputs &mdash; each risk mapped to three frameworks, with the preventive control, the detective control and the configuration that makes both work.</p>
     <div class="meta">About 12 minutes &middot; 24 risks &middot; six control categories by stack</div>
     <div class="go">Read it &rarr;</div>
+  </a>
+  <a class="card" href="aisec/ai-redteam-workbench.html" style="border-color:#3872e0">
+    <span class="kind k-web">Interactive</span>
+    <h3>AI Red Team Workbench</h3>
+    <p>Every technique in OWASP LLM Top 10 and agentic systems, mapped to MITRE ATLAS, exploitable in a sandbox, and cross-walked with mitigations from every major framework.</p>
+    <div class="meta">18 techniques &middot; sandbox testing &middot; six frameworks mapped</div>
+    <div class="go">Open it &rarr;</div>
+  </a>
+  <a class="card" href="aisec/LLM-RAG.html" style="border-color:#3872e0">
+    <span class="kind k-web">Visual primer</span>
+    <h3>LLM, RAG, and Vector Databases</h3>
+    <p>How an LLM actually works, what RAG is and why it matters for security, and the vector database layer you need to understand to know what can go wrong.</p>
+    <div class="meta">Interactive diagrams &middot; visual explanations</div>
+    <div class="go">View it &rarr;</div>
+  </a>
+  <a class="card" href="aisec/prompt_injection_sandbox_v2.html" style="border-color:#3872e0">
+    <span class="kind k-web">Interactive</span>
+    <h3>Prompt Injection Sandbox v2</h3>
+    <p>Eighteen prompt injection techniques laid out, explained, and executable in a sandbox. Every attack you can actually test against, and what a good defense looks like.</p>
+    <div class="meta">18-technique library &middot; automated campaigns &middot; defense patterns</div>
+    <div class="go">Try it &rarr;</div>
   </a>
   <a class="card" href="aisec/aibom-vs-sbom.html" style="border-color:#3872e0">
     <span class="kind k-web">Long read</span>
     <h3>AI-BOM vs SBOM</h3>
-    <p>An SBOM tells you what is in the build. An AI-BOM has to tell you what the model learned, where the weights came from, and what changes when either moves. Scope, fit, and the limits of pretending one is the other.</p>
+    <p>An SBOM tells you what is in the build. An AI-BOM has to tell you what the model learned, where the weights came from, and what changes when either moves. Scope, fit, and the limits of pretending it is all just another supply chain problem.</p>
     <div class="meta">About 7 minutes &middot; scope, fit and limits</div>
     <div class="go">Read it &rarr;</div>
   </a>
@@ -318,37 +292,51 @@ table.tbl .det{font-size:12.5px;color:var(--ink-faint)}
   <a class="card" href="security/prodsec-without-gates.html" style="border-color:#0f766e">
     <span class="kind k-cont">Long read</span>
     <h3>Building Product Security Without the Gates</h3>
-    <p>Where bugs, cost and friction originate across the lifecycle, and why shift-left fails when it moves the review without removing the wait. The continuous, no-gates model stage by stage &mdash; threat model the delta, ratchet rather than gate, exceptions that expire &mdash; plus what to do about components fielded for twenty years.</p>
+    <p>Where bugs, cost and friction originate across the lifecycle, and why shift-left fails when it moves the review without removing the wait. The continuous, no-gates model stage by stage &mdash; requirements through operations.</p>
     <div class="meta">Eight sections &middot; seven diagrams &middot; sixteen references with a provenance note</div>
     <div class="go">Read it &rarr;</div>
   </a>
   <a class="card" href="security/future-of-it-controls.html" style="border-color:#0f766e">
     <span class="kind k-cont">Long read</span>
     <h3>The Future of IT Controls</h3>
-    <p>Finding count is not risk &mdash; attackers need one path. Why the queue never ends and keeps expanding, the attack graph and the eight ways to break a link, risk-based prioritization, moving controls from activity to outcome, where AI genuinely helps and where it must not, and a ninety-day sequence.</p>
+    <p>Finding count is not risk &mdash; attackers need one path. Why the queue never ends and keeps expanding, the attack graph and the eight ways to break a link, risk-based prioritization, moving from detection to prevention, and why none of it works without a measurement system.</p>
     <div class="meta">Seven sections &middot; thirteen panels &middot; sixteen references</div>
     <div class="go">Read it &rarr;</div>
   </a>
-  <a class="card" href="controls/it-controls.html" style="border-color:#0f766e">
-    <span class="kind k-cont">Reference</span>
-    <h3>IT Security Control Library</h3>
-    <p>The full control set, cross-walked across NIST 800-53, RMF, 800-171, 800-172, SSDF and IT SOX. Built to answer &ldquo;which control covers this, and what does the other framework call it&rdquo; without opening five documents.</p>
-    <div class="meta">Searchable library &middot; six frameworks cross-walked</div>
+  <a class="card" href="security/cicd-ai-secure-pipeline-guide.html" style="border-color:#0f766e">
+    <span class="kind k-cont">Implementation guide</span>
+    <h3>Traditional vs AI-Secure CI/CD Pipeline</h3>
+    <p>Stage-by-stage: what a traditional CI/CD secure pipeline looks like, what changes when you introduce AI, what to add to each stage, and where the detection breaks down.</p>
+    <div class="meta">Stage-by-stage guide &middot; traditional vs AI threat models</div>
+    <div class="go">Read it &rarr;</div>
+  </a>
+  <a class="card" href="security/aibom_live.html" style="border-color:#0f766e">
+    <span class="kind k-cont">Tool</span>
+    <h3>Live AIBOM generator</h3>
+    <p>Generate an AI Bill of Materials in real time against the Hugging Face model registry, pull provenance and governance data, and export for your compliance program.</p>
+    <div class="meta">Real-time generation &middot; Hugging Face integration &middot; export formats</div>
     <div class="go">Open it &rarr;</div>
   </a>
-  <a class="card" href="controls/compliance-control-architecture.html" style="border-color:#0f766e">
-    <span class="kind k-cont">Implementation guide</span>
-    <h3>One Control Substrate, Seven Assertions</h3>
-    <p>Run one control set and let it satisfy seven different assertions rather than maintaining seven programmes. The substrate, the mapping layer, and what has to be true for the evidence to carry across all of them.</p>
-    <div class="meta">Implementation guide &middot; seven assertions from one substrate</div>
-    <div class="go">Read it &rarr;</div>
+  <a class="card" href="security/aibom_workbench.html" style="border-color:#0f766e">
+    <span class="kind k-cont">Reference</span>
+    <h3>AIBOM workbench</h3>
+    <p>Forty popular models with governance metadata, live resolution against current versions, and a maturity scoring system for how much of an AIBOM you actually have for each model.</p>
+    <div class="meta">40 models &middot; governance data &middot; live resolution</div>
+    <div class="go">Open it &rarr;</div>
   </a>
   <a class="card" href="security/grc-fda-digital-manufacturing.html" style="border-color:#0f766e">
     <span class="kind k-cont">Long read</span>
     <h3>What a Good GRC Program Looks Like</h3>
     <p>GRC for FDA-regulated digital manufacturing &mdash; where quality, validation and security actually meet, what the regulator is looking for, and how to run it without three parallel bureaucracies.</p>
-    <div class="meta">FDA-regulated digital manufacturing</div>
+    <div class="meta">FDA-regulated digital manufacturing &middot; quality and security integration</div>
     <div class="go">Read it &rarr;</div>
+  </a>
+  <a class="card" href="security/manufacturing-security.html" style="border-color:#0f766e">
+    <span class="kind k-cont">Interactive</span>
+    <h3>Manufacturing &amp; Plant Security</h3>
+    <p>Security for digital manufacturing and industrial plants: what to control, how to control it, and a maturity scorer to know where you are and where to focus next.</p>
+    <div class="meta">Operational technology &middot; maturity assessment &middot; control library</div>
+    <div class="go">Open it &rarr;</div>
   </a>
 </div>
 </section>
@@ -361,7 +349,7 @@ table.tbl .det{font-size:12.5px;color:var(--ink-faint)}
   <a class="card" href="governance/ai-governance-policy.html" style="border-color:#9031aa">
     <span class="kind k-gov">Interactive</span>
     <h3>AI Governance Is Not Data Governance</h3>
-    <p>Data governance is about a noun; AI governance is about a verb. Where the line actually sits and why one depends on the other. Twelve things a good AI policy does, twelve failure patterns to avoid, the eleven pieces of pre-work worth doing before you write a word &mdash; and a short model policy you can copy and adapt.</p>
+    <p>Data governance is about a noun; AI governance is about a verb. Where the line actually sits and why one depends on the other. Twelve things a good AI policy does, twelve failure patterns to avoid, and a model policy you can adapt.</p>
     <div class="meta">Six views &middot; model policy with copy and print &middot; anti-patterns flagged in red</div>
     <div class="go">Open it &rarr;</div>
   </a>
@@ -398,60 +386,24 @@ table.tbl .det{font-size:12.5px;color:var(--ink-faint)}
 </div>
 </section>
 
-<!-- ============ CULTURE ============ -->
+<!-- ============ LEADERSHIP ============ -->
 <section class="panel">
-<h2 id="s-culture">6 &middot; Culture<span class="fold">/culture</span></h2>
-<p>Why people route around good controls, and what changes that.</p>
+<h2 id="s-lead">6 &middot; Leadership<span class="fold">/leadership</span></h2>
+<p>What actually moves cyber culture, and how to move it at scale.</p>
 <div class="cards">
-  <a class="card" href="culture/index.html" style="border-color:#457c3c">
-    <span class="kind k-cul">Interactive</span>
-    <h3>Cyber Culture &mdash; what it is, and how to move it</h3>
-    <p>Culture is what people do when no one is watching. Friction decides most of it: make the safe route the easy route and behaviour follows, no matter what the policy says. Four levers that actually shift it, and an operating plan for doing so.</p>
-    <div class="meta">Three parts &middot; the mechanism, four levers, an operating plan</div>
-    <div class="go">Open it &rarr;</div>
-  </a>
-</div>
-</section>
-
-<!-- ============ LEADERSHIP AND INTERVIEWING ============ -->
-<section class="panel">
-<h2 id="s-lead">7 &middot; Leadership and interviewing<span class="fold">/leadership &middot; /interview</span></h2>
-<p>Reading the room above you, and answering the question actually being asked.</p>
-<div class="cards two">
   <a class="card" href="leadership/index.html" style="border-color:#5a4a9e">
-    <span class="kind k-lead">Interactive</span>
-    <h3>What Kind of Leader Are You, Actually?</h3>
-    <p>A self-assessment that resists flattery. Answer honestly and it will tell you which patterns you run under pressure, not which ones you would like to.</p>
-    <div class="meta">Interactive assessment &middot; named patterns</div>
-    <div class="go">Open it &rarr;</div>
-  </a>
-  <a class="card" href="leadership/leadership-signals.html" style="border-color:#5a4a9e">
     <span class="kind k-lead">Long read</span>
-    <h3>Reading Leadership &mdash; the single test, and everything under it</h3>
-    <p>One test that tells you most of what you need to know about a leader, and the layers underneath it that explain why it works.</p>
-    <div class="meta">The single test &middot; and everything under it</div>
+    <h3>The Cyber Culture Question</h3>
+    <p>Culture is what people do when no one is watching. Friction decides most of it: make the safe route the easy route and behaviour follows, no matter what the policy says. Four levers that actually move the needle and an operating plan to deploy them.</p>
+    <div class="meta">What moves culture &middot; four levers &middot; operating plan</div>
     <div class="go">Read it &rarr;</div>
-  </a>
-  <a class="card" href="leadership/leadership-style-workbench.html" style="border-color:#5a4a9e">
-    <span class="kind k-lead">Interactive</span>
-    <h3>Reading the Room Above You</h3>
-    <p>A workbench for the leadership style you are actually dealing with &mdash; how they decide, what they reward, and what to bring them.</p>
-    <div class="meta">Style workbench &middot; how they decide, what to bring</div>
-    <div class="go">Open it &rarr;</div>
-  </a>
-  <a class="card" href="interview/interview-answer-clock.html" style="border-color:#5a4a9e">
-    <span class="kind k-lead">Interactive</span>
-    <h3>Answer Clock</h3>
-    <p>Figure out what they are really asking, then answer it inside the time you have. Read the room, pick the shape, land it before the clock runs out.</p>
-    <div class="meta">Read the room &middot; answer in the time you have</div>
-    <div class="go">Open it &rarr;</div>
   </a>
 </div>
 </section>
 
 <!-- ============ DECKS AND DOWNLOADS ============ -->
 <section class="panel">
-<h2 id="s-decks">8 &middot; Decks and downloads<span class="fold">/aisec</span></h2>
+<h2 id="s-decks">7 &middot; Decks and downloads<span class="fold">/decks</span></h2>
 <p>PowerPoint and PDF, ready to use or adapt.</p>
 <div class="cards two">
   <a class="card" href="aisec/enterprise-ai-data-protection.pptx" style="border-color:#d55c26">
@@ -486,9 +438,7 @@ table.tbl .det{font-size:12.5px;color:var(--ink-faint)}
 </section>
 
 <footer>
-  <p class="disc">The views expressed here are my own. They do not represent the views of any employer, client, or other organisation with which I am or have been associated, and nothing here should be taken as legal advice.</p>
-  Built in part on <em>Careful Adoption of Agentic AI Services</em> &mdash; ASD&rsquo;s ACSC, CISA, NSA, the Canadian Centre for Cyber Security, NCSC-NZ and NCSC-UK, 30 April 2026. Diagram redrawn from Figure 1. &copy; Commonwealth of Australia 2026, licensed CC BY 4.0.<br><br>
-  OWASP and MITRE ATLAS identifiers change between published versions &mdash; verify against the current release before using them in an assessment. NIST AI RMF subcategory mappings are a derivation, not an official crosswalk. Products named are examples of a control category, not recommendations or an endorsement. The model policy is a starting point, not a compliant document.
+  <p class="disc">All material here is licensed CC-BY 4.0. Reuse, adapt, and share. Cite the original.</p>
 </footer>
 
 </div>
@@ -497,45 +447,6 @@ table.tbl .det{font-size:12.5px;color:var(--ink-faint)}
 (function(){
   document.documentElement.classList.add("js");
   document.body.classList.add("js");
-  var root=document.body, tb=document.getElementById("tbody"), q=document.getElementById("q"),
-      cnt=document.getElementById("cnt"), bC=document.getElementById("bCards"), bT=document.getElementById("bTable");
-  var rows=[].slice.call(tb.rows), dir={};
-
-  function setView(t){
-    root.classList.toggle("tv", t);
-    bT.className = t ? "on" : "";
-    bC.className = t ? "" : "on";
-  }
-  bC.onclick=function(){setView(false)};
-  bT.onclick=function(){setView(true)};
-
-  function count(){
-    var n=rows.filter(function(r){return r.style.display!=="none"}).length;
-    cnt.textContent = n + (n===1?" item":" items");
-  }
-  q.oninput=function(){
-    var v=q.value.trim().toLowerCase();
-    rows.forEach(function(r){
-      r.style.display = (!v || r.textContent.toLowerCase().indexOf(v)>-1) ? "" : "none";
-    });
-    count();
-  };
-  count();
-
-  [].forEach.call(document.querySelectorAll("table.tbl th"), function(th){
-    th.onclick=function(){
-      var c=+th.dataset.col, asc = dir[c] = !dir[c];
-      [].forEach.call(document.querySelectorAll("table.tbl th"), function(o){o.removeAttribute("aria-sort")});
-      th.setAttribute("aria-sort", asc?"ascending":"descending");
-      rows.sort(function(a,b){
-        var x=a.cells[c].dataset.s||a.cells[c].textContent, y=b.cells[c].dataset.s||b.cells[c].textContent;
-        var nx=parseFloat(x), ny=parseFloat(y);
-        if(!isNaN(nx)&&!isNaN(ny)) return asc?nx-ny:ny-nx;
-        return asc ? String(x).localeCompare(y) : String(y).localeCompare(x);
-      });
-      rows.forEach(function(r){tb.appendChild(r)});
-    };
-  });
 })();
 </script>
 </body>
