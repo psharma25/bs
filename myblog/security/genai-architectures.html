@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GenAI Reference Architectures: Paved Roads, Guardrails, Assurance and the Escape Hatch</title>
+<style>
+:root{--petrol:#4a7a99;--amber:#a4632a;--amberT:#fdf4e9;--ink:#2b3540;--muted:#6d7a85;--rule:#dbe3e9}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--ink);font-family:Calibri,Inter,"Segoe UI",system-ui,sans-serif;font-size:18px;line-height:1.65}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+.masthead{border-top:6px solid var(--petrol);padding:52px 0 36px}
+.eyebrow{font-size:13px;letter-spacing:.17em;text-transform:uppercase;color:var(--amber);font-weight:600;margin:0 0 18px}
+h1{font-size:44px;line-height:1.14;margin:0 0 18px;font-weight:600}
+.deck{font-size:22px;line-height:1.5;color:var(--muted);margin:0;max-width:42em}
+h2{font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:600;margin:56px 0 18px;padding-bottom:10px;border-bottom:2px solid var(--petrol)}
+h3{font-size:27px;font-weight:600;margin:48px 0 6px}
+.rsub{font-size:19px;font-weight:400;color:var(--muted)}
+p{margin:0 0 18px}
+em{color:var(--petrol);font-style:italic}
+figure{margin:20px 0 24px}
+figure svg{display:block;width:100%;height:auto;background:#fff;border:1.5px solid var(--rule);border-radius:12px}
+.callout{margin:30px 0;padding:22px 26px;background:var(--amberT);border-left:4px solid var(--amber);font-size:17px}
+.callout p:last-child{margin-bottom:0}
+.callout .lab{display:block;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:8px}
+ul{margin:0 0 18px;padding-left:0;list-style:none}
+ul li{position:relative;padding-left:22px;margin-bottom:11px}
+ul li:before{content:"";position:absolute;left:0;top:.62em;width:7px;height:7px;background:var(--amber)}
+@media(max-width:640px){body{font-size:16px}h1{font-size:31px}h3{font-size:22px}.deck{font-size:18px}}
+@media print{figure,h3{page-break-inside:avoid}}
+</style></head><body>
+<header class="masthead"><div class="wrap">
+<p class="eyebrow">Product security</p>
+<h1>Reference architectures for GenAI</h1>
+<p class="deck">The paved road, the guardrail, the evidence and the escape hatch &mdash; drawn out for each of the three AI surfaces. Cloud neutral.</p>
+</div></header>
+<div class="wrap">
+<p>The mechanisms don&rsquo;t change for AI. What changes is the blast radius: a model returns text, retrieval returns someone else&rsquo;s data, and an agent takes an action you cannot undo.</p>
+<p>Each surface below gets four diagrams. The <strong>paved road</strong> is a linear flow, because that is what a reference architecture is. The <strong>guardrail</strong> is a decision, because a control that cannot deny is not a control. <strong>Assurance</strong> is a pipeline that loops back, because evidence that never improves the road is just filing. And the <strong>escape hatch</strong> is a chain with an end date on it.</p>
+<p>Service names are deliberately generic. Every major cloud ships equivalents, and the pattern outlives the vendor: an API gateway is an API gateway, and a policy engine is a policy engine.</p>
+<h2>The three surfaces</h2>
+<h3>LLM <span class="rsub">&mdash; The model call itself</span></h3>
+<figure>
+<svg viewBox="0 0 1000 804" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="LLM: paved road, guardrails, assurance and escape hatch"><defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#4a7a99" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<text x="20" y="32" font-family="Calibri,Inter,sans-serif" font-size="12.5" font-weight="700" fill="#a4632a" letter-spacing="1.5">PAVED ROAD &#8212; REFERENCE ARCHITECTURE</text>
+<rect x="20" y="50" width="164" height="46" rx="8" fill="#f4f8fa" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="102.0" y="78.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Client app</text>
+<path d="M188 73 L214 73" stroke="#4a7a99" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="218" y="50" width="164" height="46" rx="8" fill="#f4f8fa" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="300.0" y="78.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">API gateway</text>
+<path d="M386 73 L412 73" stroke="#4a7a99" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="416" y="50" width="164" height="46" rx="8" fill="#f4f8fa" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="498.0" y="78.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Orchestrator</text>
+<path d="M584 73 L610 73" stroke="#4a7a99" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="614" y="50" width="164" height="46" rx="8" fill="#f4f8fa" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="696.0" y="78.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Model gateway</text>
+<path d="M782 73 L808 73" stroke="#4a7a99" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="812" y="50" width="164" height="46" rx="8" fill="#f4f8fa" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="894.0" y="78.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Model</text>
+<text x="20" y="122" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#6d7a85">Ships as a module: managed identity, secrets vault, private network, logging on by default</text>
+<line x1="20" y1="150" x2="980" y2="150" stroke="#eef2f6" stroke-width="1"/>
+<text x="20" y="180" font-family="Calibri,Inter,sans-serif" font-size="12.5" font-weight="700" fill="#a4632a" letter-spacing="1.5">GUARDRAILS &#8212; ENFORCED OUTSIDE THE MODEL</text>
+<rect x="20" y="272" width="120" height="46" rx="8" fill="#ffffff" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="80.0" y="300.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Request</text>
+<path d="M144 295 L168 295" stroke="#4a7a99" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="176" y="200" width="424" height="192" rx="10" fill="#f4f8fa" stroke="#c9dae5" stroke-width="1.4" stroke-dasharray="6 4"/>
+<text x="192" y="222" font-family="Calibri,Inter,sans-serif" font-size="12" font-weight="700" fill="#a4632a" letter-spacing="1.2">POLICY ENGINE</text>
+<rect x="192" y="234" width="392" height="40" rx="8" fill="#ffffff" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="388.0" y="259.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Prompt and content filtering, in and out</text>
+<rect x="192" y="284" width="392" height="40" rx="8" fill="#ffffff" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="388.0" y="309.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Sensitive-data detection and redaction</text>
+<rect x="192" y="334" width="392" height="40" rx="8" fill="#ffffff" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="388.0" y="359.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Per-tenant rate and token caps</text>
+<path d="M604 296 L652 250" stroke="#4a7a99" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<path d="M604 296 L652 296" stroke="#4a7a99" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<path d="M604 296 L652 350" stroke="#4a7a99" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="660" y="230" width="120" height="40" rx="8" fill="#ffffff" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="720.0" y="255.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Allow</text>
+<rect x="660" y="276" width="120" height="40" rx="8" fill="#f4f8fa" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="720.0" y="301.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Block</text>
+<rect x="660" y="330" width="120" height="40" rx="8" fill="#ffffff" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="720.0" y="355.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#2b3540">Exception</text>
+<path d="M784 350 L824 350" stroke="#4a7a99" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="832" y="328" width="148" height="44" rx="8" fill="#ffffff" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="906.0" y="346.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" font-weight="600" fill="#2b3540">Named owner</text>
+<text x="906.0" y="364.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="12.5" fill="#6d7a85">and an expiry date</text>
+<line x1="20" y1="420" x2="980" y2="420" stroke="#eef2f6" stroke-width="1"/>
+<text x="20" y="450" font-family="Calibri,Inter,sans-serif" font-size="12.5" font-weight="700" fill="#a4632a" letter-spacing="1.5">ASSURANCE &#8212; EVIDENCE PIPELINE</text>
+<rect x="20" y="470" width="214" height="38" rx="8" fill="#ffffff" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="127.0" y="494.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#2b3540">Invocation logs</text>
+<rect x="20" y="516" width="214" height="38" rx="8" fill="#ffffff" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="127.0" y="540.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#2b3540">Platform metrics</text>
+<rect x="20" y="562" width="214" height="38" rx="8" fill="#ffffff" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="127.0" y="586.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#2b3540">Control-plane activity</text>
+<path d="M238 535.0 L278 535.0" stroke="#4a7a99" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="286" y="511.0" width="150" height="48" rx="8" fill="#f4f8fa" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="361.0" y="531.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" font-weight="600" fill="#2b3540">Audit store</text>
+<text x="361.0" y="549.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="12.5" fill="#6d7a85">immutable</text>
+<path d="M440 535.0 L480 535.0" stroke="#4a7a99" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="488" y="511.0" width="150" height="48" rx="8" fill="#f4f8fa" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="563.0" y="531.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" font-weight="600" fill="#2b3540">Query and test</text>
+<text x="563.0" y="549.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="12.5" fill="#6d7a85">scheduled</text>
+<path d="M642 535.0 L682 535.0" stroke="#4a7a99" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="690" y="470" width="290" height="38" rx="8" fill="#ffffff" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="835.0" y="494.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#2b3540">Prompt and response review</text>
+<rect x="690" y="516" width="290" height="38" rx="8" fill="#ffffff" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="835.0" y="540.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#2b3540">Red-team and jailbreak evals</text>
+<rect x="690" y="562" width="290" height="38" rx="8" fill="#ffffff" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="835.0" y="586.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#2b3540">Data-leakage regression tests</text>
+<path d="M835 600 L835 630 L127 630 L127 600" stroke="#4a7a99" stroke-width="1.4" fill="none" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<text x="500.0" y="624" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="13" fill="#4a7a99">findings improve the paved road</text>
+<line x1="20" y1="658" x2="980" y2="658" stroke="#eef2f6" stroke-width="1"/>
+<text x="20" y="688" font-family="Calibri,Inter,sans-serif" font-size="12.5" font-weight="700" fill="#a4632a" letter-spacing="1.5">ESCAPE HATCH &#8212; WHEN THE ROAD DOES NOT FIT</text>
+<rect x="20" y="708" width="168" height="42" rx="8" fill="#ffffff" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="104.0" y="734.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="13.5" fill="#2b3540">Road doesn't fit</text>
+<path d="M191 729 L214 729" stroke="#4a7a99" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="218" y="708" width="168" height="42" rx="8" fill="#ffffff" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="302.0" y="734.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="13.5" fill="#2b3540">Exception raised</text>
+<path d="M389 729 L412 729" stroke="#4a7a99" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="416" y="708" width="168" height="42" rx="8" fill="#ffffff" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="500.0" y="734.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="13.5" fill="#2b3540">Compensating controls</text>
+<path d="M587 729 L610 729" stroke="#4a7a99" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="614" y="708" width="168" height="42" rx="8" fill="#ffffff" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="698.0" y="734.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="13.5" fill="#2b3540">Named owner</text>
+<path d="M785 729 L808 729" stroke="#4a7a99" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="812" y="708" width="168" height="42" rx="8" fill="#ffffff" stroke="#c9dae5" stroke-width="1.4"/>
+<text x="896.0" y="734.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="13.5" fill="#2b3540">Expiry and revisit</text>
+<text x="20" y="774" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#6d7a85">Worked example: a model not on the allowlist &#8212; isolated project, no customer data, 90-day expiry</text></svg>
+</figure>
+<p>The simplest surface, and the one teams get wrong first &mdash; not because the architecture is hard, but because the guardrail is usually a system-prompt instruction rather than an enforced control. Notice where the policy engine sits: beside the model, not inside it.</p>
+
+<h3>RAG <span class="rsub">&mdash; Retrieval and grounding</span></h3>
+<figure>
+<svg viewBox="0 0 1000 804" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="RAG: paved road, guardrails, assurance and escape hatch"><defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#c07b3a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<text x="20" y="32" font-family="Calibri,Inter,sans-serif" font-size="12.5" font-weight="700" fill="#a4632a" letter-spacing="1.5">PAVED ROAD &#8212; REFERENCE ARCHITECTURE</text>
+<rect x="20" y="50" width="164" height="46" rx="8" fill="#fdf8f2" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="102.0" y="78.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Client app</text>
+<path d="M188 73 L214 73" stroke="#c07b3a" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="218" y="50" width="164" height="46" rx="8" fill="#fdf8f2" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="300.0" y="78.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">API gateway</text>
+<path d="M386 73 L412 73" stroke="#c07b3a" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="416" y="50" width="164" height="46" rx="8" fill="#fdf8f2" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="498.0" y="78.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Orchestrator</text>
+<path d="M584 73 L610 73" stroke="#c07b3a" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="614" y="50" width="164" height="46" rx="8" fill="#fdf8f2" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="696.0" y="78.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Retrieval index</text>
+<path d="M782 73 L808 73" stroke="#c07b3a" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="812" y="50" width="164" height="46" rx="8" fill="#fdf8f2" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="894.0" y="78.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Model</text>
+<text x="20" y="122" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#6d7a85">Ships as a module: tenant-scoped index, ingestion with provenance, object store encrypted at rest</text>
+<line x1="20" y1="150" x2="980" y2="150" stroke="#eef2f6" stroke-width="1"/>
+<text x="20" y="180" font-family="Calibri,Inter,sans-serif" font-size="12.5" font-weight="700" fill="#a4632a" letter-spacing="1.5">GUARDRAILS &#8212; ENFORCED OUTSIDE THE MODEL</text>
+<rect x="20" y="272" width="120" height="46" rx="8" fill="#ffffff" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="80.0" y="300.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Request</text>
+<path d="M144 295 L168 295" stroke="#c07b3a" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="176" y="200" width="424" height="192" rx="10" fill="#fdf8f2" stroke="#ecd6bd" stroke-width="1.4" stroke-dasharray="6 4"/>
+<text x="192" y="222" font-family="Calibri,Inter,sans-serif" font-size="12" font-weight="700" fill="#a4632a" letter-spacing="1.2">POLICY ENGINE</text>
+<rect x="192" y="234" width="392" height="40" rx="8" fill="#ffffff" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="388.0" y="259.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Tenant ACL enforced at query time</text>
+<rect x="192" y="284" width="392" height="40" rx="8" fill="#ffffff" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="388.0" y="309.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Source allowlist by data classification</text>
+<rect x="192" y="334" width="392" height="40" rx="8" fill="#ffffff" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="388.0" y="359.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Chunk caps and PII stripped pre-prompt</text>
+<path d="M604 296 L652 250" stroke="#c07b3a" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<path d="M604 296 L652 296" stroke="#c07b3a" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<path d="M604 296 L652 350" stroke="#c07b3a" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="660" y="230" width="120" height="40" rx="8" fill="#ffffff" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="720.0" y="255.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Allow</text>
+<rect x="660" y="276" width="120" height="40" rx="8" fill="#fdf8f2" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="720.0" y="301.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Block</text>
+<rect x="660" y="330" width="120" height="40" rx="8" fill="#ffffff" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="720.0" y="355.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#2b3540">Exception</text>
+<path d="M784 350 L824 350" stroke="#c07b3a" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="832" y="328" width="148" height="44" rx="8" fill="#ffffff" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="906.0" y="346.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" font-weight="600" fill="#2b3540">Named owner</text>
+<text x="906.0" y="364.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="12.5" fill="#6d7a85">and an expiry date</text>
+<line x1="20" y1="420" x2="980" y2="420" stroke="#eef2f6" stroke-width="1"/>
+<text x="20" y="450" font-family="Calibri,Inter,sans-serif" font-size="12.5" font-weight="700" fill="#a4632a" letter-spacing="1.5">ASSURANCE &#8212; EVIDENCE PIPELINE</text>
+<rect x="20" y="470" width="214" height="38" rx="8" fill="#ffffff" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="127.0" y="494.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#2b3540">Retrieval logs</text>
+<rect x="20" y="516" width="214" height="38" rx="8" fill="#ffffff" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="127.0" y="540.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#2b3540">Ingestion provenance</text>
+<rect x="20" y="562" width="214" height="38" rx="8" fill="#ffffff" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="127.0" y="586.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#2b3540">Index change history</text>
+<path d="M238 535.0 L278 535.0" stroke="#c07b3a" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="286" y="511.0" width="150" height="48" rx="8" fill="#fdf8f2" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="361.0" y="531.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" font-weight="600" fill="#2b3540">Audit store</text>
+<text x="361.0" y="549.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="12.5" fill="#6d7a85">immutable</text>
+<path d="M440 535.0 L480 535.0" stroke="#c07b3a" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="488" y="511.0" width="150" height="48" rx="8" fill="#fdf8f2" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="563.0" y="531.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" font-weight="600" fill="#2b3540">Query and test</text>
+<text x="563.0" y="549.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="12.5" fill="#6d7a85">scheduled</text>
+<path d="M642 535.0 L682 535.0" stroke="#c07b3a" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="690" y="470" width="290" height="38" rx="8" fill="#ffffff" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="835.0" y="494.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#2b3540">Citation and grounding checks</text>
+<rect x="690" y="516" width="290" height="38" rx="8" fill="#ffffff" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="835.0" y="540.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#2b3540">Index freshness and drift tests</text>
+<rect x="690" y="562" width="290" height="38" rx="8" fill="#ffffff" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="835.0" y="586.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#2b3540">Sensitive-data scan of the index</text>
+<path d="M835 600 L835 630 L127 630 L127 600" stroke="#c07b3a" stroke-width="1.4" fill="none" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<text x="500.0" y="624" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="13" fill="#c07b3a">findings improve the paved road</text>
+<line x1="20" y1="658" x2="980" y2="658" stroke="#eef2f6" stroke-width="1"/>
+<text x="20" y="688" font-family="Calibri,Inter,sans-serif" font-size="12.5" font-weight="700" fill="#a4632a" letter-spacing="1.5">ESCAPE HATCH &#8212; WHEN THE ROAD DOES NOT FIT</text>
+<rect x="20" y="708" width="168" height="42" rx="8" fill="#ffffff" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="104.0" y="734.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="13.5" fill="#2b3540">Road doesn't fit</text>
+<path d="M191 729 L214 729" stroke="#c07b3a" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="218" y="708" width="168" height="42" rx="8" fill="#ffffff" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="302.0" y="734.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="13.5" fill="#2b3540">Exception raised</text>
+<path d="M389 729 L412 729" stroke="#c07b3a" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="416" y="708" width="168" height="42" rx="8" fill="#ffffff" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="500.0" y="734.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="13.5" fill="#2b3540">Compensating controls</text>
+<path d="M587 729 L610 729" stroke="#c07b3a" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="614" y="708" width="168" height="42" rx="8" fill="#ffffff" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="698.0" y="734.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="13.5" fill="#2b3540">Named owner</text>
+<path d="M785 729 L808 729" stroke="#c07b3a" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="812" y="708" width="168" height="42" rx="8" fill="#ffffff" stroke="#ecd6bd" stroke-width="1.4"/>
+<text x="896.0" y="734.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="13.5" fill="#2b3540">Expiry and revisit</text>
+<text x="20" y="774" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#6d7a85">Worked example: a shared index across tenants &#8212; row-level filter plus quarterly access review</text></svg>
+</figure>
+<p>Retrieval is where tenancy breaks. Every platform provisions the vector store; none enforces that one tenant&rsquo;s embeddings are unreachable from another&rsquo;s query. That control is yours, and the diagram puts it at query time deliberately &mdash; enforcing at ingestion is the common mistake.</p>
+
+<h3>Agentic AI <span class="rsub">&mdash; Tool use and action</span></h3>
+<figure>
+<svg viewBox="0 0 1000 804" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Agentic AI: paved road, guardrails, assurance and escape hatch"><defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#6b93a8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<text x="20" y="32" font-family="Calibri,Inter,sans-serif" font-size="12.5" font-weight="700" fill="#a4632a" letter-spacing="1.5">PAVED ROAD &#8212; REFERENCE ARCHITECTURE</text>
+<rect x="20" y="50" width="164" height="46" rx="8" fill="#f5f9fb" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="102.0" y="78.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">User app</text>
+<path d="M188 73 L214 73" stroke="#6b93a8" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="218" y="50" width="164" height="46" rx="8" fill="#f5f9fb" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="300.0" y="78.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">API gateway</text>
+<path d="M386 73 L412 73" stroke="#6b93a8" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="416" y="50" width="164" height="46" rx="8" fill="#f5f9fb" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="498.0" y="78.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Orchestrator</text>
+<path d="M584 73 L610 73" stroke="#6b93a8" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="614" y="50" width="164" height="46" rx="8" fill="#f5f9fb" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="696.0" y="78.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Scoped tools</text>
+<path d="M782 73 L808 73" stroke="#6b93a8" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="812" y="50" width="164" height="46" rx="8" fill="#f5f9fb" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="894.0" y="78.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Action</text>
+<text x="20" y="122" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#6d7a85">Ships as a module: agent runtime, scoped identity per agent, durable state, tool schema registry</text>
+<line x1="20" y1="150" x2="980" y2="150" stroke="#eef2f6" stroke-width="1"/>
+<text x="20" y="180" font-family="Calibri,Inter,sans-serif" font-size="12.5" font-weight="700" fill="#a4632a" letter-spacing="1.5">GUARDRAILS &#8212; ENFORCED OUTSIDE THE MODEL</text>
+<rect x="20" y="272" width="120" height="46" rx="8" fill="#ffffff" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="80.0" y="300.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Request</text>
+<path d="M144 295 L168 295" stroke="#6b93a8" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="176" y="200" width="424" height="192" rx="10" fill="#f5f9fb" stroke="#d3e2ea" stroke-width="1.4" stroke-dasharray="6 4"/>
+<text x="192" y="222" font-family="Calibri,Inter,sans-serif" font-size="12" font-weight="700" fill="#a4632a" letter-spacing="1.2">POLICY ENGINE</text>
+<rect x="192" y="234" width="392" height="40" rx="8" fill="#ffffff" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="388.0" y="259.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Tool allowlist and schema validation</text>
+<rect x="192" y="284" width="392" height="40" rx="8" fill="#ffffff" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="388.0" y="309.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Approval before irreversible actions</text>
+<rect x="192" y="334" width="392" height="40" rx="8" fill="#ffffff" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="388.0" y="359.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Spend caps and egress allowlist</text>
+<path d="M604 296 L652 250" stroke="#6b93a8" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<path d="M604 296 L652 296" stroke="#6b93a8" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<path d="M604 296 L652 350" stroke="#6b93a8" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="660" y="230" width="120" height="40" rx="8" fill="#ffffff" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="720.0" y="255.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Allow</text>
+<rect x="660" y="276" width="120" height="40" rx="8" fill="#f5f9fb" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="720.0" y="301.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" fill="#2b3540">Block</text>
+<rect x="660" y="330" width="120" height="40" rx="8" fill="#ffffff" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="720.0" y="355.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#2b3540">Exception</text>
+<path d="M784 350 L824 350" stroke="#6b93a8" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="832" y="328" width="148" height="44" rx="8" fill="#ffffff" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="906.0" y="346.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" font-weight="600" fill="#2b3540">Named owner</text>
+<text x="906.0" y="364.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="12.5" fill="#6d7a85">and an expiry date</text>
+<line x1="20" y1="420" x2="980" y2="420" stroke="#eef2f6" stroke-width="1"/>
+<text x="20" y="450" font-family="Calibri,Inter,sans-serif" font-size="12.5" font-weight="700" fill="#a4632a" letter-spacing="1.5">ASSURANCE &#8212; EVIDENCE PIPELINE</text>
+<rect x="20" y="470" width="214" height="38" rx="8" fill="#ffffff" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="127.0" y="494.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#2b3540">Execution traces</text>
+<rect x="20" y="516" width="214" height="38" rx="8" fill="#ffffff" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="127.0" y="540.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#2b3540">Tool-call arguments</text>
+<rect x="20" y="562" width="214" height="38" rx="8" fill="#ffffff" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="127.0" y="586.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#2b3540">Approval decisions</text>
+<path d="M238 535.0 L278 535.0" stroke="#6b93a8" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="286" y="511.0" width="150" height="48" rx="8" fill="#f5f9fb" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="361.0" y="531.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" font-weight="600" fill="#2b3540">Audit store</text>
+<text x="361.0" y="549.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="12.5" fill="#6d7a85">immutable</text>
+<path d="M440 535.0 L480 535.0" stroke="#6b93a8" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="488" y="511.0" width="150" height="48" rx="8" fill="#f5f9fb" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="563.0" y="531.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="15" font-weight="600" fill="#2b3540">Query and test</text>
+<text x="563.0" y="549.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="12.5" fill="#6d7a85">scheduled</text>
+<path d="M642 535.0 L682 535.0" stroke="#6b93a8" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="690" y="470" width="290" height="38" rx="8" fill="#ffffff" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="835.0" y="494.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#2b3540">Full action replay after the fact</text>
+<rect x="690" y="516" width="290" height="38" rx="8" fill="#ffffff" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="835.0" y="540.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#2b3540">Agent behaviour eval harness</text>
+<rect x="690" y="562" width="290" height="38" rx="8" fill="#ffffff" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="835.0" y="586.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#2b3540">Audit of human approvals</text>
+<path d="M835 600 L835 630 L127 630 L127 600" stroke="#6b93a8" stroke-width="1.4" fill="none" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<text x="500.0" y="624" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="13" fill="#6b93a8">findings improve the paved road</text>
+<line x1="20" y1="658" x2="980" y2="658" stroke="#eef2f6" stroke-width="1"/>
+<text x="20" y="688" font-family="Calibri,Inter,sans-serif" font-size="12.5" font-weight="700" fill="#a4632a" letter-spacing="1.5">ESCAPE HATCH &#8212; WHEN THE ROAD DOES NOT FIT</text>
+<rect x="20" y="708" width="168" height="42" rx="8" fill="#ffffff" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="104.0" y="734.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="13.5" fill="#2b3540">Road doesn't fit</text>
+<path d="M191 729 L214 729" stroke="#6b93a8" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="218" y="708" width="168" height="42" rx="8" fill="#ffffff" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="302.0" y="734.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="13.5" fill="#2b3540">Exception raised</text>
+<path d="M389 729 L412 729" stroke="#6b93a8" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="416" y="708" width="168" height="42" rx="8" fill="#ffffff" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="500.0" y="734.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="13.5" fill="#2b3540">Compensating controls</text>
+<path d="M587 729 L610 729" stroke="#6b93a8" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="614" y="708" width="168" height="42" rx="8" fill="#ffffff" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="698.0" y="734.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="13.5" fill="#2b3540">Named owner</text>
+<path d="M785 729 L808 729" stroke="#6b93a8" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="812" y="708" width="168" height="42" rx="8" fill="#ffffff" stroke="#d3e2ea" stroke-width="1.4"/>
+<text x="896.0" y="734.0" text-anchor="middle" font-family="Calibri,Inter,sans-serif" font-size="13.5" fill="#2b3540">Expiry and revisit</text>
+<text x="20" y="774" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#6d7a85">Worked example: an autonomous write to production &#8212; dry-run mode, hard spend cap, 30-day expiry</text></svg>
+</figure>
+<p>An agent acts, so approval sits before the action rather than after it. The exception path matters most here: an autonomous write to production is a legitimate ask, and the answer is a bounded yes, not a no.</p>
+
+<h2>Reading the guardrail diagram</h2>
+<p>Three things in that middle diagram are doing the real work.</p>
+<ul>
+<li><strong>The policy engine sits outside the dashed model boundary.</strong> A guardrail inside the reasoning loop is a suggestion. System-prompt instructions, refusal training and &ldquo;the agent knows not to do that&rdquo; all fail under a determined prompt.</li>
+<li><strong>There are three exits, not two.</strong> Allow and block alone produce shadow AI. The third exit is what keeps teams inside the system.</li>
+<li><strong>The exception exit terminates in a person and a date.</strong> Not a team, not a committee, and never open-ended &mdash; an exception without an expiry is a silent policy change.</li>
+</ul>
+<h2>Reading the assurance diagram</h2>
+<p>The dashed return path is the part most programmes skip. Evidence that only ever lands in an audit folder is compliance theatre; evidence that feeds the paved road is how the road gets better. Three teams hitting the same finding is not three findings &mdash; it is a missing module, and the pipeline is telling you which one to build.</p>
+<h2>What the platform templates give you, and what they don&rsquo;t</h2>
+<p>Both major clouds now ship real infrastructure as code rather than guidance documents. They cover networking, identity, key management and private endpoints well. Three things they do not give you:</p>
+<ul>
+<li><strong>Query-time tenancy in RAG.</strong> The vector store is provisioned. The isolation is not.</li>
+<li><strong>Blast-radius policy for agents.</strong> Policy engines give you the mechanism; the thresholds, the irreversibility classification and the spend caps are yours.</li>
+<li><strong>Eval and red-team harnesses.</strong> Nothing ships a jailbreak regression suite for your prompts.</li>
+</ul>
+<div class="callout"><span class="lab">The test</span>
+<p>Point at any control in your GenAI stack and ask one question: can the model talk its way past this? If the answer is yes, it belongs in the paved road as a default, not in the guardrail column as a control. The guardrail column is only for things the platform enforces whether or not the model cooperates.</p></div>
+</div></body></html>
