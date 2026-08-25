@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product Security: Paved Roads, Guardrails, Assurance</title>
+<style>
+:root{--petrol:#1b4965;--mid:#3d6e8c;--tint:#e7eef3;--tint2:#f2f6f9;--amber:#B45309;--amberT:#fdf1e0;--ink:#1f2933;--muted:#5f6b76;--rule:#dbe3e9;--band:#f7f9fb}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--ink);font-family:Calibri,Inter,"Segoe UI",system-ui,sans-serif;font-size:17px;line-height:1.65}
+.wrap{max-width:880px;margin:0 auto;padding:0 28px}
+.masthead{border-top:6px solid var(--petrol);padding:52px 0 38px}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);font-weight:600;margin:0 0 18px}
+h1{font-size:44px;line-height:1.14;margin:0 0 18px;font-weight:600;color:var(--petrol);letter-spacing:-.01em}
+.deck{font-size:21px;line-height:1.5;color:var(--muted);margin:0;max-width:44em}
+h2{font-size:15px;letter-spacing:.13em;text-transform:uppercase;color:var(--petrol);font-weight:600;margin:54px 0 18px;padding-bottom:10px;border-bottom:2px solid var(--petrol)}
+h3{font-size:22px;font-weight:600;color:var(--petrol);margin:34px 0 10px;line-height:1.3}
+h4{font-size:17px;font-weight:600;color:var(--petrol);margin:26px 0 8px}
+p{margin:0 0 18px}
+em{color:var(--petrol);font-style:italic}
+.lede{font-size:19px;line-height:1.6}
+.pull{margin:32px 0;padding:22px 26px;background:var(--tint);border-left:4px solid var(--petrol);font-size:19px;line-height:1.5;color:var(--petrol);font-weight:600}
+.pull span{display:block}
+.pull span+span{margin-top:8px}
+.callout{margin:28px 0;padding:20px 24px;background:var(--amberT);border-left:4px solid var(--amber);font-size:16px}
+.callout p:last-child{margin-bottom:0}
+.callout .lab{display:block;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:8px}
+figure{margin:34px 0}
+figure svg{display:block;width:100%;height:auto;border:1px solid var(--rule)}
+figcaption{margin-top:12px;font-size:14px;color:var(--muted);padding-left:14px;border-left:2px solid var(--rule)}
+.code{margin:20px 0;padding:18px 22px;background:var(--band);border:1px solid var(--rule);font-size:15px;line-height:1.95}
+.code b{color:var(--petrol);font-weight:600}
+.code i{color:var(--amber);font-style:normal;padding:0 5px}
+.code .k{color:var(--muted)}
+.chain{margin:22px 0;padding:18px 22px;background:var(--band);border:1px solid var(--rule);font-size:15.5px;line-height:2}
+.chain b{color:var(--petrol);font-weight:600}
+.chain i{color:var(--amber);font-style:normal;padding:0 5px}
+.tw{margin:24px 0;overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15.5px}
+th{text-align:left;padding:10px 14px 10px 0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--petrol);font-weight:600;border-bottom:2px solid var(--petrol);vertical-align:bottom}
+td{padding:11px 14px 11px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+tbody tr:nth-child(odd){background:var(--tint2)}
+td:first-child{font-weight:600;color:var(--petrol);white-space:nowrap}
+th:last-child,td:last-child{padding-right:0}
+ul{margin:0 0 18px;padding-left:0;list-style:none}
+ul li{position:relative;padding-left:20px;margin-bottom:10px}
+ul li:before{content:"";position:absolute;left:0;top:.62em;width:7px;height:7px;background:var(--amber)}
+.band{background:var(--band);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);margin:54px 0;padding:8px 0 38px}
+.band h2{margin-top:38px}
+@media(max-width:640px){body{font-size:16px}h1{font-size:31px}.deck{font-size:18px}}
+@media print{.band{background:none}h2{page-break-after:avoid}figure{page-break-inside:avoid}}
+</style>
+</head>
+<body>
+<header class="masthead"><div class="wrap">
+<p class="eyebrow">Product security</p>
+<h1>Paved Roads, Guardrails, Assurance.<br>All Three, or None of Them Work.</h1>
+<p class="deck">Three different mechanisms doing three different jobs. Most programmes build one, call it all three, and wonder why engineering routes around them.</p>
+</div></header>
+
+<div class="wrap">
+<p class="lede">Every product security programme eventually writes a standard. It says buckets holding customer data must use encryption, logging, least privilege, and blocked public access. It is correct. It is twenty pages long. And it asks a developer with a sprint commitment to become a part-time security architect.</p>
+<p>That is the problem in one sentence. We hand engineers a specification and ask them to produce an implementation, on their own time, under delivery pressure, with no reference build. Then we audit the result and act surprised by the variance.</p>
+<div class="pull"><span>Standards tell engineers what they must do.</span><span>Paved roads give them a ready-made way to do it.</span></div>
+<p>But "paved road" has become a catch-all, and the sloppiness costs real programmes. Three distinct mechanisms are doing three distinct jobs, and each fails differently when it's missing.</p>
+
+<h2>The three definitions</h2>
+<figure>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 690" role="img" aria-labelledby="t d">
+<title id="t">Paved roads, guardrails, and assurance</title>
+<desc id="d">Three pillars of a product security programme. Each shows what it is, how it helps, how it wins, its failure mode, and examples.</desc>
+<defs>
+<filter id="lift" x="-20%" y="-20%" width="140%" height="140%">
+<feDropShadow dx="0" dy="4" stdDeviation="7" flood-color="#1b4965" flood-opacity="0.13"/>
+</filter>
+</defs>
+
+<rect width="1200" height="690" fill="#ffffff"/>
+<rect width="1200" height="8" fill="#1b4965"/>
+
+<text x="56" y="66" font-family="Calibri,Inter,sans-serif" font-size="15" font-weight="600" fill="#B45309" letter-spacing="2.4">PRODUCT SECURITY</text>
+<text x="56" y="110" font-family="Calibri,Inter,sans-serif" font-size="34" font-weight="600" fill="#1f2933">Paved roads, guardrails, assurance.</text>
+<text x="56" y="146" font-family="Calibri,Inter,sans-serif" font-size="19" fill="#5f6b76">All three, or none of them work.</text>
+
+<g filter="url(#lift)"><rect x="56" y="188" width="336" height="426" rx="10" fill="#ffffff"/></g>
+<rect x="56" y="188" width="336" height="426" rx="10" fill="none" stroke="#dbe3e9" stroke-width="1"/>
+<path d="M56 198a10 10 0 0 1 10-10h316a10 10 0 0 1 10 10v76H56z" fill="#ffffff"/><rect x="56" y="261" width="336" height="3" fill="#1b4965"/>
+<text x="88" y="222" font-family="Calibri,Inter,sans-serif" font-size="21" font-weight="600" fill="#1f2933">Paved roads</text>
+<text x="88" y="252" font-family="Calibri,Inter,sans-serif" font-size="14.5" font-weight="700" fill="#B45309" letter-spacing="1.3">MAKE THE RIGHT THING EASY</text>
+
+<text x="88" y="288" font-family="Calibri,Inter,sans-serif" font-size="11" font-weight="600" fill="#B45309" letter-spacing="1.4">WHAT IT IS</text>
+<text x="88" y="310" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">Pre-approved implementations</text>
+<text x="88" y="329" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">teams adopt instead of building.</text>
+<line x1="88" y1="349" x2="360" y2="349" stroke="#eef2f5" stroke-width="1"/>
+
+<text x="88" y="375" font-family="Calibri,Inter,sans-serif" font-size="11" font-weight="600" fill="#B45309" letter-spacing="1.4">HOW IT HELPS</text>
+<text x="88" y="397" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">Interpretation risk moves from</text>
+<text x="88" y="416" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">dozens of teams to one owner.</text>
+<line x1="88" y1="436" x2="360" y2="436" stroke="#eef2f5" stroke-width="1"/>
+
+
+
+<text x="88" y="462" font-family="Calibri,Inter,sans-serif" font-size="11" font-weight="600" fill="#B45309" letter-spacing="1.4">EXAMPLES</text>
+<circle cx="92" cy="481" r="3" fill="#1b4965"/><text x="106" y="486" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">Terraform / IaC modules</text>
+<circle cx="92" cy="506" r="3" fill="#1b4965"/><text x="106" y="511" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">Secure application template</text>
+<circle cx="92" cy="531" r="3" fill="#1b4965"/><text x="106" y="536" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">Approved identity libraries</text>
+<circle cx="92" cy="556" r="3" fill="#1b4965"/><text x="106" y="561" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">Secrets-management module</text>
+<circle cx="92" cy="581" r="3" fill="#1b4965"/><text x="106" y="586" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">Secure pipeline template</text>
+
+<g filter="url(#lift)"><rect x="432" y="188" width="336" height="426" rx="10" fill="#ffffff"/></g>
+<rect x="432" y="188" width="336" height="426" rx="10" fill="none" stroke="#dbe3e9" stroke-width="1"/>
+<path d="M432 198a10 10 0 0 1 10-10h316a10 10 0 0 1 10 10v76H432z" fill="#ffffff"/><rect x="432" y="261" width="336" height="3" fill="#B45309"/>
+<text x="464" y="222" font-family="Calibri,Inter,sans-serif" font-size="21" font-weight="600" fill="#1f2933">Guardrails</text>
+<text x="464" y="252" font-family="Calibri,Inter,sans-serif" font-size="14.5" font-weight="700" fill="#B45309" letter-spacing="1.3">MAKE THE DANGEROUS THING HARD</text>
+
+<text x="464" y="288" font-family="Calibri,Inter,sans-serif" font-size="11" font-weight="600" fill="#B45309" letter-spacing="1.4">WHAT IT IS</text>
+<text x="464" y="310" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">Automated controls that deny,</text>
+<text x="464" y="329" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">enforced by the platform.</text>
+<line x1="464" y1="349" x2="736" y2="349" stroke="#eef2f5" stroke-width="1"/>
+
+<text x="464" y="375" font-family="Calibri,Inter,sans-serif" font-size="11" font-weight="600" fill="#B45309" letter-spacing="1.4">HOW IT HELPS</text>
+<text x="464" y="397" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">Safety stops depending on who</text>
+<text x="464" y="416" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">remembered, or on the deadline.</text>
+<line x1="464" y1="436" x2="736" y2="436" stroke="#eef2f5" stroke-width="1"/>
+
+
+
+<text x="464" y="462" font-family="Calibri,Inter,sans-serif" font-size="11" font-weight="600" fill="#B45309" letter-spacing="1.4">EXAMPLES</text>
+<circle cx="468" cy="481" r="3" fill="#B45309"/><text x="482" y="486" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">Policy as code (OPA, SCP)</text>
+<circle cx="468" cy="506" r="3" fill="#B45309"/><text x="482" y="511" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">Public storage blocked</text>
+<circle cx="468" cy="531" r="3" fill="#B45309"/><text x="482" y="536" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">No wildcard IAM privileges</text>
+<circle cx="468" cy="556" r="3" fill="#B45309"/><text x="482" y="561" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">Approved registries only</text>
+<circle cx="468" cy="581" r="3" fill="#B45309"/><text x="482" y="586" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">Signed artifacts required</text>
+
+<g filter="url(#lift)"><rect x="808" y="188" width="336" height="426" rx="10" fill="#ffffff"/></g>
+<rect x="808" y="188" width="336" height="426" rx="10" fill="none" stroke="#dbe3e9" stroke-width="1"/>
+<path d="M808 198a10 10 0 0 1 10-10h316a10 10 0 0 1 10 10v76H808z" fill="#ffffff"/><rect x="808" y="261" width="336" height="3" fill="#3d6e8c"/>
+<text x="840" y="222" font-family="Calibri,Inter,sans-serif" font-size="21" font-weight="600" fill="#1f2933">Assurance</text>
+<text x="840" y="252" font-family="Calibri,Inter,sans-serif" font-size="14.5" font-weight="700" fill="#B45309" letter-spacing="1.3">PROVE WHICH ONE HAPPENED</text>
+
+<text x="840" y="288" font-family="Calibri,Inter,sans-serif" font-size="11" font-weight="600" fill="#B45309" letter-spacing="1.4">WHAT IT IS</text>
+<text x="840" y="310" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">Evidence the road was taken</text>
+<text x="840" y="329" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">and the rail actually held.</text>
+<line x1="840" y1="349" x2="1112" y2="349" stroke="#eef2f5" stroke-width="1"/>
+
+<text x="840" y="375" font-family="Calibri,Inter,sans-serif" font-size="11" font-weight="600" fill="#B45309" letter-spacing="1.4">HOW IT HELPS</text>
+<text x="840" y="397" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">You learn the truth rather</text>
+<text x="840" y="416" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">than the stated intent.</text>
+<line x1="840" y1="436" x2="1112" y2="436" stroke="#eef2f5" stroke-width="1"/>
+
+
+
+<text x="840" y="462" font-family="Calibri,Inter,sans-serif" font-size="11" font-weight="600" fill="#B45309" letter-spacing="1.4">EXAMPLES</text>
+<circle cx="844" cy="481" r="3" fill="#3d6e8c"/><text x="858" y="486" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">Threat models</text>
+<circle cx="844" cy="506" r="3" fill="#3d6e8c"/><text x="858" y="511" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">Security and pen testing</text>
+<circle cx="844" cy="531" r="3" fill="#3d6e8c"/><text x="858" y="536" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">SBOM from the pipeline</text>
+<circle cx="844" cy="556" r="3" fill="#3d6e8c"/><text x="858" y="561" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">Signed release evidence</text>
+<circle cx="844" cy="581" r="3" fill="#3d6e8c"/><text x="858" y="586" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#1f2933">PSIRT and disclosure</text>
+
+<text x="56" y="656" font-family="Calibri,Inter,sans-serif" font-size="14" fill="#5f6b76">Roads without rails get bypassed. Rails without roads get resented. Neither is provable without assurance.</text>
+</svg>
+<figcaption>A paved road is an offer. A guardrail is a boundary. Assurance is evidence. Programmes that conflate them end up mandating offers, apologising for boundaries, and collecting evidence by asking people to remember things.</figcaption>
+</figure>
+
+<div class="callout"><span class="lab">The distinction that matters</span>
+<p>A paved road is an <em>offer</em>. A guardrail is a <em>boundary</em>. Assurance is <em>evidence</em>. Programmes that conflate them end up mandating offers, apologising for boundaries, and collecting evidence by asking people to remember things.</p></div>
+</div>
+
+<div class="band"><div class="wrap">
+<h2>Paved roads, concretely</h2>
+<p>The test of a paved road is not whether it's secure. It's whether it's <em>faster than the alternative</em>. A road that costs a team two extra days is a road nobody drives on, no matter how well built.</p>
+
+<h4>Instead of a control statement</h4>
+<div class="code"><span class="k">"S3 buckets containing customer data must use encryption, logging, least privilege, and block public access."</span> &mdash; twenty pages, thirty teams, thirty interpretations.</div>
+
+<h4>Ship a module where the answer is already encoded</h4>
+<div class="code"><b>company-secure-s3-module</b><br>
+encryption <i>=</i> KMS &middot; public_access <i>=</i> blocked &middot; TLS <i>=</i> required<br>
+logging <i>=</i> enabled &middot; IAM <i>=</i> least_privilege &middot; evidence <i>=</i> generated</div>
+
+<p>Security is no longer asking developers to interpret a control. It's asking them to import one.</p>
+
+<h4>What to pave, in order of leverage</h4>
+<div class="tw"><table>
+<thead><tr><th>Problem</th><th>Paved road</th><th>What engineering gets</th></tr></thead>
+<tbody>
+<tr><td>New application</td><td>Secure application template</td><td>Repo, CI/CD, logging, IAM and security defaults on day one</td></tr>
+<tr><td>Cloud workload</td><td>Approved reference architecture</td><td>Terraform / CloudFormation modules, already reviewed</td></tr>
+<tr><td>API</td><td>Secure API pattern</td><td>OAuth/OIDC, authorization, rate limiting, validation, logging</td></tr>
+<tr><td>Authentication</td><td>Identity pattern</td><td>Approved IdP libraries instead of hand-rolled auth</td></tr>
+<tr><td>Secrets</td><td>Secrets-management module</td><td>Vault or Secrets Manager integration, no plaintext path</td></tr>
+<tr><td>Containers</td><td>Secure container baseline</td><td>Minimal image, non-root, scanning, signing</td></tr>
+<tr><td>Dependencies</td><td>Approved dependency pipeline</td><td>SCA, automated updates, license checks</td></tr>
+<tr><td>CI/CD</td><td>Secure pipeline template</td><td>SAST, SCA, secrets, IaC and container scans pre-wired</td></tr>
+<tr><td>GenAI and RAG</td><td>Secure AI reference architecture</td><td>Model gateway, RAG isolation, IAM, guardrails, telemetry</td></tr>
+<tr><td>Agents</td><td>Agent security pattern</td><td>Scoped identity, tool allowlist, sandboxing, approval boundaries</td></tr>
+<tr><td>Release</td><td>Security evidence automation</td><td>Evidence generated from the pipeline, not questionnaires</td></tr>
+</tbody></table></div>
+</div></div>
+
+<div class="wrap">
+<h2>Guardrails, concretely</h2>
+<p>Some outcomes shouldn't depend on anyone remembering the paved road existed. A guardrail is not advice delivered in a stern tone &mdash; it's an automated denial, enforced by the platform, that fires whether or not a human was paying attention.</p>
+
+<h4>The decision path</h4>
+<div class="code"><b>Developer</b><br>
+&nbsp;&nbsp;&#8627; approved architecture <i>&rarr;</i> <b>ALLOW</b><br>
+&nbsp;&nbsp;&#8627; unsafe configuration <i>&rarr;</i> policy as code <span class="k">(OPA / SCP / config rules)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8627; <b>BLOCK</b> &nbsp;or&nbsp; <b>EXCEPTION</b> <i>&rarr;</i> named risk owner <i>+</i> expiry</div>
+
+<h4>What belongs behind a rail</h4>
+<ul>
+<li><strong>Public object storage.</strong> Not discouraged &mdash; unavailable. The canonical example, because the failure is silent, total, and always a misconfiguration rather than a decision.</li>
+<li><strong>Wildcard IAM privileges.</strong> Denied at the service control policy level so it never reaches review.</li>
+<li><strong>Unapproved container registries.</strong> Admission control rejects the pull; nobody has to notice.</li>
+<li><strong>Secrets in source.</strong> Pre-commit and pipeline gate, not a quarterly scan of what already shipped.</li>
+<li><strong>Unsigned artifacts.</strong> The pipeline refuses to promote what it cannot verify.</li>
+</ul>
+
+<div class="callout"><span class="lab">The pairing rule</span>
+<p>Never ship a guardrail without the corresponding road. Blocking public storage while offering no compliant bucket module means you've removed the only route a team knew and handed them nothing. That single mistake is how product security earns its reputation, and it is entirely avoidable by sequencing: road first, rail second.</p></div>
+
+<h2>The escape hatch</h2>
+<p>This is the level almost everyone skips, and it decides whether the other two survive contact with a delivery deadline.</p>
+<p>A product team may legitimately need something the road doesn't offer &mdash; a legacy protocol, an acquired codebase, a customer contract with its own requirements. The answer cannot be "no," and it must never be "yes, quietly." It has to be a path with a named owner and an end date.</p>
+
+<div class="chain"><b>Paved road</b> <i>&rarr;</i> doesn't meet the requirement <i>&rarr;</i> <b>exception raised</b> <i>&rarr;</i> compensating controls <i>&rarr;</i> <b>named risk owner</b> <i>&rarr;</i> expiration date <i>&rarr;</i> <b>revisit</b></div>
+
+<p>Four properties make an escape hatch real rather than ceremonial:</p>
+<ul>
+<li><strong>It is fast.</strong> Median turnaround under a week. Past that, teams stop asking and start routing around &mdash; and you lose sight of the very risk the process existed to see.</li>
+<li><strong>It names a person.</strong> Not a team, not a committee. A person whose name is on the acceptance and who will be asked about it.</li>
+<li><strong>It expires.</strong> An exception without an end date is a silent policy change. The expiry converts a permanent gap into a scheduled conversation.</li>
+<li><strong>It feeds the road.</strong> Three teams requesting the same exception is not three exceptions &mdash; it is a missing paved road, and the queue is telling you which one to build next.</li>
+</ul>
+
+<div class="callout"><span class="lab">The rule</span>
+<p>If product security doesn't provide an efficient exception mechanism, developers will eventually build roads around product security. Exception turnaround time predicts programme health better than any coverage metric.</p></div>
+
+<h2>How you know it's working</h2>
+<p>Coverage metrics &mdash; repos scanned, controls documented &mdash; measure activity, not adoption. Four numbers that actually indicate whether the road is real:</p>
+<ul>
+<li><strong>Adoption without mandate.</strong> What share of new services chose the template when nobody required it? If uptake only moves under enforcement, the road is slower than the dirt track. Fix the road, not the policy.</li>
+<li><strong>Time to first secure deploy.</strong> First commit to compliant production deployment. This is the number the paved road exists to reduce, and the one executives understand immediately.</li>
+<li><strong>Exception turnaround.</strong> Median days from request to decision.</li>
+<li><strong>Findings per service, trending down.</strong> Not total findings &mdash; total rises as you scan more. Per-service is the only version that shows the road is absorbing what you learned.</li>
+</ul>
+
+<h2>The uncomfortable part</h2>
+<p>Paved roads are expensive, and the cost lands on product security's budget rather than engineering's. You are absorbing work that was previously distributed &mdash; invisibly, badly, and at someone else's expense &mdash; across every team in the company.</p>
+<p>That's the trade, and it's also the argument for the headcount. It's a stronger argument than risk reduction, because it's measurable in delivery time rather than in incidents that didn't happen.</p>
+<p>The alternative is the twenty-page standard. Cheaper to write, satisfies the auditor, and quietly transfers the entire implementation burden to the people with the least time and the least context to carry it.</p>
+<p>Then we call the resulting variance a culture problem.</p>
+</div>
+<div style="border-top:6px solid var(--petrol);margin-top:56px"></div>
+
+</body>
+</html>
