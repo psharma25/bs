@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acceptable Use Policy — PromptHalo Trust Center</title>
+<meta name="description" content="Acceptable Use Policy — published policy, PromptHalo Trust Center.">
+<style>
+:root{
+  --paper:#f5f7f9; --card:#fff;
+  --ink:#16232e; --ink-soft:#44586a; --ink-faint:#6d8092;
+  --petrol:#1b4965; --petrol-deep:#12344a;
+  --accent:#7e63a8; --accent-tint:#f4f0fa; --accent-deep:#4a3470;
+  --line:#dbe3e9; --line-soft:#e9eef2;
+  --ok:#2e7d5b; --ok-tint:#eaf5ef;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Menlo,Consolas,monospace;
+  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --shadow:0 1px 2px rgba(18,52,74,.05),0 6px 18px rgba(18,52,74,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:86px}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.62;-webkit-font-smoothing:antialiased}
+a{color:var(--petrol)}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.93);backdrop-filter:saturate(180%) blur(8px);border-bottom:1px solid var(--line)}
+.topbar-inner{max-width:1080px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;gap:14px}
+.brand-lockup{display:flex;align-items:center;gap:11px}
+.brand-text{display:flex;flex-direction:column;line-height:1.15}
+.brand-name{font-weight:800;font-size:15px;letter-spacing:-.01em}
+.brand-sub{font-size:11px;color:var(--ink-faint);font-family:var(--mono);letter-spacing:.04em}
+.back{margin-left:auto;font-size:13.5px;text-decoration:none;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 14px;background:#fff}
+.back:hover{color:var(--petrol);border-color:#c5d3dd}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 70px}
+.hero{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:34px 36px;margin-top:28px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-deep);font-weight:700}
+h1.doc{font-size:clamp(26px,3.6vw,34px);letter-spacing:-.02em;font-weight:800;margin:12px 0 14px;line-height:1.15}
+.meta-strip{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.pill{font-family:var(--mono);font-size:11px;letter-spacing:.04em;border:1px solid var(--line);border-radius:6px;padding:4px 10px;color:var(--ink-soft);background:var(--paper)}
+.pill.cls{border-color:#d8cbe8;background:var(--accent-tint);color:var(--accent-deep)}
+.layout{display:grid;grid-template-columns:236px 1fr;gap:28px;align-items:start;margin-top:26px}
+nav.toc{position:sticky;top:86px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 14px}
+nav.toc .t{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);padding:0 6px 9px;border-bottom:1px solid var(--line-soft);margin-bottom:8px}
+nav.toc a{display:block;font-size:13.2px;color:var(--ink-soft);text-decoration:none;padding:5px 7px;border-radius:6px;line-height:1.4}
+nav.toc a:hover{background:var(--paper);color:var(--petrol)}
+.doc-body{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:34px 38px}
+.doc-body h1{font-size:20px;font-weight:800;letter-spacing:-.01em;margin:34px 0 10px;padding-top:20px;border-top:1px solid var(--line-soft);scroll-margin-top:86px}
+.doc-body h1:first-of-type{margin-top:0;padding-top:0;border-top:0}
+.doc-body h2{font-size:16px;font-weight:700;margin:22px 0 8px;scroll-margin-top:86px}
+.doc-body h3{font-size:14.5px;font-weight:700;margin:18px 0 6px;color:var(--ink-soft)}
+.doc-body p{margin:0 0 12px}
+.doc-body ul,.doc-body ol{margin:0 0 13px;padding-left:22px}
+.doc-body li{margin-bottom:6px}
+.doc-body table{width:100%;border-collapse:collapse;font-size:13.5px;margin:6px 0 18px}
+.doc-body th,.doc-body td{border:1px solid var(--line);padding:9px 12px;vertical-align:top;text-align:left}
+.doc-body thead th,.doc-body tr:first-child td strong{background:var(--paper)}
+.doc-body td strong{font-weight:700}
+.callout{background:var(--accent-tint);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;padding:14px 18px;margin:0 0 18px;font-size:14px}
+.callout b{color:var(--accent-deep)}
+footer{border-top:1px solid var(--line);margin-top:44px;padding:26px 0 40px;font-size:12.5px;color:var(--ink-faint);font-family:var(--mono)}
+footer .fi{max-width:1080px;margin:0 auto;padding:0 24px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
+@media(max-width:900px){.layout{grid-template-columns:1fr}nav.toc{position:static}}
+@media(max-width:620px){.doc-body,.hero{padding:24px 20px}}
+@media print{.topbar,nav.toc,.back{display:none}body{background:#fff}.doc-body,.hero{box-shadow:none;border:0;padding:0}.layout{display:block}}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <div class="brand-lockup"><img src="data:image/png;base64,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" width="34" height="34" alt="PromptHalo logo" style="display:block">
+    <div class="brand-text"><span class="brand-name">PromptHalo</span><span class="brand-sub">Trust Center</span></div>
+  </div>
+  <a class="back" href="../index.html">&larr; Trust Center</a>
+</div></header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Published policy</div>
+    <h1 class="doc">Acceptable Use Policy</h1>
+    <p style="color:var(--ink-soft);max-width:70ch">Governance, Ethics, and Security · All personnel, including employees and contractors</p>
+    <div class="meta-strip"><span class="pill ">POL-AUP-001</span><span class="pill ">Version 1.0</span><span class="pill ">Effective August 18, 2026</span><span class="pill ">Next review August 18, 2027</span><span class="pill cls">Classification Internal</span><span class="pill ">Review Annual, or upon material change</span></div>
+  </div>
+
+  <div class="layout">
+    <nav class="toc"><div class="t">On this page</div><a href="#overview-and-purpose">Overview and Purpose</a><a href="#scope">Scope</a><a href="#roles-and-definitions">Roles and Definitions</a><a href="#terminology">Terminology</a><a href="#what-good-use-looks-like">What Good Use Looks Like</a><a href="#personal-use-and-personal-devices">Personal Use and Personal Devices</a><a href="#using-ai-tools">Using AI Tools</a><a href="#software-services-and-access">Software, Services and Access</a><a href="#what-is-not-acceptable">What Is Not Acceptable</a><a href="#monitoring-and-privacy">Monitoring and Privacy</a><a href="#acknowledgement">Acknowledgement</a><a href="#enforcement">Enforcement</a><a href="#exceptions">Exceptions</a><a href="#reference">Reference</a><a href="#document-policy-history">Document Policy History</a></nav>
+    <article class="doc-body">
+      <div class="callout"><b>About this copy.</b> This is the published version of Acceptable Use Policy
+      (POL-AUP-001, version 1.0).
+      Owner: Chief Executive Officer — Accountable Party. Prepared by: Security Officer.
+      Printed or locally saved copies are uncontrolled — verify against this page before use.</div>
+      
+
+
+
+
+<p><strong>APPROVERS AND OWNERS</strong></p>
+<table>
+<colgroup>
+<col style="width: 21%"/>
+<col style="width: 11%"/>
+<col style="width: 31%"/>
+<col style="width: 21%"/>
+<col style="width: 14%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Name</strong></th>
+<th><strong>Role</strong></th>
+<th><strong>Information Security Role</strong></th>
+
+<th><strong>Date</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Madhuri Chandoor</strong></td>
+<td>Approver</td>
+<td>CEO and Founder</td>
+
+<td>August 18, 2026</td>
+</tr>
+<tr class="even">
+<td><strong>Praveen Sharma</strong></td>
+<td>Owner / Author</td>
+<td>Fractional CISO/Security Officer</td>
+
+<td>August 18, 2026</td>
+</tr>
+</tbody>
+</table>
+<p><strong>COMPLIANCE</strong></p>
+<p>This Policy is authorized by the Information Security Policy (POL-ISP-001) and supports the SOC 2 Trust Services Criteria CC1.1, CC1.4, CC1.5, CC2.2, CC6.1, CC6.7, CC6.8 and CC7.2, HIPAA Security Rule 45 CFR §164.310(b) and §164.312(a), and GDPR Articles 5, 6 and 13. It applies to the systems the Company actually runs — AWS, GitHub, Google Workspace and approved AI services — used mostly from personally owned laptops.</p>
+<p><strong>DOCUMENT VALIDITY</strong></p>
+<p>This document is valid only in its published electronic form in the PromptHalo Technologies policy repository. Printed or locally saved copies are uncontrolled and must be verified against the published version before use. This document is classified Internal and may not be distributed outside PromptHalo Technologies or its authorized clients without the written approval of the Security Officer.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1 id="overview-and-purpose">Overview and Purpose</h1>
+<p>PromptHalo Technologies (“the Company”) is a small, remote team. People work from their own laptops, in Google Workspace, AWS and GitHub, and use AI tools as part of ordinary work. This Policy says what good use of those systems looks like.</p>
+<p>It is written to let people get on with the work. The rules here are the few that genuinely protect client information; everything else is left to judgement. Where a rule would slow the work without reducing risk, it is not in this Policy.</p>
+<h1 id="scope">Scope</h1>
+<p>This Policy applies to everyone who uses Company systems — employees, officers, contractors, consultants, interns and temporary workers — and to any device they use for Company work, whether the Company provided it or not.</p>
+<p>“Company systems” means Google Workspace, AWS, GitHub, the approved AI services, and any other account the Company pays for or holds data in. It does not mean a person's own device, which remains theirs.</p>
+<p>Requirements apply so far as they are lawful where each person works, and the Company uses the least costly option that satisfies a requirement. Nothing here requires software to be installed on a personal device.</p>
+<h1 id="roles-and-definitions">Roles and Definitions</h1>
+<ol type="1">
+<li><p>"The Company" refers to PromptHalo Technologies.</p></li>
+<li><p>The CEO or, in their absence, the Security Officer (the “Accountable Party”) owns this policy, oversees its implementation and enforcement, and may delegate specific duties to a designee. [SOC 2: CC1.3]</p></li>
+<li><p>The Information Security Steering Committee approves this policy and reviews it at least annually. [SOC 2: CC1.2, CC5.3]</p></li>
+<li><p>Everyone is responsible for their own use of Company systems. Where someone is unsure whether something is acceptable, asking the Accountable Party first is always the right answer and is never held against them. [SOC 2: CC1.5, CC2.2]</p></li>
+</ol>
+<h1 id="terminology">Terminology</h1>
+<p>The following terms have the meanings given below wherever they appear in this policy.</p>
+<ol type="1">
+<li><p><strong>Accountable Party</strong> — the CEO or, in their absence, the Security Officer, who owns this policy.</p></li>
+<li><p><strong>Approved AI tool</strong> — an artificial intelligence service reached through a Company account, on the register maintained under the AI Governance Policy.</p></li>
+<li><p><strong>Client information</strong> — any information obtained during an engagement, including findings, evidence, architecture, incident detail and personal data.</p></li>
+<li><p><strong>Company systems</strong> — Google Workspace, AWS, GitHub, approved AI services, and any other account the Company pays for or holds data in.</p></li>
+<li><p><strong>Confidential information</strong> — information classified Confidential or Restricted under the Data Classification Policy, including customer data.</p></li>
+<li><p><strong>Deficiency</strong> — a control that is absent, not operating as described, or not producing evidence.</p></li>
+<li><p><strong>Incidental personal use</strong> — limited personal use of Company systems that does not interfere with work, cost the Company anything material, or put Company or client information at risk.</p></li>
+<li><p><strong>Information Security Steering Committee</strong> — the Company's oversight body for information security. At the Company's current size, the Committee comprises the CEO, and every reference in this policy to a decision, approval, review or report of the Committee is satisfied by a dated written record made or confirmed by the CEO; a formal meeting is not required. The Committee's composition is reviewed as the Company grows, and additional members are appointed when an oversight member independent of security operations becomes available. [SOC 2: CC1.2, CC1.3]</p></li>
+<li><p><strong>Personnel</strong> — employees, officers, contractors, consultants, interns and temporary workers of the Company.</p></li>
+<li><p><strong>Security Officer</strong> — the individual accountable for day-to-day operation of the security program.</p></li>
+<li><p><strong>Shadow IT</strong> — a service adopted for Company work without being assessed and added to the inventory.</p></li>
+</ol>
+<h1 id="what-good-use-looks-like">What Good Use Looks Like</h1>
+<p>Five things carry almost all the risk. If these hold, the rest is judgement.</p>
+<ol type="1">
+<li><p>Company and client work happens in Company accounts, not personal ones. Not personal email, not personal cloud storage, not a personal AI account. [SOC 2: CC6.7 · C1.1]</p></li>
+<li><p>Client information stays in Google Workspace, AWS and GitHub rather than on anyone's laptop. Where a local copy is needed to do the work, it is deleted when it is no longer needed. [SOC 2: CC6.7, CC6.5]</p></li>
+<li><p>Credentials are not shared, not reused from personal accounts, and not put in code, tickets or chat. Where a secret must be shared, it goes through the password manager. [SOC 2: CC6.1, CC6.7]</p></li>
+<li><p>Multi-factor authentication stays on, and people sign in through the Company identity provider rather than creating separate logins. [SOC 2: CC6.1]</p></li>
+<li><p>Anything that looks wrong — a suspicious message, a mistaken send, an account behaving oddly — is reported to the Accountable Party the same day. Reporting a mistake promptly is treated as doing the right thing, not as the mistake. [SOC 2: CC2.2, CC7.3]</p></li>
+</ol>
+<h1 id="personal-use-and-personal-devices">Personal Use and Personal Devices</h1>
+<p>People use their own laptops and phones, and the Company does not manage them. It protects information by controlling where the information sits and who can reach it, not by controlling the device.</p>
+<ol type="1">
+<li><p>Incidental personal use of Company systems is fine. Personal use that costs the Company money, interferes with the work, or puts client information at risk is not. [SOC 2: CC1.1]</p></li>
+<li><p>On a personal device, keep the protections the operating system already offers switched on: such as, disk encryption, a screen lock, and automatic updates, as applicable. Nothing needs to be installed, and the Company does not inspect the device. [SOC 2: CC6.8, CC6.4]</p></li>
+<li><p>Company work is not done in a shared profile, and Company accounts are not signed into on someone else's device. [SOC 2: CC6.1]</p></li>
+<li><p>Information classified Restricted is handled only on equipment the Company provides. If a role needs that, the Company provides the equipment. [SOC 2: CC6.1, CC6.4]</p></li>
+<li><p>Report a lost or stolen device, or a password that may have been exposed, within a day. The Company signs the accounts out and resets credentials; it does not wipe personal devices. [SOC 2: CC7.4]</p></li>
+</ol>
+<h1 id="using-ai-tools">Using AI Tools</h1>
+<p>AI tools are part of how the work gets done here, and this Policy is written to keep them usable rather than to discourage them.</p>
+<ol type="1">
+<li><p>Use AI tools through Company accounts. Do not put Company or client information into free or consumer tiers, where the terms usually allow the provider to train on what is submitted. [SOC 2: CC6.7 · C1.1]</p></li>
+<li><p>Which tools are approved, and what classification of information each may receive, is maintained under the AI Governance Policy. This Policy does not keep a second list. [SOC 2: CC1.1, CC9.2]</p></li>
+<li><p>Adding a genuinely useful tool is encouraged; adding it without saying so is not. Ask the Accountable Party and it can usually be assessed the same week. [SOC 2: CC9.2, CC2.1]</p></li>
+<li><p>A named person stays accountable for anything an AI tool produces that the Company relies on. Do not present AI output as verified unless you verified it. [SOC 2: CC1.1]</p></li>
+<li><p>Where an agent or automation acts on Company systems, it runs under its own identity with only the access it needs, and a named person owns it. Ownership passes to someone else before that person's access is removed. [SOC 2: CC6.1, CC1.3]</p></li>
+</ol>
+<h1 id="software-services-and-access">Software, Services and Access</h1>
+<ol type="1">
+<li><p>Connecting a third-party application to Google Workspace or GitHub requires approval, because a connected app inherits the access of the person who connected it. The allow-list is maintained under the Asset Management Policy. [SOC 2: CC6.8, CC9.2]</p></li>
+<li><p>Use licensed, supported software for Company work. What is installed on a personal device otherwise is that person's business. [SOC 2: CC6.8]</p></li>
+<li><p>Do not install anything that captures or forwards Company or client information — screen recorders, keyloggers, clipboard or browser-history syncing to a personal account. [SOC 2: CC6.8, CC6.7]</p></li>
+<li><p>Production access in AWS, and administrative access in Google Workspace or GitHub, is granted only where a role needs it and is approved separately. [SOC 2: CC6.1, CC6.3]</p></li>
+<li><p>Do not work around a control. If a control is stopping legitimate work, say so — that is a problem with the control, and it will be looked at. [SOC 2: CC1.1, CC5.3]</p></li>
+</ol>
+<h1 id="what-is-not-acceptable">What Is Not Acceptable</h1>
+<p>The list is short on purpose. These are the things that cause real harm.</p>
+<ol type="1">
+<li><p>Accessing client information, you have no engagement reason to look at, or looking out of curiosity. [SOC 2: CC6.1 · C1.1]</p></li>
+<li><p>Taking client information, credentials, assessment evidence or tooling output with you when an engagement ends. [SOC 2: CC6.5 · C1.2]</p></li>
+<li><p>Using Company systems for anything unlawful, or for harassment, discrimination or intimidation. [SOC 2: CC1.1]</p></li>
+<li><p>Testing, scanning or probing any system the Company has not been engaged to test. [SOC 2: CC1.1, CC6.1]</p></li>
+<li><p>Sharing an account or letting someone else act under your identity. [SOC 2: CC6.1, CC6.2]</p></li>
+</ol>
+<h1 id="monitoring-and-privacy">Monitoring and Privacy</h1>
+<p>The Company monitors its own systems and says here exactly what that means. Monitoring that is not disclosed is neither lawful nor trusted.</p>
+<ol type="1">
+<li><p>The Company logs authentication, administrative actions and access to its own systems — Google Workspace, AWS and GitHub — to protect Company and client information. [SOC 2: CC7.2 · GDPR Art. 6(1)(f), 13]</p></li>
+<li><p>The Company does not monitor personal devices and collects nothing from them. It does not read personal email, browse history, or track location. [SOC 2: C1.1 · GDPR Art. 5(1)(c)]</p></li>
+<li><p>Logs may be looked at for security reasons, not to measure how people spend their time. [SOC 2: CC7.2 · GDPR Art. 5(1)(b)]</p></li>
+<li><p>Where monitoring reveals a possible policy breach, it is handled under the Code of Conduct, with the finding, the decision and the reason recorded. [SOC 2: CC1.1, CC1.5]</p></li>
+</ol>
+<h1 id="acknowledgement">Acknowledgement</h1>
+<ol type="1">
+<li><p>Everyone accepts this Policy when they join and once a year after that, in the same acknowledgment that covers the Code of Conduct. There is no separate form. [SOC 2: CC1.5, CC2.2, CC1.4]</p></li>
+<li><p>The acknowledgment record shows the individual, the version accepted and the date and is reset when this Policy materially changes. [SOC 2: CC1.1, CC2.2]</p></li>
+</ol>
+<h1 id="enforcement">Enforcement</h1>
+<ol type="1">
+<li><p>A breach of this Policy is handled under the Code of Conduct: The Security Officer sets out the finding and recommends, the CEO decides and records the decision and the reason, and comparable cases are treated comparably. [SOC 2: CC1.1, CC1.5]</p></li>
+<li><p>Reporting your own mistake early is treated as cooperation. Concealing one is the thing that attracts a consequence. [SOC 2: CC1.1]</p></li>
+</ol>
+<h1 id="exceptions">Exceptions</h1>
+<p>Where a requirement of this Policy blocks legitimate work, an exception is recorded by the Accountable Party with the reason, the compensating measure and a review date, rather than being worked around silently. A line in the exception register is sufficient. Where no exceptions are in force, that is recorded affirmatively at the annual review.</p>
+<h1 id="reference">Reference</h1>
+<ol type="1">
+<li><p>SOC 2 Trust Services Criteria, Security category [CC1.1, CC1.4, CC1.5, CC2.2, CC6.1, CC6.7, CC6.8, CC7.2]</p></li>
+<li><p>POL-ISP-001 Information Security Policy [SOC 2: CC5.3]</p></li>
+<li><p>POL-COC-001 Code of Conduct [SOC 2: CC1.1, CC1.5]</p></li>
+<li><p>POL-AM-001 Asset Management Policy [SOC 2: CC6.8]</p></li>
+<li><p>POL-AC-001 Access Control Policy [SOC 2: CC6.1, CC6.3]</p></li>
+<li><p>POL-AI-001 Artificial Intelligence Governance Policy [SOC 2: CC9.2]</p></li>
+<li><p>POL-DCL-001 Data Classification Policy [SOC 2: CC6.7]</p></li>
+<li><p>POL-LOG-001 Logging and Monitoring Policy [SOC 2: CC7.2]</p></li>
+<li><p>HIPAA Security Rule, 45 CFR §164.310(b) and §164.312(a)</p></li>
+<li><p>EU General Data Protection Regulation, Articles 5, 6 and 13</p></li>
+</ol>
+<h1 id="document-policy-history">Document Policy History</h1>
+<table>
+<colgroup>
+<col style="width: 15%"/>
+<col style="width: 24%"/>
+<col style="width: 60%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Version</strong></th>
+<th><strong>Date</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1.0</td>
+<td>August 18, 2026</td>
+<td>Initial policy release</td>
+</tr>
+</tbody>
+</table>
+
+    </article>
+  </div>
+</div>
+
+<footer><div class="fi">
+  <span>PromptHalo Technologies · 6475 Preston Rd, Unit 140, Frisco, TX 75034</span>
+  <span>security@prompthalo.com</span>
+</div></footer>
+</body>
+</html>
