@@ -111,9 +111,11 @@ python3 tools/policy2html.py POLICY.docx trustcenter/policies/output.html \
 it out of `index.html` (`const LOGOS = { ph: '…' }`).
 
 The script reads the DOCUMENT INFORMATION table for the header pills, builds a
-live sidebar table of contents from the headings, and strips three things that
-should not be public: the letterhead image, Word's static table of contents, and
-the **signature column** of the approvals table.
+live sidebar table of contents from the headings, and starts the published copy
+at the first numbered section (**Overview and Purpose**). It strips what should
+not appear on a public page: the letterhead image, Word's static table of
+contents, the approvals table and signature column, the compliance preamble, the
+document validity notice, and any **Annex** section.
 
 `tools/build_cvd.py` regenerates the Coordinated Vulnerability Disclosure page,
 which was authored directly rather than converted from Word.
@@ -146,16 +148,24 @@ Because these pages are renderings of controlled `.docx` files, the published
 copy must not be edited independently of its source. Revise the source
 documents and re-render with `policy2html.py`.
 
-**3 — Retention figures.** The Data & privacy panel in `index.html` carries
+**3 — Annex A references in the ISP.** Annex A is stripped from published pages
+(it is an internal criteria-mapping register). The Information Security Policy
+body still refers to it nine times, including *"No security policy or standard is
+effective unless it is recorded in Annex A."* A reader now meets repeated
+references to a document they cannot see. Cheapest fix: add one line to section 6
+of the source noting that Annex A is maintained internally and available under
+NDA.
+
+**4 — Retention figures.** The Data & privacy panel in `index.html` carries
 bracketed placeholders (`[30]` days deletion, `[35]` day backup cycle,
 `[12]` month log retention). The published Data Retention policy has the real
 figures. Reconcile — a reviewer will open both.
 
-**4 — Reliability commitments.** The availability and RTO/RPO rows are
+**5 — Reliability commitments.** The availability and RTO/RPO rows are
 deliberately unfilled. Do not publish an availability figure that is not
 measured.
 
-**5 — Product description.** The hero describes PromptHalo Litmus as automated
+**6 — Product description.** The hero describes PromptHalo Litmus as automated
 penetration testing of applications and cloud. Confirm this matches the current
 product before publishing.
 
@@ -168,6 +178,8 @@ Checked before packaging:
 - JavaScript parses (`node --check`)
 - HTML tag structure balanced on all 18 pages
 - All 17 policy links from `index.html` resolve to files that exist
+- Every policy page back-links to the Trust Center
 - No external network dependencies
+- Verified from a clean extraction of this archive, not from a working copy
 
 Contact: security@prompthalo.com
