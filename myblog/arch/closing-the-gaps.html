@@ -180,6 +180,17 @@ details.rowfold[open] > summary::after{content:"\2013"}
 details.rowfold > summary:hover{color:var(--amber)}
 details.rowfold > summary + .row{border-top:1px dashed var(--line)}
 
+/* ---------- collapsible traceability table (section 06) ---------- */
+details.tablefold{margin-top:22px;background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+details.tablefold > summary{list-style:none;cursor:pointer;padding:15px 46px 15px 22px;position:relative;font-size:13.5px;font-weight:600;color:var(--petrol-900)}
+details.tablefold > summary::-webkit-details-marker{display:none}
+details.tablefold > summary::after{content:"+";position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--muted);line-height:1}
+details.tablefold[open] > summary::after{content:"\2013"}
+details.tablefold > summary:hover{background:var(--petrol-100)}
+details.tablefold .foldbody{padding:2px 22px 20px;border-top:1px solid var(--line)}
+details.tablefold .foldbody .sec-sub{margin:14px 0 14px;font-size:14px}
+details.tablefold table.ev{border-left:none;border-right:none;border-bottom:none}
+
 /* ---------- gap tabs ---------- */
 .tabs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 22px}
 .tab{font-size:13px;font-weight:600;padding:9px 17px;border:1px solid var(--line);background:var(--paper);color:var(--muted);border-radius:5px;cursor:pointer}
@@ -214,6 +225,7 @@ footer b{color:#fff}
   nav,.mat-tools,.tabs{display:none}
   .gap-panel{display:block!important}
   .gap-panel + .gap-panel{break-before:page}
+  details.tablefold > summary::after{display:none}
   details.layer > summary::after, details.rowfold > summary::after{display:none}
   .tools-layer{display:inline!important}
   section{padding:18px 0;break-inside:avoid}
@@ -247,7 +259,6 @@ section#gaps{padding-top:38px}
 
 <div class="wrap">
 <section id="gaps">
-  <p class="sec-sub">Six domains, seven conditions each. Read every diagram left to right: the condition, the road and guardrail that remove it, the state it converges on.</p>
   <div class="tabs" role="tablist" aria-label="Security domain">
     <button class="tab" role="tab" id="tab-identity" data-panel="gp-identity" aria-controls="gp-identity" aria-selected="true">Identity</button>
     <button class="tab" role="tab" id="tab-network" data-panel="gp-network" aria-controls="gp-network" aria-selected="false">Network</button>
@@ -362,7 +373,10 @@ section#gaps{padding-top:38px}
 </svg>
   </div>
 
-  <p class="sec-sub" style="margin-top:22px">Why each condition persists, what removes it, and the number that proves it is gone.</p>
+  <details class="tablefold">
+    <summary>Why each condition persists, and the proof it is gone</summary>
+    <div class="foldbody">
+      <p class="sec-sub">Why each condition persists, what removes it, and the number that proves it is gone.</p>
 
   <div class="table-scroll">
 <table class="ev dense">
@@ -486,7 +500,10 @@ section#gaps{padding-top:38px}
   </g>
 </svg>
   </div>
-  <p class="sec-sub" style="margin-top:20px">Read the middle column as a work queue.</p>
+  <details class="tablefold">
+    <summary>Why each condition persists, and the proof it is gone</summary>
+    <div class="foldbody">
+      <p class="sec-sub">Read the middle column as a work queue.</p>
 <div class="table-scroll">
 <table class="ev dense">
   <thead><tr><th>Condition today</th><th>Why it persists</th><th>Proof it is gone</th></tr></thead>
@@ -501,6 +518,10 @@ section#gaps{padding-top:38px}
   </tbody>
 </table>
 </div>
+    </div>
+  </details>
+    </div>
+  </details>
 </div>
 
 <div class="gap-panel" id="gp-cloud" role="tabpanel" aria-labelledby="tab-cloud">
@@ -605,7 +626,10 @@ section#gaps{padding-top:38px}
   </g>
 </svg>
   </div>
-  <p class="sec-sub" style="margin-top:20px">Note how many resolve at account creation rather than at deployment. That is where the leverage is.</p>
+  <details class="tablefold">
+    <summary>Why each condition persists, and the proof it is gone</summary>
+    <div class="foldbody">
+      <p class="sec-sub">Note how many resolve at account creation rather than at deployment. That is where the leverage is.</p>
 <div class="table-scroll">
 <table class="ev dense">
   <thead><tr><th>Condition today</th><th>Why it persists</th><th>Proof it is gone</th></tr></thead>
@@ -620,6 +644,8 @@ section#gaps{padding-top:38px}
   </tbody>
 </table>
 </div>
+    </div>
+  </details>
 </div>
 
 <div class="gap-panel" id="gp-appsec" role="tabpanel" aria-labelledby="tab-appsec">
@@ -725,7 +751,10 @@ section#gaps{padding-top:38px}
   </g>
 </svg>
   </div>
-  <p class="sec-sub" style="margin-top:20px">The section that carries the most external weight in a regulated product estate.</p>
+  <details class="tablefold">
+    <summary>Why each condition persists, and the proof it is gone</summary>
+    <div class="foldbody">
+      <p class="sec-sub">The section that carries the most external weight in a regulated product estate.</p>
 <div class="table-scroll">
 <table class="ev dense">
   <thead><tr><th>Condition today</th><th>Why it persists</th><th>Proof it is gone</th></tr></thead>
@@ -740,6 +769,8 @@ section#gaps{padding-top:38px}
   </tbody>
 </table>
 </div>
+    </div>
+  </details>
 </div>
 
 <div class="gap-panel" id="gp-data" role="tabpanel" aria-labelledby="tab-data">
@@ -846,7 +877,10 @@ section#gaps{padding-top:38px}
   </g>
 </svg>
   </div>
-  <p class="sec-sub" style="margin-top:20px">Unusually honest middle column: several of these persist because the non-compliant option solves a real problem.</p>
+  <details class="tablefold">
+    <summary>Why each condition persists, and the proof it is gone</summary>
+    <div class="foldbody">
+      <p class="sec-sub">Unusually honest middle column: several of these persist because the non-compliant option solves a real problem.</p>
 <div class="table-scroll">
 <table class="ev dense">
   <thead><tr><th>Condition today</th><th>Why it persists</th><th>Proof it is gone</th></tr></thead>
@@ -861,6 +895,8 @@ section#gaps{padding-top:38px}
   </tbody>
 </table>
 </div>
+    </div>
+  </details>
 </div>
 
 <div class="gap-panel" id="gp-ai" role="tabpanel" aria-labelledby="tab-ai">
@@ -966,7 +1002,10 @@ section#gaps{padding-top:38px}
   </g>
 </svg>
   </div>
-  <p class="sec-sub" style="margin-top:20px">Every condition here has an analogue in identity or AppSec. That is the argument for treating AI as a domain, not a novelty.</p>
+  <details class="tablefold">
+    <summary>Why each condition persists, and the proof it is gone</summary>
+    <div class="foldbody">
+      <p class="sec-sub">Every condition here has an analogue in identity or AppSec. That is the argument for treating AI as a domain, not a novelty.</p>
 <div class="table-scroll">
 <table class="ev dense">
   <thead><tr><th>Condition today</th><th>Why it persists</th><th>Proof it is gone</th></tr></thead>
@@ -981,6 +1020,8 @@ section#gaps{padding-top:38px}
   </tbody>
 </table>
 </div>
+    </div>
+  </details>
 </div>
 
 <script>
