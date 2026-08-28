@@ -106,7 +106,7 @@ SECTIONS = [
 <tbody>
 <tr><td>Vulnerability reports</td><td><a href="mailto:security@prompthalo.com">security@prompthalo.com</a></td><td>PGP key referenced in security.txt</td></tr>
 <tr><td>Active incident affecting your data</td><td><a href="mailto:security@prompthalo.com">security@prompthalo.com</a></td><td>Put <strong>INCIDENT</strong> in the subject line</td></tr>
-<tr><td>Trust desk and document requests</td><td><a href="mailto:trust@prompthalo.com">trust@prompthalo.com</a></td><td>Response within 2 business days</td></tr>
+<tr><td>Trust desk and document requests</td><td><a href="mailto:security@prompthalo.com">security@prompthalo.com</a></td><td>Response within 2 business days</td></tr>
 </tbody>
 </table>
 <p>PromptHalo Technologies · 6475 Preston Rd, Unit 140 · Frisco, TX 75034, USA</p>

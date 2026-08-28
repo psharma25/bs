@@ -840,7 +840,7 @@ const DEFAULTS = {
     cvdRecord:[],
     assistantEndpoint:"",
     secTxtDomain:"prompthalo.com",
-    trustEmail:"trust@prompthalo.com",
+    trustEmail:"security@prompthalo.com",
     securityEmail:"security@prompthalo.com",
     docs:[
       {n:"Information Security Policy", s:"POL-ISP-001 \u00b7 the governing policy for the programme", gate:"Public", href:"policies/information-security-policy.html"},
@@ -873,8 +873,8 @@ const DEFAULTS = {
     ],
     contacts:[
       ["Security reports","security@prompthalo.com","PGP key in security.txt"],
-      ["Trust desk / document requests","trust@prompthalo.com","Responses within 2 business days"],
-      ["Privacy requests","privacy@prompthalo.com","Requests honored within 30 days"]
+      ["Trust desk / document requests","security@prompthalo.com","Responses within 2 business days"],
+      ["Privacy requests","security@prompthalo.com","Requests honored within 30 days"]
     ]
   },
 };
@@ -996,7 +996,7 @@ function renderBrand(){
     + rowAdd("subs", 4);
   $("secTxt").innerHTML =
     `# https://${esc(b.secTxtDomain)}/.well-known/security.txt<br>` +
-    `Contact: mailto:${esc(b.securityEmail || "security@example.com")}<br>` +
+    `Contact: mailto:${esc(b.securityEmail || "security@prompthalo.com")}<br>` +
     `Expires: 2027-07-25T00:00:00Z<br>` +
     `Preferred-Languages: en<br>` +
     `Policy: https://${esc(b.secTxtDomain)}/trustcenter/policies/vulnerability-disclosure.html<br>` +
@@ -1095,7 +1095,7 @@ const BLANKS = {
   data:["Category","Handling"],
   reliability:["Area","Commitment"],
   subs:["Vendor","Purpose","Region","Safeguards"],
-  contacts:["Channel","name@example.com","Note"]
+  contacts:["Channel","security@prompthalo.com","Note"]
 };
 const CYCLES = { status:["ok","progress","align","plan"], gate:["NDA","Public"] };
 
@@ -1211,7 +1211,7 @@ $("reqSend").addEventListener("click", () => {
   box.push({brand: viewKey, when: new Date().toISOString().slice(0,16).replace("T"," "), doc, company});
   try { localStorage.setItem("tc.outbox", JSON.stringify(box)); } catch(e){}
   renderOutbox();
-  window.location.href = `mailto:${b.trustEmail || "trust@example.com"}?subject=${subject}&body=${body}`;
+  window.location.href = `mailto:${b.trustEmail || "security@prompthalo.com"}?subject=${subject}&body=${body}`;
   toast("Request drafted in your mail client and logged locally");
 });
 
@@ -1241,7 +1241,7 @@ $("vSend").addEventListener("click", () => {
   box.push({brand: viewKey, when: new Date().toISOString().slice(0,16).replace("T"," "), ref, sev, asset});
   try { localStorage.setItem("tc.vulnbox", JSON.stringify(box)); } catch(e){}
   renderVbox();
-  window.location.href = `mailto:${b.securityEmail || "security@example.com"}?subject=${subject}&body=${body}`;
+  window.location.href = `mailto:${b.securityEmail || "security@prompthalo.com"}?subject=${subject}&body=${body}`;
   toast(`Report ${ref} drafted in your mail client`);
 });
 
