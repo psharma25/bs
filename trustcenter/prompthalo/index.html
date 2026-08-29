@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trust Center — PromptHalo</title>
+<meta name="description" content="Security, compliance, privacy, and reliability for PromptHalo.">
+<style>
+:root{
+  --paper:#f5f7f9; --card:#ffffff;
+  --ink:#16232e; --ink-soft:#44586a; --ink-faint:#6d8092;
+  --petrol:#1b4965; --petrol-deep:#12344a;
+  --ok:#2e7d5b; --ok-tint:#eaf5ef;
+  --progress:#b07d2a; --progress-tint:#faf3e4;
+  --align:#3d6b8f; --align-tint:#edf3f8;
+  --plan:#6d8092; --plan-tint:#f0f3f5;
+  --line:#dbe3e9; --line-soft:#e9eef2;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Menlo,Consolas,monospace;
+  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --accent:var(--petrol); --accent-tint:#eef4f8;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(18,52,74,.05),0 6px 18px rgba(18,52,74,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:86px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);font-size:15px;line-height:1.62;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+button{font-family:inherit}
+
+/* ---------- Header ---------- */
+.topbar{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar-inner{max-width:1080px;margin:0 auto;padding:0 24px;height:66px;display:flex;align-items:center;gap:26px}
+.brand-lockup{display:flex;align-items:center;gap:10px;min-width:0}
+.brand-lockup svg{flex:none}
+.brand-name{font-weight:800;font-size:16px;letter-spacing:-.01em;white-space:nowrap}
+.brand-sub{font-size:11px;color:var(--ink-faint);font-family:var(--mono);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.brand-text{display:flex;flex-direction:column;line-height:1.25}
+.nav{display:flex;align-items:center;gap:6px;margin-left:auto}
+.menu{position:relative}
+.menu>button{border:0;background:transparent;cursor:pointer;padding:9px 13px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--ink-soft);display:flex;align-items:center;gap:6px}
+.menu>button:hover,.menu>button[aria-expanded="true"]{background:var(--line-soft);color:var(--ink)}
+.menu>button .car{font-size:9px;transition:transform .15s}
+.menu>button[aria-expanded="true"] .car{transform:rotate(180deg)}
+.menu-list{position:absolute;top:calc(100% + 8px);right:0;min-width:230px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 40px rgba(18,52,74,.16);padding:7px;display:none;z-index:70}
+.menu-list.open{display:block}
+.menu-list a,.menu-list button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:transparent;cursor:pointer;padding:9px 11px;border-radius:8px;font-size:13.5px;color:var(--ink);font-weight:550}
+.menu-list a:hover,.menu-list button:hover{background:var(--accent-tint);text-decoration:none}
+.menu-list .m-note{font-size:11px;color:var(--ink-faint);font-weight:400;display:block}
+.menu-list .m-sep{height:1px;background:var(--line-soft);margin:6px 4px}
+.menu-list .m-label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);padding:6px 11px 3px}
+.menu-list .checked{color:var(--accent);font-weight:700}
+.cta{border:1px solid var(--accent);background:var(--accent);color:#fff;font-size:13px;font-weight:650;padding:9px 16px;border-radius:9px;cursor:pointer;white-space:nowrap}
+.cta:hover{filter:brightness(1.1);text-decoration:none;color:#fff}
+
+/* ---------- Layout ---------- */
+main{max-width:1080px;margin:0 auto;padding:34px 24px 90px}
+
+/* ---------- Hero frame ---------- */
+.hero-frame{background:linear-gradient(180deg,#fff, #fdfefe);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:38px 40px 34px;position:relative;overflow:hidden}
+.hero-frame::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:linear-gradient(90deg,var(--accent),transparent 70%)}
+.hero-eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.hero-eyebrow::after{content:"";height:1px;flex:1;background:var(--line)}
+h1{font-size:33px;line-height:1.16;letter-spacing:-.022em;font-weight:800;max-width:680px}
+.hero p.lede{margin-top:14px;font-size:16.5px;color:var(--ink-soft);max-width:680px}
+.hero-meta{margin-top:16px;font-family:var(--mono);font-size:12px;color:var(--ink-faint)}
+.hero-meta:empty{display:none}
+.hero-meta strong{color:var(--ink-soft);font-weight:600}
+.pillars{margin-top:28px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.pillar{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 16px;display:block;color:inherit;box-shadow:var(--shadow)}
+.pillar:hover{text-decoration:none;border-color:var(--accent);background:#fff}
+.pillar .p-ico{width:32px;height:32px;border-radius:8px;background:var(--accent-tint);display:flex;align-items:center;justify-content:center;margin-bottom:10px;color:var(--accent)}
+.pillar h3{font-size:14px;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+.pillar p{font-size:12.5px;color:var(--ink-soft);margin-top:3px}
+.ledger{margin-top:26px;border:1px solid var(--line);border-radius:13px;background:#fff;overflow:hidden}
+.ledger-head{display:flex;align-items:baseline;gap:12px;padding:13px 20px;border-bottom:1px solid var(--line-soft);background:linear-gradient(to right,var(--accent-tint),transparent 60%)}
+.ledger-head h2{font-size:12.5px;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.ledger-head span{font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);margin-left:auto}
+.ledger-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.seal-cell{padding:17px 20px;border-right:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);display:flex;gap:14px;align-items:flex-start}
+.seal-cell svg{flex:none;margin-top:2px}
+.seal-name{font-weight:700;font-size:13.5px}
+.seal-scope{font-size:12px;color:var(--ink-faint);margin-top:1px}
+.seal-status{display:inline-block;margin-top:7px;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:2.5px 8px;border-radius:5px;font-weight:600}
+.seal-req{background:none;border:0;border-bottom:1px solid #c5d3dd;padding:0;cursor:pointer;font-family:var(--mono);font-size:11px;color:var(--petrol)}.seal-link+.seal-link{margin-left:12px}
+.seal-link{display:inline-block;margin-top:7px;font-family:var(--mono);font-size:11px;color:var(--petrol);text-decoration:none;border-bottom:1px solid #c5d3dd}.seal-link:hover{border-color:var(--petrol)}
+.seal-date{font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:6px}
+.st-ok{color:var(--ok);background:var(--ok-tint)}
+.st-progress{color:var(--progress);background:var(--progress-tint)}
+.st-align{color:var(--align);background:var(--align-tint)}
+.st-plan{color:var(--plan);background:var(--plan-tint)}
+.hero-note{margin-top:14px;font-size:12px;color:var(--ink-faint);font-family:var(--mono)}
+
+/* ---------- Divider between frames ---------- */
+.sep{display:flex;align-items:center;gap:14px;margin:30px 6px 0;color:var(--ink-faint)}
+.sep::before,.sep::after{content:"";height:1px;flex:1;background:var(--line)}
+.sep span{font-family:var(--mono);font-size:10px;letter-spacing:.28em}
+
+/* ---------- Collapsible section panels ---------- */
+details.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-top:30px;overflow:hidden}
+details.panel>summary{cursor:pointer;list-style:none;padding:20px 26px;display:flex;align-items:center;gap:16px}
+details.panel>summary::-webkit-details-marker{display:none}
+.p-head{flex:1;min-width:0}
+.p-head .kicker{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:3px}
+.p-head h2{font-size:19px;letter-spacing:-.015em;font-weight:800}
+.chev{flex:none;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--ink-soft);transition:transform .18s;background:#fff}
+details.panel[open]>summary .chev{transform:rotate(180deg)}
+details.panel>summary:hover .chev{border-color:var(--accent);color:var(--accent)}
+.adm-edit{flex:none;display:none;border:1px solid var(--line);background:#fff;color:var(--ink-soft);font-size:11.5px;font-weight:650;padding:5px 12px;border-radius:7px;cursor:pointer;font-family:var(--mono)}
+body.admin .adm-edit{display:inline-block}
+.adm-edit:hover{border-color:var(--accent);color:var(--accent)}
+.panel-body{padding:6px 26px 26px;border-top:1px solid var(--line-soft)}
+.panel-body>p.intro{margin:16px 0 4px;color:var(--ink-soft);max-width:680px}
+.panel-body>p.intro:empty{display:none}
+
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.practice{background:var(--paper);border:1px solid var(--line);border-radius:11px;overflow:hidden;align-self:start}
+.practice>summary{list-style:none;cursor:pointer;padding:15px 18px;display:flex;align-items:center;gap:10px}
+.practice>summary::-webkit-details-marker{display:none}
+.practice>summary:hover{background:#eef2f5}
+.practice>summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.practice h3{font-size:14px;font-weight:700;display:flex;align-items:center;gap:9px}
+.practice h3 .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
+.practice .prac-chev{margin-left:auto;color:var(--ink-faint);font-size:12px;transition:transform .18s ease}
+.practice[open]>summary .prac-chev{transform:rotate(180deg)}
+.practice .prac-body{padding:0 18px 16px}
+.practice p{font-size:13.5px;color:var(--ink-soft)}
+.prac-link{display:inline-block;margin-top:11px;font-size:12.5px;font-weight:600;color:var(--accent-deep);text-decoration:none;border-bottom:1px solid rgba(126,99,168,.35);padding-bottom:1px}
+.prac-link:hover{border-bottom-color:var(--accent-deep)}
+@media (prefers-reduced-motion:reduce){.practice .prac-chev{transition:none}}
+.tbl{margin-top:18px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;text-align:left;padding:11px 18px;border-bottom:1px solid var(--line);background:var(--paper)}
+td{padding:12px 18px;border-bottom:1px solid var(--line-soft);vertical-align:top;color:var(--ink-soft)}
+td:first-child{color:var(--ink);font-weight:600}
+tr:last-child td{border-bottom:0}
+td .sub{display:block;font-size:12px;color:var(--ink-faint);font-weight:400;margin-top:2px}
+.reg-list{margin-top:18px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff}
+.reg-more{margin:10px 0 0}.reg-more a{font-family:var(--mono);font-size:12px;letter-spacing:.02em;color:var(--petrol);text-decoration:none;border-bottom:1px solid #c5d3dd}.reg-more a:hover{border-color:var(--petrol)}
+.reg-item{border-bottom:1px solid var(--line-soft)}
+.reg-item:last-child{border-bottom:0}
+.reg-item>summary{list-style:none;cursor:pointer;padding:15px 20px;display:flex;align-items:center;gap:14px}
+.reg-item>summary::-webkit-details-marker{display:none}
+.reg-item>summary:hover{background:var(--paper)}
+.reg-item>summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.reg-item .reg-chev{margin-left:auto;color:var(--ink-faint);font-size:12px;transition:transform .18s ease}
+.reg-item[open]>summary .reg-chev{transform:rotate(180deg)}
+.reg-item .reg-body{padding:0 20px 17px}
+@media (prefers-reduced-motion:reduce){.reg-item .reg-chev{transition:none}}
+.reg-name{font-weight:700;font-size:14px}
+.reg-name .sub{display:block;font-family:var(--mono);font-size:11px;color:var(--ink-faint);font-weight:500;margin-top:2px}
+.reg-item p{font-size:13.5px;color:var(--ink-soft)}
+
+.doc-group{border:1px solid var(--line);border-radius:11px;background:#fff;margin-top:18px;overflow:hidden}
+.doc-group>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:13px 20px;background:var(--paper);border-bottom:1px solid var(--line-soft)}
+.doc-group>summary::-webkit-details-marker{display:none}
+.doc-group:not([open])>summary{border-bottom:0}
+.dg-title{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:700}
+.dg-count{font-family:var(--mono);font-size:11px;color:var(--ink-faint);border:1px solid var(--line);border-radius:20px;padding:1px 8px}
+.dg-chev{margin-left:auto;color:var(--ink-faint);font-size:12px;transition:transform .18s}
+.doc-group[open]>summary .dg-chev{transform:rotate(180deg)}
+.doc-group .doc-list{margin-top:0;border:0;border-radius:0}
+.doc-list{margin-top:18px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff}
+.doc-row{display:grid;grid-template-columns:1fr auto auto;gap:16px;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line-soft)}
+.doc-row:last-child{border-bottom:0}
+.doc-name{font-weight:650;font-size:14px}
+.doc-name .sub{display:block;font-size:12px;color:var(--ink-faint);font-weight:400;margin-top:1px}
+.gate{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);border:1px solid var(--line);border-radius:5px;padding:2px 8px;white-space:nowrap}
+.gate.open{color:var(--ok);border-color:#cde6d9;background:var(--ok-tint)}
+.btn{border:1px solid var(--accent);background:var(--accent);color:#fff;font-size:12.5px;font-weight:600;padding:8px 15px;border-radius:8px;cursor:pointer;transition:filter .15s;white-space:nowrap}
+.btn:hover{filter:brightness(1.1)}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.ghost:hover{background:var(--accent-tint);filter:none}
+.btn.danger{border-color:#b3452f;background:#b3452f}
+.form-card{margin-top:16px;border:1px solid var(--line);border-radius:11px;background:#fff}
+.req-form{padding:20px;display:grid;gap:14px;grid-template-columns:1fr 1fr}
+.req-form .full{grid-column:1/-1}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:5px}
+.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-family:inherit;font-size:13.5px;background:#fff;color:var(--ink)}
+.field textarea{resize:vertical;min-height:80px}
+.field input:focus,.field textarea:focus,.field select:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
+.form-foot{grid-column:1/-1;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.form-note{font-size:12px;color:var(--ink-faint)}
+.outbox-item{font-family:var(--mono);font-size:12px;color:var(--ink-soft);padding:9px 20px;border-top:1px solid var(--line-soft);display:flex;gap:12px;align-items:baseline}
+.outbox-item .when{color:var(--ink-faint);flex:none}
+.outbox-empty{font-size:12.5px;color:var(--ink-faint);padding:10px 20px;border-top:1px solid var(--line-soft)}
+
+.cvd-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-top:18px}
+.codebox{background:var(--petrol-deep);color:#dbe9f2;border-radius:11px;padding:18px 20px;font-family:var(--mono);font-size:12.5px;line-height:1.7;position:relative;overflow:auto}
+.codebox .cbtn{position:absolute;top:10px;right:10px;border:1px solid rgba(255,255,255,.25);background:transparent;color:#dbe9f2;font-size:11px;font-family:var(--mono);padding:4px 10px;border-radius:6px;cursor:pointer}
+.codebox .cbtn:hover{background:rgba(255,255,255,.1)}
+.safeharbor{padding:16px 20px;font-size:13px;color:var(--ink-soft);border:1px solid var(--line);border-radius:11px;background:var(--paper)}
+.safeharbor strong{color:var(--ink)}
+.vdp-head{margin-top:26px;display:flex;align-items:center;gap:10px}
+.vdp-head h3{font-size:15.5px;font-weight:800}
+.vdp-head .pill{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ok);background:var(--ok-tint);border-radius:5px;padding:2px 8px;font-weight:700}
+
+details.faq{border-bottom:1px solid var(--line-soft)}
+details.faq:last-child{border-bottom:0}
+details.faq summary{cursor:pointer;padding:15px 20px;font-weight:650;font-size:14px;list-style:none;display:flex;align-items:center;gap:10px}
+details.faq summary::-webkit-details-marker{display:none}
+details.faq summary::before{content:"+";font-family:var(--mono);color:var(--accent);font-weight:600;width:14px;flex:none}
+details.faq[open] summary::before{content:"–"}
+details.faq .a{padding:0 20px 16px 44px;font-size:13.5px;color:var(--ink-soft)}
+.faq-wrap{margin-top:18px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff}
+
+/* Blueprint */
+.bp-grid{display:grid;grid-template-columns:320px 1fr;gap:26px;align-items:start;margin-top:30px}
+.wireframe{position:sticky;top:96px;border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--shadow);padding:18px}
+.wf-title{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.wf-zone{border:1.5px dashed var(--line);border-radius:9px;padding:10px;margin-bottom:10px}
+.wf-zone:last-child{margin-bottom:0}
+.wf-zone-label{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
+.wf-zone-label .z{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:var(--accent);border-radius:5px;padding:1px 7px}
+.wf-zone-label span:last-child{font-size:11.5px;font-weight:700;color:var(--ink-soft)}
+.wf-el{display:flex;align-items:center;gap:8px;background:var(--accent-tint);border:1px solid var(--line);border-radius:6px;padding:6px 9px;margin-top:6px;font-size:12px;color:var(--ink-soft);font-weight:600}
+.wf-el:first-of-type{margin-top:0}
+.wf-el .n{font-family:var(--mono);font-size:10.5px;font-weight:700;color:var(--accent);flex:none;width:18px}
+.wf-el.t2{background:#fff}
+.wf-el.t3{background:#fff;border-style:dashed;color:var(--ink-faint)}
+.bp-cat{border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff}
+.bp-cat .cat-item{padding:17px 20px;border-bottom:1px solid var(--line-soft);display:grid;grid-template-columns:44px 1fr;gap:14px}
+.bp-cat .cat-item:last-child{border-bottom:0}
+.cat-num{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent);padding-top:2px}
+.cat-item h3{font-size:14.5px;font-weight:700;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tier{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:5px;font-weight:700}
+.tier.t1{color:var(--ok);background:var(--ok-tint)}
+.tier.t2{color:var(--progress);background:var(--progress-tint)}
+.tier.t3{color:var(--plan);background:var(--plan-tint)}
+.cat-item .where{font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:2px}
+.cat-item p{font-size:13.5px;color:var(--ink-soft);margin-top:6px}
+.rs-list{border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff;margin-top:18px}
+.rs-item{padding:16px 20px;border-bottom:1px solid var(--line-soft)}
+.rs-item:last-child{border-bottom:0}
+.rs-item h3{font-size:14px;font-weight:700}
+.rs-item p{font-size:13.5px;color:var(--ink-soft);margin-top:4px}
+
+/* Admin */
+.gate-overlay{position:fixed;inset:0;background:rgba(18,35,46,.55);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.gate-overlay.show{display:flex}
+.gate-modal{background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.3);padding:26px;width:min(380px,100%)}
+.gate-modal h2{font-size:17px;font-weight:800}
+.gate-modal p{font-size:13px;color:var(--ink-soft);margin-top:6px}
+.gate-modal input{width:100%;margin-top:14px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px;font-family:var(--mono)}
+.gate-modal .row{display:flex;gap:10px;margin-top:14px;justify-content:flex-end}
+.gate-err{font-size:12.5px;color:#b3452f;margin-top:8px;display:none}
+.admin-drawer{position:fixed;top:0;right:0;bottom:0;width:min(470px,100vw);background:#fff;border-left:1px solid var(--line);box-shadow:-12px 0 40px rgba(18,52,74,.14);z-index:150;transform:translateX(102%);transition:transform .22s ease;display:flex;flex-direction:column}
+.admin-drawer.open{transform:translateX(0)}
+.admin-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;flex:none}
+.admin-head h2{font-size:15px;font-weight:800}
+.admin-head .site-tag{font-family:var(--mono);font-size:11px;color:var(--accent);background:var(--accent-tint);border-radius:5px;padding:2px 8px;font-weight:700}
+.admin-head button{margin-left:auto}
+.admin-body{overflow-y:auto;padding:14px 20px 30px;flex:1}
+.admin-note{font-size:12px;color:var(--ink-soft);background:var(--progress-tint);border:1px solid #ecd9ae;border-radius:8px;padding:10px 12px;margin-bottom:14px}
+details.adm{border:1px solid var(--line);border-radius:9px;margin-bottom:10px;background:#fff}
+details.adm summary{cursor:pointer;padding:11px 14px;font-weight:700;font-size:13.5px;list-style:none;display:flex;align-items:center;gap:9px}
+details.adm summary::-webkit-details-marker{display:none}
+details.adm summary::before{content:"▸";font-size:11px;color:var(--accent)}
+details.adm[open] summary::before{content:"▾"}
+details.adm .adm-body{padding:4px 14px 14px;border-top:1px solid var(--line-soft)}
+.adm-field{margin-top:10px}
+.adm-field label{display:block;font-size:11.5px;font-weight:600;color:var(--ink-soft);margin-bottom:4px}
+.adm-field input,.adm-field textarea{width:100%;border:1px solid var(--line);border-radius:7px;padding:8px 10px;font-size:12.5px;font-family:var(--mono);background:#fff}
+.adm-field textarea{min-height:150px;resize:vertical;line-height:1.5}
+.adm-apply{margin-top:10px;display:flex;gap:10px;align-items:center}
+.adm-msg{font-size:11.5px;font-family:var(--mono)}
+.adm-msg.ok{color:var(--ok)} .adm-msg.err{color:#b3452f}
+.admin-global{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.adm-hint{font-size:11px;color:var(--ink-faint);margin-top:6px;line-height:1.5}
+
+footer{border-top:1px solid var(--line);margin-top:70px;background:#fff}
+.foot-inner{max-width:1080px;margin:0 auto;padding:26px 24px;display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.foot-inner .sp{margin-left:auto}
+.made-by{font-size:12.5px;color:var(--ink-soft)}
+.made-by strong{font-weight:700;color:var(--ink)}
+.admin-link{border:1px solid var(--line);background:transparent;color:var(--ink-faint);font-size:11px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:6px;cursor:pointer}
+.admin-link:hover{color:var(--accent);border-color:var(--accent)}
+body.admin .admin-link{color:#fff;background:var(--accent);border-color:var(--accent)}
+.adm-sites{display:flex;gap:6px;margin-left:6px}
+.adm-sites button{border:1px solid var(--line);background:#fff;color:var(--ink-soft);font-size:11.5px;font-weight:650;padding:4px 11px;border-radius:999px;cursor:pointer}
+.adm-sites button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+footer p{font-size:12.5px;color:var(--ink-faint)}
+footer a{color:var(--ink-soft)}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--petrol-deep);color:#fff;font-size:13px;padding:10px 18px;border-radius:9px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:300;box-shadow:0 8px 24px rgba(18,52,74,.3)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (max-width:920px){
+  .topbar-inner{padding:0 14px;gap:10px}
+  .brand-sub{display:none}
+  .nav{gap:2px}
+  .menu>button{padding:8px 9px;font-size:12.5px}
+  .cta{padding:8px 11px;font-size:12px}
+  main{padding:22px 14px 70px}
+  .hero-frame{padding:26px 20px}
+  h1{font-size:26px}
+  .pillars{grid-template-columns:1fr 1fr}
+  .card-grid,.cvd-grid{grid-template-columns:1fr}
+  .wireframe{position:static}
+  .reg-item{grid-template-columns:1fr;gap:8px}
+  .doc-row{grid-template-columns:1fr;gap:8px}
+  .req-form{grid-template-columns:1fr}
+  details.panel>summary{padding:16px 18px}
+  .panel-body{padding:4px 18px 20px}
+  .menu-list{right:auto;left:0}
+}
+/* ---- Banner (full-bleed hero) ---- */
+body{overflow-x:hidden}
+.hero-frame{width:100vw;margin-left:calc(50% - 50vw);border:0;border-radius:0;box-shadow:none;background:linear-gradient(135deg,var(--accent) 0%,var(--accent-deep) 100%);padding:32px 0 48px;color:#fff}
+.hero-frame{position:relative}
+.hero-frame::before{display:block;content:"";position:absolute;inset:0;background:radial-gradient(900px 420px at 88% -12%, rgba(255,255,255,.13), transparent 62%);pointer-events:none}
+.hero-inner{position:relative}
+.hero-inner{max-width:1080px;margin:0 auto;padding:0 24px}
+.hero-frame .hero-eyebrow{color:rgba(255,255,255,.85)}
+.hero-frame .hero-eyebrow::after{background:rgba(255,255,255,.28)}
+.hero-frame h1{color:#fff}
+.hero-frame p.lede{color:rgba(255,255,255,.88)}
+.hero-frame .hero-meta{color:rgba(255,255,255,.6)}
+.hero-frame .hero-meta strong{color:rgba(255,255,255,.9)}
+.hero-frame .hero-note{color:rgba(255,255,255,.65)}
+.hero-ctas{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}
+.bbtn{display:inline-block;background:#fff;color:var(--accent);font-size:13.5px;font-weight:700;padding:11px 20px;border-radius:9px}
+.bbtn:hover{text-decoration:none;filter:brightness(.96)}
+.bbtn.o{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.55)}
+.bbtn.o:hover{background:rgba(255,255,255,.12);filter:none}
+.hero-below{margin-top:-26px;position:relative;z-index:2}
+.hero-below .pillars{margin-top:0}
+.hero-below .ledger{box-shadow:var(--shadow)}
+.hero-below .hero-note{color:var(--ink-faint)}
+/* ---- Header quick links ---- */
+.navlink{padding:9px 12px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--ink-soft)}
+.navlink:hover{background:var(--line-soft);color:var(--ink);text-decoration:none}
+/* ---- Footer ---- */
+footer{background:#12202b;border-top:0;color:#c3d2dd}
+.foot-cols{max-width:1080px;margin:0 auto;padding:44px 24px 30px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:34px}
+.fc h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#7e93a3;margin-bottom:12px;font-weight:600}
+.fc-links a{display:block;color:#c3d2dd;font-size:13.5px;padding:4px 0}
+.fc-links a:hover{color:#fff;text-decoration:none}
+.fc-logo{width:40px;height:40px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.fc-logo img,.fc-logo svg{width:26px;height:26px}
+#footTag{font-size:13px;color:#9fb2c0;max-width:280px}
+footer .made-by{margin-top:14px;font-size:12.5px;color:#7e93a3}
+footer .made-by strong{color:#e8eef3}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.1);max-width:1080px;margin:0 auto;padding:16px 24px 22px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.foot-bottom p{font-size:12px;color:#7e93a3}
+.fb-sp{margin-left:auto}
+.foot-bottom a{color:#9fb2c0;font-size:12.5px}
+.foot-bottom a:hover{color:#fff}
+footer .admin-link{border-color:rgba(255,255,255,.2);color:#7e93a3}
+footer .admin-link:hover{color:#fff;border-color:#fff}
+body.admin footer .admin-link{color:#fff;background:var(--accent);border-color:var(--accent)}
+@media (max-width:920px){
+  .hero-frame{padding:34px 0 30px}
+  .hero-inner{padding:0 16px}
+  .navlink{display:none}
+  .foot-cols{grid-template-columns:1fr 1fr;gap:24px;padding:32px 16px 22px}
+  .fc-brand{grid-column:1/-1}
+}
+/* ---- Professional polish ---- */
+.hero-frame h1{font-size:29px;line-height:1.15;letter-spacing:-.022em;max-width:730px}
+.hero-frame p.lede{font-size:14.5px;line-height:1.6;max-width:720px;margin-top:10px}
+.hero-frame .hero-eyebrow{font-size:11px}
+.bbtn{letter-spacing:.01em;padding:10px 19px;font-size:13px}
+.topbar{box-shadow:0 1px 0 rgba(18,52,74,.03)}
+.brand-name{letter-spacing:-.015em}
+.p-head h2{font-size:18px}
+.p-head .kicker{letter-spacing:.14em}
+.pillar h3{font-size:13.5px}
+.pillar p{line-height:1.55}
+.seal-name{letter-spacing:-.005em}
+.menu>button,.navlink{letter-spacing:-.005em}
+details.panel{transition:box-shadow .15s}
+details.panel:hover{box-shadow:0 2px 4px rgba(18,52,74,.06),0 10px 26px rgba(18,52,74,.09)}
+.fc h4{letter-spacing:.16em}
+@media (max-width:920px){.hero-frame h1{font-size:23px}.hero-frame{padding:24px 0 38px}}
+/* ---- Inline edit mode ---- */
+.cyc,.rowbtn,.delbtn{display:none}
+body.editing [data-path]{outline:1px dashed rgba(125,99,181,.55);outline-offset:2px;border-radius:3px;min-width:22px;display:inline-block}
+body.editing td[data-path],body.editing p[data-path],body.editing div[data-path]{display:block}
+body.editing [data-path]:hover{background:var(--accent-tint)}
+body.editing [data-path]:focus{outline:2px solid var(--accent);background:#fff;box-shadow:0 0 0 4px var(--accent-tint)}
+body.editing .hero-frame [data-path]{outline-color:rgba(255,255,255,.6)}
+body.editing .hero-frame [data-path]:focus{background:rgba(255,255,255,.14);box-shadow:none}
+body.editing .cyc{display:inline-block;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border:1px solid var(--line);background:#fff;color:var(--ink-soft);border-radius:5px;padding:1px 7px;margin-left:6px;cursor:pointer}
+body.editing .cyc:hover{border-color:var(--accent);color:var(--accent)}
+body.editing .delbtn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1px solid #e6c3bd;background:#fdf1ef;color:#b3452f;font-size:13px;line-height:1;cursor:pointer;margin-left:8px;vertical-align:middle}
+body.editing .delbtn:hover{background:#b3452f;color:#fff;border-color:#b3452f}
+body.editing .rowbtn{display:inline-flex;align-items:center;gap:6px;margin:10px 0 2px;border:1px dashed var(--line);background:#fff;color:var(--accent);font-size:12px;font-weight:650;padding:6px 12px;border-radius:7px;cursor:pointer}
+body.editing .rowbtn:hover{border-color:var(--accent);background:var(--accent-tint)}
+body.editing .practice-add{grid-column:1/-1}
+body.editing .pillar{pointer-events:none}
+body.editing .pillar [data-path]{pointer-events:auto}
+.edit-bar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(120%);background:var(--petrol-deep);color:#fff;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:12px;z-index:180;box-shadow:0 12px 34px rgba(18,52,74,.35);transition:transform .2s}
+body.editing .edit-bar{transform:translateX(-50%) translateY(0)}
+.edit-bar span{font-size:12.5px;color:#c3d2dd}
+.edit-bar b{color:#fff}
+.edit-bar button{border:1px solid rgba(255,255,255,.28);background:transparent;color:#fff;font-size:12.5px;font-weight:650;padding:6px 13px;border-radius:8px;cursor:pointer}
+.edit-bar button.pri{background:#fff;color:var(--petrol-deep);border-color:#fff}
+.edit-bar button:hover{filter:brightness(1.1)}
+.empty-note{margin-top:18px;border:1px dashed var(--line);border-radius:11px;padding:18px 20px;font-size:13.5px;color:var(--ink-soft);background:#fff}
+.sev{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;font-weight:700;padding:2px 8px;border-radius:5px;background:var(--plan-tint);color:var(--plan)}
+.sev.s-critical,.sev.s-high{background:#fdeeec;color:#b3452f}
+.sev.s-medium{background:var(--progress-tint);color:var(--progress)}
+.sev.s-low{background:var(--align-tint);color:var(--align)}
+/* ---- Assistant ---- */
+.chat-fab{position:fixed;right:22px;bottom:22px;z-index:170;display:flex;align-items:center;gap:9px;border:0;background:var(--accent);color:#fff;font-size:13.5px;font-weight:650;padding:12px 18px;border-radius:999px;cursor:pointer;box-shadow:0 10px 30px rgba(18,52,74,.28)}
+.chat-fab:hover{filter:brightness(1.08)}
+.chat-fab svg{flex:none}
+body.editing .chat-fab{display:none}
+.chat-panel{position:fixed;right:22px;bottom:22px;width:min(400px,calc(100vw - 32px));height:min(600px,calc(100vh - 44px));background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 60px rgba(18,52,74,.28);z-index:175;display:none;flex-direction:column;overflow:hidden}
+.chat-panel.open{display:flex}
+.chat-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));color:#fff}
+.chat-head h3{font-size:14px;font-weight:750}
+.chat-head p{font-size:11.5px;color:rgba(255,255,255,.8)}
+.chat-head button{margin-left:auto;border:0;background:rgba(255,255,255,.16);color:#fff;width:26px;height:26px;border-radius:7px;cursor:pointer;font-size:14px;line-height:1}
+.chat-head button:hover{background:rgba(255,255,255,.28)}
+.chat-log{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--paper)}
+.msg{max-width:88%;font-size:13.5px;line-height:1.6;padding:10px 13px;border-radius:12px;white-space:pre-wrap;word-wrap:break-word}
+.msg.bot{background:#fff;border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.me{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.msg .src{display:block;margin-top:8px;padding-top:8px;border-top:1px solid var(--line-soft);font-size:11px;color:var(--ink-faint);font-family:var(--mono)}
+.msg .src a{color:var(--accent)}
+.msg.think{color:var(--ink-faint);font-style:italic;background:transparent;border:0}
+.chat-sugg{padding:0 16px 12px;display:flex;flex-wrap:wrap;gap:7px;background:var(--paper)}
+.chat-sugg button{border:1px solid var(--line);background:#fff;color:var(--ink-soft);font-size:11.5px;padding:6px 11px;border-radius:999px;cursor:pointer;text-align:left}
+.chat-sugg button:hover{border-color:var(--accent);color:var(--accent)}
+.chat-in{border-top:1px solid var(--line);padding:11px;display:flex;gap:9px;align-items:flex-end;background:#fff}
+.chat-in textarea{flex:1;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:13.5px;resize:none;min-height:38px;max-height:110px}
+.chat-in textarea:focus{outline:2px solid var(--accent);border-color:var(--accent)}
+.chat-in button{border:0;background:var(--accent);color:#fff;width:38px;height:38px;border-radius:9px;cursor:pointer;flex:none;font-size:15px}
+.chat-in button:disabled{opacity:.5;cursor:default}
+.chat-foot{padding:8px 14px 11px;font-size:10.5px;color:var(--ink-faint);text-align:center;background:#fff;border-top:1px solid var(--line-soft)}
+@media (max-width:920px){
+  .chat-panel{right:8px;left:8px;bottom:8px;width:auto;height:min(560px,calc(100vh - 20px))}
+  .chat-fab{right:14px;bottom:14px;padding:11px 15px;font-size:12.5px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand-lockup" id="brandLockup" aria-live="polite"></div>
+    <nav class="nav" aria-label="Main">
+      <div class="menu" id="menuSections">
+        <button aria-haspopup="true" aria-expanded="false">Sections <span class="car">▾</span></button>
+        <div class="menu-list" role="menu" id="sectionsMenu"></div>
+      </div>
+      <a class="navlink" href="#documents">Documents</a>
+      <a class="navlink" href="#faq">FAQ</a>
+      <a class="cta" href="#disclosure" id="ctaReport">Report a vulnerability</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- ============ STANDARD SITE VIEW ============ -->
+  <div id="stdView">
+    <section class="hero hero-frame" id="overview">
+      <div class="hero-inner">
+      <div class="hero-eyebrow">Trust Center</div>
+      <h1 id="heroTitle"></h1>
+      <p class="lede" id="heroLede"></p>
+      <div class="hero-meta" id="heroMeta"></div>
+      <div class="hero-ctas">
+        <a class="bbtn" href="#documents">Request documents</a>
+        <a class="bbtn o" href="#disclosure">Report a vulnerability</a>
+      </div>
+      </div>
+    </section>
+
+    <div class="hero-below">
+      <div class="pillars" id="pillars"></div>
+      <div class="ledger" aria-label="Compliance ledger">
+        <div class="ledger-head"><h2>Compliance ledger</h2><span id="ledgerStamp"></span></div>
+        <div class="ledger-grid" id="ledgerGrid"></div>
+      </div>
+      <p class="hero-note">Statuses reflect the current program state. Alignment to a framework is not certification. Evidence is available under NDA — see Document requests.</p>
+    </div>
+
+    <div class="sep"><span>TRUST DETAIL</span></div>
+
+    <details class="panel" id="security" open>
+      <summary>
+        <div class="p-head"><div class="kicker">Security</div><h2>Security practices</h2></div>
+        <button class="adm-edit" data-edit="practices">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro" id="practicesIntro"></p>
+        <div class="card-grid" id="practiceGrid"></div>
+      </div>
+    </details>
+
+    <details class="panel" id="privacy">
+      <summary>
+        <div class="p-head"><div class="kicker">Privacy</div><h2>Data &amp; privacy</h2></div>
+        <button class="adm-edit" data-edit="data">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro" id="dataIntro"></p>
+        <div class="tbl"><table aria-label="Data handling summary">
+          <thead><tr><th style="width:220px">Category</th><th>Handling</th></tr></thead>
+          <tbody id="dataTable"></tbody>
+        </table></div>
+      </div>
+    </details>
+
+    <details class="panel" id="reliability">
+      <summary>
+        <div class="p-head"><div class="kicker">Reliability</div><h2>Availability &amp; resilience</h2></div>
+        <button class="adm-edit" data-edit="reliability">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro" id="reliabilityIntro"></p>
+        <div class="tbl"><table aria-label="Reliability summary">
+          <thead><tr><th style="width:220px">Area</th><th>Commitment</th></tr></thead>
+          <tbody id="reliabilityTable"></tbody>
+        </table></div>
+      </div>
+    </details>
+
+    <div class="sep"><span>OPERATIONS</span></div>
+
+    <details class="panel" id="subprocessors">
+      <summary>
+        <div class="p-head"><div class="kicker">Third parties</div><h2>Subprocessors</h2></div>
+        <button class="adm-edit" data-edit="subs">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro">Vendors that may process data in delivering the service. Each is reviewed before onboarding and annually; changes are versioned on this page.</p>
+        <div class="tbl"><table aria-label="Subprocessor list">
+          <thead><tr><th>Vendor</th><th>Purpose</th><th>Region</th><th>Safeguards</th></tr></thead>
+          <tbody id="subTable"></tbody>
+        </table></div>
+      </div>
+    </details>
+
+    <details class="panel" id="cvd-record">
+      <summary>
+        <div class="p-head"><div class="kicker">Disclosure record</div><h2>Coordinated disclosure record</h2></div>
+        <button class="adm-edit" data-edit="cvdRecord">Edit</button>
+        <span class="chev" aria-hidden="true">&#9662;</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro" id="cvdRecordIntro"></p>
+        <div id="cvdList"></div>
+      </div>
+    </details>
+
+    <details class="panel" id="advisories">
+      <summary>
+        <div class="p-head"><div class="kicker">Advisories</div><h2>Security advisories &amp; CVEs</h2></div>
+        <button class="adm-edit" data-edit="advisories">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro">Published advisories affecting this product, including our assessment of relevant third-party CVEs. Ask the assistant about a specific CVE to have it check both this list and current public sources.</p>
+        <div id="advList"></div>
+      </div>
+    </details>
+
+    <details class="panel" id="disclosure">
+      <summary>
+        <div class="p-head"><div class="kicker">Coordinated vulnerability disclosure</div><h2>Responsible disclosure</h2></div>
+        <button class="adm-edit" data-edit="__fields">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro">Good-faith security research is welcome. Reports are acknowledged within 2 business days, triaged and severity-scored, remediated on severity-based timelines (critical 7 days, high 30, medium 60, low 90), and disclosed in coordination with the reporter within 90 days by default. The full terms &mdash; scope, safe harbour, and what we commit to at each stage &mdash; are in the <a href="policies/vulnerability-disclosure.html"><strong>Coordinated Vulnerability Disclosure Policy</strong></a>.</p>
+        <div class="cvd-grid">
+          <div class="codebox" aria-label="security.txt">
+            <button class="cbtn" id="copySecTxt">Copy</button>
+            <div id="secTxt"></div>
+          </div>
+          <div class="safeharbor">
+            <strong>Safe harbor.</strong> Research conducted in good faith and within this policy will not be met with legal action. Do not access, modify, or exfiltrate data beyond what is required to demonstrate the issue; stop and report immediately if personal data is encountered.
+          </div>
+        </div>
+
+        <div class="vdp-head" id="vdpForm"><h3>Report a vulnerability</h3><span class="pill">Safe harbor applies</span></div>
+        <p class="intro" style="margin-top:6px">Submit a report below — it composes a structured email to the security team with a tracking reference, and nothing is transmitted from this page itself. Encrypted reports via the PGP key in security.txt are welcome.</p>
+        <div class="form-card">
+          <div class="req-form">
+            <div class="field"><label for="vName">Your name <span style="font-weight:400;color:var(--ink-faint)">(optional — anonymous reports accepted)</span></label><input id="vName" autocomplete="name"></div>
+            <div class="field"><label for="vEmail">Contact email <span style="font-weight:400;color:var(--ink-faint)">(for coordination)</span></label><input id="vEmail" type="email" autocomplete="email"></div>
+            <div class="field"><label for="vAsset">Affected asset / URL</label><input id="vAsset" placeholder="e.g., app.example.com/login"></div>
+            <div class="field"><label for="vSev">Your severity estimate</label>
+              <select id="vSev"><option>Critical</option><option>High</option><option selected>Medium</option><option>Low</option><option>Informational</option></select>
+            </div>
+            <div class="field full"><label for="vDesc">What you found &amp; how to reproduce it</label><textarea id="vDesc" placeholder="Steps to reproduce, impact, and any proof-of-concept detail. Please do not include others' personal data."></textarea></div>
+            <div class="form-foot">
+              <button class="btn" id="vSend">Compose vulnerability report</button>
+              <span class="form-note">Opens your mail client with a tracking reference. Response within 2 business days.</span>
+            </div>
+          </div>
+          <div>
+            <div class="outbox-empty" id="vboxEmpty">No reports logged on this device yet.</div>
+            <div id="vboxList"></div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="panel" id="documents">
+      <summary>
+        <div class="p-head"><div class="kicker">Evidence</div><h2>Document requests</h2></div>
+        <button class="adm-edit" data-edit="docs">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro">Public documents are available on request; audit evidence is shared under NDA. Requests generate a pre-filled email and are logged locally in your browser only.</p>
+        <details class="doc-group" id="docGroupPolicy"><summary><span class="dg-title">Policies</span><span class="dg-count" id="docCountPolicy"></span><span class="dg-chev" aria-hidden="true">&#9662;</span></summary><div class="doc-list" id="docListPolicy"></div></details><details class="doc-group" id="docGroupAssurance"><summary><span class="dg-title">Assurance</span><span class="dg-count" id="docCountAssurance"></span><span class="dg-chev" aria-hidden="true">&#9662;</span></summary><div class="doc-list" id="docListAssurance"></div></details>
+        <div class="form-card">
+          <div class="req-form">
+            <div class="field"><label for="reqName">Your name</label><input id="reqName" autocomplete="name"></div>
+            <div class="field"><label for="reqCompany">Company</label><input id="reqCompany" autocomplete="organization"></div>
+            <div class="field"><label for="reqEmail">Work email</label><input id="reqEmail" type="email" autocomplete="email"></div>
+            <div class="field"><label for="reqDoc">Document</label><select id="reqDoc"></select></div>
+            <div class="field full"><label for="reqNote">Context (optional)</label><textarea id="reqNote" placeholder="e.g., vendor security review"></textarea></div>
+            <div class="form-foot">
+              <button class="btn" id="reqSend">Compose request email</button>
+              <span class="form-note">Opens your mail client. Nothing is transmitted from this page.</span>
+            </div>
+          </div>
+          <div>
+            <div class="outbox-empty" id="outboxEmpty">No requests logged on this device yet.</div>
+            <div id="outboxList"></div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <div class="sep"><span>REFERENCE</span></div>
+
+    <details class="panel" id="faq">
+      <summary>
+        <div class="p-head"><div class="kicker">Common questions</div><h2>FAQ</h2></div>
+        <button class="adm-edit" data-edit="faq">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body"><div class="faq-wrap" id="faqList"></div></div>
+    </details>
+
+    <details class="panel" id="contact">
+      <summary>
+        <div class="p-head"><div class="kicker">Reach the trust desk</div><h2>Contact</h2></div>
+        <button class="adm-edit" data-edit="contacts">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <div class="tbl"><table aria-label="Contact channels"><tbody id="contactTable"></tbody></table></div>
+        <p class="intro" style="font-size:12px;color:var(--ink-faint);font-family:var(--mono)">For active incidents affecting your data, use the security contact and include "INCIDENT" in the subject line.</p>
+      </div>
+    </details>
+  </div>
+
+</main>
+
+<footer>
+  <div class="foot-cols">
+    <div class="fc fc-brand">
+      <div class="fc-logo" id="footLogo"></div>
+      <p id="footTag"></p>
+      <p class="made-by">Created by <strong>BitSense, LLC</strong></p>
+    </div>
+    <div class="fc fc-links">
+      <h4>Trust</h4>
+      <a href="https://www.prompthalo.ai/compliance/" target="_blank" rel="noopener">Compliance</a>
+      <a href="#security">Security practices</a>
+      <a href="#privacy">Data &amp; privacy</a>
+      <a href="#reliability">Reliability</a>
+    </div>
+    <div class="fc fc-links">
+      <h4>Resources</h4>
+      <a href="#documents">Document requests</a>
+      <a href="#subprocessors">Subprocessors</a>
+      <a href="#advisories">Advisories &amp; CVEs</a>
+      <a href="#cvd-record">Disclosure record</a>
+      <a href="#disclosure">Responsible disclosure</a>
+      <a href="policies/vulnerability-disclosure.html">CVD policy</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="fc fc-links">
+      <h4>Contact</h4>
+      <div id="footContacts"></div>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <p id="footBrand"></p>
+    <p id="footStamp"></p>
+    <span class="fb-sp"></span>
+    <a href="#" id="footTop">Back to top</a>
+    <button class="admin-link" id="adminLink" title="Admin sign in">Admin</button>
+  </div>
+</footer>
+
+<!-- Admin gate -->
+<div class="gate-overlay" id="gateOverlay" role="dialog" aria-modal="true" aria-label="Admin sign in">
+  <div class="gate-modal">
+    <h2>Admin access</h2>
+    <p>Enter the admin passphrase to edit this site's content.</p>
+    <input type="password" id="gatePass" placeholder="Passphrase" autocomplete="off">
+    <div class="gate-err" id="gateErr">Incorrect passphrase.</div>
+    <div class="row">
+      <button class="btn ghost" id="gateCancel">Cancel</button>
+      <button class="btn" id="gateGo">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin drawer -->
+<aside class="admin-drawer" id="adminDrawer" aria-label="Admin editor">
+  <div class="admin-head">
+    <h2>Admin</h2><span class="site-tag" id="adminSiteTag"></span>
+    <button class="btn ghost" id="adminClose">Close</button>
+  </div>
+  <div class="admin-body">
+    <div class="admin-note"><b>Edit page inline</b> lets you click any text on the page and retype it — the fastest way to correct content. The JSON editors below are for bulk changes. Edits save to this browser only (localStorage) and take effect immediately here. To publish for everyone, use <b>Export config</b> and replace the CONFIG block in the deployed file (or commit the JSON alongside it). This gate is a convenience lock, not a security boundary — for a hosted admin route, front it with Cloudflare Access.</div>
+    <div id="adminSections"></div>
+    <div class="admin-global">
+      <button class="btn" id="admInline">Edit page inline</button>
+      <button class="btn" id="admExport">Export config</button>
+      <button class="btn ghost" id="admImport">Import config</button>
+      <button class="btn ghost" id="admPass">Change passphrase</button>
+      <button class="btn danger" id="admReset">Reset this site</button>
+    </div>
+    <div class="adm-hint">Import expects the JSON produced by Export. Reset restores this site's shipped defaults on this browser. Passphrase changes apply to this browser; to change the shipped default, update ADMIN_HASH in the file.</div>
+  </div>
+</aside>
+
+<div class="edit-bar" id="editBar">
+  <span>Inline editing <b id="editSite"></b> — click any text to change it</span>
+  <button id="editDone" class="pri">Done</button>
+</div>
+
+<button class="chat-fab" id="chatFab" aria-label="Ask the trust assistant">
+  <svg width="17" height="17" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 5.5A2.5 2.5 0 0 1 5.5 3h9A2.5 2.5 0 0 1 17 5.5v6A2.5 2.5 0 0 1 14.5 14H8l-4 3.2V14H5.5A2.5 2.5 0 0 1 3 11.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M7 7.2h6M7 10h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+  Ask about security
+</button>
+
+<div class="chat-panel" id="chatPanel" role="dialog" aria-label="Trust assistant">
+  <div class="chat-head">
+    <div><h3 id="chatTitle">Trust Assistant</h3><p>Security, privacy &amp; compliance questions</p></div>
+    <button id="chatClose" aria-label="Close assistant">×</button>
+  </div>
+  <div class="chat-log" id="chatLog"></div>
+  <div class="chat-sugg" id="chatSugg"></div>
+  <div class="chat-in">
+    <textarea id="chatInput" rows="1" placeholder="Ask about SOC 2, data retention, a CVE…"></textarea>
+    <button id="chatSend" aria-label="Send">↑</button>
+  </div>
+  <div class="chat-foot">Answers are grounded in this Trust Center. Verify anything material with the trust desk.</div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+
+const LAST_UPDATED = "2026-07-25";
+const ADMIN_HASH = "244065b2cfc6c1643c2d2b218ffbe5eb620b5407632e4e0a3ba6fd6975d09cb8";
+
+const LOGOS = {
+  ph: '<img src="data:image/png;base64,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" width="34" height="34" alt="PromptHalo logo" style="display:block">'
+};
+
+const PILLAR_ICONS = {
+  security:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 2 L17 5 V10 C17 14 14 17 10 18.5 C6 17 3 14 3 10 V5 Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7.2 10.2 L9.2 12.2 L13 8.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  compliance:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="2.5" width="12" height="15" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 7 H13 M7 10 H13 M7 13 H10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+  privacy:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4.5" y="8.5" width="11" height="8.5" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 8.5 V6.5 A3 3 0 0 1 13 6.5 V8.5" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="12.7" r="1.4" fill="currentColor"/></svg>',
+  reliability:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 12 L6.5 12 L8.5 6.5 L11.5 15 L13.5 10 L17.5 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+};
+
+const DEFAULTS = {
+  ph: {
+    cfgVersion:2,
+    accent:"#7e63a8", accentTint:"#f4f0fa", accentDeep:"#4a3470",
+    name:"PromptHalo", sub:"Trust Center",
+    heroTitle:"Rapid. Continuous. Answerable to auditors.",
+    heroLede:"PromptHalo Litmus provides automated penetration testing — continuously probing your applications and cloud environment the way an attacker would, and turning findings into evidence your auditors and customers accept. Companies point Litmus at their real attack surface, so we hold ourselves to the standard our customers are measured against: documented controls, minimal data, independent examination.",
+    heroMeta:"",
+    pillars:[
+      {icon:"security", t:"Security", d:"Layered controls protecting the service and your data.", href:"#security"},
+      {icon:"compliance", t:"Compliance", d:"Frameworks and regulations we work to.", href:"https://www.prompthalo.ai/compliance/"},
+      {icon:"privacy", t:"Privacy", d:"Minimal collection, clear retention, published notice.", href:"#privacy"},
+      {icon:"reliability", t:"Reliability", d:"Resilient delivery with tested backups and rollback.", href:"#reliability"}
+    ],
+    ledger:[
+      {name:"SOC 2", scope:"Security (Common Criteria) only", status:"align", label:"Report under NDA", date:"Reviewed annually", doc:"SOC 2 report"},
+      {name:"GDPR / UK GDPR", scope:"Controller and processor activities", status:"align", label:"In scope where applicable", date:"Reviewed annually", doc:"Data Processing Addendum"},
+      {name:"ISO/IEC 27001", scope:"Information security controls", status:"align", label:"Control set aligned", date:"Reviewed annually", doc:"ISO/IEC 27001 control mapping"},
+      {name:"HIPAA", scope:"Engagements involving protected health information", status:"align", label:"Business associate where engaged", date:"BAA on request", doc:"Business associate agreement"},
+      {name:"Security program", scope:"Policies & controls", status:"ok", label:"Operating", date:"Reviewed annually"},
+      {name:"NIST AI RMF 1.0", scope:"AI governance", status:"align", label:"Aligned", date:"Reviewed annually"},
+      {name:"ISO/IEC 42001", scope:"AI management system", status:"align", label:"Aligned", date:"Reviewed annually"}
+    ],
+    practicesIntro:"Summaries of the control areas that are not published in full. Each is drawn from a policy in our library; those source documents are Internal and available under NDA on request. Where a policy is published in full, it is linked from Document requests rather than summarised here.",
+    practices:[
+      {t:"Governance & policy", d:"A complete security policy library with matching implementation plans, owned by the security lead and approved by executive leadership. Every policy carries a document ID, version, effective date and annual review date. Twelve are published in full on this page; the rest are summarised below and released under NDA.", href:"policies/information-security-policy.html"},
+      {t:"Access control", d:"Access is denied by default and granted on least privilege to a named individual identity; shared logins are not used. Approval precedes the grant and the record shows who asked, who approved, and what was granted. New joiners get a defined baseline for their role rather than a copy of a colleague\u2019s access, which is how privilege accumulates unnoticed. Authentication runs through Google Workspace SSO. Privileged access is approved separately and held apart from day-to-day accounts; break-glass credentials sit behind hardware MFA, raise an alert on use, and are recorded with a reason. Non-human identities \u2014 service accounts, automations, agents \u2014 are inventoried with a named human owner and reviewed alongside people. Production and non-production are separated at the cloud account boundary. Access is revoked within one business day of departure and immediately where the departure is involuntary.", href:"policies/access-control.html"},
+      {t:"Access to client environments", d:"Any access we hold inside a client environment exists only under the engagement agreement, is limited to the authorised scope, and is surrendered when the engagement ends. We treat standing access to a client estate as our single largest insider risk, so it is reviewed monthly rather than waiting for the quarterly cycle.", href:"policies/access-control.html"},
+      {t:"Access reviews", d:"Access within the audit boundary is reviewed on a fixed quarterly cadence, with removals actioned and the action recorded. Non-human identities and client-environment access are included in the same review rather than handled separately. A review that identifies removals and does not complete them is worse evidence than no review at all, because it shows we knew.", href:"policies/access-control.html"},
+      {t:"Change management", d:"Every in-scope change goes through a pull request that records what is changing and why; the pull request is the change record and no separate register is kept. Approval precedes implementation and comes from someone other than the author, enforced by branch protection so it cannot be skipped by accident. Production is reachable only through the pipeline \u2014 a manual console change is an emergency change by definition, recorded the same day and approved after the fact by a second person. Security impact is assessed inside the review rather than at a separate gate. The full deployment population is exportable and reviewed every six months for changes with no approver, self-approved changes, and deployments with no matching record.", href:"policies/change-management.html"},
+      {t:"Secure development", d:"Security requirements are considered at design rather than retrofitted; for anything handling client information or granting access that means a recorded conversation about how it could be misused. Static analysis and dependency scanning run on every change, and secrets are scanned on commit. Test and development environments hold no real client information \u2014 realistic data is synthetic or masked. Prompts, tool definitions and retrieval configuration are treated as code: held in the repository, reviewed, and changed through the same path. Internet-facing surfaces are tested before first exposure and again when the attack surface changes materially. Independent penetration tests are commissioned when a client agreement requires one or the service has changed enough to warrant it, not on a calendar to produce a certificate.", href:"policies/secure-sdlc.html"},
+      {t:"Cryptography", d:"TLS 1.2 minimum and 1.3 preferred, restricted to forward-secret authenticated cipher suites, with plain HTTP redirected. Confidential and Restricted information is encrypted at rest with AES-256 or equivalent, and cloud storage, databases, backups and snapshots have encryption enabled by default at account level so a resource created without thought is still encrypted. Secrets live in a managed secrets service or the password manager and are retrieved at runtime \u2014 never in source, committed environment files, tickets, chat or logs. Keys are managed by the platform key service with rotation enabled; we do not run our own key infrastructure and do not implement our own cryptography. A deprecated or broken algorithm is treated as a significant change and remediated on a timescale set by exposure rather than convenience.", href:"policies/encryption.html"},
+      {t:"Logging & monitoring", d:"Four platforms carry almost everything that matters: AWS CloudTrail management events across every account and region plus data events for buckets holding client information, Google Workspace admin, login and OAuth grant logs, GitHub organisation and repository audit logs, and application activity from our own code. Logs are retained at least thirteen months with the most recent ninety days available for immediate query \u2014 thirteen so a twelve-month observation period is covered with margin. Log storage is separated from the accounts that generate it, with object lock or equivalent, so compromising a workload does not erase the record of it. Alert dispositions for production are reviewed monthly, and a month with no alerts is recorded as such.", href:"policies/logging-monitoring.html"},
+      {t:"AI and agent activity", d:"Each agent runs under its own identity rather than a person\u2019s credentials, so its actions are attributable in the same logs as anyone else\u2019s. Agent activity is logged with enough context to reconstruct what happened: the triggering input, the tools invoked, the parameters used, the actions taken and the outcome. Prompts, tool definitions, retrieval configuration, guardrails and model versions move through the same approval path as code, and those changes are logged \u2014 what the model was and what it was told are part of reconstructing what it did. The full AI Governance Policy is published; see Document requests.", href:"policies/ai-governance.html"},
+      {t:"Vendor management", d:"Subprocessors are risk-tiered, reviewed before onboarding against SOC 2 or equivalent, and re-reviewed annually. The subprocessor list below is versioned on this page. The full policy is published; see Document requests.", href:"policies/vendor-management.html"},
+      {t:"Incident response & continuity", d:"A documented incident response plan with customer-notification commitments, annual exercises, and encrypted versioned backups with periodic restore tests. Both the Incident Response and Business Continuity policies are published in full; see Document requests.", href:"policies/incident-response.html"}
+    ],
+    dataIntro:"What the service holds, where it lives, and how long it is kept.",
+    data:[
+      ["Customer program data","Content customers place in the service, stored in access-controlled, encrypted infrastructure. Customers control what they upload and can export or delete it."],
+      ["Account & contact data","Names, work emails, and authentication data needed to operate accounts. Never sold or shared for advertising."],
+      ["Retention & deletion","Customer data is retained while the account is active and deleted within 30 days of a verified deletion request or contract end, backups included on their cycle."],
+      ["Data subject requests","Access, correction, and deletion requests are honored within 30 days via the privacy contact below."]
+    ],
+    reliabilityIntro:"Availability commitments and how the service recovers when things fail.",
+    reliability:[
+      ["Availability","The service is designed for high availability on redundant cloud infrastructure; material incidents are communicated to affected customers."],
+      ["Backups","Encrypted, versioned backups held separately from the workloads they protect, with annual restore tests. Recovery objectives are set in the Business Continuity and Disaster Recovery Policy; how long data is kept is set in the Data Retention and Disposal Policy."],
+      ["Change safety","Releases are staged, reviewed, and reversible; a rollback path exists for every production change."],
+      ["Incident communication","Customers are notified of incidents affecting their data without undue delay, with a post-incident summary on request."]
+    ],
+    subs:[
+      ["Google Workspace","Email, documents, storage","US","SOC 2 / ISO 27001; DPA in place"],
+      ["GitHub","Source control & build","US","SOC 2; private repos, MFA enforced"],
+      ["Cloudflare","DNS, delivery, access gateway","Global edge","SOC 2 / ISO 27001; TLS enforced"],
+      ["Anthropic","AI-assisted features","US","SOC 2; no training on customer inputs"]
+    ],
+    advisories:[],
+    cvdRecordIntro:"Every report accepted through our Coordinated Vulnerability Disclosure Policy is recorded here once it is remediated and the coordination window has closed \u2014 what was reported, how it was scored, when it was fixed, and who reported it. We publish the record whether or not a finding was ours to be proud of, because a disclosure page that only ever shows good news tells a reviewer nothing.",
+    cvdRecord:[],
+    assistantEndpoint:"",
+    secTxtDomain:"prompthalo.com",
+    trustEmail:"security@prompthalo.com",
+    securityEmail:"security@prompthalo.com",
+    docs:[
+      {n:"Information Security Policy", s:"The governing policy for the programme", gate:"Public", href:"policies/information-security-policy.html", grp:"policy"},
+      {n:"AI Governance Policy", s:"Tool register, model providers, agents, pre-ship checks", gate:"Public", href:"policies/ai-governance.html", grp:"policy"},
+      {n:"Privacy Notice", s:"External notice \u00b7 collection, use, rights", gate:"Public", href:"policies/privacy-notice.html", grp:"policy"},
+      {n:"Cookie Policy", s:"Strictly necessary cookies only", gate:"Public", href:"policies/cookie-policy.html", grp:"policy"},
+      {n:"Coordinated Vulnerability Disclosure Policy", s:"Scope, safe harbour, timelines", gate:"Public", href:"policies/vulnerability-disclosure.html", grp:"policy"},
+      {n:"Data Classification Policy", s:"How data is labelled and handled", gate:"Public", href:"policies/data-classification.html", grp:"policy"},
+      {n:"Data Retention and Disposal Policy", s:"Retention periods, legal hold and destruction", gate:"Public", href:"policies/data-retention.html", grp:"policy"},
+      {n:"Privacy Policy", s:"Privacy position, protection and disclosure", gate:"Public", href:"policies/privacy-policy.html", grp:"policy"},
+      {n:"Incident Response Policy", s:"Detection, escalation, customer notification", gate:"Public", href:"policies/incident-response.html", grp:"policy"},
+      {n:"Business Continuity and Disaster Recovery Policy", s:"Backup, recovery objectives, restore testing", gate:"Public", href:"policies/business-continuity.html", grp:"policy"},
+      {n:"Vendor Management Policy", s:"Subprocessor review and re-review", gate:"Public", href:"policies/vendor-management.html", grp:"policy"},
+      {n:"Vulnerability and Patch Management Policy", s:"Scanning, severity, patch windows", gate:"Public", href:"policies/vulnerability-patch-management.html", grp:"policy"},
+      {n:"Acceptable Use Policy", s:"Permitted use of systems and the platform", gate:"Public", href:"policies/acceptable-use.html", grp:"policy"},
+      {n:"Security overview", s:"Architecture & control summary", gate:"Public", grp:"assurance"},
+      {n:"Access Control Policy", s:"Summarised under Security practices", gate:"Public", href:"policies/access-control.html", grp:"policy"},
+      {n:"Change Management Policy", s:"Summarised under Security practices", gate:"Public", href:"policies/change-management.html", grp:"policy"},
+      {n:"Secure SDLC Policy", s:"Summarised under Security practices", gate:"Public", href:"policies/secure-sdlc.html", grp:"policy"},
+      {n:"Encryption Policy", s:"Summarised under Security practices", gate:"Public", href:"policies/encryption.html", grp:"policy"},
+      {n:"Logging and Monitoring Policy", s:"Summarised under Security practices", gate:"Public", href:"policies/logging-monitoring.html", grp:"policy"},
+      {n:"Data Processing Addendum", s:"Processor terms for customers who require them", gate:"Public", grp:"assurance"},
+      {n:"SOC 2 report", s:"Available under NDA on request", gate:"NDA", grp:"assurance"},
+      {n:"ISO/IEC 27001 control mapping", s:"Controls mapped to the Annex A set", gate:"NDA", grp:"assurance"},
+      {n:"Business associate agreement", s:"For engagements involving protected health information", gate:"NDA", grp:"assurance"},
+      {n:"Penetration test summary", s:"Most recent executive summary", gate:"NDA", grp:"assurance"},
+    ],
+    faq:[
+      {q:"Where is customer data stored?", a:"In access-controlled, encrypted cloud infrastructure. The security overview available from the trust desk describes the architecture and regions in detail."},
+      {q:"Do you use customer data to train AI models?", a:"No. Where AI-assisted features are used, they operate under a provider commitment that customer inputs are not used for model training."},
+      {q:"Can we see your SOC 2 report?", a:"Yes, under NDA, once issued. Until then we share the control matrix and auditor engagement letter as interim evidence."},
+      {q:"How do we delete our data?", a:"Request deletion through your account contact or the security contact below; deletion completes within 30 days, including backups on their cycle."}
+    ],
+    contacts:[
+      ["Security, trust desk and privacy","security@prompthalo.com","PGP key in security.txt \u00b7 responses within 2 business days \u00b7 privacy requests honored within 30 days"]
+    ]
+  },
+};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const viewKey = "ph";
+const CFG_VERSION = 2;
+/* Keys whose shape changed in v2. A config saved before then would silently
+   override the shipped copy — that is how documents lost their group and the
+   ledger lost its rows. Stale copies are backed up, not merged. */
+const CFG_STALE_KEYS = ["docs","ledger","pillars","regs","frameworksIntro"];
+
+function getConfig(k){
+  try {
+    const raw = localStorage.getItem("tc.cfg." + k);
+    if (raw) {
+      const saved = JSON.parse(raw);
+      if (saved.cfgVersion !== CFG_VERSION) {
+        try { localStorage.setItem("tc.cfg." + k + ".v1bak", raw); } catch(e){}
+        CFG_STALE_KEYS.forEach(key => { delete saved[key]; });
+        saved.cfgVersion = CFG_VERSION;
+        try { localStorage.setItem("tc.cfg." + k, JSON.stringify(saved)); } catch(e){}
+      }
+      return Object.assign({}, DEFAULTS[k], saved);
+    }
+  } catch(e){}
+  return DEFAULTS[k];
+}
+function saveConfig(k, cfg){ try { cfg.cfgVersion = CFG_VERSION; localStorage.setItem("tc.cfg." + k, JSON.stringify(cfg)); } catch(e){} }
+
+/* Compact synchronous SHA-256 */
+function sha256(ascii){
+  function rr(v,a){return (v>>>a)|(v<<(32-a));}
+  var mF=Math.pow,mC=mF(2,32),j,r='',words=[],aLen=ascii.length*8;
+  var h=sha256.h=sha256.h||[],k=sha256.k=sha256.k||[],pC=k.length,iH={};
+  for(var c=2;pC<64;c++){if(!iH[c]){for(j=0;j<313;j+=c)iH[j]=c;h[pC]=(mF(c,.5)*mC)|0;k[pC++]=(mF(c,1/3)*mC)|0;}}
+  ascii+='\x80';while(ascii.length%64-56)ascii+='\x00';
+  for(j=0;j<ascii.length;j++){var cc=ascii.charCodeAt(j);if(cc>>8)return'';words[j>>2]|=cc<<((3-j)%4)*8;}
+  words[words.length]=(aLen/mC)|0;words[words.length]=aLen;
+  for(j=0;j<words.length;){var w=words.slice(j,j+=16),oH=h.slice(0,8);
+    for(var i=0;i<64;i++){var w15=w[i-15],w2=w[i-2];
+      var a=h[0],e=h[4];
+      var t1=h[7]+(rr(e,6)^rr(e,11)^rr(e,25))+((e&h[5])^(~e&h[6]))+k[i]+(w[i]=(i<16)?w[i]:(w[i-16]+(rr(w15,7)^rr(w15,18)^(w15>>>3))+w[i-7]+(rr(w2,17)^rr(w2,19)^(w2>>>10)))|0);
+      var t2=(rr(a,2)^rr(a,13)^rr(a,22))+((a&h[1])^(a&h[2])^(h[1]&h[2]));
+      h=[(t1+t2)|0].concat(h);h[4]=(h[4]+t1)|0;}
+    for(i=0;i<8;i++)h[i]=(h[i]+oH[i])|0;}
+  for(i=0;i<8;i++)for(j=3;j+1;j--){var b=(h[i]>>(j*8))&255;r+=((b<16)?0:'')+b.toString(16);}
+  return r;
+}
+
+const SEAL = (status) => {
+  const colors = {ok:"#2e7d5b", progress:"#b07d2a", align:"#3d6b8f", plan:"#6d8092"};
+  const c = colors[status] || "#1b4965";
+  const glyph = status === "progress"
+    ? `<circle cx="19" cy="19" r="6.2" fill="none" stroke="${c}" stroke-width="2"/><line x1="19" y1="19" x2="19" y2="14.6" stroke="${c}" stroke-width="2" stroke-linecap="round"/><line x1="19" y1="19" x2="22" y2="20.8" stroke="${c}" stroke-width="2" stroke-linecap="round"/>`
+    : (status === "align" || status === "plan")
+    ? `<line x1="13.5" y1="19" x2="24.5" y2="19" stroke="${c}" stroke-width="2.4" stroke-linecap="round"/><line x1="13.5" y1="14.5" x2="24.5" y2="14.5" stroke="${c}" stroke-width="2.4" stroke-linecap="round" opacity=".45"/><line x1="13.5" y1="23.5" x2="24.5" y2="23.5" stroke="${c}" stroke-width="2.4" stroke-linecap="round" opacity=".45"/>`
+    : `<path d="M13 19.5 L17.2 23.5 L25 14.5" fill="none" stroke="${c}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;
+  return `<svg width="38" height="38" viewBox="0 0 38 38" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><circle cx="19" cy="19" r="17" fill="none" stroke="${c}" stroke-width="1.4" stroke-dasharray="2.6 3.1"/><circle cx="19" cy="19" r="12.5" fill="none" stroke="${c}" stroke-width="1.6"/>${glyph}</svg>`;
+};
+
+/* ---------- Header menus ---------- */
+function closeMenus(except){
+  document.querySelectorAll(".menu").forEach(m => {
+    if (m !== except){
+      m.querySelector(":scope > button").setAttribute("aria-expanded","false");
+      m.querySelector(".menu-list").classList.remove("open");
+    }
+  });
+}
+document.querySelectorAll(".menu > button").forEach(btn => {
+  btn.addEventListener("click", e => {
+    e.stopPropagation();
+    const menu = btn.parentElement, list = menu.querySelector(".menu-list");
+    const willOpen = !list.classList.contains("open");
+    closeMenus(menu);
+    list.classList.toggle("open", willOpen);
+    btn.setAttribute("aria-expanded", String(willOpen));
+  });
+});
+document.addEventListener("click", () => closeMenus());
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeMenus(); });
+document.querySelectorAll("[data-setview]").forEach(b =>
+  b.addEventListener("click", () => { closeMenus(); setView(b.dataset.setview); }));
+
+function buildSectionsMenu(){
+  const std = [
+    ["#overview","Overview"],["https://www.prompthalo.ai/compliance/","Compliance"],["#security","Security"],["#privacy","Privacy"],
+    ["#reliability","Reliability"],["#subprocessors","Subprocessors"],["#advisories","Advisories & CVEs"],["#cvd-record","Disclosure record"],["#disclosure","Responsible disclosure"],
+    ["#documents","Document requests"],["#faq","FAQ"],["#contact","Contact"]
+  ];
+  const items = std;
+  $("sectionsMenu").innerHTML = items.map(i => `<a role="menuitem" href="${i[0]}">${esc(i[1])}</a>`).join("");
+  $("sectionsMenu").querySelectorAll("a").forEach(a => a.addEventListener("click", () => {
+    closeMenus();
+    const href = a.getAttribute("href") || "";
+    if (!href.startsWith("#")) return;
+    const target = document.querySelector(href);
+    if (target && target.tagName === "DETAILS") target.open = true;
+  }));
+}
+
+/* ---------- Render ---------- */
+function renderBrand(){
+  const b = getConfig(viewKey);
+  $("brandLockup").innerHTML = LOGOS[viewKey] +
+    `<div class="brand-text"><span class="brand-name">${esc(b.name)}</span><span class="brand-sub">${esc(b.sub)}</span></div>`;
+  bindText("heroTitle", b.heroTitle, "heroTitle");
+  bindText("heroLede", b.heroLede, "heroLede");
+  $("heroMeta").innerHTML = b.heroMeta || "";
+  $("ledgerStamp").textContent = "Updated " + LAST_UPDATED;
+  $("pillars").innerHTML = (b.pillars||[]).map((p,i) =>
+    `<a class="pillar" href="${esc(p.href)}"><div class="p-ico">${PILLAR_ICONS[p.icon]||""}</div><h3 data-path="pillars.${i}.t">${esc(p.t)}</h3><p data-path="pillars.${i}.d">${esc(p.d)}</p></a>`).join("");
+  $("ledgerGrid").innerHTML = b.ledger.map((l,i) =>
+    `<div class="seal-cell" data-item="ledger.${i}">${SEAL(l.status)}<div style="min-width:0">
+      <div class="seal-name" data-path="ledger.${i}.name">${esc(l.name)}</div>
+      <div class="seal-scope" data-path="ledger.${i}.scope">${esc(l.scope)}</div>
+      <span class="seal-status st-${l.status}" data-path="ledger.${i}.label">${esc(l.label)}</span>
+      <button class="cyc" data-cycle="ledger.${i}.status" title="Cycle status">${esc(l.status)}</button>
+      <div class="seal-date" data-path="ledger.${i}.date">${esc(l.date)}</div>${l.doc?`<button class="seal-link seal-req" data-doc="${esc(l.doc)}">Request under NDA &rarr;</button>`:""}</div>${delBtn("ledger",i)}</div>`).join("")
+    + addBtn("ledger","compliance item");
+  bindText("practicesIntro", b.practicesIntro, "practicesIntro");
+  $("practiceGrid").innerHTML = b.practices.map((p,i) =>
+    `<details class="practice" data-item="practices.${i}"><summary><h3><span class="dot"></span><span data-path="practices.${i}.t">${esc(p.t)}</span></h3><span class="prac-chev" aria-hidden="true">&#9662;</span></summary><div class="prac-body"><p data-path="practices.${i}.d">${esc(p.d)}</p>${p.href?`<a class="prac-link" href="${esc(p.href)}">Read the full policy &rarr;</a>`:""}${delBtn("practices",i)}</div></details>`).join("")
+    + addBtn("practices","practice","practice-add");
+  bindText("dataIntro", b.dataIntro, "dataIntro");
+  $("dataTable").innerHTML = b.data.map((r,i) => `<tr data-item="data.${i}"><td data-path="data.${i}.0">${esc(r[0])}</td><td data-path="data.${i}.1">${esc(r[1])}${delBtn("data",i)}</td></tr>`).join("")
+    + rowAdd("data", 2);
+  bindText("reliabilityIntro", b.reliabilityIntro || "", "reliabilityIntro");
+  $("reliabilityTable").innerHTML = (b.reliability||[]).map((r,i) => `<tr data-item="reliability.${i}"><td data-path="reliability.${i}.0">${esc(r[0])}</td><td data-path="reliability.${i}.1">${esc(r[1])}${delBtn("reliability",i)}</td></tr>`).join("")
+    + rowAdd("reliability", 2);
+  $("subTable").innerHTML = b.subs.map((r,i) =>
+    `<tr data-item="subs.${i}"><td data-path="subs.${i}.0">${esc(r[0])}</td><td data-path="subs.${i}.1">${esc(r[1])}</td><td data-path="subs.${i}.2">${esc(r[2])}</td><td data-path="subs.${i}.3">${esc(r[3])}${delBtn("subs",i)}</td></tr>`).join("")
+    + rowAdd("subs", 4);
+  $("secTxt").innerHTML =
+    `# https://${esc(b.secTxtDomain)}/.well-known/security.txt<br>` +
+    `Contact: mailto:${esc(b.securityEmail || "security@prompthalo.com")}<br>` +
+    `Expires: 2027-07-25T00:00:00Z<br>` +
+    `Preferred-Languages: en<br>` +
+    `Policy: https://${esc(b.secTxtDomain)}/trustcenter/policies/vulnerability-disclosure.html<br>` +
+    `Canonical: https://${esc(b.secTxtDomain)}/.well-known/security.txt`;
+  const docRow = (d,i) =>
+    `<div class="doc-row" data-item="docs.${i}"><div class="doc-name"><span data-path="docs.${i}.n">${esc(d.n)}</span><span class="sub" data-path="docs.${i}.s">${esc(d.s)}</span></div>
+     <span class="gate ${d.gate==="Public"?"open":""}">${d.gate==="Public"?(d.href?"Read online":"Available on request"):"Under NDA"}</span>
+     <button class="cyc" data-cycle="docs.${i}.gate" title="Toggle access">${esc(d.gate)}</button>
+     ${d.href?`<a class="btn ghost" href="${esc(d.href)}">Read</a>`:`<button class="btn ghost" data-doc="${esc(d.n)}">Request</button>`}${delBtn("docs",i)}</div>`;
+  const ASSURANCE_DOCS = new Set(["Security overview","Data Processing Addendum",
+    "SOC 2 report","ISO/IEC 27001 control mapping","Business associate agreement",
+    "Penetration test summary"]);
+  const groupOf = (d) => d.grp || (ASSURANCE_DOCS.has(d.n) ? "assurance" : "policy");
+  const docsByGroup = (g) => b.docs.map((d,i) => [d,i]).filter(([d]) => groupOf(d) === g);
+  const pol = docsByGroup("policy"), asr = docsByGroup("assurance");
+  $("docListPolicy").innerHTML = pol.map(([d,i]) => docRow(d,i)).join("") + addBtn("docs","document");
+  $("docListAssurance").innerHTML = asr.map(([d,i]) => docRow(d,i)).join("");
+  $("docCountPolicy").textContent = pol.length;
+  $("docCountAssurance").textContent = asr.length;
+  $("reqDoc").innerHTML = b.docs.map(d => `<option>${esc(d.n)}</option>`).join("");
+  $("faqList").innerHTML = b.faq.map((f,i) =>
+    `<details class="faq" data-item="faq.${i}"><summary><span data-path="faq.${i}.q">${esc(f.q)}</span>${delBtn("faq",i)}</summary><div class="a" data-path="faq.${i}.a">${esc(f.a)}</div></details>`).join("")
+    + addBtn("faq","question");
+  $("contactTable").innerHTML = b.contacts.map((c,i) =>
+    `<tr data-item="contacts.${i}"><td style="width:260px" data-path="contacts.${i}.0">${esc(c[0])}</td><td><a href="mailto:${esc(c[1])}" data-path="contacts.${i}.1">${esc(c[1])}</a><span class="sub" data-path="contacts.${i}.2">${esc(c[2])}</span>${delBtn("contacts",i)}</td></tr>`).join("")
+    + rowAdd("contacts", 3);
+  bindText("cvdRecordIntro", b.cvdRecordIntro, "cvdRecordIntro");
+  $("cvdList").innerHTML = (((b.cvdRecord)||[]).length
+    ? `<div class="tbl"><table aria-label="Coordinated disclosure record"><thead><tr><th style="width:130px">Reference</th><th>Finding</th><th style="width:110px">Severity</th><th style="width:150px">Resolved</th></tr></thead><tbody>`
+      + b.cvdRecord.map((c,i) =>
+        `<tr data-item="cvdRecord.${i}"><td><span data-path="cvdRecord.${i}.ref">${esc(c.ref||"")}</span><span class="sub" data-path="cvdRecord.${i}.reported">${esc(c.reported||"")}</span></td>
+         <td><span data-path="cvdRecord.${i}.title">${esc(c.title||"")}</span><span class="sub" data-path="cvdRecord.${i}.credit">${esc(c.credit||"")}</span></td>
+         <td><span class="sev s-${(c.severity||"").toLowerCase()}" data-path="cvdRecord.${i}.severity">${esc(c.severity||"")}</span></td>
+         <td><span data-path="cvdRecord.${i}.resolved">${esc(c.resolved||"")}</span>${delBtn("cvdRecord",i)}</td></tr>`).join("")
+      + `</tbody></table></div>`
+    : `<div class="empty-note">No coordinated disclosures have been published yet. This table will be updated as reports are received, remediated and released &mdash; an empty record here means no report has completed the process, not that reports are unwelcome. See the <a href="policies/vulnerability-disclosure.html">Coordinated Vulnerability Disclosure Policy</a> for scope, safe harbour and our response commitments.</div>`)
+    + addBtn("cvdRecord","disclosure");
+  $("advList").innerHTML = ((b.advisories||[]).length
+    ? `<div class="tbl"><table aria-label="Security advisories"><thead><tr><th style="width:150px">Identifier</th><th>Summary</th><th style="width:110px">Severity</th><th style="width:150px">Status</th></tr></thead><tbody>`
+      + b.advisories.map((a,i) =>
+        `<tr data-item="advisories.${i}"><td><span data-path="advisories.${i}.id">${esc(a.id)}</span><span class="sub" data-path="advisories.${i}.date">${esc(a.date||"")}</span></td>
+         <td><span data-path="advisories.${i}.title">${esc(a.title)}</span><span class="sub" data-path="advisories.${i}.detail">${esc(a.detail||"")}</span></td>
+         <td><span class="sev s-${(a.severity||"").toLowerCase()}" data-path="advisories.${i}.severity">${esc(a.severity||"")}</span></td>
+         <td><span data-path="advisories.${i}.status">${esc(a.status||"")}</span>${delBtn("advisories",i)}</td></tr>`).join("")
+      + `</tbody></table></div>`
+    : `<div class="empty-note">No advisories are currently published for this product. Vulnerabilities reported through the disclosure process are published here once remediated.</div>`)
+    + addBtn("advisories","advisory");
+  $("footBrand").textContent = `© ${new Date().getFullYear()} ${b.name} · Trust Center`;
+  $("footLogo").innerHTML = LOGOS[viewKey];
+  $("footTag").textContent = (b.heroLede.split(". ")[0] || b.name) + ".";
+  $("footContacts").innerHTML = b.contacts.map(c => `<a href="mailto:${esc(c[1])}">${esc(c[0])}</a>`).join("");
+  document.title = `Trust Center — ${b.name}`;
+  renderOutbox(); renderVbox();
+}
+
+function render(){
+  const theme = getConfig(viewKey);
+  document.documentElement.style.setProperty("--accent", theme.accent);
+  document.documentElement.style.setProperty("--accent-tint", theme.accentTint);
+  document.documentElement.style.setProperty("--accent-deep", theme.accentDeep || theme.accent);
+  $("footStamp").textContent = `Page version ${LAST_UPDATED} · Served statically; requests logged locally only`;
+  buildSectionsMenu();
+  renderBrand();
+  if (adminOpen) buildAdmin();
+  if (editing) document.querySelectorAll("[data-path]").forEach(el => {
+    el.setAttribute("contenteditable","true"); el.setAttribute("spellcheck","false");
+  });
+  buildSuggestions();
+}
+$("footTop").addEventListener("click", e => { e.preventDefault(); window.scrollTo({top:0,behavior:"smooth"}); });
+$("ctaReport").addEventListener("click", () => {
+  const p = $("disclosure"); if (p) p.open = true;
+  setTimeout(() => { const f = $("vdpForm"); if (f) f.scrollIntoView({behavior:"smooth", block:"start"}); }, 60);
+});
+
+/* ===== Inline editing engine ===== */
+let editing = false;
+function pathParts(p){ return p.split(".").map(k => /^\d+$/.test(k) ? Number(k) : k); }
+function getByPath(o,p){ return pathParts(p).reduce((a,k) => (a==null?a:a[k]), o); }
+function setByPath(o,p,v){
+  const ks = pathParts(p), last = ks.pop();
+  let cur = o; ks.forEach(k => { cur = cur[k]; });
+  cur[last] = v;
+}
+function cloneCfg(){ return JSON.parse(JSON.stringify(getConfig(viewKey))); }
+function commit(cfg){ saveConfig(viewKey, cfg); render(); }
+function bindText(id, value, path){
+  const el = $(id);
+  el.textContent = value;
+  el.setAttribute("data-path", path);
+}
+const delBtn = (list,i) => `<button class="delbtn" data-del="${list}.${i}" title="Delete">×</button>`;
+const addBtn = (list,label,cls) => `<button class="rowbtn ${cls||""}" data-add="${list}">+ Add ${label}</button>`;
+const rowAdd = (list,cols) => `<tr class="addrow"><td colspan="${cols}"><button class="rowbtn" data-add="${list}">+ Add row</button></td></tr>`;
+
+const BLANKS = {
+  ledger:{name:"New item",scope:"Scope",status:"plan",label:"Planned",date:"Date",doc:""},
+  practices:{t:"Practice",d:"Describe the control."},
+  docs:{n:"Document",s:"Description",gate:"NDA",grp:"policy"},
+  faq:{q:"New question?",a:"Answer."},
+  pillars:{icon:"security",t:"Pillar",d:"Short blurb.",href:"#security"},
+  cvdRecord:{ref:"PH-CVD-0000",title:"Summary of the finding",severity:"Medium",resolved:"",reported:"",credit:"Reported by \u2014"},
+  advisories:{id:"CVE-0000-0000",title:"Summary",severity:"Medium",status:"Under investigation",date:"",detail:"Assessment and remediation status."},
+  data:["Category","Handling"],
+  reliability:["Area","Commitment"],
+  subs:["Vendor","Purpose","Region","Safeguards"],
+  contacts:["Channel","security@prompthalo.com","Note"]
+};
+const CYCLES = { status:["ok","progress","align","plan"], gate:["NDA","Public"] };
+
+function setEditing(on){
+  editing = on;
+  document.body.classList.toggle("editing", on);
+  $("editSite").textContent = getConfig(viewKey).name;
+  document.querySelectorAll("[data-path]").forEach(el => {
+    if (on){ el.setAttribute("contenteditable","true"); el.setAttribute("spellcheck","false"); }
+    else el.removeAttribute("contenteditable");
+  });
+  if (on) toast("Inline editing on — changes save as you click away");
+}
+document.addEventListener("focusout", e => {
+  const el = e.target.closest && e.target.closest("[data-path]");
+  if (!el || !editing) return;
+  const path = el.getAttribute("data-path");
+  const val = el.textContent.trim();
+  if (val === String(getByPath(getConfig(viewKey), path) ?? "")) return;
+  const cfg = cloneCfg();
+  setByPath(cfg, path, val);
+  saveConfig(viewKey, cfg);
+  render();
+  setEditing(true);
+  toast("Saved");
+});
+document.addEventListener("keydown", e => {
+  if (!editing) return;
+  const el = e.target.closest && e.target.closest("[data-path]");
+  if (el && e.key === "Enter" && !e.shiftKey && el.tagName !== "P" && el.tagName !== "TD"){ e.preventDefault(); el.blur(); }
+  if (e.key === "Escape" && editing) setEditing(false);
+});
+document.addEventListener("click", e => {
+  if (!editing) return;
+  const cyc = e.target.closest("[data-cycle]");
+  if (cyc){
+    e.preventDefault(); e.stopPropagation();
+    const p = cyc.getAttribute("data-cycle"), key = p.split(".").pop();
+    const opts = CYCLES[key] || [];
+    const cfg = cloneCfg();
+    const cur = getByPath(cfg, p);
+    setByPath(cfg, p, opts[(opts.indexOf(cur)+1) % opts.length]);
+    commit(cfg); setEditing(true); return;
+  }
+  const del = e.target.closest("[data-del]");
+  if (del){
+    e.preventDefault(); e.stopPropagation();
+    const [list, idx] = del.getAttribute("data-del").split(".");
+    const cfg = cloneCfg();
+    cfg[list].splice(Number(idx), 1);
+    commit(cfg); setEditing(true); toast("Removed"); return;
+  }
+  const add = e.target.closest("[data-add]");
+  if (add){
+    e.preventDefault(); e.stopPropagation();
+    const list = add.getAttribute("data-add");
+    const cfg = cloneCfg();
+    if (!Array.isArray(cfg[list])) cfg[list] = [];
+    cfg[list].push(JSON.parse(JSON.stringify(BLANKS[list])));
+    commit(cfg); setEditing(true); toast("Added — click the new text to edit"); return;
+  }
+}, true);
+$("editDone").addEventListener("click", () => { setEditing(false); toast("Inline editing off"); });
+
+/* Any in-page link expands its target panel before scrolling */
+document.addEventListener("click", e => {
+  const a = e.target.closest('a[href^="#"]');
+  if (!a) return;
+  const t = document.querySelector(a.getAttribute("href"));
+  if (t && t.tagName === "DETAILS") t.open = true;
+});
+
+/* Toast */
+let toastTimer;
+function toast(msg){
+  const t = $("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+/* Copy security.txt */
+$("copySecTxt").addEventListener("click", () => {
+  const text = $("secTxt").innerText;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => toast("security.txt copied"), () => toast("Copy failed — select the text manually"));
+  } else { toast("Copy not available — select the text manually"); }
+});
+
+/* Document requests */
+document.addEventListener("click", e => {
+  const btn = e.target.closest("[data-doc]");
+  if (!btn) return;
+  const grp = document.querySelector(`[data-doc="${CSS.escape(btn.dataset.doc)}"]`);
+  const owner = grp && grp.closest("details.doc-group");
+  if (owner) owner.open = true;
+  const form = document.querySelector(".req-form");
+  const panel = form && form.closest("details");
+  if (panel) panel.open = true;
+  $("reqDoc").value = btn.dataset.doc;
+  $("reqName").focus();
+  if (form) form.scrollIntoView({behavior:"smooth", block:"center"});
+});
+function loadBox(key){ try { return JSON.parse(localStorage.getItem(key) || "[]"); } catch(e){ return []; } }
+function renderOutbox(){
+  const items = loadBox("tc.outbox").filter(i => i.brand === viewKey);
+  $("outboxEmpty").style.display = items.length ? "none" : "block";
+  $("outboxList").innerHTML = items.slice(-8).reverse().map(i =>
+    `<div class="outbox-item"><span class="when">${esc(i.when)}</span><span>${esc(i.doc)} — ${esc(i.company || "no company given")}</span></div>`).join("");
+}
+$("reqSend").addEventListener("click", () => {
+  const b = getConfig(viewKey);
+  const name = $("reqName").value.trim(), company = $("reqCompany").value.trim(),
+        email = $("reqEmail").value.trim(), doc = $("reqDoc").value, note = $("reqNote").value.trim();
+  if (!name || !email) { toast("Name and work email are needed to compose the request"); return; }
+  const subject = encodeURIComponent(`[${b.name} Trust Center] Document request: ${doc}`);
+  const body = encodeURIComponent(`Document requested: ${doc}\nRequester: ${name}\nCompany: ${company || "—"}\nWork email: ${email}\n\nContext:\n${note || "—"}\n\n(Composed from the ${b.name} Trust Center, ${LAST_UPDATED})`);
+  const box = loadBox("tc.outbox");
+  box.push({brand: viewKey, when: new Date().toISOString().slice(0,16).replace("T"," "), doc, company});
+  try { localStorage.setItem("tc.outbox", JSON.stringify(box)); } catch(e){}
+  renderOutbox();
+  window.location.href = `mailto:${b.trustEmail || "security@prompthalo.com"}?subject=${subject}&body=${body}`;
+  toast("Request drafted in your mail client and logged locally");
+});
+
+/* Vulnerability reports */
+function vdpRef(){
+  const d = new Date();
+  const ymd = d.toISOString().slice(0,10).replace(/-/g,"");
+  const rand = Math.random().toString(36).slice(2,6).toUpperCase();
+  return `VDP-${ymd}-${rand}`;
+}
+function renderVbox(){
+  const items = loadBox("tc.vulnbox").filter(i => i.brand === viewKey);
+  $("vboxEmpty").style.display = items.length ? "none" : "block";
+  $("vboxList").innerHTML = items.slice(-8).reverse().map(i =>
+    `<div class="outbox-item"><span class="when">${esc(i.when)}</span><span>${esc(i.ref)} · ${esc(i.sev)} · ${esc(i.asset || "asset not given")}</span></div>`).join("");
+}
+$("vSend").addEventListener("click", () => {
+  const b = getConfig(viewKey);
+  const name = $("vName").value.trim(), email = $("vEmail").value.trim(),
+        asset = $("vAsset").value.trim(), sev = $("vSev").value, desc = $("vDesc").value.trim();
+  if (!desc) { toast("Please describe what you found so the team can triage it"); return; }
+  const ref = vdpRef();
+  const subject = encodeURIComponent(`[${b.name} VDP] ${ref} — ${sev}: ${asset || "vulnerability report"}`);
+  const body = encodeURIComponent(
+    `Tracking reference: ${ref}\nProduct: ${b.name}\nReporter: ${name || "Anonymous"}\nContact: ${email || "—"}\nAffected asset: ${asset || "—"}\nReporter severity estimate: ${sev}\n\nReport:\n${desc}\n\n— Submitted via the ${b.name} Trust Center (${LAST_UPDATED}). Good-faith research is covered by the safe harbor stated on that page.`);
+  const box = loadBox("tc.vulnbox");
+  box.push({brand: viewKey, when: new Date().toISOString().slice(0,16).replace("T"," "), ref, sev, asset});
+  try { localStorage.setItem("tc.vulnbox", JSON.stringify(box)); } catch(e){}
+  renderVbox();
+  window.location.href = `mailto:${b.securityEmail || "security@prompthalo.com"}?subject=${subject}&body=${body}`;
+  toast(`Report ${ref} drafted in your mail client`);
+});
+
+/* ---------- Admin (#admin) ---------- */
+let adminOpen = false;
+function adminHash(){ try { return localStorage.getItem("tc.adminhash") || ADMIN_HASH; } catch(e){ return ADMIN_HASH; } }
+function isAdmin(){ try { return sessionStorage.getItem("tc.admin") === "1"; } catch(e){ return false; } }
+function requestAdmin(){
+  if (viewKey === "bp") setView("ph");
+  if (isAdmin()) { openAdmin(); return; }
+  $("gateErr").style.display = "none";
+  $("gatePass").value = "";
+  $("gateOverlay").classList.add("show");
+  $("gatePass").focus();
+}
+function tryUnlock(){
+  if (sha256($("gatePass").value) === adminHash()){
+    try { sessionStorage.setItem("tc.admin","1"); } catch(e){}
+    $("gateOverlay").classList.remove("show");
+    openAdmin();
+  } else { $("gateErr").style.display = "block"; }
+}
+$("gateGo").addEventListener("click", tryUnlock);
+$("gatePass").addEventListener("keydown", e => { if (e.key === "Enter") tryUnlock(); });
+$("gateCancel").addEventListener("click", () => {
+  $("gateOverlay").classList.remove("show");
+  if (location.hash === "#admin") history.replaceState(null,"",location.pathname + location.search);
+});
+function openAdmin(){
+  adminOpen = true;
+  document.body.classList.add("admin");
+  buildAdmin();
+  $("adminDrawer").classList.add("open");
+}
+function closeAdmin(){
+  adminOpen = false;
+  document.body.classList.remove("admin");
+  $("adminDrawer").classList.remove("open");
+  if (location.hash === "#admin") history.replaceState(null,"",location.pathname + location.search);
+}
+$("adminClose").addEventListener("click", closeAdmin);
+$("admInline").addEventListener("click", () => { setEditing(!editing); if (editing) closeAdmin(); });
+$("adminLink").addEventListener("click", () => { if (adminOpen) closeAdmin(); else requestAdmin(); });
+document.querySelectorAll("[data-admsite]").forEach(btn => btn.addEventListener("click", () => {
+  if (viewKey !== btn.dataset.admsite) setView(btn.dataset.admsite);
+}));
+window.addEventListener("hashchange", () => { if (location.hash === "#admin") requestAdmin(); });
+if (location.hash === "#admin") setTimeout(requestAdmin, 50);
+
+/* Per-section Edit buttons (visible when admin) */
+document.addEventListener("click", e => {
+  const btn = e.target.closest(".adm-edit");
+  if (!btn) return;
+  e.preventDefault(); e.stopPropagation();
+  if (!isAdmin()){ requestAdmin(); return; }
+  if (!editing) setEditing(true);
+  const panel = btn.closest("details.panel");
+  if (panel){ panel.open = true; panel.scrollIntoView({behavior:"smooth", block:"start"}); }
+  if (!adminOpen) openAdmin();
+  const key = btn.dataset.edit;
+  const target = key === "__fields" ? document.querySelector("details.adm[data-adm='__fields']")
+                                    : document.querySelector(`details.adm[data-adm='${key}']`);
+  document.querySelectorAll("details.adm").forEach(d => d.open = false);
+  if (target){ target.open = true; target.scrollIntoView({behavior:"smooth", block:"start"}); }
+});
+
+const ADMIN_FIELDS = [
+  {key:"name", label:"Site / product name", type:"input"},
+  {key:"heroTitle", label:"Hero title", type:"input"},
+  {key:"heroLede", label:"Hero paragraph", type:"textarea", rows:4},
+  {key:"heroMeta", label:"Hero meta line (optional, HTML allowed; leave blank to hide)", type:"textarea", rows:2},
+  {key:"accent", label:"Accent color (hex)", type:"input"},
+  {key:"accentTint", label:"Accent tint (hex)", type:"input"},
+  {key:"accentDeep", label:"Accent deep (banner gradient end, hex)", type:"input"},
+  {key:"secTxtDomain", label:"security.txt domain", type:"input"},
+  {key:"trustEmail", label:"Trust desk email (document requests)", type:"input"},
+  {key:"securityEmail", label:"Security email (vulnerability reports)", type:"input"},
+  {key:"assistantEndpoint", label:"Assistant proxy URL (blank = direct API)", type:"input"}
+];
+const ADMIN_JSON = [
+  {key:"pillars", label:"Trust pillars", hint:'[{"icon":"security|compliance|privacy|reliability","t":"Title","d":"Blurb","href":"#security"}]'},
+  {key:"ledger", label:"Compliance ledger", hint:'[{"name":"SOC 2","scope":"...","status":"ok|progress|align|plan","label":"...","date":"..."}]'},
+  {key:"practices", label:"Security practices", hint:'[{"t":"Title","d":"Description"}]'},
+  {key:"data", label:"Data & privacy rows", hint:'[["Category","Handling"], ...]'},
+  {key:"reliability", label:"Reliability rows", hint:'[["Area","Commitment"], ...]'},
+  {key:"subs", label:"Subprocessors", hint:'[["Vendor","Purpose","Region","Safeguards"], ...]'},
+  {key:"docs", label:"Documents", hint:'[{"n":"Name","s":"Subtitle","gate":"NDA|Public"}]'},
+  {key:"faq", label:"FAQ", hint:'[{"q":"Question","a":"Answer"}]'},
+  {key:"contacts", label:"Contacts", hint:'[["Channel","email","Note"], ...]'},
+  {key:"cvdRecordIntro", label:"Disclosure record intro", type:"textarea"},
+  {key:"cvdRecord", label:"Coordinated disclosure record", hint:'[{"ref":"PH-CVD-0001","title":"...","severity":"High","resolved":"2026-09-01","reported":"2026-08-01","credit":"Reported by ..."}]'},
+  {key:"advisories", label:"Security advisories / CVEs", hint:'[{"id":"CVE-2026-0001","title":"...","severity":"Critical|High|Medium|Low","status":"Fixed in 2.1","date":"2026-07-01","detail":"..."}]'},
+  {key:"intros", label:"Section intros", multi:["practicesIntro","dataIntro","reliabilityIntro"], hint:'{"practicesIntro":"...","dataIntro":"...","reliabilityIntro":"..."}'}
+];
+function buildAdmin(){
+  const cfg = getConfig(viewKey);
+  $("adminSiteTag").textContent = cfg.name;
+  $("admSitePH").classList.toggle("on", viewKey === "ph");
+  $("admSiteJF").classList.toggle("on", viewKey === "jf");
+  let html = `<details class="adm" data-adm="__fields" open><summary>Site settings</summary><div class="adm-body">`;
+  ADMIN_FIELDS.forEach(f => {
+    const v = cfg[f.key] || "";
+    html += `<div class="adm-field"><label for="af_${f.key}">${esc(f.label)}</label>` +
+      (f.type === "textarea"
+        ? `<textarea id="af_${f.key}" style="min-height:${(f.rows||3)*24}px">${esc(v)}</textarea>`
+        : `<input id="af_${f.key}" value="${esc(v)}">`) + `</div>`;
+  });
+  html += `<div class="adm-apply"><button class="btn" id="applyFields">Apply site settings</button><span class="adm-msg" id="msg_fields"></span></div></div></details>`;
+  ADMIN_JSON.forEach(sec => {
+    let value;
+    if (sec.multi){ value = {}; sec.multi.forEach(k => value[k] = cfg[k] || ""); }
+    else value = cfg[sec.key];
+    html += `<details class="adm" data-adm="${sec.key}"><summary>${esc(sec.label)}</summary><div class="adm-body">
+      <div class="adm-field"><label for="aj_${sec.key}">JSON</label>
+      <textarea id="aj_${sec.key}">${esc(JSON.stringify(value, null, 2))}</textarea></div>
+      <div class="adm-hint">Shape: ${esc(sec.hint)}</div>
+      <div class="adm-apply"><button class="btn" data-applyjson="${sec.key}">Apply</button><span class="adm-msg" id="msg_${sec.key}"></span></div>
+    </div></details>`;
+  });
+  $("adminSections").innerHTML = html;
+  $("applyFields").addEventListener("click", () => {
+    const cfg2 = Object.assign({}, getConfig(viewKey));
+    ADMIN_FIELDS.forEach(f => { cfg2[f.key] = $("af_" + f.key).value; });
+    saveConfig(viewKey, cfg2);
+    render();
+    const m = $("msg_fields"); m.textContent = "Saved"; m.className = "adm-msg ok";
+  });
+  document.querySelectorAll("[data-applyjson]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const key = btn.dataset.applyjson;
+      const sec = ADMIN_JSON.find(s => s.key === key);
+      const m = $("msg_" + key);
+      try {
+        const parsed = JSON.parse($("aj_" + key).value);
+        const cfg2 = Object.assign({}, getConfig(viewKey));
+        if (sec.multi){ sec.multi.forEach(k => { if (parsed[k] !== undefined) cfg2[k] = parsed[k]; }); }
+        else cfg2[key] = parsed;
+        saveConfig(viewKey, cfg2);
+        render();
+        m.textContent = "Saved"; m.className = "adm-msg ok";
+      } catch(err){ m.textContent = "Invalid JSON: " + err.message; m.className = "adm-msg err"; }
+    });
+  });
+}
+$("admExport").addEventListener("click", () => {
+  const out = { ph: getConfig("ph"), exported: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(out, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "trust-center-config.json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast("Config exported");
+});
+$("admImport").addEventListener("click", () => {
+  const raw = prompt("Paste the exported config JSON:");
+  if (!raw) return;
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed.ph) saveConfig("ph", Object.assign({}, DEFAULTS.ph, parsed.ph));
+    if (parsed.jf) saveConfig("jf", Object.assign({}, DEFAULTS.jf, parsed.jf));
+    render(); buildAdmin();
+    toast("Config imported");
+  } catch(err){ toast("Import failed: invalid JSON"); }
+});
+$("admPass").addEventListener("click", () => {
+  const np = prompt("New admin passphrase (applies to this browser):");
+  if (!np) return;
+  try { localStorage.setItem("tc.adminhash", sha256(np)); toast("Passphrase updated on this browser"); } catch(e){}
+});
+$("admReset").addEventListener("click", () => {
+  if (!confirm(`Reset ${getConfig(viewKey).name} to shipped defaults on this browser?`)) return;
+  try { localStorage.removeItem("tc.cfg." + viewKey); } catch(e){}
+  render(); buildAdmin();
+  toast("Site reset to defaults");
+});
+
+/* ============================================================
+   TRUST ASSISTANT — retrieval over this page's content, with an
+   optional LLM layer that can web-search for CVEs / current info.
+   ============================================================ */
+const STOP = new Set("a an and are as at be by for from has have how in is it its of on or that the to we what when where which who will with you your do does can".split(" "));
+function tok(str){ return String(str).toLowerCase().replace(/[^a-z0-9\s-]/g," ").split(/\s+/).filter(w => w.length > 2 && !STOP.has(w)); }
+
+function buildCorpus(b){
+  const c = [];
+  const push = (s,t) => { if (t && String(t).trim()) c.push({s, t:String(t)}); };
+  push("Overview", b.heroTitle + " " + b.heroLede);
+  (b.pillars||[]).forEach(p => push("Pillar — " + p.t, p.d));
+  (b.ledger||[]).forEach(l => push("Compliance — " + l.name, `${l.scope}. Current status: ${l.label}. ${l.date}${l.doc?" Report available under NDA: request \""+l.doc+"\" under Document requests.":""}`));
+  push("Security overview", b.practicesIntro);
+  (b.practices||[]).forEach(p => push("Security — " + p.t, p.d));
+  push("Privacy overview", b.dataIntro);
+  (b.data||[]).forEach(r => push("Privacy — " + r[0], r[1]));
+  push("Reliability overview", b.reliabilityIntro);
+  (b.reliability||[]).forEach(r => push("Reliability — " + r[0], r[1]));
+  (b.subs||[]).forEach(r => push("Subprocessor — " + r[0], `Purpose: ${r[1]}. Region: ${r[2]}. Safeguards: ${r[3]}`));
+  (b.advisories||[]).forEach(a => push("Advisory — " + a.id, `${a.title}. Severity: ${a.severity}. Status: ${a.status}. ${a.date||""} ${a.detail||""}`));
+  if (!((b.cvdRecord)||[]).length) push("Coordinated disclosure record", "No coordinated disclosures have been published yet. The record is updated as reports are received, remediated and released. An empty record means no report has completed the process, not that reports are unwelcome.");
+  if (!(b.advisories||[]).length) push("Advisories", "No advisories are currently published for this product. Vulnerabilities reported through the disclosure process are published once remediated.");
+  (b.docs||[]).forEach(d => push("Document — " + d.n, `${d.s}. Access: ${d.gate === "Public" ? "available on request" : "shared under NDA"}`));
+  (b.faq||[]).forEach(f => push("FAQ — " + f.q, f.a));
+  (b.contacts||[]).forEach(r => push("Contact — " + r[0], `${r[1]}. ${r[2]}`));
+  push("Responsible disclosure", "Good-faith research is welcome and covered by safe harbor. Reports are acknowledged within 2 business days, triaged and severity-scored, and remediated on severity-based timelines: critical 7 days, high 30 days, medium 60 days, low 90 days. Coordinated disclosure within 90 days by default. Reports can be submitted from the Responsible disclosure section of this page.");
+  return c;
+}
+function retrieve(query, corpus, n){
+  const qt = tok(query);
+  if (!qt.length) return [];
+  const df = {};
+  corpus.forEach(c => { new Set(tok(c.s + " " + c.t)).forEach(w => df[w] = (df[w]||0) + 1); });
+  return corpus.map(c => {
+    const words = tok(c.s + " " + c.t), set = new Set(words);
+    let score = 0;
+    qt.forEach(q => {
+      const idf = Math.log(1 + corpus.length / (1 + (df[q]||0)));
+      if (set.has(q)) score += 2 * idf;
+      else if (words.some(w => w.startsWith(q.slice(0,5)) && q.length > 4)) score += 0.7 * idf;
+      if (tok(c.s).includes(q)) score += 1.2 * idf;
+    });
+    return {c, score};
+  }).filter(x => x.score > 0).sort((a,b) => b.score - a.score).slice(0, n || 6).map(x => x.c);
+}
+
+const chatHistory = [];
+function addMsg(role, text, sources){
+  const div = document.createElement("div");
+  div.className = "msg " + (role === "me" ? "me" : role === "think" ? "bot think" : "bot");
+  div.textContent = text;
+  if (sources && sources.length){
+    const sp = document.createElement("span");
+    sp.className = "src";
+    sp.textContent = "Sources: " + sources.join(" · ");
+    div.appendChild(sp);
+  }
+  $("chatLog").appendChild(div);
+  $("chatLog").scrollTop = $("chatLog").scrollHeight;
+  return div;
+}
+function buildSuggestions(){
+  if (viewKey === "bp") return;
+  const b = getConfig(viewKey);
+  const qs = [
+    "Are you SOC 2 certified?",
+    "How long do you retain my data?",
+    "Are you affected by any known CVEs?",
+    "Who are your subprocessors?",
+    "How do I report a vulnerability?"
+  ];
+  const el = $("chatSugg");
+  if (!el) return;
+  el.innerHTML = qs.map(q => `<button data-q="${esc(q)}">${esc(q)}</button>`).join("");
+  el.querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => ask(btn.dataset.q)));
+  $("chatTitle").textContent = b.name + " Trust Assistant";
+}
+
+function fallbackAnswer(hits, b){
+  if (!hits.length){
+    return "I could not find that on this Trust Center. For anything not covered here, contact " + (b.trustEmail || "the trust desk") + " and the team will answer directly.";
+  }
+  return hits.slice(0,3).map(h => h.s + ": " + h.t).join("\n\n");
+}
+
+async function callModel(question, hits, b){
+  const context = hits.map(h => "[" + h.s + "] " + h.t).join("\n");
+  const system = "You are the Trust Assistant for " + b.name + ", answering security, privacy, compliance, and vulnerability questions for prospective and existing customers.\n\n" +
+    "RULES:\n" +
+    "1. Answer primarily from the TRUST CENTER CONTEXT below. It is the authoritative source about " + b.name + ".\n" +
+    "2. Never invent or upgrade compliance claims. If the context says an audit is in progress, do not say certified. If something is not in the context, say it is not published on the Trust Center and point the user to " + (b.trustEmail || "the trust desk") + ".\n" +
+    "3. For questions about CVEs, vulnerabilities in third-party software, or current security news, use the web search tool, then state clearly what applies to " + b.name + " based on the context and what is general public information.\n" +
+    "4. Be concise: under 130 words, plain prose, no markdown headings.\n" +
+    "5. For vulnerability reports, direct the user to the Responsible disclosure section of this page.\n\n" +
+    "TRUST CENTER CONTEXT:\n" + context;
+
+  const payload = {
+    model: "claude-sonnet-4-6",
+    max_tokens: 1000,
+    system,
+    messages: chatHistory.concat([{ role: "user", content: question }]),
+    tools: [{ type: "web_search_20250305", name: "web_search" }]
+  };
+  const endpoint = (b.assistantEndpoint || "").trim() || "https://api.anthropic.com/v1/messages";
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  const data = await res.json();
+  const text = (data.content || []).map(i => i.type === "text" ? i.text : "").filter(Boolean).join("\n").trim();
+  if (!text) throw new Error("empty response");
+  return text;
+}
+
+let asking = false;
+async function ask(question){
+  question = (question || "").trim();
+  if (!question || asking) return;
+  asking = true;
+  $("chatSend").disabled = true;
+  addMsg("me", question);
+  $("chatInput").value = "";
+  const b = getConfig(viewKey);
+  const hits = retrieve(question, buildCorpus(b), 7);
+  const thinking = addMsg("think", "Checking the Trust Center…");
+  try {
+    const answer = await callModel(question, hits, b);
+    thinking.remove();
+    addMsg("bot", answer, hits.slice(0,3).map(h => h.s));
+    chatHistory.push({role:"user", content:question}, {role:"assistant", content:answer});
+    if (chatHistory.length > 8) chatHistory.splice(0, chatHistory.length - 8);
+  } catch(err){
+    thinking.remove();
+    const txt = fallbackAnswer(hits, b);
+    addMsg("bot", txt, hits.slice(0,3).map(h => h.s));
+    addMsg("think", "Quoted directly from this Trust Center (live assistant unavailable here). Configure an assistant proxy URL in admin to enable web-search answers.");
+  }
+  asking = false;
+  $("chatSend").disabled = false;
+}
+
+function openChat(){
+  $("chatPanel").classList.add("open");
+  $("chatFab").style.display = "none";
+  if (!$("chatLog").children.length){
+    const b = getConfig(viewKey);
+    addMsg("bot", "Hi — I answer questions about " + b.name + "'s security, privacy, and compliance posture using this Trust Center, and I can look up CVEs and current advisories on the web. What would you like to know?");
+  }
+  $("chatInput").focus();
+}
+function closeChat(){ $("chatPanel").classList.remove("open"); $("chatFab").style.display = ""; }
+$("chatFab").addEventListener("click", openChat);
+$("chatClose").addEventListener("click", closeChat);
+$("chatSend").addEventListener("click", () => ask($("chatInput").value));
+$("chatInput").addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey){ e.preventDefault(); ask($("chatInput").value); }
+});
+$("chatInput").addEventListener("input", function(){
+  this.style.height = "auto";
+  this.style.height = Math.min(this.scrollHeight, 110) + "px";
+});
+
+render();
+</script>
+</body>
+</html>
