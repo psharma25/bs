@@ -138,6 +138,23 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *a, **kw):
         super().__init__(*a, directory=str(HERE), **kw)
 
+    def end_headers(self):
+        # Without this the browser caches index.html and quietly keeps showing an
+        # old build after you edit the file. Never cache the app itself.
+        if not self.path.startswith("/api/"):
+            self.send_header("Cache-Control", "no-store, no-cache, must-revalidate")
+            self.send_header("Pragma", "no-cache")
+        super().end_headers()
+
+    def send_head(self):
+        # drop conditional-request headers so we never answer 304 for the page
+        if self.path.endswith((".html", "/")) or self.path == "":
+            self.headers.replace_header("If-Modified-Since", "") if \
+                self.headers.get("If-Modified-Since") else None
+            if "If-None-Match" in self.headers:
+                del self.headers["If-None-Match"]
+        return super().send_head()
+
     def log_message(self, fmt, *args):
         if self.path.startswith("/api/"):
             sys.stderr.write("  %s %s\n" % (self.command, self.path))
@@ -383,6 +400,16 @@ def main():
         url = "https://%s-%d.%s/" % (name, args.port, domain)
 
     with Server((args.host, args.port), Handler) as httpd:
+        index = HERE / "index.html"
+        try:
+            text = index.read_text(errors="replace")
+            m = re.search(r'name="build" content="([^"]+)"', text)
+            when = datetime.datetime.fromtimestamp(index.stat().st_mtime).strftime("%Y-%m-%d %H:%M")
+            print("Serving %s from %s" % (index.name, index.parent))
+            print("  build %s, %d bytes, last modified %s"
+                  % (m.group(1) if m else "unstamped", index.stat().st_size, when))
+        except Exception:
+            pass
         print("Serving %s" % url)
         if in_codespace:
             print("Open it from the Ports tab. Keep the port private \u2014 it spends your API credits.")
