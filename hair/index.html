@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Find Your Perfect Hairstyle</title>
+<meta name="build" content="2026-08-31">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -73,6 +74,8 @@ button{font:inherit;color:inherit}
 .connfold>summary{cursor:pointer;list-style:none;padding:.85rem 1.4rem;font-family:var(--disp);
   color:var(--navy);display:flex;align-items:center;gap:.6rem}
 .connfold>summary::-webkit-details-marker{display:none}
+.connfold.warn{border-color:#E7CFC8;background:#FDF7F5}
+.connfold.warn>summary{color:#8A4B3B}
 .connfold>summary::before{content:"\25B8";font-size:.8rem;transition:transform .15s ease}
 .connfold[open]>summary::before{transform:rotate(90deg)}
 .connbody{padding:0 1.4rem 1.2rem;max-width:46rem}
@@ -205,7 +208,8 @@ table.usage tr.over td{background:#FBF3F1}
       <span class="bar-label" id="lenLab">Hair length</span>
       <div class="pills" role="group" aria-labelledby="lenLab" id="lenPills">
         <button data-v="short" aria-pressed="false">Short</button>
-        <button data-v="long" aria-pressed="true">Long</button>
+        <button data-v="medium" aria-pressed="true">Medium</button>
+        <button data-v="long" aria-pressed="false">Long</button>
       </div>
     </div>
     <p class="tip">Front views come first. Click a style and its side and back views load straight away.</p>
@@ -355,6 +359,7 @@ table.usage tr.over td{background:#FBF3F1}
     </div>
   </details>
 
+  <p class="footnote" id="buildLine">Build 2026-08-31b · short, medium and long · key panel collapsed at the bottom.</p>
   <p class="footnote">Each picture is your own photo re-rendered by an image model. Faces shift a little
     between generations, so take them to the salon as a guide, not a promise.</p>
 </div>
@@ -372,19 +377,33 @@ var $ = function(id){ return document.getElementById(id); };
 
 var BOOK = {
   womens:{
-    long:[
+    medium:[
       {name:"Shoulder Length Layers", tags:"Soft \u2022 Natural \u2022 Timeless",
        hair:"soft shoulder-length layers with gentle movement, face-framing pieces and natural volume",
        desc:"Soft layers add movement and body while framing the face and softening cheeks. Versatile and easy to maintain."},
-      {name:"Long Layers with Side Part", tags:"Elegant \u2022 Face-Framing \u2022 Youthful",
-       hair:"long layered hair with a deep side part and soft bouncy waves through the lengths",
-       desc:"Long layers with a side part add lift and frame your features beautifully. Elegant, flattering and youthful."},
       {name:"Collarbone Bob (Lob)", tags:"Chic \u2022 Modern \u2022 Polished",
        hair:"a polished collarbone-length lob with a blunt perimeter and smooth ends turned slightly under",
        desc:"A modern lob that grazes the collarbone. Adds structure and shape while keeping a soft, feminine look."},
       {name:"Curtain Fringe Midi", tags:"Fresh \u2022 Flattering \u2022 Easy",
        hair:"mid-length hair with a soft curtain fringe parted in the middle and sweeping away from the face",
-       desc:"A curtain fringe softens the forehead and draws the eye upward. Fresh without giving up length."}
+       desc:"A curtain fringe softens the forehead and draws the eye upward. Fresh without giving up length."},
+      {name:"Blunt Midi Cut", tags:"Strong \u2022 Glossy \u2022 Minimal",
+       hair:"a blunt one-length midi cut just below the shoulders with a heavy, glossy perimeter",
+       desc:"One clean length below the shoulders. No layers, so the ends stay thick and the line stays sharp."}
+    ],
+    long:[
+      {name:"Long Layers with Side Part", tags:"Elegant \u2022 Face-Framing \u2022 Youthful",
+       hair:"long layered hair with a deep side part and soft bouncy waves through the lengths",
+       desc:"Long layers with a side part add lift and frame your features beautifully. Elegant, flattering and youthful."},
+      {name:"Long Face-Framing Cascade", tags:"Romantic \u2022 Full \u2022 Flowing",
+       hair:"long hair well past the shoulders with cascading layers beginning at the cheekbone and soft waves",
+       desc:"Layers start high at the cheekbone and fall away, so the length keeps moving instead of hanging flat."},
+      {name:"One-Length Long", tags:"Classic \u2022 Sleek \u2022 Low-Fuss",
+       hair:"long one-length hair with a blunt straight-across perimeter and no visible layers",
+       desc:"Grown long and cut straight across. The simplest long shape there is, and the easiest to keep tidy."},
+      {name:"Long Shag", tags:"Textured \u2022 Undone \u2022 Modern",
+       hair:"a long shag with heavy choppy layers through the crown and lengths, and a wispy fringe",
+       desc:"Choppy layers all the way up give long hair volume it otherwise loses. Undone by design."}
     ],
     short:[
       {name:"Soft Pixie Cut", tags:"Short \u2022 Chic \u2022 Low Maintenance",
@@ -416,19 +435,33 @@ var BOOK = {
        hair:"an ivy league cut with a clean side part, short tapered sides and enough length on top to sweep across",
        desc:"A grown-out crew cut with a defined part. Dresses up for work and down at the weekend."}
     ],
-    long:[
+    medium:[
       {name:"Textured Quiff", tags:"Volume \u2022 Modern \u2022 Confident",
        hair:"a medium-length textured quiff swept up and back with tapered sides",
        desc:"Height at the front with tidy sides. Adds length to the face and holds its shape all day."},
-      {name:"Mid-Length Flow", tags:"Relaxed \u2022 Natural \u2022 Easy",
-       hair:"collar-length hair with natural movement, tucked loosely behind the ears",
-       desc:"Grown to the collar and left to move. Low effort, though it needs a trim to keep its shape."},
       {name:"Curtain Fringe", tags:"Fresh \u2022 Youthful \u2022 Soft",
        hair:"a middle-parted curtain fringe of medium length falling either side of the forehead",
        desc:"Parted in the middle and swept either side. Softens a strong forehead and reads young."},
       {name:"Slicked-Back Undercut", tags:"Sharp \u2022 Striking \u2022 Groomed",
        hair:"long hair on top slicked straight back, with a disconnected undercut at the sides",
-       desc:"Long on top, short underneath. A bold outline that needs product and regular upkeep."}
+       desc:"Long on top, short underneath. A bold outline that needs product and regular upkeep."},
+      {name:"Side-Swept Comb Over", tags:"Smart \u2022 Tidy \u2022 Office-Ready",
+       hair:"a medium-length comb over with a defined side parting and a clean taper fade at the sides",
+       desc:"A defined parting with the top combed across. Neat enough for work, soft enough for the weekend."}
+    ],
+    long:[
+      {name:"Mid-Length Flow", tags:"Relaxed \u2022 Natural \u2022 Easy",
+       hair:"collar-length hair with natural movement, tucked loosely behind the ears",
+       desc:"Grown to the collar and left to move. Low effort, though it needs a trim to keep its shape."},
+      {name:"Shoulder-Length Layers", tags:"Full \u2022 Relaxed \u2022 Bold",
+       hair:"shoulder-length hair with long soft layers and a centre parting, tucked behind the ears",
+       desc:"Past the collar with layers so it falls rather than triangles out. Commit to the grow-out."},
+      {name:"Long Middle Part", tags:"Sleek \u2022 Striking \u2022 Simple",
+       hair:"long straight hair well past the collar with a clean centre parting and no fringe",
+       desc:"One length, parted down the middle. Needs healthy ends, so trim every couple of months."},
+      {name:"Top Knot with Taper", tags:"Practical \u2022 Sharp \u2022 Versatile",
+       hair:"long hair on top gathered into a neat top knot, with tapered short sides and back",
+       desc:"Long enough to tie up, short at the sides so it stays sharp when it is down."}
     ]
   }
 };
@@ -454,7 +487,7 @@ var API_BASE = (function(){
 })();
 function api(path){ return API_BASE + path; }
 
-var photo = null, length = "long", picked = -1, running = false, goodModel = null;
+var photo = null, length = "medium", picked = -1, running = false, goodModel = null;
 var gender = "womens", genderSet = false;   // genderSet: the person chose, so stop auto-picking
 var detecting = null;                       // in-flight read of the photo
 var limit = 4;   // requests in flight; drops to 2 if Google starts rate limiting
@@ -991,11 +1024,11 @@ fetch(api("/api/health")).then(function(r){ return r.ok ? r.json() : null; })
     PROXY = true;
     $("connSummary").textContent = "Connection and API key \u2014 " +
       (j.key ? "connected" : "connected, no key on the server");
+    $("connFold").classList.toggle("warn", !j.key);
     $("connNote").innerHTML = j.key
       ? "Connected. The server is holding the key \u2014 nothing to paste."
       : "Connected, but the server has no key. Set GEMINI_API_KEY and restart it, " +
         "or paste one below just for this session.";
-    if (!j.key) $("connFold").open = true;
     refreshGo();
     maybeDetect();
     loadLibrary();
@@ -1003,7 +1036,7 @@ fetch(api("/api/health")).then(function(r){ return r.ok ? r.json() : null; })
   })
   .catch(function(){
     $("connSummary").textContent = "Connection and API key \u2014 no server";
-    $("connFold").open = true;
+    $("connFold").classList.add("warn");
     updateSetup();
     $("connNote").innerHTML = "No server behind this page, so nothing can be generated. " +
       "This page never holds an API key itself \u2014 run <code>python3 serve.py</code> and open the " +
