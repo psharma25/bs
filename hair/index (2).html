@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Find Your Perfect Hairstyle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FAF8F4;
+  --card:#FFFFFF;
+  --line:#E7E3DA;
+  --navy:#16233F;
+  --ink:#2C3243;
+  --muted:#6B7183;
+  --lav:#EDEAF7;
+  --lav-line:#DAD4EE;
+  --base:16px;
+  --disp:"Playfair Display",Georgia,"Times New Roman",serif;
+  --body:"Lora",Georgia,serif;
+}
+html{font-size:var(--base);-webkit-text-size-adjust:100%}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);line-height:1.55}
+h1,h2,h3{font-family:var(--disp);margin:0;color:var(--navy);line-height:1.2}
+p{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--navy);outline-offset:3px}
+
+.wrap{max-width:1560px;margin:0 auto;padding:2.4rem 1.6rem 3rem}
+.masthead{text-align:center;margin-bottom:1.6rem}
+.masthead h1{font-size:3.1rem;font-weight:700;letter-spacing:-.01em}
+.masthead p{margin-top:.5rem;font-size:1.06rem;color:var(--ink)}
+
+.bar{
+  display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;
+  background:var(--card);border:1px solid var(--line);border-radius:.7rem;
+  padding:.8rem 1.4rem;margin-bottom:1.6rem;
+}
+.bar-left{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.bar-label{font-family:var(--disp);font-size:.86rem;letter-spacing:.09em;text-transform:uppercase;color:var(--navy)}
+.pills{display:flex;gap:.5rem}
+.pills button{
+  border:1px solid var(--line);background:var(--card);color:var(--navy);
+  border-radius:999px;padding:.45rem 1.5rem;cursor:pointer;
+  font-family:var(--disp);font-size:.86rem;letter-spacing:.09em;text-transform:uppercase;
+}
+.pills button[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+.tip{font-size:.92rem;color:var(--muted)}
+
+.setup{
+  background:var(--card);border:1px solid var(--line);border-radius:.7rem;
+  padding:1.6rem;margin-bottom:1.6rem;display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1.6rem 2.4rem;
+}
+@media (max-width:820px){.setup{grid-template-columns:1fr}}
+.setup h2{font-size:1.25rem;margin-bottom:.4rem}
+.setup p.note{font-size:.9rem;color:var(--muted);margin-bottom:.8rem}
+.setup a{color:var(--navy)}
+.drop{
+  border:1.5px dashed var(--lav-line);border-radius:.6rem;background:#FCFBFF;
+  padding:1.4rem;text-align:center;cursor:pointer;width:100%;color:var(--muted);font-size:.95rem;
+}
+.drop:hover,.drop.over{border-color:var(--navy);color:var(--navy)}
+.drop strong{display:block;font-family:var(--disp);color:var(--navy);font-size:1.05rem;margin-bottom:.2rem}
+.shot{margin-top:.2rem;display:flex;gap:.9rem;align-items:center}
+.shot img{width:96px;height:auto;border-radius:.4rem;border:1px solid var(--line)}
+.shot button{background:none;border:0;text-decoration:underline;cursor:pointer;color:var(--muted);font-size:.9rem;padding:0}
+.keyrow{display:flex;gap:.6rem;flex-wrap:wrap}
+.keyrow input{
+  flex:1 1 16rem;font:inherit;font-size:.95rem;padding:.6rem .8rem;
+  border:1px solid var(--line);border-radius:.5rem;background:#FCFBFF;
+}
+.views-opt{margin-top:.9rem;display:flex;align-items:center;gap:.7rem;font-size:.9rem;color:var(--muted);flex-wrap:wrap}
+.views-opt select,.adjust select{
+  font:inherit;font-size:.9rem;padding:.35rem .6rem;border:1px solid var(--line);
+  border-radius:.4rem;background:#FCFBFF;color:var(--ink);
+}
+.go{
+  margin-top:1.1rem;background:var(--navy);color:#fff;border:0;border-radius:.5rem;
+  padding:.75rem 1.8rem;cursor:pointer;font-family:var(--disp);font-size:1rem;letter-spacing:.02em;
+}
+.go[disabled]{background:#B9BDC8;cursor:not-allowed}
+
+.setup-fold{margin-bottom:1.6rem}
+.setup-fold>summary{
+  cursor:pointer;list-style:none;background:var(--card);border:1px solid var(--line);
+  border-radius:.7rem;padding:.75rem 1.4rem;font-family:var(--disp);color:var(--navy);
+  display:flex;align-items:center;gap:.6rem;
+}
+.setup-fold>summary::-webkit-details-marker{display:none}
+.setup-fold>summary::before{content:"\25B8";font-size:.8rem;transition:transform .15s ease}
+.setup-fold[open]>summary::before{transform:rotate(90deg)}
+.setup-fold[open]>summary{border-radius:.7rem .7rem 0 0;border-bottom:0}
+.setup-fold[open] .setup{border-radius:0 0 .7rem .7rem;margin-bottom:0}
+.howto{margin-top:1.1rem;font-size:.92rem}
+.howto>summary{cursor:pointer;color:var(--navy);font-family:var(--disp)}
+.howto pre{background:#F4F2ED;border:1px solid var(--line);border-radius:.4rem;
+  padding:.6rem .8rem;margin:.6rem 0;font-size:.88rem;overflow-x:auto}
+.howto .note{margin:.4rem 0}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1.1rem}
+@media (max-width:1180px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:620px){.grid{grid-template-columns:1fr}}
+
+.style{
+  background:var(--card);border:1px solid var(--line);border-radius:.6rem;overflow:hidden;
+  display:flex;flex-direction:column;cursor:pointer;text-align:left;padding:0;
+  transition:box-shadow .15s ease,border-color .15s ease;
+}
+.style:hover{border-color:var(--lav-line);box-shadow:0 10px 30px -24px rgba(22,35,63,.6)}
+.style[aria-pressed="true"]{border-color:var(--navy);box-shadow:0 0 0 2px var(--navy)}
+.style header{background:var(--lav);border-bottom:1px solid var(--lav-line);padding:.85rem 1rem;text-align:center}
+.style header h2{font-size:.98rem;letter-spacing:.05em;text-transform:uppercase;font-weight:600}
+.style header .tags{font-family:var(--disp);font-style:italic;font-size:.9rem;color:var(--ink);margin-top:.2rem}
+.front{background:#FCFCFB;aspect-ratio:4/5;display:grid;place-items:center;overflow:hidden}
+.front img{width:100%;height:100%;object-fit:cover;display:block}
+.views{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)}
+.views>div{padding:.7rem .6rem;text-align:center}
+.views>div+div{border-left:1px solid var(--line)}
+.vlabel{
+  display:block;font-family:var(--disp);font-size:.72rem;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--navy);margin-bottom:.45rem;
+}
+.thumb{background:#FCFCFB;aspect-ratio:3/4;display:grid;place-items:center;overflow:hidden;border-radius:.25rem}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.desc{padding:.9rem 1rem 1.1rem;text-align:center;font-size:.92rem;color:var(--ink);border-top:1px solid var(--line)}
+
+.ph{width:100%;height:100%;display:grid;place-items:center;color:#A9AEBB;font-size:.8rem;
+  font-family:var(--disp);letter-spacing:.06em;text-align:center;padding:.5rem;background:#F6F5F2}
+.ph.busy{background:linear-gradient(100deg,#F6F5F2 30%,#EDECE8 50%,#F6F5F2 70%);
+  background-size:250% 100%;animation:sweep 1.6s linear infinite}
+@keyframes sweep{from{background-position:120% 0}to{background-position:-120% 0}}
+.ph.failed{background:#FBF3F1;color:#9C5B4B}
+@media (prefers-reduced-motion:reduce){.ph.busy{animation:none}}
+
+.adjust{
+  margin-top:1.4rem;background:var(--card);border:1px solid var(--line);border-radius:.7rem;
+  padding:1rem 1.4rem;display:flex;gap:1.6rem;align-items:center;flex-wrap:wrap;
+}
+.adjust .grp{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap}
+.adjust .pills button{padding:.35rem 1rem;font-size:.78rem}
+#adjustHint{font-size:.88rem;color:var(--muted)}
+.adjust .glab{font-family:var(--disp);font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;color:var(--navy)}
+.sw{width:1.6rem;height:1.6rem;border-radius:50%;border:1px solid rgba(0,0,0,.2);cursor:pointer;padding:0}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--navy)}
+.redo{background:var(--navy);color:#fff;border:0;border-radius:.45rem;padding:.5rem 1.1rem;cursor:pointer;font-family:var(--disp)}
+.redo[disabled]{background:#B9BDC8;cursor:not-allowed}
+
+.saver,.library{background:var(--card);border:1px solid var(--line);border-radius:.7rem;
+  padding:1.2rem 1.4rem;margin-top:1.4rem}
+.saver h2,.library h2{font-size:1.15rem;margin-bottom:.3rem}
+.saverow{display:flex;gap:.6rem;flex-wrap:wrap;margin:.8rem 0}
+.clientrow{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin:.9rem 0 .3rem}
+.clientrow input{flex:1 1 7rem;font:inherit;font-size:.92rem;padding:.45rem .6rem;
+  border:1px solid var(--line);border-radius:.45rem;background:#FCFBFF}
+.clientrow .lbl{font-family:var(--disp);font-size:.78rem;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--navy);width:100%}
+.usagerow{display:flex;gap:.7rem;align-items:center;flex-wrap:wrap;margin:.8rem 0;font-size:.92rem}
+.usagerow input{font:inherit;padding:.35rem .5rem;border:1px solid var(--line);border-radius:.4rem;background:#FCFBFF}
+table.usage{width:100%;border-collapse:collapse;font-size:.92rem}
+table.usage th,table.usage td{text-align:left;padding:.45rem .6rem;border-top:1px solid var(--line)}
+table.usage th{font-family:var(--disp);font-weight:600;color:var(--navy)}
+table.usage td.num,table.usage th.num{text-align:right;font-variant-numeric:tabular-nums}
+table.usage tr.over td{background:#FBF3F1}
+.del{background:none;border:0;color:#8A4B3B;cursor:pointer;text-decoration:underline;font-size:.88rem;padding:0;margin-left:.8rem}
+.saverow input{flex:1 1 12rem;font:inherit;font-size:.95rem;padding:.55rem .8rem;
+  border:1px solid var(--line);border-radius:.5rem;background:#FCFBFF}
+.saveopts{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;font-size:.92rem;color:var(--muted)}
+.saveopts label{display:flex;align-items:center;gap:.4rem}
+#saveMsg{font-size:.9rem}
+.libitem{display:flex;gap:.8rem;align-items:center;padding:.6rem 0;border-top:1px solid var(--line);font-size:.93rem}
+.libitem:first-child{border-top:0}
+.libitem img{width:44px;height:56px;object-fit:cover;border-radius:.3rem;border:1px solid var(--line)}
+.libitem b{font-family:var(--disp);font-weight:600}
+.libitem span{color:var(--muted)}
+.libitem a{margin-left:auto;color:var(--navy)}
+.footnote{margin-top:1.4rem;text-align:center;font-size:.92rem;color:var(--muted)}
+.status{margin-top:1rem;text-align:center;font-size:.95rem;color:var(--muted);min-height:1.4rem}
+.err{background:#FBF3F1;border:1px solid #E7CFC8;color:#8A4B3B;border-radius:.5rem;padding:.9rem 1.1rem;margin-bottom:1.2rem;font-size:.93rem}
+.hidden{display:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <h1>Find Your Perfect Hairstyle</h1>
+    <p>Explore different styles and views. Click on any style to see it on you.</p>
+  </div>
+
+  <div class="bar">
+    <div class="bar-left">
+      <span class="bar-label" id="lenLab">Hair length</span>
+      <div class="pills" role="group" aria-labelledby="lenLab" id="lenPills">
+        <button data-v="short" aria-pressed="false">Short</button>
+        <button data-v="long" aria-pressed="true">Long</button>
+      </div>
+    </div>
+    <p class="tip">Front views come first. Click a style and its side and back views load straight away.</p>
+  </div>
+
+  <div id="errBox"></div>
+
+  <details class="setup-fold" id="setupFold" open>
+    <summary id="setupSummary">Setup</summary>
+  <section class="setup" id="setup">
+    <div>
+      <h2>Your photo</h2>
+      <p class="note">A straight-on headshot works best: good light, hair off the face, plain background.</p>
+      <button class="drop" id="drop">
+        <strong>Drag a photo in</strong>
+        Drop it anywhere on the page, paste it, or click to browse.
+      </button>
+      <div class="shot hidden" id="shot">
+        <img id="shotImg" alt="Your photo">
+        <button id="reshoot">Use a different photo</button>
+      </div>
+      <input type="file" id="file" accept="image/*" class="sr">
+    </div>
+    <div>
+      <h2>Connection</h2>
+      <p class="note" id="connNote">Checking for the server…</p>
+      <div class="clientrow">
+        <span class="lbl">Client</span>
+        <input id="refId" placeholder="Client ID" aria-label="Client ID">
+        <input id="refNick" placeholder="Nickname" aria-label="Nickname">
+        <input id="refName" placeholder="Full name" aria-label="Full name">
+      </div>
+      <p class="note">Any one is enough. Every picture generated is counted against
+        this client so you can see what they cost.</p>
+
+      <div class="views-opt">
+        <label for="viewsSel">Views per style</label>
+        <select id="viewsSel">
+          <option value="1">Front first — side and back load when you pick one</option>
+          <option value="3">All three views up front — slower</option>
+        </select>
+      </div>
+      <button class="go" id="go" disabled>Show me these styles</button>
+
+      <details class="howto">
+        <summary>How do I run this?</summary>
+        <p class="note">This page needs its small server alongside it. In a terminal, in the
+          folder holding <code>index.html</code> and <code>serve.py</code>:</p>
+        <pre>python3 serve.py</pre>
+        <p class="note">It asks for your key once, then opens
+          <code>http://localhost:8000</code>. On Windows use <code>py serve.py</code>.
+          In a Codespace it starts on its own and the key comes from your
+          <code>GEMINI_API_KEY</code> secret.</p>
+      </details>
+    </div>
+  </section>
+  </details>
+
+  <div class="grid" id="grid"></div>
+  <p class="status" id="status"></p>
+
+  <div class="adjust" id="adjust">
+    <div class="grp">
+      <span class="glab" id="setLab">Styles</span>
+      <div class="pills" role="group" aria-labelledby="setLab" id="setPills">
+        <button data-v="womens" aria-pressed="true">Women's</button>
+        <button data-v="mens" aria-pressed="false">Men's</button>
+      </div>
+    </div>
+    <div class="grp">
+      <span class="glab">Hair colour</span>
+      <div id="swatches" style="display:flex;gap:.45rem"></div>
+    </div>
+    <div class="grp">
+      <span class="glab">Highlights</span>
+      <select id="hl">
+        <option value="">As they are</option>
+        <option value="a few subtle highlights">A few</option>
+        <option value="bright face-framing highlights around the face">Face-framing</option>
+        <option value="rich multi-tonal balayage highlights throughout">Plenty</option>
+      </select>
+    </div>
+    <div class="grp">
+      <span class="glab">Eyebrow width</span>
+      <select id="brow">
+        <option value="">As they are</option>
+        <option value="noticeably thinner, finely groomed eyebrows">Thinner</option>
+        <option value="fuller, more defined eyebrows">Fuller</option>
+        <option value="thick, bold, strongly defined eyebrows">Much fuller</option>
+      </select>
+    </div>
+    <button class="redo" id="redo" disabled>Regenerate this style</button>
+    <span id="adjustHint" class="note">Pick a style above, then regenerate it with these.</span>
+  </div>
+
+  <section class="saver hidden" id="saveBox">
+    <h2>Save this look</h2>
+    <p class="note">Saves the original photo and the generated pictures under the client
+      reference above, and deletes them automatically when the retention period is up.</p>
+    <div class="saveopts">
+      <label for="keepDays">Keep for</label>
+      <select id="keepDays">
+        <option value="7">7 days</option>
+        <option value="30" selected>30 days</option>
+        <option value="90">90 days</option>
+        <option value="180">180 days</option>
+        <option value="0">Until I delete it</option>
+      </select>
+    </div>
+    <div class="saveopts">
+      <label><input type="checkbox" id="saveAll"> Save every style, not just the one I picked</label>
+      <button class="redo" id="saveBtn">Save</button>
+      <span id="saveMsg"></span>
+    </div>
+  </section>
+
+  <section class="library hidden" id="library">
+    <h2>Saved looks</h2>
+    <div id="libList"></div>
+  </section>
+
+  <section class="library hidden" id="usageBox">
+    <h2>What each client has cost</h2>
+    <div class="usagerow">
+      <label for="allowance">Images included per client per month</label>
+      <input id="allowance" type="number" min="0" step="1" value="12" style="width:5rem">
+      <button class="redo" id="refreshUsage">Refresh</button>
+      <span id="usageTotals"></span>
+    </div>
+    <div id="usageTable"></div>
+  </section>
+
+  <p class="footnote">Each picture is your own photo re-rendered by an image model. Faces shift a little
+    between generations, so take them to the salon as a guide, not a promise.</p>
+</div>
+
+<script>
+/* Point this at your backend when the page is hosted somewhere static (GitHub Pages,
+   S3/CloudFront). Leave it empty to use a same-origin backend such as serve.py.
+   A ?api=https://... query string overrides it. */
+window.HAIR_CONFIG = { apiBase: "" };
+</script>
+<script>
+(function(){
+"use strict";
+var $ = function(id){ return document.getElementById(id); };
+
+var BOOK = {
+  womens:{
+    long:[
+      {name:"Shoulder Length Layers", tags:"Soft \u2022 Natural \u2022 Timeless",
+       hair:"soft shoulder-length layers with gentle movement, face-framing pieces and natural volume",
+       desc:"Soft layers add movement and body while framing the face and softening cheeks. Versatile and easy to maintain."},
+      {name:"Long Layers with Side Part", tags:"Elegant \u2022 Face-Framing \u2022 Youthful",
+       hair:"long layered hair with a deep side part and soft bouncy waves through the lengths",
+       desc:"Long layers with a side part add lift and frame your features beautifully. Elegant, flattering and youthful."},
+      {name:"Collarbone Bob (Lob)", tags:"Chic \u2022 Modern \u2022 Polished",
+       hair:"a polished collarbone-length lob with a blunt perimeter and smooth ends turned slightly under",
+       desc:"A modern lob that grazes the collarbone. Adds structure and shape while keeping a soft, feminine look."},
+      {name:"Curtain Fringe Midi", tags:"Fresh \u2022 Flattering \u2022 Easy",
+       hair:"mid-length hair with a soft curtain fringe parted in the middle and sweeping away from the face",
+       desc:"A curtain fringe softens the forehead and draws the eye upward. Fresh without giving up length."}
+    ],
+    short:[
+      {name:"Soft Pixie Cut", tags:"Short \u2022 Chic \u2022 Low Maintenance",
+       hair:"a soft textured pixie cut, longer on top with a wispy side-swept fringe and a tapered nape",
+       desc:"A chic pixie cut that is easy to style and maintain. Perfect for a fresh, confident and modern look."},
+      {name:"Chin-Length Bob", tags:"Classic \u2022 Structured \u2022 Sharp",
+       hair:"a blunt chin-length bob with a clean perimeter and a subtle inward bend at the ends",
+       desc:"A classic bob ending at the chin. Adds width at the jaw and keeps a strong, tidy outline."},
+      {name:"Textured Crop", tags:"Modern \u2022 Light \u2022 Effortless",
+       hair:"a short textured crop with piecey layers on top and softly tapered sides",
+       desc:"Piecey texture on top with close sides. Quick to dry, quick to style, and full of movement."},
+      {name:"Layered Bixie", tags:"Playful \u2022 Soft \u2022 Volumised",
+       hair:"a layered bixie cut between a bob and a pixie, with volume at the crown and soft ends around the ears",
+       desc:"Halfway between a bob and a pixie. Volume at the crown lifts the face while the ends stay soft."}
+    ]
+  },
+  mens:{
+    short:[
+      {name:"Classic Taper", tags:"Sharp \u2022 Tidy \u2022 Professional",
+       hair:"a classic tapered haircut, short back and sides blending up into a little length on top, combed neatly",
+       desc:"Short at the back and sides with just enough on top to comb. Smart, tidy and never out of place."},
+      {name:"Textured French Crop", tags:"Modern \u2022 Low-Fuss \u2022 Youthful",
+       hair:"a short textured French crop with a blunt fringe worn forward and neatly faded sides",
+       desc:"Texture on top worn forward, tight at the sides. Quick in the morning and easy to keep sharp."},
+      {name:"Buzz Cut with Fade", tags:"Clean \u2022 Bold \u2022 Effortless",
+       hair:"a short buzz cut with a skin fade at the sides and a sharp, clean hairline",
+       desc:"About as simple as it gets. A clean fade keeps it looking deliberate rather than plain."},
+      {name:"Ivy League Side Part", tags:"Smart \u2022 Timeless \u2022 Versatile",
+       hair:"an ivy league cut with a clean side part, short tapered sides and enough length on top to sweep across",
+       desc:"A grown-out crew cut with a defined part. Dresses up for work and down at the weekend."}
+    ],
+    long:[
+      {name:"Textured Quiff", tags:"Volume \u2022 Modern \u2022 Confident",
+       hair:"a medium-length textured quiff swept up and back with tapered sides",
+       desc:"Height at the front with tidy sides. Adds length to the face and holds its shape all day."},
+      {name:"Mid-Length Flow", tags:"Relaxed \u2022 Natural \u2022 Easy",
+       hair:"collar-length hair with natural movement, tucked loosely behind the ears",
+       desc:"Grown to the collar and left to move. Low effort, though it needs a trim to keep its shape."},
+      {name:"Curtain Fringe", tags:"Fresh \u2022 Youthful \u2022 Soft",
+       hair:"a middle-parted curtain fringe of medium length falling either side of the forehead",
+       desc:"Parted in the middle and swept either side. Softens a strong forehead and reads young."},
+      {name:"Slicked-Back Undercut", tags:"Sharp \u2022 Striking \u2022 Groomed",
+       hair:"long hair on top slicked straight back, with a disconnected undercut at the sides",
+       desc:"Long on top, short underneath. A bold outline that needs product and regular upkeep."}
+    ]
+  }
+};
+
+var COLORS = [
+  {n:"Keep my colour", v:""},
+  {n:"Jet black", v:"jet black hair colour", c:"#1B1B1E"},
+  {n:"Dark brown", v:"dark brown hair colour", c:"#3B2A1E"},
+  {n:"Chestnut", v:"warm chestnut brown hair colour", c:"#6E4326"},
+  {n:"Auburn", v:"rich auburn hair colour", c:"#7C3A22"},
+  {n:"Honey blonde", v:"honey blonde hair colour", c:"#BE9256"},
+  {n:"Silver grey", v:"natural silver grey hair colour", c:"#9AA0A6"}
+];
+
+var BLOCKED = "Could not reach the server behind this page. Check that serve.py is still " +
+  "running, then try again.";
+var MODELS = ["gemini-3.1-flash-image","gemini-2.5-flash-image"];
+var TEXT_MODELS = ["gemini-3.7-flash","gemini-2.5-flash"];
+var API_BASE = (function(){
+  var q = /[?&]api=([^&]+)/.exec(location.search);
+  var v = q ? decodeURIComponent(q[1]) : ((window.HAIR_CONFIG||{}).apiBase || "");
+  return String(v).replace(/\/$/, "");
+})();
+function api(path){ return API_BASE + path; }
+
+var photo = null, length = "long", picked = -1, running = false, goodModel = null;
+var gender = "womens", genderSet = false;   // genderSet: the person chose, so stop auto-picking
+var detecting = null;                       // in-flight read of the photo
+var limit = 4;   // requests in flight; drops to 2 if Google starts rate limiting
+function wait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+var PROXY = false;   // true when serve.py is hosting this page and holds the key
+var look = {colour:"", hl:"", brow:""};
+var results = {};
+
+/* ---------------- photo ---------------- */
+$("drop").addEventListener("click", function(){ $("file").click(); });
+$("reshoot").addEventListener("click", function(){ $("file").click(); });
+$("file").addEventListener("change", function(){ if (this.files[0]) load(this.files[0]); });
+
+["dragenter","dragover"].forEach(function(ev){
+  window.addEventListener(ev, function(e){
+    if (!hasFiles(e)) return;
+    e.preventDefault(); $("drop").classList.add("over");
+  });
+});
+window.addEventListener("dragleave", function(){ $("drop").classList.remove("over"); });
+window.addEventListener("drop", function(e){
+  e.preventDefault(); $("drop").classList.remove("over");
+  var f = e.dataTransfer && e.dataTransfer.files[0];
+  if (f) load(f);
+});
+document.addEventListener("paste", function(e){
+  var it = (e.clipboardData||{}).items||[];
+  for (var i=0;i<it.length;i++) if (it[i].type.indexOf("image") === 0){ load(it[i].getAsFile()); break; }
+});
+function hasFiles(e){
+  var t = e.dataTransfer && e.dataTransfer.types; if (!t) return false;
+  for (var i=0;i<t.length;i++) if (t[i] === "Files") return true;
+  return false;
+}
+
+function load(file){
+  if (!file || file.type.indexOf("image") !== 0){ return say("That file isn't an image."); }
+  var r = new FileReader();
+  r.onload = function(){
+    var im = new Image();
+    im.onload = function(){
+      var max = 768, s = Math.min(1, max/Math.max(im.width, im.height));
+      var c = document.createElement("canvas");
+      c.width = Math.round(im.width*s); c.height = Math.round(im.height*s);
+      c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+      var url = c.toDataURL("image/jpeg", 0.86);
+      photo = {b64:url.split(",")[1], mime:"image/jpeg", url:url};
+      $("shotImg").src = url;
+      $("shot").classList.remove("hidden");
+      $("drop").classList.add("hidden");
+      detecting = null;   // a new photo deserves a fresh read
+      refreshGo();
+      maybeDetect();
+    };
+    im.onerror = function(){ say("That image wouldn't open. Try exporting it as a JPG."); };
+    im.src = r.result;
+  };
+  r.readAsDataURL(file);
+}
+
+
+/* The setup panel is folded away once there is nothing left to do in it.
+   Nothing is removed from the page \u2014 click the summary to open it again. */
+var setupTouched = false;
+// listen for the click, not the toggle event: toggling it in code must not
+// count as the person having taken control of the panel
+$("setupSummary").addEventListener("click", function(){ setupTouched = true; });
+
+function updateSetup(){
+  var bits = [];
+  bits.push(photo ? "Photo ready" : "No photo yet");
+  bits.push(PROXY ? "Connected" : "No server");
+  $("setupSummary").textContent = "Setup \u2014 " + bits.join(" \u00b7 ");
+  // fold it the first time both are true, unless the person has opened or
+  // closed it themselves
+  if (photo && PROXY && !setupTouched) $("setupFold").open = false;
+}
+
+function refreshGo(){ $("go").disabled = !(photo && PROXY); updateSetup(); }
+
+/* ---------------- controls ---------------- */
+function btn(t, box){
+  while (t && t !== box && t.tagName !== "BUTTON") t = t.parentNode;
+  return (t && t !== box) ? t : null;
+}
+function press(box, b){
+  Array.prototype.forEach.call(box.querySelectorAll("button"), function(o){
+    o.setAttribute("aria-pressed", String(o === b));
+  });
+}
+
+$("setPills").addEventListener("click", function(e){
+  var b = btn(e.target, this); if (!b || b.dataset.v === gender) return;
+  press(this, b);
+  gender = b.dataset.v;
+  genderSet = true;                      // an explicit choice always wins from here on
+  picked = -1;
+  $("redo").disabled = true;
+  $("adjustHint").textContent = "Pick a style above, then regenerate it with these.";
+  drawGrid();
+  if (photo && PROXY) generate();
+});
+
+$("lenPills").addEventListener("click", function(e){
+  var b = btn(e.target, this); if (!b || b.dataset.v === length) return;
+  press(this, b);
+  length = b.dataset.v;
+  picked = -1;
+  $("redo").disabled = true;
+  $("adjustHint").textContent = "Pick a style above, then regenerate it with these.";
+  drawGrid();
+  if (photo && PROXY) generate();
+});
+
+$("swatches").innerHTML = COLORS.map(function(c,i){
+  var bg = c.c ? c.c : "linear-gradient(135deg,#fff 45%,#d8d8d8 55%)";
+  return '<button class="sw" data-i="'+i+'" aria-pressed="'+(i===0)+'" title="'+c.n+
+         '" aria-label="'+c.n+'" style="background:'+bg+'"></button>';
+}).join("");
+$("swatches").addEventListener("click", function(e){
+  var b = btn(e.target, this); if (!b) return;
+  press(this, b);
+  look.colour = COLORS[b.dataset.i|0].v;
+});
+$("hl").addEventListener("change", function(){ look.hl = this.value; });
+$("brow").addEventListener("change", function(){ look.brow = this.value; });
+
+function startRun(){
+  if (running) return;
+  results = {};
+  maybeDetect();
+  (detecting || Promise.resolve()).then(function(){
+    drawGrid();
+    generate();
+  });
+}
+$("go").addEventListener("click", startRun);
+$("redo").addEventListener("click", function(){
+  if (picked < 0 || running) return;
+  ["front","side","back"].forEach(function(v){ delete results[gender+":"+length+":"+picked+":"+v]; });
+  generate(picked);
+});
+
+/* ---------------- grid ---------------- */
+function drawGrid(){
+  $("grid").innerHTML = BOOK[gender][length].map(function(s,i){
+    return '<button class="style" data-i="'+i+'" aria-pressed="false">' +
+      '<header><h2>'+(i+1)+'. '+esc(s.name)+'</h2><p class="tags">'+esc(s.tags)+'</p></header>' +
+      '<div class="front" id="cell-'+i+'-front">'+ph("Add a photo and a key")+'</div>' +
+      '<div class="views">' +
+        '<div><span class="vlabel">Side view</span><div class="thumb" id="cell-'+i+'-side">'+ph("")+'</div></div>' +
+        '<div><span class="vlabel">Back view</span><div class="thumb" id="cell-'+i+'-back">'+ph("")+'</div></div>' +
+      '</div>' +
+      '<p class="desc">'+esc(s.desc)+'</p>' +
+    '</button>';
+  }).join("");
+  Array.prototype.forEach.call($("grid").querySelectorAll(".style"), function(b){
+    b.addEventListener("click", function(){
+      picked = b.dataset.i|0;
+      press($("grid"), b);
+      $("saveBox").classList.remove("hidden");
+      $("redo").disabled = false;
+      $("adjustHint").textContent = "";
+      if (results[gender+":"+length+":"+picked+":front"]) generate(picked, ["side","back"]);
+    });
+  });
+  Object.keys(results).forEach(function(k){
+    var p = k.split(":");
+    if (p[0] !== gender || p[1] !== length) return;
+    var cell = $("cell-"+p[2]+"-"+p[3]);
+    if (cell) cell.innerHTML = '<img src="'+results[k]+'" alt="">';
+  });
+}
+function ph(txt, cls){ return '<div class="ph '+(cls||"")+'">'+esc(txt)+'</div>'; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function say(m){ $("status").textContent = m || ""; }
+function fail(m){ $("errBox").innerHTML = m ? '<div class="err">'+esc(m)+'</div>' : ""; }
+
+/* ---------------- prompts ---------------- */
+function promptFor(style, view){
+  var extra = [look.colour, look.hl, look.brow].filter(Boolean).join(", ");
+  var base =
+    "Edit this photograph of a real person. Change ONLY the hair: give them " + style.hair + ". " +
+    (extra ? "Also apply: " + extra + ". " : "") +
+    "Keep the same person: identical facial features, bone structure, skin tone, age, expression, " +
+    "make-up, facial hair, jewellery, clothing, lighting and background. Do not add or remove a beard or moustache, and do not slim, smooth or beautify the face. " +
+    "Photorealistic, sharp, professional studio headshot quality.";
+  if (view === "front") return base + " Keep the same front-facing camera angle as the original photograph.";
+  if (view === "side")  return base + " Show the same person in profile, facing to their right, so the shape " +
+    "of the cut is visible from the side. Same clothing, lighting and plain background.";
+  return base + " Show the back of the head from directly behind, so the shape and length at the nape are " +
+    "visible. Same clothing, lighting and plain background. The face is not visible.";
+}
+
+/* ---------------- image model ---------------- */
+function generateOne(style, view){
+  var body = {
+    contents:[{ role:"user", parts:[
+      { inline_data:{ mime_type:photo.mime, data:photo.b64 } },
+      { text: promptFor(style, view) }
+    ]}],
+    generationConfig:{ responseModalities:["TEXT","IMAGE"] }
+  };
+  var models = goodModel ? [goodModel] : MODELS.slice();
+
+  function send(model){
+    // The only outbound call this page makes. There is deliberately no
+    // direct-to-Google path and no key in the browser.
+    return fetch(api("/api/gen"), {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ model:model, payload:body, ref:refFields() })
+    });
+  }
+
+  function attempt(i, retried){
+    if (i >= models.length) return Promise.reject(new Error("No available image model accepted the request."));
+    return send(models[i]).catch(function(e){
+      throw new Error(BLOCKED);
+    }).then(function(r){
+      return r.json().then(function(j){
+        if (!r.ok){
+          var msg = (j.error && j.error.message) || ("HTTP " + r.status);
+          if (r.status === 404 || /not found|not supported/i.test(msg)) return attempt(i+1, retried);
+          if ((r.status === 429 || r.status === 503) && !retried){
+            limit = 2;                                  // ease off, then try this one again
+            return wait(2500).then(function(){ return attempt(i, true); });
+          }
+          throw new Error(msg);
+        }
+        goodModel = models[i];
+        var parts = (((j.candidates||[])[0]||{}).content||{}).parts||[];
+        for (var k=0;k<parts.length;k++){
+          var d = parts[k].inlineData || parts[k].inline_data;
+          if (d && d.data) return "data:" + (d.mimeType || d.mime_type || "image/png") + ";base64," + d.data;
+        }
+        var why = ((j.candidates||[])[0]||{}).finishReason || "";
+        throw new Error(/SAFETY|PROHIBIT/i.test(why)
+          ? "The model declined to edit this photo."
+          : "The reply came back without a picture.");
+      });
+    });
+  }
+  return attempt(0, false);
+}
+
+/* One quick look at the photo to decide which book of cuts to open first.
+   It only sets the starting tab \u2014 the person can switch at any time, and once
+   they do we never ask again. */
+function detectSet(){
+  if (genderSet || !photo) return Promise.resolve(null);
+  var payload = {
+    contents:[{ role:"user", parts:[
+      { inline_data:{ mime_type:photo.mime, data:photo.b64 } },
+      { text:"A hairstyle app has two catalogues of cuts: a women's book and a men's book. " +
+             "Which one is the better starting point for the person in this photo? " +
+             "Reply with exactly one word: womens, mens, or unsure." }
+    ]}]
+  };
+  var models = TEXT_MODELS.slice();
+
+  function ask(i){
+    if (i >= models.length) return Promise.resolve(null);
+    var req = fetch(api("/api/gen"), {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({model:models[i], payload:payload, ref:refFields()})
+    });
+    return req.then(function(r){
+      return r.json().then(function(j){
+        if (!r.ok) return ask(i+1);
+        var parts = (((j.candidates||[])[0]||{}).content||{}).parts||[];
+        var txt = parts.map(function(x){ return x.text||""; }).join(" ").toLowerCase();
+        // "womens" contains "mens", and "female" contains "male", so test the
+        // longer words first and only then fall through
+        if (/wom[ae]n|female|lad(y|ies)/.test(txt)) return "womens";
+        if (/\bmen\b|\bmens\b|men's|\bmale\b/.test(txt)) return "mens";
+        return null;
+      });
+    }).catch(function(){ return null; });
+  }
+  return ask(0);
+}
+
+/* fires on its own as soon as a photo and a way to call the API are both present */
+function maybeDetect(){
+  if (genderSet || detecting || !photo) return;
+  if (!PROXY) return;
+  detecting = detectSet().then(function(v){ applySet(v); });
+}
+
+function applySet(v){
+  if (!v || genderSet || v === gender) return false;
+  gender = v;
+  press($("setPills"), $("setPills").querySelector('[data-v="'+v+'"]'));
+  drawGrid();
+  return true;
+}
+
+/* ---------------- saving ---------------- */
+function refFields(){
+  return { id:$("refId").value.trim(), nickname:$("refNick").value.trim(), name:$("refName").value.trim() };
+}
+function refLabel(r){ return r.id || r.nickname || r.name; }
+
+function imagesFor(index){
+  var out = [];
+  ["front","side","back"].forEach(function(v){
+    var u = results[gender+":"+length+":"+index+":"+v];
+    if (u) out.push({ view:v, dataUrl:u });
+  });
+  return out;
+}
+
+function saveMsg(m, bad){
+  var el = $("saveMsg");
+  el.textContent = m || "";
+  el.style.color = bad ? "#8A4B3B" : "var(--muted)";
+}
+
+$("saveBtn").addEventListener("click", function(){
+  var ref = refFields();
+  if (!refLabel(ref)) return saveMsg("Give a client ID, a nickname or a name first.", true);
+  if (!photo) return saveMsg("No photo to save.", true);
+
+  var all = $("saveAll").checked;
+  var list = BOOK[gender][length];
+  var picks = [];
+  if (all){
+    list.forEach(function(st,i){
+      var imgs = imagesFor(i);
+      if (imgs.length) picks.push({ style:st.name, chosen:(i === picked), images:imgs });
+    });
+  } else {
+    if (picked < 0) return saveMsg("Pick a style first, or tick save every style.", true);
+    var imgs = imagesFor(picked);
+    if (!imgs.length) return saveMsg("That style hasn't generated yet.", true);
+    picks.push({ style:list[picked].name, chosen:true, images:imgs });
+  }
+
+  var record = {
+    ref: ref,
+    keepDays: parseInt($("keepDays").value, 10) || 0,
+    set: gender, length: length,
+    chosenStyle: picked >= 0 ? list[picked].name : null,
+    original: photo.url,
+    styles: picks,
+    when: new Date().toISOString()
+  };
+
+  saveMsg("Saving\u2026");
+  if (!PROXY) return downloadRecord(record);
+
+  fetch(api("/api/save"), {
+    method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(record)
+  }).then(function(r){ return r.json().then(function(j){
+      if (!r.ok) throw new Error((j.error && j.error.message) || "Save failed.");
+      saveMsg("Saved as " + j.slug + ".");
+      loadLibrary();
+      loadUsage();
+    });
+  }).catch(function(e){
+    saveMsg(e.message + " Downloading to this device instead\u2026", true);
+    downloadRecord(record);
+  });
+});
+
+/* no backend: hand the files straight to the browser's downloads */
+function downloadRecord(rec){
+  var base = (refLabel(rec.ref) || "client").replace(/[^\w.-]+/g,"-").toLowerCase() +
+             "-" + rec.when.slice(0,10);
+  grab(rec.original, base + "-original.jpg");
+  rec.styles.forEach(function(st){
+    var name = st.style.replace(/[^\w]+/g,"-").toLowerCase();
+    st.images.forEach(function(im){ grab(im.dataUrl, base + "-" + name + "-" + im.view + ".png"); });
+  });
+  var meta = JSON.parse(JSON.stringify(rec));
+  meta.original = "(saved alongside)";
+  meta.styles.forEach(function(st){ st.images = st.images.map(function(i){ return i.view; }); });
+  grab("data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(meta,null,2)))),
+       base + "-details.json");
+  saveMsg("Downloaded " + base + " to this device.");
+}
+function grab(url, filename){
+  var a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* ---------------- per-client usage ---------------- */
+function money(n){ return "$" + (Math.round(n*100)/100).toFixed(2); }
+
+function loadUsage(){
+  if (!PROXY) return;
+  var allowance = parseInt($("allowance").value, 10) || 0;
+  fetch(api("/api/usage?allowance=" + allowance))
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(j){
+      if (!j || !j.rows || !j.rows.length) return;
+      $("usageBox").classList.remove("hidden");
+      $("usageTotals").textContent = j.month + ": " + j.totals.images + " images, " +
+        money(j.totals.cost) + " total" + (j.totals.over ? ", " + j.totals.over + " over allowance" : "");
+      $("usageTable").innerHTML =
+        '<table class="usage"><thead><tr><th>Client</th><th class="num">Images</th>' +
+        '<th class="num">Cost</th><th class="num">Over</th><th class="num">Overage cost</th></tr></thead><tbody>' +
+        j.rows.map(function(r){
+          return '<tr class="' + (r.over ? "over" : "") + '"><td>' + esc(r.customer) + '</td>' +
+            '<td class="num">' + r.images + '</td>' +
+            '<td class="num">' + money(r.cost) + '</td>' +
+            '<td class="num">' + (r.over || "\u2014") + '</td>' +
+            '<td class="num">' + (r.over ? money(r.overCost) : "\u2014") + '</td></tr>';
+        }).join("") + '</tbody></table>';
+    }).catch(function(){});
+}
+$("refreshUsage").addEventListener("click", loadUsage);
+$("allowance").addEventListener("change", loadUsage);
+
+function deleteSaved(slug){
+  fetch(api("/api/delete"), {
+    method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({slug:slug})
+  }).then(function(){ loadLibrary(); }).catch(function(){});
+}
+
+function loadLibrary(){
+  if (!PROXY) return;
+  fetch(api("/api/saves")).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){
+    if (!j || !j.items || !j.items.length) return;
+    $("library").classList.remove("hidden");
+    $("libList").innerHTML = j.items.map(function(it){
+      var keep = it.daysLeft === null || it.daysLeft === undefined
+        ? "kept until deleted"
+        : (it.daysLeft === 0 ? "expires today" : "expires in " + it.daysLeft + " day" + (it.daysLeft === 1 ? "" : "s"));
+      return '<div class="libitem">' +
+        (it.thumb ? '<img src="'+esc(api(it.thumb))+'" alt="">' : '') +
+        '<div><b>'+esc(it.label)+'</b><br><span>'+esc(it.chosenStyle || it.set)+
+        ' \u2014 '+esc((it.when||"").slice(0,10))+' \u2014 '+esc(keep)+'</span></div>' +
+        '<a href="'+esc(api(it.path))+'" target="_blank" rel="noopener">Open folder</a>' +
+        '<button class="del" data-slug="'+esc(it.slug)+'">Delete now</button></div>';
+    }).join("");
+    Array.prototype.forEach.call($("libList").querySelectorAll(".del"), function(b){
+      b.addEventListener("click", function(){ deleteSaved(b.dataset.slug); });
+    });
+  }).catch(function(){});
+}
+
+function generate(onlyIndex, viewList){
+  if (running) return;
+  if (!photo || !PROXY) return;
+  fail("");
+  running = true;
+  $("go").disabled = true; $("redo").disabled = true;
+
+  var views = viewList || ($("viewsSel").value === "1" ? ["front"] : ["front","side","back"]);
+  var jobs = [];
+  BOOK[gender][length].forEach(function(s,i){
+    if (onlyIndex != null && i !== onlyIndex) return;
+    views.forEach(function(v){ if (!results[gender+":"+length+":"+i+":"+v]) jobs.push({i:i, v:v, s:s}); });
+  });
+  jobs.sort(function(a,b){ return (a.v === "front" ? 0 : 1) - (b.v === "front" ? 0 : 1); });
+
+  jobs.forEach(function(j){
+    var c = $("cell-"+j.i+"-"+j.v);
+    if (c) c.innerHTML = ph("Queued");
+  });
+
+  var done = 0, total = jobs.length, next = 0, active = 0, failures = 0;
+  if (!total){ running = false; $("go").disabled = false; $("redo").disabled = picked < 0; return; }
+  say("Generating " + total + " picture" + (total === 1 ? "" : "s") + "\u2026");
+
+  function finish(){
+    running = false;
+    loadUsage();
+    $("go").disabled = false;
+    $("redo").disabled = picked < 0;
+    say(failures === total ? "Nothing rendered. Check the key, then try again." : "");
+  }
+
+  function pump(){
+    while (active < limit && next < jobs.length){
+      var j = jobs[next++];
+      active++;
+      (function(j){
+        var c0 = $("cell-"+j.i+"-"+j.v);
+        if (c0) c0.innerHTML = ph("Cutting\u2026","busy");
+        generateOne(j.s, j.v).then(function(url){
+          results[gender+":"+length+":"+j.i+":"+j.v] = url;
+          var c = $("cell-"+j.i+"-"+j.v);
+          if (c) c.innerHTML = '<img src="'+url+'" alt="'+esc(j.s.name)+', '+j.v+' view">';
+        }, function(err){
+          failures++;
+          var c = $("cell-"+j.i+"-"+j.v);
+          if (c) c.innerHTML = ph("Didn\u2019t render","failed");
+          if (failures === 1) fail(err.message);
+        }).then(function(){
+          done++; active--;
+          say(done < total ? "Generated " + done + " of " + total + "\u2026" : "");
+          if (next < jobs.length) pump();
+          if (done === total) finish();
+        });
+      })(j);
+    }
+  }
+  pump();
+}
+
+drawGrid();
+
+/* if serve.py is hosting this page it holds the key, so the browser never needs one */
+fetch(api("/api/health")).then(function(r){ return r.ok ? r.json() : null; })
+  .then(function(j){
+    if (!j || !j.ok) throw new Error("no server");
+    PROXY = true;
+    $("connNote").innerHTML = j.key
+      ? "Connected. The server is holding the key \u2014 nothing to paste."
+      : "Connected, but the server has no key. Set GEMINI_API_KEY and restart it.";
+    refreshGo();
+    if (!j.key) return;
+    maybeDetect();
+    loadLibrary();
+    loadUsage();
+  })
+  .catch(function(){
+    updateSetup();
+    $("connNote").innerHTML = "No server behind this page, so nothing can be generated. " +
+      "This page never holds an API key itself \u2014 run <code>python3 serve.py</code> and open the " +
+      "address it prints, rather than opening this file directly.";
+  });
+})();
+</script>
+</body>
+</html>

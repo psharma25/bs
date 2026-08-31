@@ -26,9 +26,11 @@ import http.server
 import json
 import os
 import re
+import shutil
 import socketserver
 import sys
 import threading
+import urllib.parse
 import urllib.error
 import urllib.request
 import webbrowser
@@ -37,7 +39,85 @@ from pathlib import Path
 GOOGLE = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 HERE = Path(__file__).resolve().parent
 SAVES = HERE / "saves"
+USAGE = HERE / "usage.json"
 API_KEY = ""
+
+# What Google charges per generated image, so the per-customer figures mean
+# something. Update if the published rates change.
+PRICES = {"gemini-3.1-flash-image": 0.067, "gemini-2.5-flash-image": 0.039}
+DEFAULT_PRICE = 0.067
+
+_usage_lock = threading.Lock()
+
+
+def load_usage():
+    if USAGE.exists():
+        try:
+            return json.loads(USAGE.read_text())
+        except Exception:
+            pass
+    return {}
+
+
+def record_usage(label, model, n=1):
+    """One row per customer per month, counted per model."""
+    month = datetime.datetime.now().strftime("%Y-%m")
+    with _usage_lock:
+        data = load_usage()
+        customer = data.setdefault(month, {}).setdefault(label or "(unassigned)", {})
+        customer[model] = customer.get(model, 0) + n
+        USAGE.write_text(json.dumps(data, indent=2))
+
+
+def usage_summary(allowance=0, month=None):
+    month = month or datetime.datetime.now().strftime("%Y-%m")
+    data = load_usage().get(month, {})
+    rows, t_img, t_cost, t_over = [], 0, 0.0, 0
+    for label, models in sorted(data.items()):
+        images = sum(models.values())
+        cost = sum(PRICES.get(m, DEFAULT_PRICE) * n for m, n in models.items())
+        over = max(0, images - allowance) if allowance else 0
+        over_cost = sum(
+            PRICES.get(m, DEFAULT_PRICE) * n for m, n in models.items()
+        ) * (over / images) if images and over else 0.0
+        rows.append({
+            "customer": label,
+            "images": images,
+            "cost": round(cost, 4),
+            "over": over,
+            "overCost": round(over_cost, 4),
+            "models": models,
+        })
+        t_img += images
+        t_cost += cost
+        t_over += over
+    rows.sort(key=lambda r: -r["cost"])
+    return {
+        "month": month,
+        "allowance": allowance,
+        "rows": rows,
+        "totals": {"images": t_img, "cost": round(t_cost, 4), "over": t_over},
+    }
+
+
+def purge_expired():
+    """Delete any saved look whose retention window has passed."""
+    if not SAVES.exists():
+        return []
+    now = datetime.datetime.now().isoformat()
+    gone = []
+    for folder in list(SAVES.iterdir()):
+        meta_file = folder / "details.json"
+        if not folder.is_dir() or not meta_file.exists():
+            continue
+        try:
+            expires = json.loads(meta_file.read_text()).get("expiresAt")
+        except Exception:
+            continue
+        if expires and expires < now:
+            shutil.rmtree(folder, ignore_errors=True)
+            gone.append(folder.name)
+    return gone
 
 
 def slugify(text):
@@ -75,10 +155,20 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if self.path.startswith("/api/health"):
             return self._json(200, {"ok": True, "key": bool(API_KEY)})
         if self.path.startswith("/api/saves"):
+            purge_expired()
             return self._json(200, {"items": list_saves()})
+        if self.path.startswith("/api/usage"):
+            q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            try:
+                allowance = int((q.get("allowance") or ["0"])[0])
+            except ValueError:
+                allowance = 0
+            return self._json(200, usage_summary(allowance, (q.get("month") or [None])[0]))
         return super().do_GET()
 
     def do_POST(self):
+        if self.path.startswith("/api/delete"):
+            return self.do_delete()
         if self.path.startswith("/api/save"):
             return self.do_save()
         if not self.path.startswith("/api/gen"):
@@ -94,6 +184,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         except Exception as exc:
             return self._json(400, {"error": {"message": "Bad request: %s" % exc}})
 
+        label = ""
+        ref = req.get("ref") or {}
+        if isinstance(ref, dict):
+            label = ref.get("id") or ref.get("nickname") or ref.get("name") or ""
+
         url = GOOGLE.format(model=model)
         out = urllib.request.Request(
             url,
@@ -104,6 +199,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         try:
             with urllib.request.urlopen(out, timeout=180) as resp:
                 body = resp.read()
+            # only count what Google actually returned
+            record_usage(label, model)
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.send_header("Content-Length", str(len(body)))
@@ -133,6 +230,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         label = ref.get("id") or ref.get("nickname") or ref.get("name")
         if not label:
             return self._json(400, {"error": {"message": "Need an ID, a nickname or a name."}})
+
+        try:
+            keep_days = int(rec.get("keepDays") or 0)
+        except (TypeError, ValueError):
+            keep_days = 0
 
         stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
         slug = "%s-%s" % (slugify(label), stamp)
@@ -168,11 +270,31 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 for st in rec.get("styles") or []
             ],
             "when": rec.get("when") or datetime.datetime.now().isoformat(),
+            "keepDays": keep_days,
+            "expiresAt": (
+                (datetime.datetime.now() + datetime.timedelta(days=keep_days)).isoformat()
+                if keep_days else None
+            ),
             "files": written,
         }
         (folder / "details.json").write_text(json.dumps(meta, indent=2))
         print("  saved %d files to saves/%s" % (len(written), slug))
         return self._json(200, {"ok": True, "slug": slug, "files": written})
+
+
+    def do_delete(self):
+        try:
+            length = int(self.headers.get("Content-Length") or 0)
+            slug = (json.loads(self.rfile.read(length) or b"{}")).get("slug") or ""
+        except Exception as exc:
+            return self._json(400, {"error": {"message": "Bad request: %s" % exc}})
+        # keep the slug inside saves/ whatever was sent
+        folder = (SAVES / slug).resolve()
+        if not slug or SAVES.resolve() not in folder.parents or not folder.is_dir():
+            return self._json(404, {"error": {"message": "No such saved look."}})
+        shutil.rmtree(folder, ignore_errors=True)
+        print("  deleted saves/%s" % slug)
+        return self._json(200, {"ok": True, "slug": slug})
 
 
 def list_saves():
@@ -189,8 +311,18 @@ def list_saves():
         except Exception:
             continue
         thumb = next((f for f in meta.get("files", []) if f.startswith("original.")), None)
+        days_left = None
+        if meta.get("expiresAt"):
+            try:
+                delta = datetime.datetime.fromisoformat(meta["expiresAt"]) - datetime.datetime.now()
+                days_left = max(0, delta.days + (1 if delta.seconds else 0))
+            except Exception:
+                days_left = None
         items.append({
             "slug": meta.get("slug", folder.name),
+            "keepDays": meta.get("keepDays"),
+            "expiresAt": meta.get("expiresAt"),
+            "daysLeft": days_left,
             "label": meta.get("label", folder.name),
             "set": meta.get("set"),
             "chosenStyle": meta.get("chosenStyle"),
@@ -250,6 +382,9 @@ def main():
             print("Open it from the Ports tab. Keep the port private \u2014 it spends your API credits.")
         print("Your key stays here; the browser never sees it.")
         print("Saved looks go to %s" % SAVES)
+        gone = purge_expired()
+        if gone:
+            print("Removed %d expired look(s)" % len(gone))
         print("Ctrl-C to stop.")
         if not args.no_browser and not in_codespace:
             threading.Timer(0.6, lambda: webbrowser.open(url)).start()
