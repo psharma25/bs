@@ -1,0 +1,1925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Enterprise architecture for a health payer &mdash; data platform on AWS</title>
+<style>
+:root{
+  --bg:#F5F3EE; --paper:#FDFCFA; --card2:#FAF8F3;
+  --ink:#24384A; --body:#455C6B; --muted:#5F757D; --line:#E5E0D8; --line2:#EFEBE3;
+  --blue:#5C87A6; --blue-s:#DEE9F1;
+  --green:#5F8F79; --green-s:#DFEBE3;
+  --lilac:#6F669B; --lilac-s:#E4E0EF;
+  --peach:#B0784E; --peach-s:#F6E6D7;
+  --sand:#96803E; --sand-s:#F2ECD8;
+  --rose:#A16C74; --rose-s:#F2E1E2;
+  --teal:#4F8683; --teal-s:#DCEAE8;
+  --slate:#6E7C8A; --slate-s:#E5E9ED;
+  --display:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:Inter,Calibri,"Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,"DejaVu Sans Mono",monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:19px;line-height:1.72;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1300px;margin:0 auto;padding:0 26px}
+h1,h2,h3,h4{font-family:var(--display);font-weight:600;line-height:1.25;margin:0;letter-spacing:-0.005em}
+p{margin:0 0 16px}
+ul,ol{margin:0 0 14px;padding-left:22px}
+li{margin:0 0 7px}
+a{color:var(--blue)}
+code{font-family:var(--mono);font-size:.88em;background:var(--slate-s);padding:2px 6px;border-radius:4px}
+
+header.mast{background:#2C4A5E;color:#fff;padding:56px 0 46px;border-bottom:3px solid var(--peach)}
+.kicker{font-family:var(--mono);font-size:13.5px;letter-spacing:.18em;text-transform:uppercase;color:#EBD9C6}
+header.mast h1{font-size:52px;color:#fff;margin:16px 0 16px}
+header.mast .lede{color:#C7D8E2;font-size:21px;max-width:840px;margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:28px;margin-top:28px;padding-top:22px;border-top:1px solid rgba(255,255,255,.18)}
+.meta .k{font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:#93AEBE}
+.meta .v{font-size:18px;color:#fff;margin-top:4px}
+
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:28px 0 26px}
+.tab{font-size:17px;font-weight:600;padding:13px 22px;border:1px solid var(--line);background:var(--paper);color:var(--muted);border-radius:6px;cursor:pointer;font-family:var(--sans)}
+.tab:hover{color:var(--ink);border-color:var(--blue-s)}
+.tab[aria-selected="true"]{background:#2C4A5E;color:#fff;border-color:#2C4A5E}
+.pane{display:none}
+.pane.on{display:block}
+
+.eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--peach);margin-top:38px}
+h2{font-size:34px;margin:8px 0 8px}
+h3{font-size:23px;margin:26px 0 8px}
+.sub{color:var(--muted);font-size:19px;max-width:900px;margin:0 0 22px}
+
+.card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:24px 26px}
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(400px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+
+figure{margin:24px 0;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:22px;overflow-x:auto}
+figure svg{display:block;width:100%;min-width:960px;height:auto}
+figcaption{font-size:15.5px;color:var(--muted);margin-top:14px}
+
+table{width:100%;border-collapse:collapse;font-size:17px;background:var(--paper)}
+th{background:var(--slate-s);color:var(--ink);text-align:left;padding:13px 16px;font-family:var(--mono);font-size:12.5px;letter-spacing:.11em;text-transform:uppercase;border-bottom:1px solid var(--line)}
+td{padding:14px 16px;border-bottom:1px solid var(--line2);color:var(--body);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td:first-child{color:var(--ink);font-weight:600}
+.tbl{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.scroll{overflow-x:auto}
+
+.step{background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:14px}
+.step > summary{list-style:none;cursor:pointer;padding:18px 48px 18px 20px;position:relative;display:flex;gap:16px;align-items:baseline}
+.step > summary::-webkit-details-marker{display:none}
+.step > summary::after{content:"+";position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:21px;color:var(--muted)}
+.step[open] > summary::after{content:"\2013"}
+.step > summary:hover{background:var(--card2)}
+.step .n{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--peach);border:1px solid var(--peach-s);background:var(--peach-s);border-radius:20px;padding:3px 11px;flex:none}
+.step .t{font-family:var(--display);font-size:24px;font-weight:600}
+.step .g{font-size:16px;color:var(--muted);margin-left:auto;padding-right:16px;text-align:right;max-width:42%}
+.step .bd{padding:4px 22px 22px;border-top:1px solid var(--line2)}
+
+pre{background:#25333D;color:#E4EDF2;border-radius:10px;padding:18px 20px;overflow-x:auto;font-family:var(--mono);font-size:14.5px;line-height:1.6;margin:14px 0}
+pre .c{color:#8FA9B4}
+pre .k{color:#C6A2C8}
+pre .s{color:#A9CDA1}
+.filename{font-family:var(--mono);font-size:13px;color:var(--muted);background:var(--slate-s);display:inline-block;padding:4px 10px;border-radius:6px 6px 0 0;margin-bottom:-8px}
+
+.trap{background:var(--rose-s);border-radius:9px;padding:15px 18px;font-size:17px;color:#7A4F56;margin-top:14px}
+.trap b{color:var(--rose)}
+.gap{background:var(--sand-s);border-radius:9px;padding:15px 18px;font-size:17px;color:#6E5C2A;margin-top:12px}
+.gap b{color:var(--sand)}
+.note{background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--lilac);border-radius:0 10px 10px 0;padding:18px 22px;margin:22px 0;font-size:18.5px;color:var(--body)}
+.note b{color:var(--lilac)}
+.callout{background:#2C4A5E;color:#fff;border-radius:10px;padding:26px 30px;margin:24px 0}
+.callout h3{color:#fff;font-size:25px;margin:0 0 10px}
+.callout p{color:#C7D8E2;margin:0}
+.callout .rule{color:#fff;border-left:3px solid var(--peach);padding-left:16px;margin-top:18px;font-size:19.5px}
+
+.pill{border-radius:10px;padding:18px 20px}
+.pill .h{font-family:var(--mono);font-size:13px;letter-spacing:.13em;text-transform:uppercase;margin-bottom:10px}
+.pill ul{margin:0;padding-left:20px;font-size:17px}
+
+footer{background:#2C4A5E;color:#93AEBE;padding:30px 0;margin-top:48px;font-size:17px}
+footer b{color:#fff;font-family:var(--display);font-size:19px}
+
+
+details.ex{background:var(--paper);border:1px solid var(--line);border-radius:10px;margin:12px 0;overflow:hidden}
+details.ex > summary{list-style:none;cursor:pointer;padding:14px 44px 14px 18px;position:relative;font-size:17px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:12px}
+details.ex > summary::-webkit-details-marker{display:none}
+details.ex > summary::after{content:"+";position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:20px;color:var(--muted)}
+details.ex[open] > summary::after{content:"\2013"}
+details.ex > summary:hover{background:var(--card2)}
+details.ex .exb{padding:2px 18px 18px;border-top:1px solid var(--line2)}
+.tag{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;border-radius:5px;padding:3px 9px;flex:none}
+.tag.cfg{background:var(--lilac-s);color:var(--lilac)}
+.tag.code{background:var(--blue-s);color:var(--blue)}
+.tag.data{background:var(--green-s);color:var(--green)}
+.tag.doc{background:var(--sand-s);color:var(--sand)}
+.tag.sql{background:var(--teal-s);color:var(--teal)}
+.tag.money{background:var(--peach-s);color:var(--peach)}
+.tag.q{background:var(--rose-s);color:var(--rose)}
+.exb pre{margin-top:10px}
+.exb p:first-child{margin-top:10px}
+.ans{background:var(--card2);border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding:14px 18px;margin:12px 0;font-size:17.5px}
+.ans b{color:var(--green)}
+.bad{background:var(--rose-s);border-radius:8px;padding:12px 16px;margin:10px 0;font-size:16.5px;color:#7A4F56}
+.bad b{color:var(--rose)}
+
+@media (max-width:900px){ header.mast h1{font-size:32px} .step .g{display:none} }
+@media print{ .tabs{display:none} .pane{display:block!important} .step{break-inside:avoid} details{display:block} }
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="wrap">
+    <div class="kicker">ENTERPRISE ARCHITECTURE &middot; TUTORIAL</div>
+    <h1>You are the key architect</h1>
+    <p class="lede">A health plan has asked you to own its data architecture. This walks the whole path: what enterprise architecture actually is, what this organisation's estate looks like, how to design the data platform on AWS, where ETL ends and ELT begins, how the Well-Architected pillars and the catalogue overlay on top &mdash; and then the code to deploy it.</p>
+    <div class="meta">
+      <div><div class="k">Worked example</div><div class="v">Regional Blue plan, 3M members</div></div>
+      <div><div class="k">Platform</div><div class="v">AWS, multi-account</div></div>
+      <div><div class="k">Patterns</div><div class="v">Streaming, batch, CDC</div></div>
+      <div><div class="k">Constraint</div><div class="v">Everything is PHI until proven otherwise</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="t-1" data-pane="p-1" aria-selected="true">1 &middot; Foundations</button>
+    <button class="tab" role="tab" id="t-2" data-pane="p-2" aria-selected="false">2 &middot; The estate</button>
+    <button class="tab" role="tab" id="t-3" data-pane="p-3" aria-selected="false">3 &middot; Architecture</button>
+    <button class="tab" role="tab" id="t-4" data-pane="p-4" aria-selected="false">4 &middot; ETL or ELT</button>
+    <button class="tab" role="tab" id="t-5" data-pane="p-5" aria-selected="false">5 &middot; Governance</button>
+    <button class="tab" role="tab" id="t-6" data-pane="p-6" aria-selected="false">6 &middot; Build it</button>
+    <button class="tab" role="tab" id="t-7" data-pane="p-7" aria-selected="false">7 &middot; Traps</button>
+    <button class="tab" role="tab" id="t-8" data-pane="p-8" aria-selected="false">8 &middot; Interview</button>
+    <button class="tab" role="tab" id="t-9" data-pane="p-9" aria-selected="false">9 &middot; Practice</button>
+  </div>
+
+<!-- ==================================================== 1 FOUNDATIONS -->
+<div class="pane on" id="p-1" role="tabpanel" aria-labelledby="t-1">
+  <h2>What enterprise architecture actually is</h2>
+  <p class="sub">Not a diagram library. It is the discipline of making sure that what the business is trying to do, what it knows, what it runs, and what it runs on all point in the same direction &mdash; and that a decision made in one place does not quietly break another.</p>
+
+  <div class="callout">
+    <h3>The job, in one sentence</h3>
+    <p>You maintain a defensible chain from business capability to data domain to application to infrastructure, so that when someone proposes something, you can say what it costs, what it breaks and what it makes possible.</p>
+    <p class="rule">If you cannot trace a technology decision upward to a business capability, you are doing solution architecture and calling it enterprise architecture.</p>
+  </div>
+
+  <figure><svg viewBox="0 0 1280 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The four layers of enterprise architecture with health payer examples: business, data, application and technology.">
+  <defs>
+    <symbol id="s-health" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.4S3.8 15.2 3.8 9.4A4.6 4.6 0 0 1 12 6.6a4.6 4.6 0 0 1 8.2 2.8c0 5.8-8.2 11-8.2 11z"/><path d="M9.6 11.6h4.8M12 9.2v4.8"/></symbol>
+    <symbol id="s-catalog" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.6h6.4a2 2 0 0 1 2 2v13a2 2 0 0 0-2-1.6H4z"/><path d="M20 4.6h-6.4a2 2 0 0 0-2 2v13a2 2 0 0 1 2-1.6H20z"/></symbol>
+    <symbol id="s-ecs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="7" width="17" height="11" rx="1.6"/><path d="M8 7V4.6h8V7M8 11h8M8 14.4h5"/></symbol>
+    <symbol id="s-ec2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="1.6"/><path d="M9 2.5v2.5M15 2.5v2.5M9 19v2.5M15 19v2.5M2.5 9H5M2.5 15H5M19 9h2.5M19 15h2.5"/></symbol>
+    <symbol id="s-iam" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l6.5 2.8v5.4c0 4-2.8 7.2-6.5 8.2-3.7-1-6.5-4.2-6.5-8.2V5.8z"/><circle cx="12" cy="10.4" r="2.1"/><path d="M8.6 16.2c.6-1.9 1.9-2.8 3.4-2.8s2.8.9 3.4 2.8"/></symbol>
+    <marker id="mF" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#5C87A6"/></marker>
+  </defs>
+  <text x="20" y="26" fill="#24384A" font-size="16.2" font-weight="700">EA-0  ·  THE FOUR LAYERS, WITH PAYER EXAMPLES</text>
+  <text x="20" y="46" fill="#7B8B94" font-size="13.9">Every architecture question belongs to one of these. Most arguments happen because two people are in different layers.</text>
+  <rect x="20" y="78" width="1240" height="116" rx="9" fill="#DFEBE3" stroke="#5F8F79" stroke-width="1.4"/>
+  <svg x="46" y="102" width="30" height="30" viewBox="0 0 24 24" style="color:#5F8F79"><use href="#s-health"/></svg>
+  <text x="96" y="116" fill="#24384A" font-size="18.6" font-weight="700">BUSINESS</text>
+  <text x="96" y="136" fill="#7B8B94" font-size="13.9">What the organisation does and is measured on</text>
+  <circle cx="452" cy="106" r="2.4" fill="#5F8F79"/>
+  <text x="464" y="110" fill="#455C6B" font-size="14.5">Capabilities: enrol a member, adjudicate a claim, authorise care, pay a provider</text>
+  <circle cx="452" cy="128" r="2.4" fill="#5F8F79"/>
+  <text x="464" y="132" fill="#455C6B" font-size="14.5">Value streams: member onboarding, claim to payment, prior authorisation</text>
+  <circle cx="452" cy="150" r="2.4" fill="#5F8F79"/>
+  <text x="464" y="154" fill="#455C6B" font-size="14.5">Drivers: medical loss ratio, STARS rating, HEDIS scores, CMS interoperability rules</text>
+  <rect x="20" y="206" width="1240" height="116" rx="9" fill="#DEE9F1" stroke="#5C87A6" stroke-width="1.4"/>
+  <svg x="46" y="230" width="30" height="30" viewBox="0 0 24 24" style="color:#5C87A6"><use href="#s-catalog"/></svg>
+  <text x="96" y="244" fill="#24384A" font-size="18.6" font-weight="700">DATA</text>
+  <text x="96" y="264" fill="#7B8B94" font-size="13.9">What the organisation knows, and who owns each of it</text>
+  <circle cx="452" cy="234" r="2.4" fill="#5C87A6"/>
+  <text x="464" y="238" fill="#455C6B" font-size="14.5">Domains: member, provider, claim, clinical, pharmacy, finance</text>
+  <circle cx="452" cy="256" r="2.4" fill="#5C87A6"/>
+  <text x="464" y="260" fill="#455C6B" font-size="14.5">Subject areas and golden records, with one named steward each</text>
+  <circle cx="452" cy="278" r="2.4" fill="#5C87A6"/>
+  <text x="464" y="282" fill="#455C6B" font-size="14.5">Classification drives everything downstream: PHI, PII, de-identified, public</text>
+  <rect x="20" y="334" width="1240" height="116" rx="9" fill="#E4E0EF" stroke="#6F669B" stroke-width="1.4"/>
+  <svg x="46" y="358" width="30" height="30" viewBox="0 0 24 24" style="color:#6F669B"><use href="#s-ecs"/></svg>
+  <text x="96" y="372" fill="#24384A" font-size="18.6" font-weight="700">APPLICATION</text>
+  <text x="96" y="392" fill="#7B8B94" font-size="13.9">The systems that create and consume that data</text>
+  <circle cx="452" cy="362" r="2.4" fill="#6F669B"/>
+  <text x="464" y="366" fill="#455C6B" font-size="14.5">Core admin platform, care management, provider directory, portals, EDI gateway</text>
+  <circle cx="452" cy="384" r="2.4" fill="#6F669B"/>
+  <text x="464" y="388" fill="#455C6B" font-size="14.5">Interfaces between them, and the contract each interface promises</text>
+  <circle cx="452" cy="406" r="2.4" fill="#6F669B"/>
+  <text x="464" y="410" fill="#455C6B" font-size="14.5">Buy, build or retire, decided against the capability map, not the vendor demo</text>
+  <rect x="20" y="462" width="1240" height="116" rx="9" fill="#F2ECD8" stroke="#96803E" stroke-width="1.4"/>
+  <svg x="46" y="486" width="30" height="30" viewBox="0 0 24 24" style="color:#96803E"><use href="#s-ec2"/></svg>
+  <text x="96" y="500" fill="#24384A" font-size="18.6" font-weight="700">TECHNOLOGY</text>
+  <text x="96" y="520" fill="#7B8B94" font-size="13.9">What it all runs on</text>
+  <circle cx="452" cy="490" r="2.4" fill="#96803E"/>
+  <text x="464" y="494" fill="#455C6B" font-size="14.5">Accounts, networks, compute, storage, the data platform itself</text>
+  <circle cx="452" cy="512" r="2.4" fill="#96803E"/>
+  <text x="464" y="516" fill="#455C6B" font-size="14.5">Identity, encryption, logging, and the guardrails that hold them</text>
+  <circle cx="452" cy="534" r="2.4" fill="#96803E"/>
+  <text x="464" y="538" fill="#455C6B" font-size="14.5">The layer everyone starts with, and the one that should be decided last</text>
+  <path d="M40,190 L40,566" stroke="#6E7C8A" stroke-width="1.4" stroke-dasharray="5 4" fill="none"/>
+  <text x="20" y="596" fill="#7B8B94" font-size="13.9">Read downward: business capability decides the data domain, which decides the application, which decides the technology. Never the other way round.</text>
+</svg>
+    <figcaption>Most architecture arguments are two people reasoning in different layers. Naming the layer usually ends the argument.</figcaption>
+  </figure>
+
+  <div class="eyebrow">FIRST NINETY DAYS</div>
+  <h2>What you need before you design anything</h2>
+  <p class="sub">In order. Each one is the input to the next.</p>
+  <div class="scroll"><div class="tbl"><table>
+    <thead><tr><th>Artefact</th><th>The question it answers</th><th>Who signs it</th><th>How often it changes</th></tr></thead>
+    <tbody>
+      <tr><td>Business capability map</td><td>What does this organisation do, independent of how it does it?</td><td>COO and business unit leads</td><td>Rarely &mdash; capabilities outlive systems</td></tr>
+      <tr><td>Data domain model and stewards</td><td>What do we know, and who is accountable for each domain?</td><td>Chief data officer</td><td>Annually</td></tr>
+      <tr><td>Application portfolio</td><td>What systems exist, what capability does each serve, what state is it in?</td><td>CIO</td><td>Quarterly</td></tr>
+      <tr><td>Integration inventory</td><td>What talks to what, in what format, on what schedule?</td><td>You</td><td>Continuously &mdash; and it is always wrong</td></tr>
+      <tr><td>Architecture principles</td><td>What do we always do, and what do we never do?</td><td>Executive, ratified once</td><td>Governance event to change</td></tr>
+      <tr><td>Reference architectures</td><td>What is the approved way to solve this recurring problem?</td><td>Architecture review board</td><td>On a review cycle</td></tr>
+      <tr><td>Decision records</td><td>Why did we choose this, and what did we rule out?</td><td>Whoever made the decision</td><td>Append only &mdash; never rewrite one</td></tr>
+    </tbody>
+  </table></div></div>
+
+  <div class="note"><b>The one that saves you.</b> Decision records. In two years someone will ask why the claim mart is in Redshift and not Athena, and the only defensible answer is a dated record naming the options, the constraint and the person who accepted the trade-off. Without it every past decision is relitigated from scratch.</div>
+
+  <h3>Four questions to ask before any design</h3>
+  <div class="grid g4">
+    <div class="pill" style="background:var(--green-s)"><div class="h" style="color:var(--green)">Decision</div><ul><li>What decision does this data support?</li><li>Who makes it, and how often?</li><li>What happens if it is a day late?</li></ul></div>
+    <div class="pill" style="background:var(--blue-s)"><div class="h" style="color:var(--blue)">Latency</div><ul><li>Seconds, minutes, hours or days?</li><li>Is that a real need or a preference?</li><li>What does the source system actually emit?</li></ul></div>
+    <div class="pill" style="background:var(--rose-s)"><div class="h" style="color:var(--rose)">Sensitivity</div><ul><li>PHI, PII, de-identified or public?</li><li>Minimum necessary for whom?</li><li>Which contracts constrain it?</li></ul></div>
+    <div class="pill" style="background:var(--sand-s)"><div class="h" style="color:var(--sand)">Ownership</div><ul><li>Which domain owns the golden record?</li><li>Who approves access?</li><li>Who is paged when it breaks?</li></ul></div>
+  </div>
+
+  <div class="eyebrow">WORKED EXAMPLES</div>
+  <h2>Configuration and code</h2>
+  <p class="sub">Open what you need. These are the artefacts, not illustrations of them.</p>
+<details class="ex"><summary><span class="tag doc">DOC</span>Architecture decision record &mdash; the template that saves you</summary><div class="exb">
+<p>One page, appended never rewritten. In two years this is the only defence you have against relitigating a settled choice.</p>
+<div class="filename">docs/adr/ADR-014-iceberg-silver.md</div><pre># ADR-014: Iceberg for the silver zone
+
+Status:      Accepted
+Date:        2026-03-11
+Deciders:    P. Sharma (EA), J. Okafor (Data Eng), M. Reyes (Claims steward)
+Supersedes:  ADR-009 (Parquet with daily full rewrite)
+
+## Context
+Claims arrive as resubmissions and corrections. CDC from the core admin
+platform emits updates and deletes. A daily full rewrite of the claim
+partition costs 4.2 hours and blocks the 06:00 actuarial refresh.
+
+## Options considered
+1. Parquet + full partition rewrite   — simple, too slow, no row-level delete
+2. Apache Hudi                        — good merge story, smaller AWS support surface
+3. Apache Iceberg                     — merge-on-read, native Glue/Athena/EMR support
+4. Redshift as system of record       — cost scales with retention, not with query
+
+## Decision
+Iceberg, format-version 2, partitioned by service_month.
+
+## Consequences
++ MERGE on natural key handles resubmission and CDC with one code path
++ Time travel gives us the "what did we submit to CMS in March" answer for free
+- Requires Glue 4.0+ and adds compaction as an operational job we must run
+- Team needs Iceberg maintenance training before go-live
+
+## Constraint that decided it
+CMS encounter resubmission requires proving what we held at submission time.
+Time travel gives that. Nothing else on the list did.
+</pre></div></details>
+<details class="ex"><summary><span class="tag doc">DOC</span>Architecture principles &mdash; the eight that settle arguments</summary><div class="exb">
+<p>Few, sharp, and each one rules something out. A principle that permits every option is a slogan.</p>
+<div class="filename">docs/principles.md</div><pre>1.  The system of record is never the analytics source.
+    Implication: CDC out of core admin. No analytical query against production.
+
+2.  Raw arrives untouched and is never edited.
+    Implication: bronze is immutable. Defects are reprocessed forward.
+
+3.  Every dataset has one named steward.
+    Implication: no dataset ships without an owner in the catalogue.
+
+4.  Classification decides handling, not the project.
+    Implication: PHI controls are inherited from the tag, not negotiated.
+
+5.  Minimum necessary applies internally.
+    Implication: internal fan-out is filtered like external sharing.
+
+6.  Latency is justified by a decision, not by preference.
+    Implication: streaming requires a named decision that expires.
+
+7.  Access is granted on tags, never on table names.
+    Implication: the taxonomy is designed before the second table.
+
+8.  If it is not in the catalogue, it does not exist.
+    Implication: an undocumented pipeline is a defect, not a shortcut.
+</pre></div></details>
+<details class="ex"><summary><span class="tag cfg">CONFIG</span>Capability map fragment &mdash; machine-readable, so it stays honest</summary><div class="exb">
+<p>Keep it in the repository next to the code. A capability map in a slide deck is out of date the week it is presented.</p>
+<div class="filename">architecture/capabilities.yaml</div><pre>capabilities:
+  - id: CAP-030
+    name: Adjudicate a claim
+    owner: VP Claims Operations
+    value_stream: claim-to-payment
+    measured_by: [auto-adjudication-rate, days-to-payment, adjustment-rate]
+    supported_by:
+      applications: [core-admin, edi-gateway, pricing-engine]
+      data_domains: [claim, member, provider, finance]
+    pain:
+      - "Auto-adjudication rate plateaued at 78% for six quarters"
+      - "Pricing engine is a black box to everyone outside one team"
+
+  - id: CAP-041
+    name: Coordinate care for a member
+    owner: Chief Medical Officer
+    value_stream: care-management
+    measured_by: [readmission-rate, care-gap-closure, engagement-rate]
+    supported_by:
+      applications: [care-management, clinical-integration, member-portal]
+      data_domains: [clinical, member, claim]
+    pain:
+      - "Clinical domain has no steward"          # &lt;- your first fight
+      - "ADT events arrive nightly; the decision they support expires in hours"
+</pre></div></details>
+</div>
+
+<!-- ==================================================== 2 ESTATE -->
+<div class="pane" id="p-2" role="tabpanel" aria-labelledby="t-2">
+  <h2>The estate you have inherited</h2>
+  <p class="sub">A regional Blue plan with roughly three million members. Commercial, Medicare Advantage and Medicaid lines. The shape below is typical; the names differ by plan.</p>
+
+  <h3>Applications</h3>
+  <div class="scroll"><div class="tbl"><table>
+    <thead><tr><th>System</th><th>Capability it serves</th><th>What it emits</th><th>Architectural note</th></tr></thead>
+    <tbody>
+      <tr><td>Core admin platform</td><td>Enrol, adjudicate, pay</td><td>Claim, member, provider, payment tables</td><td>The system of record. Never query it directly for analytics &mdash; CDC out of it.</td></tr>
+      <tr><td>EDI gateway</td><td>Trading partner exchange</td><td>X12 837 claims, 835 remittance, 834 enrolment, 270/271 eligibility, 278 prior auth</td><td>Batch by nature. File arrival is the event.</td></tr>
+      <tr><td>Care management</td><td>Authorise and coordinate care</td><td>Authorisations, care plans, assessments</td><td>Consumes clinical events; wants them in seconds, not overnight.</td></tr>
+      <tr><td>Clinical integration</td><td>Receive provider data</td><td>HL7v2 ADT, CCDA documents, FHIR resources</td><td>The only genuinely real-time source you have.</td></tr>
+      <tr><td>Pharmacy benefit</td><td>Adjudicate drug claims</td><td>NCPDP transactions, formulary, accumulators</td><td>Usually outsourced. You get files, not a database.</td></tr>
+      <tr><td>Provider directory</td><td>Maintain the network</td><td>Contracts, demographics, network status</td><td>Feeds a CMS-mandated public API. Accuracy is regulated.</td></tr>
+      <tr><td>Member and provider portals</td><td>Self service</td><td>Web and mobile events, secure messages</td><td>Event source, and a consumer of gold data.</td></tr>
+      <tr><td>Enterprise data warehouse</td><td>Reporting</td><td>Whatever it was fed in 2014</td><td>The thing you are replacing. Do not turn it off first.</td></tr>
+    </tbody>
+  </table></div></div>
+
+  <h3>Data domains</h3>
+  <div class="scroll"><div class="tbl"><table>
+    <thead><tr><th>Domain</th><th>Golden record lives in</th><th>Formats you will meet</th><th>Class</th><th>Volume, order of magnitude</th></tr></thead>
+    <tbody>
+      <tr><td>Member</td><td>Core admin, keyed by enterprise member ID</td><td>834, internal tables, FHIR Patient</td><td>PHI + PII</td><td>3M members, 8M historical</td></tr>
+      <tr><td>Provider</td><td>Provider directory</td><td>Contracts, NPI registry, FHIR Practitioner</td><td>PII, some public</td><td>200k providers</td></tr>
+      <tr><td>Claim</td><td>Core admin</td><td>837 in, 835 out, adjudicated internal rows</td><td>PHI</td><td>60M lines a year</td></tr>
+      <tr><td>Clinical</td><td>No single owner &mdash; this is your first fight</td><td>HL7v2, CCDA, FHIR bundles</td><td>PHI, highest sensitivity</td><td>Millions of events a year</td></tr>
+      <tr><td>Pharmacy</td><td>PBM, contractually</td><td>NCPDP, accumulator files</td><td>PHI</td><td>30M scripts a year</td></tr>
+      <tr><td>Finance</td><td>General ledger</td><td>Internal, actuarial extracts</td><td>Confidential, not PHI</td><td>Small but heavily scrutinised</td></tr>
+    </tbody>
+  </table></div></div>
+
+  <div class="gap"><b>Gap you will find on day one.</b> Clinical data has no steward. It arrives from provider integration, it is used by care management, risk adjustment and quality, and nobody owns the golden record. Until you name a steward, every clinical design decision will be made by whoever asked most recently.</div>
+
+  <h3>Use cases, and what each one demands</h3>
+  <div class="scroll"><div class="tbl"><table>
+    <thead><tr><th>Use case</th><th>Decision it supports</th><th>Latency actually needed</th><th>Pattern</th></tr></thead>
+    <tbody>
+      <tr><td>Care-gap alert on admission</td><td>Contact the member before discharge</td><td>Seconds to minutes</td><td>Streaming</td></tr>
+      <tr><td>Prior authorisation turnaround</td><td>Meet a regulated clock</td><td>Minutes</td><td>Streaming</td></tr>
+      <tr><td>Fraud, waste and abuse scoring</td><td>Hold a claim before payment</td><td>Minutes to hours</td><td>Mixed</td></tr>
+      <tr><td>Member 360 for the service desk</td><td>Answer the member on the call</td><td>Minutes</td><td>Mixed &mdash; CDC</td></tr>
+      <tr><td>Claim adjudication analytics</td><td>Where cost is moving</td><td>Next day</td><td>Batch</td></tr>
+      <tr><td>Risk adjustment and HCC capture</td><td>Submit accurately to CMS</td><td>Weekly to monthly</td><td>Batch</td></tr>
+      <tr><td>HEDIS and STARS measures</td><td>Annual quality position</td><td>Monthly refresh, annual submit</td><td>Batch</td></tr>
+      <tr><td>Price transparency files</td><td>Regulatory publication</td><td>Monthly</td><td>Batch, very large</td></tr>
+      <tr><td>CMS Patient Access API</td><td>Give the member their data</td><td>On request, sub-second</td><td>Serve from gold, not from the lake</td></tr>
+    </tbody>
+  </table></div></div>
+
+  <div class="note"><b>Read that table backwards.</b> Only three of nine use cases genuinely need streaming. Build the batch and CDC lanes first and you will serve most of the business within two quarters; start with streaming and you will spend those quarters on the three hardest ones.</div>
+
+  <div class="eyebrow">WORKED EXAMPLES</div>
+  <h2>Configuration and code</h2>
+  <p class="sub">Open what you need. These are the artefacts, not illustrations of them.</p>
+<details class="ex"><summary><span class="tag data">DATA</span>X12 837P claim &mdash; what actually lands in bronze</summary><div class="exb">
+<p>This is a professional claim, trimmed. Learn to read three segments and you can debug most payer pipelines: <code>CLM</code> is the claim, <code>NM1</code> is a party, <code>SV1</code> is a service line.</p>
+<div class="filename">bronze/edi/partner=SUBMITTERID/txn=837/arrival_date=2026-03-11/claims_0930.x12</div><pre>ISA*00*          *00*          *ZZ*SUBMITTERID    *ZZ*BCBSPLAN       *260311*0930*^*00501*000000101*0*P*:~
+GS*HC*SUBMITTERID*BCBSPLAN*20260311*0930*101*X*005010X222A1~
+ST*837*0001*005010X222A1~
+BHT*0019*00*244579*20260311*0930*CH~
+NM1*41*2*BIG GROUP PRACTICE*****46*SUBMITTERID~     &lt;- submitter
+NM1*40*2*BCBS PLAN*****46*BCBSPLAN~                 &lt;- receiver
+HL*1**20*1~
+NM1*85*2*RIVERSIDE FAMILY MED*****XX*1234567893~    &lt;- billing provider, NPI
+HL*2*1*22*0~
+SBR*P*18*******CI~                                  &lt;- subscriber, commercial
+NM1*IL*1*DOE*JANE****MI*W123456789~                 &lt;- member id you must map
+DMG*D8*19780412*F~
+CLM*CCN20260311001*450.00***11:B:1*Y*A*Y*I~         &lt;- claim control number
+                                                       ^ the natural key
+HI*ABK:E1165~                                       &lt;- diagnosis, ICD-10
+LX*1~
+SV1*HC:99214*225.00*UN*1***1~                       &lt;- service line, CPT
+DTP*472*D8*20260305~                                &lt;- service date
+LX*2~
+SV1*HC:80053*225.00*UN*1***1~
+DTP*472*D8*20260305~
+SE*20*0001~
+GE*1*101~
+IEA*1*000000101~</pre></div></details>
+<details class="ex"><summary><span class="tag data">DATA</span>HL7v2 ADT^A01 &mdash; an admission, and what you may forward</summary><div class="exb">
+<p>The whole message lands in bronze. Only the highlighted fields go on the event bus. Everything in <code>OBX</code> and <code>NTE</code> is clinical narrative that most subscribers have no right to.</p>
+<div class="filename">bronze/clinical/adt/arrival_date=2026-03-11/hour=09/49590000000.hl7</div><pre>MSH|^~\&amp;|EPIC|RIVERSIDE|BCBS|PLAN|20260311093015||ADT^A01|MSG00042|P|2.5.1
+EVN|A01|20260311093015
+PID|1||W123456789^^^BCBS^MI||DOE^JANE^A||19780412|F|||12 ELM ST^^BOSTON^MA^02118
+PV1|1|I|3W^302^1^RIVERSIDE||||1234567893^SMITH^JOHN|||MED||||||||V20260311
+DG1|1||E11.65^Type 2 diabetes with hyperglycemia^I10|||A
+OBX|1|TX|||Patient reports poor adherence, lives alone, no transport||||||F
+NTE|1||Social work consult requested
+
+# Forward on the bus:      member_id, trigger, facility, occurred_at
+# Land in bronze:          the entire message, unmodified
+# Never forward:           OBX, NTE, DG1 free text
+#
+# The A01/A03/A08 triggers are the ones care management acts on.
+# Everything else is noise you still store but do not publish.</pre></div></details>
+<details class="ex"><summary><span class="tag cfg">CONFIG</span>Data domain register &mdash; the artefact that ends the steward argument</summary><div class="exb">
+<p>Publish it, get it signed, and refer to it every time someone proposes a pipeline. The clinical entry is deliberately shown unresolved, because that is what you will actually inherit.</p>
+<div class="filename">architecture/data-domains.yaml</div><pre>domains:
+  - name: claim
+    steward: M. Reyes, Director Claims Operations
+    golden_record: core-admin.CLAIM_HEADER / CLAIM_LINE
+    natural_key: claim_control_number
+    classification: phi
+    retention: 10y
+    sla: { freshness: 24h, completeness: 99.5% }
+    consumers: [actuarial, risk-adjustment, fwa, member-360]
+
+  - name: member
+    steward: A. Blake, Director Enrolment
+    golden_record: core-admin.MEMBER (enterprise_member_id)
+    natural_key: enterprise_member_id
+    classification: phi
+    retention: 10y
+    note: &gt;
+      Subscriber id is payer-assigned and is NOT stable across lines of
+      business. Never join on it downstream of silver.
+
+  - name: clinical
+    steward: UNASSIGNED            # escalated 2026-02-14, still open
+    golden_record: none            # this is the actual problem
+    classification: phi
+    sensitivity: highest
+    note: &gt;
+      Arrives from clinical-integration, consumed by care management, risk
+      adjustment and quality. No owner means every design decision is made
+      by whoever asked most recently. Blocking issue for CAP-041.
+</pre></div></details>
+</div>
+
+<!-- ==================================================== 3 ARCHITECTURE -->
+<div class="pane" id="p-3" role="tabpanel" aria-labelledby="t-3">
+  <h2>The platform, top down</h2>
+  <p class="sub">Five stages, three storage zones, two overlays. Everything else is detail.</p>
+
+  <figure><svg viewBox="0 0 1300 772" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Reference architecture for a health payer data platform on AWS: sources, ingest, medallion lake, serve and consume, with governance and security as vertical overlays.">
+  <defs>
+    <symbol id="s-sftp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.6h6l1.6 2H21v9.8H3z"/><path d="M12 12v4.4M9.8 14.2L12 16.4l2.2-2.2"/></symbol>
+    <symbol id="s-stream" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.6 8.4c2-1.6 3.4-1.6 5.4 0s3.4 1.6 5.4 0 3.4-1.6 5.4 0"/><path d="M2.6 13c2-1.6 3.4-1.6 5.4 0s3.4 1.6 5.4 0 3.4-1.6 5.4 0"/><path d="M2.6 17.6c2-1.6 3.4-1.6 5.4 0s3.4 1.6 5.4 0 3.4-1.6 5.4 0"/></symbol>
+    <symbol id="s-dms" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="6" cy="6" rx="3.4" ry="1.6"/><path d="M2.6 6v6.6c0 .9 1.5 1.6 3.4 1.6s3.4-.7 3.4-1.6V6"/><ellipse cx="18" cy="10" rx="3.4" ry="1.6"/><path d="M14.6 10v6.6c0 .9 1.5 1.6 3.4 1.6s3.4-.7 3.4-1.6V10"/><path d="M10.4 9.6h3.2M12.4 8l1.6 1.6-1.6 1.6"/></symbol>
+    <symbol id="s-hub" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.6"/><circle cx="12" cy="4" r="1.8"/><circle cx="12" cy="20" r="1.8"/><circle cx="4.4" cy="8" r="1.8"/><circle cx="19.6" cy="8" r="1.8"/><circle cx="4.4" cy="16" r="1.8"/><circle cx="19.6" cy="16" r="1.8"/><path d="M12 5.8v3.6M12 14.6v3.6M6 9L9.6 11M18 9L14.4 11M6 15L9.6 13M18 15L14.4 13"/></symbol>
+    <symbol id="s-lambda" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20l6.2-13.4a2 2 0 0 1 3.6 0L20 20"/><path d="M4.6 5.4h4.2"/></symbol>
+    <symbol id="s-glue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.6 3h4.8v4.4l4 7.2a4.2 4.2 0 0 1-3.7 6.3H9.3a4.2 4.2 0 0 1-3.7-6.3l4-7.2z"/><path d="M7.6 14.6h8.8"/></symbol>
+    <symbol id="s-steps" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3.4" width="7" height="6" rx="1.4"/><rect x="14" y="3.4" width="7" height="6" rx="1.4"/><rect x="8.5" y="14.6" width="7" height="6" rx="1.4"/><path d="M6.5 9.6v2.6h11V9.6M12 12.2v2.4"/></symbol>
+    <symbol id="s-s3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14l-1.6 14.4H6.6z"/><path d="M5.6 10h12.8"/></symbol>
+    <symbol id="s-athena" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.6" width="18" height="12.8" rx="1.6"/><path d="M3 9h18M9 9v8.4"/><circle cx="16" cy="14" r="3.2"/><path d="M18.4 16.4L21 19"/></symbol>
+    <symbol id="s-redshift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="4.6" cy="7" r="2"/><circle cx="19.4" cy="7" r="2"/><circle cx="4.6" cy="17" r="2"/><circle cx="19.4" cy="17" r="2"/><path d="M6.4 8L9.6 10.4M17.6 8L14.4 10.4M6.4 16L9.6 13.6M17.6 16L14.4 13.6"/></symbol>
+    <symbol id="s-bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.4 20h17.2"/><rect x="5" y="11" width="3.4" height="7" rx="1"/><rect x="10.3" y="6.6" width="3.4" height="11.4" rx="1"/><rect x="15.6" y="8.8" width="3.4" height="9.2" rx="1"/></symbol>
+    <symbol id="s-ml" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4.2A3.2 3.2 0 0 0 5.8 7.4v.4A3 3 0 0 0 4 10.6a3 3 0 0 0 1.4 2.5A3 3 0 0 0 8 18h1z"/><path d="M15 4.2a3.2 3.2 0 0 1 3.2 3.2v.4A3 3 0 0 1 20 10.6a3 3 0 0 1-1.4 2.5A3 3 0 0 1 16 18h-1z"/><path d="M12 4v16"/></symbol>
+    <symbol id="s-catalog" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.6h6.4a2 2 0 0 1 2 2v13a2 2 0 0 0-2-1.6H4z"/><path d="M20 4.6h-6.4a2 2 0 0 0-2 2v13a2 2 0 0 1 2-1.6H20z"/></symbol>
+    <symbol id="s-lake" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.6c2-1.4 3.4-1.4 5.4 0s3.4 1.4 5.4 0 3.4-1.4 5.4 0"/><path d="M3 13.4c2-1.4 3.4-1.4 5.4 0s3.4 1.4 5.4 0 3.4-1.4 5.4 0"/><rect x="8" y="16" width="8" height="5.4" rx="1.4"/><path d="M10 16v-1.6a2 2 0 0 1 4 0V16"/></symbol>
+    <symbol id="s-kms" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="12" r="3.2"/><path d="M11.7 12H21M18.4 12v3M15.4 12v2.2"/></symbol>
+    <symbol id="s-dq" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.6"/><path d="M8.2 12.2l2.6 2.6 5-5.2"/></symbol>
+    <symbol id="s-health" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.4S3.8 15.2 3.8 9.4A4.6 4.6 0 0 1 12 6.6a4.6 4.6 0 0 1 8.2 2.8c0 5.8-8.2 11-8.2 11z"/><path d="M9.6 11.6h4.8M12 9.2v4.8"/></symbol>
+    <marker id="mF" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#5C87A6"/></marker>
+    <marker id="mS" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#A16C74"/></marker>
+    <marker id="mZ" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#4F8683"/></marker>
+  </defs>
+  <text x="20" y="26" fill="#24384A" font-size="16.2" font-weight="700">EA-1  ·  PAYER DATA PLATFORM ON AWS</text>
+  <text x="20" y="46" fill="#7B8B94" font-size="13.9">Five stages left to right. Governance and security are not a stage — they cut across all five.</text>
+  <text x="127" y="78" fill="#7B8B94" font-size="13.3" text-anchor="middle" font-weight="700">SOURCES</text>
+  <text x="350" y="78" fill="#7B8B94" font-size="13.3" text-anchor="middle" font-weight="700">INGEST</text>
+  <text x="631" y="78" fill="#7B8B94" font-size="13.3" text-anchor="middle" font-weight="700">STORE · MEDALLION</text>
+  <text x="912" y="78" fill="#7B8B94" font-size="13.3" text-anchor="middle" font-weight="700">SERVE</text>
+  <text x="1144" y="78" fill="#7B8B94" font-size="13.3" text-anchor="middle" font-weight="700">CONSUME</text>
+  <rect x="20" y="90" width="214" height="380" rx="8" fill="#F6FAF7" stroke="#5F8F79" stroke-width="1.4"/>
+  <rect x="107" y="112" width="40" height="40" rx="7" fill="#DFEBE3" stroke="#5F8F79" stroke-width="1.3"/>
+  <svg x="116" y="120" width="22" height="22" viewBox="0 0 24 24" style="color:#5F8F79"><use href="#s-sftp"/></svg>
+  <text x="127" y="169" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">EDI gateway</text>
+  <text x="127" y="184" text-anchor="middle" fill="#7B8B94" font-size="12.5">837, 835, 834, 270</text>
+  <rect x="107" y="204" width="40" height="40" rx="7" fill="#DFEBE3" stroke="#5F8F79" stroke-width="1.3"/>
+  <svg x="116" y="212" width="22" height="22" viewBox="0 0 24 24" style="color:#5F8F79"><use href="#s-health"/></svg>
+  <text x="127" y="261" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">Clinical feeds</text>
+  <text x="127" y="276" text-anchor="middle" fill="#7B8B94" font-size="12.5">HL7v2, FHIR, CCDA</text>
+  <rect x="107" y="296" width="40" height="40" rx="7" fill="#DFEBE3" stroke="#5F8F79" stroke-width="1.3"/>
+  <svg x="116" y="304" width="22" height="22" viewBox="0 0 24 24" style="color:#5F8F79"><use href="#s-dms"/></svg>
+  <text x="127" y="353" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">Core admin DB</text>
+  <text x="127" y="368" text-anchor="middle" fill="#7B8B94" font-size="12.5">CDC from core</text>
+  <rect x="107" y="388" width="40" height="40" rx="7" fill="#DFEBE3" stroke="#5F8F79" stroke-width="1.3"/>
+  <svg x="116" y="396" width="22" height="22" viewBox="0 0 24 24" style="color:#5F8F79"><use href="#s-hub"/></svg>
+  <text x="127" y="445" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">Portals and APIs</text>
+  <text x="127" y="460" text-anchor="middle" fill="#7B8B94" font-size="12.5">events, prior auth</text>
+  <rect x="250" y="90" width="200" height="380" rx="8" fill="#F7F6FB" stroke="#6F669B" stroke-width="1.4"/>
+  <rect x="330" y="112" width="40" height="40" rx="7" fill="#E4E0EF" stroke="#6F669B" stroke-width="1.3"/>
+  <svg x="339" y="120" width="22" height="22" viewBox="0 0 24 24" style="color:#6F669B"><use href="#s-stream"/></svg>
+  <text x="350" y="169" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">Kinesis / MSK</text>
+  <text x="350" y="184" text-anchor="middle" fill="#7B8B94" font-size="12.5">real time</text>
+  <rect x="330" y="216" width="40" height="40" rx="7" fill="#F6E6D7" stroke="#B0784E" stroke-width="1.3"/>
+  <svg x="339" y="224" width="22" height="22" viewBox="0 0 24 24" style="color:#B0784E"><use href="#s-lambda"/></svg>
+  <text x="350" y="273" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">Lambda</text>
+  <text x="350" y="288" text-anchor="middle" fill="#7B8B94" font-size="12.5">validate, redact</text>
+  <rect x="330" y="320" width="40" height="40" rx="7" fill="#DEE9F1" stroke="#5C87A6" stroke-width="1.3"/>
+  <svg x="339" y="328" width="22" height="22" viewBox="0 0 24 24" style="color:#5C87A6"><use href="#s-dms"/></svg>
+  <text x="350" y="377" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">DMS + Firehose</text>
+  <text x="350" y="392" text-anchor="middle" fill="#7B8B94" font-size="12.5">CDC and micro-batch</text>
+  <rect x="466" y="90" width="330" height="380" rx="8" fill="#FBF8F1" stroke="#96803E" stroke-width="1.4"/>
+  <rect x="486" y="108" width="290" height="96" rx="8" fill="#F6E6D7" stroke="#B0784E" stroke-width="1.3"/>
+  <svg x="504" y="124" width="26" height="26" viewBox="0 0 24 24" style="color:#B0784E"><use href="#s-s3"/></svg>
+  <text x="542" y="142" fill="#24384A" font-size="14.5" font-weight="700">BRONZE  ·  raw, immutable</text>
+  <text x="542" y="162" fill="#7B8B94" font-size="12.8">as received, partitioned by arrival</text>
+  <text x="542" y="186" fill="#B0784E" font-size="10.5">s3://bcbs-lake/bronze/</text>
+  <path d="M631,204 L631,222" fill="none" stroke="#96803E" stroke-width="1.7" marker-end="url(#mF)"/>
+  <rect x="486" y="226" width="290" height="96" rx="8" fill="#E5E9ED" stroke="#6E7C8A" stroke-width="1.3"/>
+  <svg x="504" y="242" width="26" height="26" viewBox="0 0 24 24" style="color:#6E7C8A"><use href="#s-s3"/></svg>
+  <text x="542" y="260" fill="#24384A" font-size="14.5" font-weight="700">SILVER  ·  conformed</text>
+  <text x="542" y="280" fill="#7B8B94" font-size="12.8">validated, typed, PHI tagged</text>
+  <text x="542" y="304" fill="#6E7C8A" font-size="10.5">s3://bcbs-lake/silver/</text>
+  <path d="M631,322 L631,340" fill="none" stroke="#96803E" stroke-width="1.7" marker-end="url(#mF)"/>
+  <rect x="486" y="344" width="290" height="96" rx="8" fill="#F2ECD8" stroke="#96803E" stroke-width="1.3"/>
+  <svg x="504" y="360" width="26" height="26" viewBox="0 0 24 24" style="color:#96803E"><use href="#s-s3"/></svg>
+  <text x="542" y="378" fill="#24384A" font-size="14.5" font-weight="700">GOLD  ·  product</text>
+  <text x="542" y="398" fill="#7B8B94" font-size="12.8">member 360, claim mart, HEDIS</text>
+  <text x="542" y="422" fill="#96803E" font-size="10.5">s3://bcbs-lake/gold/</text>
+  <rect x="812" y="90" width="200" height="380" rx="8" fill="#F5F9FC" stroke="#5C87A6" stroke-width="1.4"/>
+  <rect x="892" y="112" width="40" height="40" rx="7" fill="#E4E0EF" stroke="#6F669B" stroke-width="1.3"/>
+  <svg x="901" y="120" width="22" height="22" viewBox="0 0 24 24" style="color:#6F669B"><use href="#s-athena"/></svg>
+  <text x="912" y="169" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">Athena</text>
+  <text x="912" y="184" text-anchor="middle" fill="#7B8B94" font-size="12.5">ad hoc SQL on S3</text>
+  <rect x="892" y="216" width="40" height="40" rx="7" fill="#DEE9F1" stroke="#5C87A6" stroke-width="1.3"/>
+  <svg x="901" y="224" width="22" height="22" viewBox="0 0 24 24" style="color:#5C87A6"><use href="#s-redshift"/></svg>
+  <text x="912" y="273" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">Redshift</text>
+  <text x="912" y="288" text-anchor="middle" fill="#7B8B94" font-size="12.5">curated marts</text>
+  <rect x="892" y="320" width="40" height="40" rx="7" fill="#F6E6D7" stroke="#B0784E" stroke-width="1.3"/>
+  <svg x="901" y="328" width="22" height="22" viewBox="0 0 24 24" style="color:#B0784E"><use href="#s-glue"/></svg>
+  <text x="912" y="377" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">Glue / EMR</text>
+  <text x="912" y="392" text-anchor="middle" fill="#7B8B94" font-size="12.5">Spark transforms</text>
+  <rect x="1028" y="90" width="232" height="380" rx="8" fill="#F3F8F7" stroke="#4F8683" stroke-width="1.4"/>
+  <rect x="1124" y="112" width="40" height="40" rx="7" fill="#DFEBE3" stroke="#5F8F79" stroke-width="1.3"/>
+  <svg x="1133" y="120" width="22" height="22" viewBox="0 0 24 24" style="color:#5F8F79"><use href="#s-bi"/></svg>
+  <text x="1144" y="169" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">QuickSight</text>
+  <text x="1144" y="184" text-anchor="middle" fill="#7B8B94" font-size="12.5">actuarial, STARS, ops</text>
+  <rect x="1124" y="216" width="40" height="40" rx="7" fill="#F2E1E2" stroke="#A16C74" stroke-width="1.3"/>
+  <svg x="1133" y="224" width="22" height="22" viewBox="0 0 24 24" style="color:#A16C74"><use href="#s-ml"/></svg>
+  <text x="1144" y="273" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">SageMaker</text>
+  <text x="1144" y="288" text-anchor="middle" fill="#7B8B94" font-size="12.5">risk, fraud, care gaps</text>
+  <rect x="1124" y="320" width="40" height="40" rx="7" fill="#E4E0EF" stroke="#6F669B" stroke-width="1.3"/>
+  <svg x="1133" y="328" width="22" height="22" viewBox="0 0 24 24" style="color:#6F669B"><use href="#s-hub"/></svg>
+  <text x="1144" y="377" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">APIs</text>
+  <text x="1144" y="392" text-anchor="middle" fill="#7B8B94" font-size="12.5">CMS Patient Access</text>
+  <path d="M234,270 L250,270" fill="none" stroke="#5C87A6" stroke-width="1.7" marker-end="url(#mF)"/>
+  <path d="M450,270 L466,270" fill="none" stroke="#5C87A6" stroke-width="1.7" marker-end="url(#mF)"/>
+  <path d="M796,270 L812,270" fill="none" stroke="#5C87A6" stroke-width="1.7" marker-end="url(#mF)"/>
+  <path d="M1012,270 L1028,270" fill="none" stroke="#5C87A6" stroke-width="1.7" marker-end="url(#mF)"/>
+  <rect x="20" y="496" width="1260" height="112" rx="9" fill="#E4E0EF" stroke="#6F669B" stroke-width="1.3"/>
+  <svg x="44" y="522" width="28" height="28" viewBox="0 0 24 24" style="color:#6F669B"><use href="#s-catalog"/></svg>
+  <text x="88" y="528" fill="#6F669B" font-size="14.5" font-weight="700">GOVERNANCE OVERLAY</text>
+  <text x="88" y="548" fill="#455C6B" font-size="13.9">Glue Data Catalog for technical metadata  ·  Lake Formation tag-based access  ·  DataZone for data products</text>
+  <text x="88" y="570" fill="#455C6B" font-size="13.9">Glue Data Quality at every hop  ·  lineage recorded at write time, not reconstructed later</text>
+  <text x="88" y="592" fill="#7B8B94" font-size="13.3">Every table in the diagram above appears here, or it does not exist as far as the business is concerned.</text>
+  <rect x="20" y="622" width="1260" height="112" rx="9" fill="#F2E1E2" stroke="#A16C74" stroke-width="1.3"/>
+  <svg x="44" y="648" width="28" height="28" viewBox="0 0 24 24" style="color:#A16C74"><use href="#s-kms"/></svg>
+  <text x="88" y="654" fill="#A16C74" font-size="14.5" font-weight="700">SECURITY OVERLAY</text>
+  <text x="88" y="668" fill="#455C6B" font-size="13.9">KMS customer-managed keys per data class  ·  Lake Formation row and column filters for PHI</text>
+  <text x="88" y="690" fill="#455C6B" font-size="13.9">No public access, VPC endpoints only  ·  CloudTrail data events on every bucket</text>
+  <text x="88" y="712" fill="#7B8B94" font-size="13.3">A HIPAA covered entity has no de-identified-by-default option. Assume PHI until a documented method says otherwise.</text>
+  <text x="20" y="756" fill="#7B8B94" font-size="13.9" font-style="italic">Bronze is never queried by a human. Silver is queried by engineers. Gold is the only layer the business sees.</text>
+</svg>
+    <figcaption>Sources you do not control, an ingest layer that normalises arrival, three storage zones with different contracts, a serving layer chosen per query pattern, and consumers who never touch raw data.</figcaption>
+  </figure>
+
+  <h3>The zone contract</h3>
+  <p>The medallion pattern only works if each zone has a written contract that nobody is allowed to bend. This is the single most useful table you will produce in year one.</p>
+  <div class="scroll"><div class="tbl"><table>
+    <thead><tr><th>&nbsp;</th><th>Bronze</th><th>Silver</th><th>Gold</th></tr></thead>
+    <tbody>
+      <tr><td>What it holds</td><td>Exactly what arrived, byte for byte</td><td>Validated, typed, de-duplicated, conformed keys</td><td>Business-shaped products</td></tr>
+      <tr><td>Format</td><td>Native &mdash; X12, HL7, CSV, JSON</td><td>Parquet or Iceberg</td><td>Iceberg, or Redshift tables</td></tr>
+      <tr><td>Partitioned by</td><td>Arrival date and source</td><td>Business date and domain</td><td>Query pattern</td></tr>
+      <tr><td>Who may read it</td><td>Pipelines only. No humans.</td><td>Data engineers, with PHI filtering</td><td>Analysts and applications</td></tr>
+      <tr><td>Quality gate</td><td>Did the file arrive intact?</td><td>Schema, referential, freshness rules</td><td>Business rules and reconciliation</td></tr>
+      <tr><td>If you find a defect</td><td>Never edit. Reprocess forward.</td><td>Fix the job, re-run the partition</td><td>Fix silver, rebuild gold</td></tr>
+      <tr><td>Retention</td><td>Long &mdash; it is your replay source</td><td>Medium</td><td>As the business requires</td></tr>
+    </tbody>
+  </table></div></div>
+
+  <div class="trap"><b>Trap.</b> Editing bronze. The first time a bad file lands, somebody will want to "just fix the one record". The moment you allow that, bronze stops being a replay source and you can never reconstruct history. Reprocess forward, always.</div>
+
+  <div class="eyebrow">CHOOSING THE LANE</div>
+  <h2>Streaming, batch and mixed</h2>
+  <figure><svg viewBox="0 0 1280 700" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Three processing patterns: streaming, batch and mixed change data capture, each with its payer use case and AWS services.">
+  <defs>
+    <symbol id="s-stream" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.6 8.4c2-1.6 3.4-1.6 5.4 0s3.4 1.6 5.4 0 3.4-1.6 5.4 0"/><path d="M2.6 13c2-1.6 3.4-1.6 5.4 0s3.4 1.6 5.4 0 3.4-1.6 5.4 0"/><path d="M2.6 17.6c2-1.6 3.4-1.6 5.4 0s3.4 1.6 5.4 0 3.4-1.6 5.4 0"/></symbol>
+    <symbol id="s-lambda" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20l6.2-13.4a2 2 0 0 1 3.6 0L20 20"/><path d="M4.6 5.4h4.2"/></symbol>
+    <symbol id="s-steps" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3.4" width="7" height="6" rx="1.4"/><rect x="14" y="3.4" width="7" height="6" rx="1.4"/><rect x="8.5" y="14.6" width="7" height="6" rx="1.4"/><path d="M6.5 9.6v2.6h11V9.6M12 12.2v2.4"/></symbol>
+    <symbol id="s-glue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.6 3h4.8v4.4l4 7.2a4.2 4.2 0 0 1-3.7 6.3H9.3a4.2 4.2 0 0 1-3.7-6.3l4-7.2z"/><path d="M7.6 14.6h8.8"/></symbol>
+    <symbol id="s-s3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14l-1.6 14.4H6.6z"/><path d="M5.6 10h12.8"/></symbol>
+    <symbol id="s-dms" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="6" cy="6" rx="3.4" ry="1.6"/><path d="M2.6 6v6.6c0 .9 1.5 1.6 3.4 1.6s3.4-.7 3.4-1.6V6"/><ellipse cx="18" cy="10" rx="3.4" ry="1.6"/><path d="M14.6 10v6.6c0 .9 1.5 1.6 3.4 1.6s3.4-.7 3.4-1.6V10"/><path d="M10.4 9.6h3.2M12.4 8l1.6 1.6-1.6 1.6"/></symbol>
+    <symbol id="s-sftp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.6h6l1.6 2H21v9.8H3z"/><path d="M12 12v4.4M9.8 14.2L12 16.4l2.2-2.2"/></symbol>
+    <symbol id="s-queue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="4.6" height="10" rx="1.2"/><rect x="9.7" y="7" width="4.6" height="10" rx="1.2"/><rect x="16.4" y="7" width="4.6" height="10" rx="1.2"/></symbol>
+    <symbol id="s-athena" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.6" width="18" height="12.8" rx="1.6"/><path d="M3 9h18M9 9v8.4"/><circle cx="16" cy="14" r="3.2"/><path d="M18.4 16.4L21 19"/></symbol>
+    <symbol id="s-health" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.4S3.8 15.2 3.8 9.4A4.6 4.6 0 0 1 12 6.6a4.6 4.6 0 0 1 8.2 2.8c0 5.8-8.2 11-8.2 11z"/><path d="M9.6 11.6h4.8M12 9.2v4.8"/></symbol>
+    <symbol id="s-hub" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.6"/><circle cx="12" cy="4" r="1.8"/><circle cx="12" cy="20" r="1.8"/><circle cx="4.4" cy="8" r="1.8"/><circle cx="19.6" cy="8" r="1.8"/><circle cx="4.4" cy="16" r="1.8"/><circle cx="19.6" cy="16" r="1.8"/><path d="M12 5.8v3.6M12 14.6v3.6M6 9L9.6 11M18 9L14.4 11M6 15L9.6 13M18 15L14.4 13"/></symbol>
+    <symbol id="s-redshift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="4.6" cy="7" r="2"/><circle cx="19.4" cy="7" r="2"/><circle cx="4.6" cy="17" r="2"/><circle cx="19.4" cy="17" r="2"/><path d="M6.4 8L9.6 10.4M17.6 8L14.4 10.4M6.4 16L9.6 13.6M17.6 16L14.4 13.6"/></symbol>
+    <marker id="mF" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#5C87A6"/></marker>
+    <marker id="mS" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#A16C74"/></marker>
+    <marker id="mG" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#5F8F79"/></marker>
+    <marker id="mP" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#B0784E"/></marker>
+  </defs>
+  <text x="20" y="26" fill="#24384A" font-size="16.2" font-weight="700">EA-2  ·  STREAMING, BATCH AND MIXED</text>
+  <text x="20" y="46" fill="#7B8B94" font-size="13.9">Pick the lane from the decision the data supports, not from the technology you would enjoy building.</text>
+  <rect x="20" y="78" width="1240" height="186" rx="9" fill="#F6FAF7" stroke="#5F8F79" stroke-width="1.4"/>
+  <text x="44" y="108" fill="#5F8F79" font-size="16.2" font-weight="700">STREAMING</text>
+  <text x="44" y="130" fill="#455C6B" font-size="13.9">Clinical ADT feed → care-gap alert while the member is still admitted</text>
+  <rect x="280" y="152" width="40" height="40" rx="7" fill="#E4E0EF" stroke="#6F669B" stroke-width="1.3"/>
+  <svg x="289" y="160" width="22" height="22" viewBox="0 0 24 24" style="color:#6F669B"><use href="#s-stream"/></svg>
+  <text x="300" y="209" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">Kinesis Data Streams</text>
+  <text x="300" y="224" text-anchor="middle" fill="#7B8B94" font-size="12.5">ADT and prior auth events</text>
+  <path d="M334,172 L496,172" fill="none" stroke="#5F8F79" stroke-width="1.7" marker-end="url(#mF)"/>
+  <rect x="510" y="152" width="40" height="40" rx="7" fill="#F6E6D7" stroke="#B0784E" stroke-width="1.3"/>
+  <svg x="519" y="160" width="22" height="22" viewBox="0 0 24 24" style="color:#B0784E"><use href="#s-lambda"/></svg>
+  <text x="530" y="209" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">Lambda consumer</text>
+  <text x="530" y="224" text-anchor="middle" fill="#7B8B94" font-size="12.5">parse HL7, redact, score</text>
+  <path d="M564,172 L726,172" fill="none" stroke="#5F8F79" stroke-width="1.7" marker-end="url(#mF)"/>
+  <rect x="740" y="152" width="40" height="40" rx="7" fill="#E4E0EF" stroke="#6F669B" stroke-width="1.3"/>
+  <svg x="749" y="160" width="22" height="22" viewBox="0 0 24 24" style="color:#6F669B"><use href="#s-queue"/></svg>
+  <text x="760" y="209" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">EventBridge</text>
+  <text x="760" y="224" text-anchor="middle" fill="#7B8B94" font-size="12.5">fan out to care management</text>
+  <path d="M794,172 L956,172" fill="none" stroke="#5F8F79" stroke-width="1.7" marker-end="url(#mF)"/>
+  <rect x="970" y="152" width="40" height="40" rx="7" fill="#DFEBE3" stroke="#5F8F79" stroke-width="1.3"/>
+  <svg x="979" y="160" width="22" height="22" viewBox="0 0 24 24" style="color:#5F8F79"><use href="#s-s3"/></svg>
+  <text x="990" y="209" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">Firehose to bronze</text>
+  <text x="990" y="224" text-anchor="middle" fill="#7B8B94" font-size="12.5">same event, kept raw</text>
+  <text x="44" y="246" fill="#7B8B94" font-size="13.3" font-style="italic">Latency seconds · cost per event · replay from the stream, not the source</text>
+  <rect x="20" y="282" width="1240" height="186" rx="9" fill="#FDF7F1" stroke="#B0784E" stroke-width="1.4"/>
+  <text x="44" y="312" fill="#B0784E" font-size="16.2" font-weight="700">BATCH</text>
+  <text x="44" y="334" fill="#455C6B" font-size="13.9">Nightly 837 claim files → adjudication analytics and the monthly CMS encounter submission</text>
+  <rect x="280" y="356" width="40" height="40" rx="7" fill="#DFEBE3" stroke="#5F8F79" stroke-width="1.3"/>
+  <svg x="289" y="364" width="22" height="22" viewBox="0 0 24 24" style="color:#5F8F79"><use href="#s-sftp"/></svg>
+  <text x="300" y="413" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">Transfer Family</text>
+  <text x="300" y="428" text-anchor="middle" fill="#7B8B94" font-size="12.5">trading partner drops</text>
+  <path d="M334,376 L496,376" fill="none" stroke="#B0784E" stroke-width="1.7" marker-end="url(#mF)"/>
+  <rect x="510" y="356" width="40" height="40" rx="7" fill="#F2ECD8" stroke="#96803E" stroke-width="1.3"/>
+  <svg x="519" y="364" width="22" height="22" viewBox="0 0 24 24" style="color:#96803E"><use href="#s-steps"/></svg>
+  <text x="530" y="413" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">Step Functions</text>
+  <text x="530" y="428" text-anchor="middle" fill="#7B8B94" font-size="12.5">orchestrate, retry, alert</text>
+  <path d="M564,376 L726,376" fill="none" stroke="#B0784E" stroke-width="1.7" marker-end="url(#mF)"/>
+  <rect x="740" y="356" width="40" height="40" rx="7" fill="#F6E6D7" stroke="#B0784E" stroke-width="1.3"/>
+  <svg x="749" y="364" width="22" height="22" viewBox="0 0 24 24" style="color:#B0784E"><use href="#s-glue"/></svg>
+  <text x="760" y="413" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">Glue Spark job</text>
+  <text x="760" y="428" text-anchor="middle" fill="#7B8B94" font-size="12.5">bronze to silver to gold</text>
+  <path d="M794,376 L956,376" fill="none" stroke="#B0784E" stroke-width="1.7" marker-end="url(#mF)"/>
+  <rect x="970" y="356" width="40" height="40" rx="7" fill="#DEE9F1" stroke="#5C87A6" stroke-width="1.3"/>
+  <svg x="979" y="364" width="22" height="22" viewBox="0 0 24 24" style="color:#5C87A6"><use href="#s-redshift"/></svg>
+  <text x="990" y="413" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">Redshift load</text>
+  <text x="990" y="428" text-anchor="middle" fill="#7B8B94" font-size="12.5">marts for actuarial</text>
+  <text x="44" y="450" fill="#7B8B94" font-size="13.3" font-style="italic">Latency hours · cost per run · replay by re-running the window</text>
+  <rect x="20" y="486" width="1240" height="186" rx="9" fill="#F5F9FC" stroke="#5C87A6" stroke-width="1.4"/>
+  <text x="44" y="516" fill="#5C87A6" font-size="16.2" font-weight="700">MIXED · CDC</text>
+  <text x="44" y="538" fill="#455C6B" font-size="13.9">Member and claim status changes → near-real-time member 360 without hammering the core system</text>
+  <rect x="280" y="560" width="40" height="40" rx="7" fill="#DEE9F1" stroke="#5C87A6" stroke-width="1.3"/>
+  <svg x="289" y="568" width="22" height="22" viewBox="0 0 24 24" style="color:#5C87A6"><use href="#s-dms"/></svg>
+  <text x="300" y="617" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">DMS ongoing CDC</text>
+  <text x="300" y="632" text-anchor="middle" fill="#7B8B94" font-size="12.5">from core admin</text>
+  <path d="M334,580 L496,580" fill="none" stroke="#5C87A6" stroke-width="1.7" marker-end="url(#mF)"/>
+  <rect x="510" y="560" width="40" height="40" rx="7" fill="#E4E0EF" stroke="#6F669B" stroke-width="1.3"/>
+  <svg x="519" y="568" width="22" height="22" viewBox="0 0 24 24" style="color:#6F669B"><use href="#s-stream"/></svg>
+  <text x="530" y="617" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">Kinesis stream</text>
+  <text x="530" y="632" text-anchor="middle" fill="#7B8B94" font-size="12.5">ordered change events</text>
+  <path d="M564,580 L726,580" fill="none" stroke="#5C87A6" stroke-width="1.7" marker-end="url(#mF)"/>
+  <rect x="740" y="560" width="40" height="40" rx="7" fill="#F6E6D7" stroke="#B0784E" stroke-width="1.3"/>
+  <svg x="749" y="568" width="22" height="22" viewBox="0 0 24 24" style="color:#B0784E"><use href="#s-glue"/></svg>
+  <text x="760" y="617" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">Glue streaming job</text>
+  <text x="760" y="632" text-anchor="middle" fill="#7B8B94" font-size="12.5">merge into Iceberg</text>
+  <path d="M794,580 L956,580" fill="none" stroke="#5C87A6" stroke-width="1.7" marker-end="url(#mF)"/>
+  <rect x="970" y="560" width="40" height="40" rx="7" fill="#E4E0EF" stroke="#6F669B" stroke-width="1.3"/>
+  <svg x="979" y="568" width="22" height="22" viewBox="0 0 24 24" style="color:#6F669B"><use href="#s-athena"/></svg>
+  <text x="990" y="617" text-anchor="middle" fill="#24384A" font-size="14" font-weight="600">Athena or Redshift</text>
+  <text x="990" y="632" text-anchor="middle" fill="#7B8B94" font-size="12.5">read the merged table</text>
+  <text x="44" y="654" fill="#7B8B94" font-size="13.3" font-style="italic">Latency minutes · the hardest to operate · upserts and late arrivals are the whole problem</text>
+</svg>
+    <figcaption>The same platform carries all three. What differs is the trigger, the failure mode and how you replay.</figcaption>
+  </figure>
+
+  <div class="grid g3">
+    <div class="card" style="border-left:3px solid var(--green)">
+      <h3 style="margin-top:0">Choose streaming when</h3>
+      <ul>
+        <li>The decision expires. A care-gap alert after discharge is worthless.</li>
+        <li>The source emits events anyway &mdash; ADT feeds, portal activity.</li>
+        <li>You can tolerate out-of-order arrival and design for it.</li>
+      </ul>
+      <p style="margin:0;color:var(--muted);font-size:16px">Cost is per event and never sleeps. Ten thousand events an hour is cheap; ten million is a budget conversation.</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--peach)">
+      <h3 style="margin-top:0">Choose batch when</h3>
+      <ul>
+        <li>The source is a file. An 837 drop is a batch whatever you wrap around it.</li>
+        <li>The decision is periodic &mdash; monthly submissions, annual measures.</li>
+        <li>You need the whole window to compute correctly.</li>
+      </ul>
+      <p style="margin:0;color:var(--muted);font-size:16px">Cheapest per record and easiest to reason about. Most of a payer's value lives here and it is unfashionable to say so.</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--blue)">
+      <h3 style="margin-top:0">Choose mixed when</h3>
+      <ul>
+        <li>You need current state from a system you must not query directly.</li>
+        <li>Updates matter as much as inserts &mdash; a claim changes status repeatedly.</li>
+        <li>The consumer wants a table, not a stream.</li>
+      </ul>
+      <p style="margin:0;color:var(--muted);font-size:16px">Hardest to operate. Upserts, late arrivals and schema drift are the entire job. Iceberg or Hudi exists for exactly this.</p>
+    </div>
+  </div>
+
+  <div class="note"><b>A rule that will save you a year.</b> Latency requirements are stated in meetings and discovered in production. Ask what the consumer does in the gap. If a nightly refresh means someone waits until morning to make a call they could make at nine anyway, you do not have a streaming requirement &mdash; you have a habit.</div>
+
+  <div class="eyebrow">WORKED EXAMPLES</div>
+  <h2>Configuration and code</h2>
+  <p class="sub">Open what you need. These are the artefacts, not illustrations of them.</p>
+<details class="ex"><summary><span class="tag cfg">CONFIG</span>S3 prefix layout &mdash; decide this once, live with it for a decade</summary><div class="exb">
+<p>The prefix is the contract. Partition on arrival in bronze and on business date in silver, and never mix the two.</p>
+<div class="filename">docs/lake-layout.txt</div><pre>s3://bcbs-lake-bronze-&lt;acct&gt;/
+  edi/partner=SUBMITTERID/txn=837/arrival_date=2026-03-11/claims_0930.x12
+  edi/partner=PBMCORP/txn=ncpdp/arrival_date=2026-03-11/accum_0400.txt
+  clinical/adt/arrival_date=2026-03-11/hour=09/49590000000.hl7
+  cdc/core-admin/schema=CLAIMS/table=CLAIM_HEADER/dt=2026-03-11/LOAD0001.parquet
+
+s3://bcbs-lake-silver-&lt;acct&gt;/
+  db=bcbs_lakehouse/table=claim_line/service_month=2026-03/...parquet
+  db=bcbs_lakehouse/table=member/effective_month=2026-03/...parquet
+  quarantine/claim_no_member/run_date=2026-03-11/...parquet
+  glue-scripts/bronze_to_silver_claims.py
+
+s3://bcbs-lake-gold-&lt;acct&gt;/
+  db=bcbs_marts/table=member_360/...
+  db=bcbs_marts/table=claim_summary_monthly/line_of_business=commercial/...
+  products/hedis_measures/measurement_year=2026/...
+
+# Why arrival_date in bronze and service_month in silver:
+#   a claim for March service can arrive in July as a correction.
+#   Bronze answers "what did we receive on the 11th".
+#   Silver answers "what is true about March".
+#   Those are different questions and they need different partitions.</pre></div></details>
+<details class="ex"><summary><span class="tag sql">SQL</span>Iceberg table and the MERGE that handles corrections and CDC</summary><div class="exb">
+<p>One code path for resubmissions, corrections and change data capture. This is the reason Iceberg is in the design rather than plain Parquet.</p>
+<div class="filename">sql/silver_claim_line.sql</div><pre>-- Silver claim line, created once
+CREATE TABLE glue_catalog.bcbs_lakehouse.claim_line (
+    claim_control_number    string,
+    line_number             int,
+    enterprise_member_id    string,
+    billing_provider_npi    string,
+    service_date            date,
+    service_month           string,
+    procedure_code          string,
+    diagnosis_codes         array&lt;string&gt;,
+    billed_amount           decimal(12,2),
+    allowed_amount          decimal(12,2),
+    claim_status            string,
+    source_file             string,
+    ingested_at             timestamp,
+    is_deleted              boolean
+)
+USING iceberg
+PARTITIONED BY (service_month)
+TBLPROPERTIES (
+    'format-version' = '2',
+    'write.delete.mode' = 'merge-on-read',
+    'write.update.mode' = 'merge-on-read'
+);
+
+-- Applied on every run: resubmission, correction and CDC all land here
+MERGE INTO glue_catalog.bcbs_lakehouse.claim_line AS t
+USING staged_claims AS s
+   ON t.claim_control_number = s.claim_control_number
+  AND t.line_number = s.line_number
+
+WHEN MATCHED AND s.op = 'D' THEN
+    UPDATE SET is_deleted = true, ingested_at = s.ingested_at
+
+WHEN MATCHED AND s.ingested_at &gt; t.ingested_at THEN
+    UPDATE SET *                       -- last writer on the natural key wins
+
+WHEN NOT MATCHED THEN
+    INSERT *;
+
+-- What we submitted to CMS in March, months later, for free:
+SELECT count(*), sum(billed_amount)
+FROM   glue_catalog.bcbs_lakehouse.claim_line
+FOR    TIMESTAMP AS OF TIMESTAMP '2026-04-01 00:00:00'
+WHERE  service_month = '2026-03';</pre></div></details>
+<details class="ex"><summary><span class="tag cfg">CONFIG</span>Data contract &mdash; what a gold table promises its consumers</summary><div class="exb">
+<p>Write one of these per gold table before you build it. It converts "the data looks wrong" into a testable claim.</p>
+<div class="filename">contracts/claim_summary_monthly.yaml</div><pre>table: bcbs_marts.claim_summary_monthly
+version: 2.1.0
+owner: M. Reyes (claims steward)
+producer_team: data-engineering
+description: &gt;
+  One row per member per service month per line of business, with allowed
+  and billed totals. The actuarial and finance source of truth for trend.
+
+grain: [enterprise_member_id, service_month, line_of_business]
+
+freshness:
+  expectation: available by 06:00 ET for the prior day's load
+  measured_by: max(ingested_at) vs run_date
+  breach_action: page the on-call, do not silently serve stale
+
+quality_rules:
+  - row_count between prior_run * 0.9 and prior_run * 1.15
+  - enterprise_member_id is never null
+  - allowed_amount &lt;= billed_amount for 99.9% of rows
+  - referential: every enterprise_member_id exists in dim_member
+
+reconciliation:
+  against: legacy_edw.CLAIM_SUMMARY_MONTH
+  tolerance: 0.1% on sum(allowed_amount)
+  cadence: every run until two consecutive clean cycles, then monthly
+
+breaking_change_policy:
+  notice: 30 days to registered subscribers via DataZone
+  removal_of_column: major version bump, never in place
+
+classification: confidential          # PHI columns are NOT in this table
+lf_tags: { zone: gold, domain: claim, classification: confidential }
+</pre></div></details>
+</div>
+
+<!-- ==================================================== 4 ETL / ELT -->
+<div class="pane" id="p-4" role="tabpanel" aria-labelledby="t-4">
+  <h2>ETL, ELT, and where each one belongs</h2>
+  <p class="sub">The letters describe where transformation happens relative to landing. That single choice drives cost, auditability and how fast you can answer a question you have not been asked yet.</p>
+
+  <div class="grid g2">
+    <div class="card" style="border-left:3px solid var(--peach)">
+      <h3 style="margin-top:0">ETL &mdash; transform, then land</h3>
+      <p>Data is reshaped in flight and only the result is stored. The classic warehouse pattern, and still correct in specific places.</p>
+      <p><b>Use it when:</b></p>
+      <ul>
+        <li>You must not persist the raw form. Tokenising a member identifier or stripping a direct identifier before it reaches storage is an ETL decision.</li>
+        <li>A contract forbids retention of the source payload.</li>
+        <li>The transformation reduces volume enormously and the raw form has no future use.</li>
+        <li>The target is a fixed schema you control and query patterns are known.</li>
+      </ul>
+      <p style="margin:0;color:var(--muted);font-size:16px">Cost: you cannot answer a question you did not anticipate, because the raw data is gone.</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--blue)">
+      <h3 style="margin-top:0">ELT &mdash; land, then transform</h3>
+      <p>Raw arrives in bronze untouched; transformation happens with elastic compute reading from storage. This is the default for a modern lakehouse.</p>
+      <p><b>Use it when:</b></p>
+      <ul>
+        <li>Storage is cheaper than re-acquiring the data &mdash; which for claims and clinical feeds it always is.</li>
+        <li>Future questions are unknown, which is every analytics programme honestly described.</li>
+        <li>You need to reprocess history when a rule changes, and rules change constantly in risk adjustment and quality.</li>
+        <li>You want lineage that starts at the byte you received.</li>
+      </ul>
+      <p style="margin:0;color:var(--muted);font-size:16px">Cost: you are now storing PHI in its rawest form, and every control in the governance overlay has to be real.</p>
+    </div>
+  </div>
+
+  <div class="scroll"><div class="tbl"><table>
+    <thead><tr><th>Situation in this estate</th><th>Pattern</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>837 claim files from trading partners</td><td>ELT</td><td>Land the X12 verbatim in bronze. You will reprocess it when an edit rule changes, and you will need to prove what the partner actually sent.</td></tr>
+      <tr><td>HL7v2 ADT event stream</td><td>ELT with an ETL step</td><td>Land raw, but redact free-text notes in flight before they reach any zone an analyst can reach.</td></tr>
+      <tr><td>Data shared with a research partner</td><td>ETL</td><td>De-identification happens before it lands anywhere outside the boundary. The raw form must never exist on the far side.</td></tr>
+      <tr><td>CDC from the core admin platform</td><td>ELT</td><td>Land the change events, merge into an Iceberg table. Merge logic changes far more often than the events do.</td></tr>
+      <tr><td>Pharmacy accumulator files from the PBM</td><td>ELT</td><td>You do not control the format and it will change without notice. Keep the original.</td></tr>
+      <tr><td>Price transparency machine-readable files</td><td>ETL on the way out</td><td>Gold to a published artefact in a mandated schema. This is a write-side transformation, not a landing one.</td></tr>
+    </tbody>
+  </table></div></div>
+
+  <div class="callout">
+    <h3>The rule for a covered entity</h3>
+    <p>Default to ELT so you can reprocess and prove lineage. Reach for ETL only where a legal or contractual obligation says a form of the data must not exist at rest &mdash; then do that transformation as early in the path as the obligation demands, and document which obligation drove it.</p>
+    <p class="rule">Never ETL because someone thinks storage is expensive. Storage is the cheapest thing in this architecture.</p>
+  </div>
+
+  <div class="trap"><b>Trap.</b> ELT is used as an excuse to skip modelling. Landing everything in bronze feels like progress and produces nothing. Silver is where the actual work is, and it is the layer teams underestimate by a factor of three.</div>
+
+  <div class="eyebrow">WORKED EXAMPLES</div>
+  <h2>Configuration and code</h2>
+  <p class="sub">Open what you need. These are the artefacts, not illustrations of them.</p>
+<details class="ex"><summary><span class="tag code">CODE</span>The ETL case &mdash; tokenising before anything lands</summary><div class="exb">
+<p>The one situation where transformation must happen in flight: the raw form is not permitted to exist at rest on the far side of a boundary. Everything else in this platform is ELT.</p>
+<div class="filename">jobs/research_extract_deidentify.py</div><pre>"""Research extract: de-identify in flight, land only the result.
+
+Driven by the data use agreement with the research partner, not by
+preference. The raw form must never exist in the partner boundary, so
+this is genuinely ETL and the ADR records which clause required it.
+"""
+import hashlib
+import hmac
+import os
+from datetime import date
+
+import boto3
+
+# Key lives in Secrets Manager, rotated annually, never in the job.
+_HMAC_KEY = boto3.client("secretsmanager").get_secret_value(
+    SecretId="bcbs/research/token-key")["SecretBinary"]
+
+# Safe Harbor: the 18 identifiers. This handles the three that survive
+# most naive de-identification attempts.
+DIRECT_IDENTIFIERS = [
+    "member_name", "street", "phone", "email", "ssn", "mrn",
+    "account_number", "certificate_number", "device_id", "url", "ip",
+]
+
+
+def tokenise(value: str) -&gt; str:
+    """Stable pseudonym. Same member, same token, across extracts."""
+    return hmac.new(_HMAC_KEY, value.encode(), hashlib.sha256).hexdigest()[:32]
+
+
+def shift_date(d: date, member_token: str) -&gt; date:
+    """Per-member consistent date shift, +/- 30 days.
+
+    A single global shift is reversible from a known event. A per-member
+    shift preserves within-member intervals, which is what researchers
+    actually need, without preserving the calendar.
+    """
+    offset = int(member_token[:4], 16) % 61 - 30
+    return date.fromordinal(d.toordinal() + offset)
+
+
+def deidentify(row: dict) -&gt; dict:
+    token = tokenise(row["enterprise_member_id"])
+    out = {k: v for k, v in row.items() if k not in DIRECT_IDENTIFIERS}
+    out["member_token"] = token
+    out.pop("enterprise_member_id", None)
+
+    for field in ("service_date", "admit_date", "discharge_date"):
+        if row.get(field):
+            out[field] = shift_date(row[field], token)
+
+    # Ages over 89 aggregate to a single bucket under Safe Harbor.
+    if row.get("age", 0) &gt; 89:
+        out["age"] = "90+"
+
+    # ZIP: first three digits only, and suppressed for sparse areas.
+    zip3 = str(row.get("zip", ""))[:3]
+    out["zip3"] = "000" if zip3 in SPARSE_ZIP3 else zip3
+    return out
+</pre></div></details>
+<details class="ex"><summary><span class="tag sql">SQL</span>The ELT case &mdash; the same logic as a transformation over landed data</summary><div class="exb">
+<p>Nothing was destroyed on the way in. When the risk adjustment rules change in September you re-run this over history; in the ETL version above, that history is gone.</p>
+<div class="filename">sql/gold_claim_summary_monthly.sql</div><pre>-- silver -&gt; gold. Runs over data already landed, re-runnable at will.
+CREATE OR REPLACE TABLE bcbs_marts.claim_summary_monthly AS
+WITH lines AS (
+    SELECT
+        c.enterprise_member_id,
+        c.service_month,
+        m.line_of_business,
+        c.billed_amount,
+        c.allowed_amount,
+        c.claim_status
+    FROM   bcbs_lakehouse.claim_line c
+    JOIN   bcbs_lakehouse.member_month m
+      ON   c.enterprise_member_id = m.enterprise_member_id
+     AND   c.service_month       = m.service_month
+    WHERE  c.is_deleted = false
+      AND  c.claim_status IN ('PAID', 'ADJUSTED')
+)
+SELECT
+    enterprise_member_id,
+    service_month,
+    line_of_business,
+    count(*)                   AS line_count,
+    sum(billed_amount)         AS billed_amount,
+    sum(allowed_amount)        AS allowed_amount,
+    current_timestamp          AS built_at
+FROM   lines
+GROUP  BY 1, 2, 3;
+
+-- The reconciliation that decides whether anyone trusts this table
+SELECT  n.service_month,
+        n.allowed_amount                       AS new_total,
+        l.allowed_amount                       AS legacy_total,
+        abs(n.allowed_amount - l.allowed_amount)
+          / nullif(l.allowed_amount, 0)        AS variance
+FROM   (SELECT service_month, sum(allowed_amount) allowed_amount
+        FROM bcbs_marts.claim_summary_monthly GROUP BY 1) n
+FULL OUTER JOIN legacy_edw.claim_summary_month l USING (service_month)
+WHERE  abs(n.allowed_amount - l.allowed_amount)
+         / nullif(l.allowed_amount, 0) &gt; 0.001;   -- 0.1% tolerance</pre></div></details>
+</div>
+
+<!-- ==================================================== 5 GOVERNANCE -->
+<div class="pane" id="p-5" role="tabpanel" aria-labelledby="t-5">
+  <h2>Overlaying Well-Architected</h2>
+  <p class="sub">The framework is not a checklist you run at the end. Used properly it is six questions you ask of every design decision, before it is made.</p>
+
+  <div class="scroll"><div class="tbl"><table>
+    <thead><tr><th>Pillar</th><th>The question, in this architecture</th><th>What it changes in the design</th></tr></thead>
+    <tbody>
+      <tr><td>Operational excellence</td><td>How do we know a pipeline failed before the business does?</td><td>Step Functions with explicit failure paths, Glue Data Quality gates, freshness alerts per table, runbooks per job.</td></tr>
+      <tr><td>Security</td><td>Who can see PHI, and how do we evidence minimum necessary?</td><td>Lake Formation column and row filtering, KMS keys per data class, no bucket reachable from the internet, CloudTrail data events on every zone.</td></tr>
+      <tr><td>Reliability</td><td>What happens when a source sends nothing, or sends it twice?</td><td>Idempotent loads keyed on a natural key, replay from bronze, dead-letter paths on every stream, cross-region backup of gold.</td></tr>
+      <tr><td>Performance efficiency</td><td>Are we scanning what we need, or the whole lake?</td><td>Partitioning on business date, columnar formats, Iceberg for merge-on-read, Redshift only where the join pattern justifies it.</td></tr>
+      <tr><td>Cost optimisation</td><td>What does one more use case cost?</td><td>Lifecycle rules to Glacier for bronze, right-sized Glue workers, autoscaling on Redshift, per-domain cost allocation tags.</td></tr>
+      <tr><td>Sustainability</td><td>Are we storing and computing things nobody reads?</td><td>Table access telemetry, retire unread gold tables, batch rather than continuous where latency allows.</td></tr>
+    </tbody>
+  </table></div></div>
+
+  <div class="note"><b>Use the lenses.</b> The Data Analytics Lens and the Healthcare Industry Lens turn the generic pillars into questions with payer-specific answers. Reviewing against the base framework alone will miss things a lens would have caught &mdash; PHI handling in intermediate storage, and de-identification methodology, are the two that come up most.</div>
+
+  <div class="eyebrow">CATALOGUING</div>
+  <h2>Four things called the catalogue</h2>
+  <figure><svg viewBox="0 0 1280 620" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cataloguing and governance: technical catalog, permissions, business catalog, data quality and lineage, and how a request for data is answered.">
+  <defs>
+    <symbol id="s-catalog" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.6h6.4a2 2 0 0 1 2 2v13a2 2 0 0 0-2-1.6H4z"/><path d="M20 4.6h-6.4a2 2 0 0 0-2 2v13a2 2 0 0 1 2-1.6H20z"/></symbol>
+    <symbol id="s-lake" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.6c2-1.4 3.4-1.4 5.4 0s3.4 1.4 5.4 0 3.4-1.4 5.4 0"/><path d="M3 13.4c2-1.4 3.4-1.4 5.4 0s3.4 1.4 5.4 0 3.4-1.4 5.4 0"/><rect x="8" y="16" width="8" height="5.4" rx="1.4"/><path d="M10 16v-1.6a2 2 0 0 1 4 0V16"/></symbol>
+    <symbol id="s-dq" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.6"/><path d="M8.2 12.2l2.6 2.6 5-5.2"/></symbol>
+    <symbol id="s-s3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14l-1.6 14.4H6.6z"/><path d="M5.6 10h12.8"/></symbol>
+    <symbol id="s-glue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.6 3h4.8v4.4l4 7.2a4.2 4.2 0 0 1-3.7 6.3H9.3a4.2 4.2 0 0 1-3.7-6.3l4-7.2z"/><path d="M7.6 14.6h8.8"/></symbol>
+    <symbol id="s-iam" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l6.5 2.8v5.4c0 4-2.8 7.2-6.5 8.2-3.7-1-6.5-4.2-6.5-8.2V5.8z"/><circle cx="12" cy="10.4" r="2.1"/><path d="M8.6 16.2c.6-1.9 1.9-2.8 3.4-2.8s2.8.9 3.4 2.8"/></symbol>
+    <symbol id="s-bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.4 20h17.2"/><rect x="5" y="11" width="3.4" height="7" rx="1"/><rect x="10.3" y="6.6" width="3.4" height="11.4" rx="1"/><rect x="15.6" y="8.8" width="3.4" height="9.2" rx="1"/></symbol>
+    <symbol id="s-hub" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.6"/><circle cx="12" cy="4" r="1.8"/><circle cx="12" cy="20" r="1.8"/><circle cx="4.4" cy="8" r="1.8"/><circle cx="19.6" cy="8" r="1.8"/><circle cx="4.4" cy="16" r="1.8"/><circle cx="19.6" cy="16" r="1.8"/><path d="M12 5.8v3.6M12 14.6v3.6M6 9L9.6 11M18 9L14.4 11M6 15L9.6 13M18 15L14.4 13"/></symbol>
+    <marker id="mF" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#5C87A6"/></marker>
+    <marker id="mS" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#A16C74"/></marker>
+  </defs>
+  <text x="20" y="26" fill="#24384A" font-size="16.2" font-weight="700">EA-3  ·  CATALOGUING AND ACCESS</text>
+  <text x="20" y="46" fill="#7B8B94" font-size="13.9">Four different things get called the catalog. They do different jobs and you need all four.</text>
+  <rect x="20" y="76" width="293" height="268" rx="9" fill="#FDFCFA" stroke="#6F669B" stroke-width="1.4"/>
+  <rect x="20" y="76" width="293" height="40" rx="9" fill="#E4E0EF"/>
+  <rect x="20" y="100" width="293" height="16" fill="#E4E0EF"/>
+  <svg x="36" y="84" width="24" height="24" viewBox="0 0 24 24" style="color:#6F669B"><use href="#s-catalog"/></svg>
+  <text x="70" y="102" fill="#24384A" font-size="15.7" font-weight="700">Technical catalog</text>
+  <text x="36" y="138" fill="#6F669B" font-size="13.3" font-weight="700">AWS Glue Data Catalog</text>
+  <circle cx="40" cy="160" r="2.2" fill="#6F669B"/>
+  <text x="50" y="164" fill="#455C6B" font-size="13.3">Databases, tables, columns, types</text>
+  <circle cx="40" cy="194" r="2.2" fill="#6F669B"/>
+  <text x="50" y="198" fill="#455C6B" font-size="13.3">Partitions and file formats</text>
+  <circle cx="40" cy="228" r="2.2" fill="#6F669B"/>
+  <text x="50" y="232" fill="#455C6B" font-size="13.3">Populated by crawlers and by the jobs themse</text>
+  <text x="50" y="246" fill="#455C6B" font-size="13.3">lves</text>
+  <circle cx="40" cy="262" r="2.2" fill="#6F669B"/>
+  <text x="50" y="266" fill="#455C6B" font-size="13.3">Answers: what tables exist and what shape ar</text>
+  <text x="50" y="280" fill="#455C6B" font-size="13.3">e they</text>
+  <rect x="333" y="76" width="293" height="268" rx="9" fill="#FDFCFA" stroke="#A16C74" stroke-width="1.4"/>
+  <rect x="333" y="76" width="293" height="40" rx="9" fill="#F2E1E2"/>
+  <rect x="333" y="100" width="293" height="16" fill="#F2E1E2"/>
+  <svg x="349" y="84" width="24" height="24" viewBox="0 0 24 24" style="color:#A16C74"><use href="#s-lake"/></svg>
+  <text x="383" y="102" fill="#24384A" font-size="15.7" font-weight="700">Permissions</text>
+  <text x="349" y="138" fill="#A16C74" font-size="13.3" font-weight="700">AWS Lake Formation</text>
+  <circle cx="353" cy="160" r="2.2" fill="#A16C74"/>
+  <text x="363" y="164" fill="#455C6B" font-size="13.3">Grants on database, table, column and row</text>
+  <circle cx="353" cy="194" r="2.2" fill="#A16C74"/>
+  <text x="363" y="198" fill="#455C6B" font-size="13.3">LF-Tags: classification=PHI, domain=claims</text>
+  <circle cx="353" cy="228" r="2.2" fill="#A16C74"/>
+  <text x="363" y="232" fill="#455C6B" font-size="13.3">Tag-based access replaces per-table grants</text>
+  <circle cx="353" cy="262" r="2.2" fill="#A16C74"/>
+  <text x="363" y="266" fill="#455C6B" font-size="13.3">Answers: who may see which columns and rows</text>
+  <rect x="646" y="76" width="293" height="268" rx="9" fill="#FDFCFA" stroke="#4F8683" stroke-width="1.4"/>
+  <rect x="646" y="76" width="293" height="40" rx="9" fill="#DCEAE8"/>
+  <rect x="646" y="100" width="293" height="16" fill="#DCEAE8"/>
+  <svg x="662" y="84" width="24" height="24" viewBox="0 0 24 24" style="color:#4F8683"><use href="#s-hub"/></svg>
+  <text x="696" y="102" fill="#24384A" font-size="15.7" font-weight="700">Business catalog</text>
+  <text x="662" y="138" fill="#4F8683" font-size="13.3" font-weight="700">Amazon DataZone</text>
+  <circle cx="666" cy="160" r="2.2" fill="#4F8683"/>
+  <text x="676" y="164" fill="#455C6B" font-size="13.3">Domains, data products, subscriptions</text>
+  <circle cx="666" cy="194" r="2.2" fill="#4F8683"/>
+  <text x="676" y="198" fill="#455C6B" font-size="13.3">Owner, steward, description, SLA</text>
+  <circle cx="666" cy="228" r="2.2" fill="#4F8683"/>
+  <text x="676" y="232" fill="#455C6B" font-size="13.3">A request and approval workflow that leaves </text>
+  <text x="676" y="246" fill="#455C6B" font-size="13.3">a record</text>
+  <circle cx="666" cy="262" r="2.2" fill="#4F8683"/>
+  <text x="676" y="266" fill="#455C6B" font-size="13.3">Answers: what does this mean and who owns it</text>
+  <rect x="959" y="76" width="293" height="268" rx="9" fill="#FDFCFA" stroke="#5F8F79" stroke-width="1.4"/>
+  <rect x="959" y="76" width="293" height="40" rx="9" fill="#DFEBE3"/>
+  <rect x="959" y="100" width="293" height="16" fill="#DFEBE3"/>
+  <svg x="975" y="84" width="24" height="24" viewBox="0 0 24 24" style="color:#5F8F79"><use href="#s-dq"/></svg>
+  <text x="1009" y="102" fill="#24384A" font-size="15.7" font-weight="700">Quality and lineage</text>
+  <text x="975" y="138" fill="#5F8F79" font-size="13.3" font-weight="700">Glue Data Quality</text>
+  <circle cx="979" cy="160" r="2.2" fill="#5F8F79"/>
+  <text x="989" y="164" fill="#455C6B" font-size="13.3">Rules per table, run on every load</text>
+  <circle cx="979" cy="194" r="2.2" fill="#5F8F79"/>
+  <text x="989" y="198" fill="#455C6B" font-size="13.3">Freshness, completeness, referential checks</text>
+  <circle cx="979" cy="228" r="2.2" fill="#5F8F79"/>
+  <text x="989" y="232" fill="#455C6B" font-size="13.3">Lineage captured at write time, not reconstr</text>
+  <text x="989" y="246" fill="#455C6B" font-size="13.3">ucted</text>
+  <circle cx="979" cy="262" r="2.2" fill="#5F8F79"/>
+  <text x="989" y="266" fill="#455C6B" font-size="13.3">Answers: can I trust this, and where did it </text>
+  <text x="989" y="280" fill="#455C6B" font-size="13.3">come from</text>
+  <rect x="20" y="368" width="1240" height="150" rx="9" fill="#F7F5F0" stroke="#6E7C8A" stroke-width="1.3"/>
+  <text x="44" y="396" fill="#24384A" font-size="14.5" font-weight="700">HOW A REQUEST FOR DATA IS ACTUALLY ANSWERED</text>
+  <circle cx="55" cy="426" r="11" fill="#FDFCFA" stroke="#4F8683" stroke-width="1.4"/>
+  <text x="55" y="430" fill="#4F8683" font-size="12" text-anchor="middle" font-weight="700">1</text>
+  <text x="44" y="458" fill="#455C6B" font-size="13.3">An analyst finds a data product in</text>
+  <text x="44" y="474" fill="#455C6B" font-size="13.3"> DataZone</text>
+  <path d="M70,426 L270,426" fill="none" stroke="#6E7C8A" stroke-width="1.7" marker-end="url(#mF)"/>
+  <circle cx="297" cy="426" r="11" fill="#FDFCFA" stroke="#4F8683" stroke-width="1.4"/>
+  <text x="297" y="430" fill="#4F8683" font-size="12" text-anchor="middle" font-weight="700">2</text>
+  <text x="286" y="458" fill="#455C6B" font-size="13.3">They subscribe; the owner approves</text>
+  <text x="286" y="474" fill="#455C6B" font-size="13.3">, and the approval is the record</text>
+  <path d="M312,426 L512,426" fill="none" stroke="#6E7C8A" stroke-width="1.7" marker-end="url(#mF)"/>
+  <circle cx="539" cy="426" r="11" fill="#FDFCFA" stroke="#A16C74" stroke-width="1.4"/>
+  <text x="539" y="430" fill="#A16C74" font-size="12" text-anchor="middle" font-weight="700">3</text>
+  <text x="528" y="458" fill="#455C6B" font-size="13.3">Lake Formation grants on the LF-Ta</text>
+  <text x="528" y="474" fill="#455C6B" font-size="13.3">g, not the table name</text>
+  <path d="M554,426 L754,426" fill="none" stroke="#6E7C8A" stroke-width="1.7" marker-end="url(#mF)"/>
+  <circle cx="781" cy="426" r="11" fill="#FDFCFA" stroke="#A16C74" stroke-width="1.4"/>
+  <text x="781" y="430" fill="#A16C74" font-size="12" text-anchor="middle" font-weight="700">4</text>
+  <text x="770" y="458" fill="#455C6B" font-size="13.3">PHI columns are filtered out unles</text>
+  <text x="770" y="474" fill="#455C6B" font-size="13.3">s the role carries the entitlement</text>
+  <path d="M796,426 L996,426" fill="none" stroke="#6E7C8A" stroke-width="1.7" marker-end="url(#mF)"/>
+  <circle cx="1023" cy="426" r="11" fill="#FDFCFA" stroke="#5C87A6" stroke-width="1.4"/>
+  <text x="1023" y="430" fill="#5C87A6" font-size="12" text-anchor="middle" font-weight="700">5</text>
+  <text x="1012" y="458" fill="#455C6B" font-size="13.3">Athena or Redshift reads it; the q</text>
+  <text x="1012" y="474" fill="#455C6B" font-size="13.3">uery is logged against the person</text>
+  <text x="44" y="502" fill="#7B8B94" font-size="13.3" font-style="italic">No step in that chain involves a ticket to a platform engineer. If it does, the catalogue is decoration.</text>
+  <rect x="20" y="536" width="1240" height="64" rx="9" fill="#F2E1E2" stroke="#A16C74" stroke-width="1.2"/>
+  <svg x="44" y="552" width="26" height="26" viewBox="0 0 24 24" style="color:#A16C74"><use href="#s-iam"/></svg>
+  <text x="84" y="562" fill="#A16C74" font-size="12" font-weight="700">THE PAYER-SPECIFIC RULE</text>
+  <text x="84" y="584" fill="#455C6B" font-size="13.9">Minimum necessary is a HIPAA requirement, not a preference. Column and row filtering in Lake Formation is how you evidence it — and the evidence is the grant, not the intention.</text>
+</svg>
+    <figcaption>Technical metadata, permissions, business meaning and trust are four separate problems. Buying one tool and hoping it covers all four is the most common governance failure.</figcaption>
+  </figure>
+
+  <h3>Designing the LF-Tags before you have data</h3>
+  <p>Tag-based access control in Lake Formation is the only way this scales. Decide the tag taxonomy first, because retagging a populated lake is miserable work.</p>
+  <div class="scroll"><div class="tbl"><table>
+    <thead><tr><th>Tag key</th><th>Values</th><th>What it controls</th></tr></thead>
+    <tbody>
+      <tr><td><code>classification</code></td><td>phi, pii, confidential, internal, public</td><td>Whether a column is visible at all, and which role may see it</td></tr>
+      <tr><td><code>domain</code></td><td>member, provider, claim, clinical, pharmacy, finance</td><td>Which steward approves access, and which team is paged</td></tr>
+      <tr><td><code>zone</code></td><td>bronze, silver, gold</td><td>Blocks human access to bronze structurally rather than by convention</td></tr>
+      <tr><td><code>line_of_business</code></td><td>commercial, medicare, medicaid</td><td>Row-level filtering where a team may only see one line</td></tr>
+      <tr><td><code>retention</code></td><td>7y, 10y, indefinite</td><td>Drives lifecycle policy and defensible deletion</td></tr>
+    </tbody>
+  </table></div></div>
+
+  <div class="trap"><b>Trap.</b> Granting on table names. It works for twenty tables and collapses at two hundred. Grant on tags from the first table, even when tagging feels like overhead for a lake with three objects in it.</div>
+
+  <div class="eyebrow">WORKED EXAMPLES</div>
+  <h2>Configuration and code</h2>
+  <p class="sub">Open what you need. These are the artefacts, not illustrations of them.</p>
+<details class="ex"><summary><span class="tag cfg">CONFIG</span>Glue Data Quality ruleset &mdash; the gate that stops the pipeline</summary><div class="exb">
+<p>Written in DQDL. These five rule types cover most of what goes wrong in a payer pipeline; add domain rules as the stewards learn what to ask for.</p>
+<div class="filename">quality/claim_line_rules.dqdl</div><pre>Rules = [
+    # --- completeness -------------------------------------------------
+    IsComplete "claim_control_number",
+    IsComplete "enterprise_member_id",
+    IsComplete "service_date",
+
+    # --- volume: catches a truncated or duplicated file ----------------
+    RowCount between 180000 and 420000,
+
+    # --- uniqueness: a resubmission must have replaced, not appended ---
+    IsUnique "claim_control_number, line_number",
+
+    # --- referential ---------------------------------------------------
+    ReferentialIntegrity "enterprise_member_id"
+        "bcbs_lakehouse.member.{enterprise_member_id}" &gt;= 0.995,
+
+    # --- freshness: the newest service date must be plausible ----------
+    ColumnValues "service_date" &lt;= now(),
+    ColumnValues "ingested_at" &gt; (now() - 2 days),
+
+    # --- business plausibility -----------------------------------------
+    ColumnValues "billed_amount" between 0 and 5000000,
+    CustomSql "SELECT count(*) FROM primary
+               WHERE allowed_amount &gt; billed_amount" &lt; 100,
+
+    # --- distribution drift: catches an upstream code set change -------
+    ColumnValues "claim_status" in ["PAID","DENIED","ADJUSTED","PENDED"],
+    Completeness "diagnosis_codes" &gt;= 0.98
+]
+</pre></div></details>
+<details class="ex"><summary><span class="tag cfg">CONFIG</span>Lake Formation &mdash; column exclusion and a row filter for line of business</summary><div class="exb">
+<p>Two mechanisms, different jobs. Column exclusion implements minimum necessary; the row filter implements "this team only sees Medicaid".</p>
+<div class="filename">governance/lf-grants.sh</div><pre># 1. Column-level: the analyst never sees the PHI columns.
+aws lakeformation grant-permissions --cli-input-json '{
+  "Principal": {"DataLakePrincipalIdentifier": "arn:aws:iam::111122223333:role/ClaimAnalyst"},
+  "Resource": {
+    "TableWithColumns": {
+      "CatalogId": "111122223333",
+      "DatabaseName": "bcbs_marts",
+      "Name": "claim_detail",
+      "ColumnWildcard": {
+        "ExcludedColumnNames": [
+          "member_name", "date_of_birth", "street_address",
+          "ssn_last4", "diagnosis_narrative"
+        ]
+      }
+    }
+  },
+  "Permissions": ["SELECT"]
+}'
+
+# 2. Row-level: a Medicaid analytics team sees only Medicaid rows.
+aws lakeformation create-data-cells-filter --table-data '{
+  "TableCatalogId": "111122223333",
+  "DatabaseName": "bcbs_marts",
+  "TableName": "claim_detail",
+  "Name": "medicaid_only",
+  "RowFilter": {"FilterExpression": "line_of_business = '"'"'medicaid'"'"'"},
+  "ColumnWildcard": {"ExcludedColumnNames": ["member_name", "ssn_last4"]}
+}'
+
+# Evidence for the auditor is the grant itself, not a policy document
+# saying you intended to do this.</pre></div></details>
+<details class="ex"><summary><span class="tag cfg">CONFIG</span>Service control policy for the data organisational unit</summary><div class="exb">
+<p>The guardrails no application team can lift. Short, absolute, and applied at the OU rather than the account.</p>
+<div class="filename">org/scp-data-ou.json</div><pre>{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyUnencryptedObjectUploads",
+      "Effect": "Deny",
+      "Action": "s3:PutObject",
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {"s3:x-amz-server-side-encryption": "aws:kms"}
+      }
+    },
+    {
+      "Sid": "DenyPublicAccessBlockRemoval",
+      "Effect": "Deny",
+      "Action": [
+        "s3:PutAccountPublicAccessBlock",
+        "s3:PutBucketPublicAccessBlock"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyRegionsOutsideResidency",
+      "Effect": "Deny",
+      "NotAction": ["iam:*", "organizations:*", "support:*", "sts:*"],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {"aws:RequestedRegion": ["us-east-1", "us-west-2"]}
+      }
+    },
+    {
+      "Sid": "DenyKmsKeyDeletion",
+      "Effect": "Deny",
+      "Action": ["kms:ScheduleKeyDeletion", "kms:DisableKey"],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyCloudTrailTampering",
+      "Effect": "Deny",
+      "Action": ["cloudtrail:StopLogging", "cloudtrail:DeleteTrail"],
+      "Resource": "*"
+    }
+  ]
+}</pre></div></details>
+<details class="ex"><summary><span class="tag doc">DOC</span>Well-Architected review &mdash; the questions to actually ask</summary><div class="exb">
+<p>Run this against a design before it is built, not against a system after it is live. Twenty minutes per pillar with the team in the room.</p>
+<div class="filename">reviews/war-question-set.md</div><pre>OPERATIONAL EXCELLENCE
+  How do we learn a pipeline failed before the business does?
+  What is the runbook for the 03:00 page, and who has read it?
+  Can we replay yesterday without a human deciding which files?
+
+SECURITY
+  Which roles can read PHI, and how do we evidence minimum necessary?
+  What lands in bronze that we would not want in a breach notification?
+  If the CDC task leaks, what does the attacker get?
+
+RELIABILITY
+  What happens if the trading partner sends nothing on Tuesday?
+  What happens if they send Tuesday's file twice on Wednesday?
+  Which single component, failing, stops the CMS submission?
+
+PERFORMANCE
+  Which query scans the most and is run the most? Are those the same?
+  Where are we paying Redshift prices for an Athena query pattern?
+
+COST
+  What does one more data product cost to add, in dollars and in days?
+  Which gold table has nobody queried in 90 days?
+
+SUSTAINABILITY
+  What are we computing continuously that could be computed on demand?
+
+DATA ANALYTICS LENS — additional
+  Where does data lose its lineage?
+  Which schema change would break a downstream consumer silently?
+
+HEALTHCARE LENS — additional
+  Is de-identification methodology documented and reviewed by counsel?
+  Does intermediate storage in any job hold PHI longer than the job runs?</pre></div></details>
+</div>
+
+<!-- ==================================================== 6 BUILD -->
+<div class="pane" id="p-6" role="tabpanel" aria-labelledby="t-6">
+  <h2>Build it</h2>
+  <p class="sub">Ten steps, in dependency order, with deployable code. The accompanying CDK project is the same thing as a repository you can <code>cdk deploy</code>.</p>
+
+  <div class="note"><b>Before you run anything.</b> This deploys into an account that must already be covered by a business associate agreement with AWS and configured under your landing zone guardrails. Deploying a PHI platform into a sandbox account is the fastest way to turn an architecture exercise into a reportable incident.</div>
+
+  <details class="step" open>
+    <summary><span class="n">01</span><span class="t">Accounts and boundaries</span><span class="g">Before a single bucket</span></summary>
+    <div class="bd">
+      <p>Separate accounts for raw, curated and consumption, under an organisational unit with SCPs that no team can lift. The account boundary is the only segmentation that cannot be misconfigured away by a well-meaning engineer.</p>
+      <ul>
+        <li><b>data-raw</b> &mdash; bronze only, no human read access, no internet path</li>
+        <li><b>data-curated</b> &mdash; silver and gold, Glue and EMR compute</li>
+        <li><b>data-consumption</b> &mdash; Athena workgroups, Redshift, QuickSight</li>
+        <li><b>data-governance</b> &mdash; Lake Formation administration, DataZone domain, audit</li>
+      </ul>
+      <div class="trap"><b>Trap.</b> One account with prefixes for separation. It reads fine in a diagram and gives you nothing: a single over-broad IAM policy exposes every zone at once.</div>
+    </div>
+  </details>
+
+  <details class="step">
+    <summary><span class="n">02</span><span class="t">Keys and the lake buckets</span><span class="g">Encryption before data</span></summary>
+    <div class="bd">
+      <p>A customer-managed key per data class, not per bucket. The key policy is where minimum necessary becomes enforceable, because a role without <code>kms:Decrypt</code> cannot read the object no matter what the bucket policy says.</p>
+      <div class="filename">stacks/foundation_stack.py</div>
+<pre><span class="c"># One CMK per data class; the key policy is the real control</span>
+phi_key = kms.Key(
+    self, <span class="s">"PhiKey"</span>,
+    alias=<span class="s">"alias/bcbs-data-phi"</span>,
+    enable_key_rotation=<span class="k">True</span>,
+    description=<span class="s">"PHI at rest across bronze, silver and gold"</span>,
+)
+
+<span class="k">for</span> zone <span class="k">in</span> [<span class="s">"bronze"</span>, <span class="s">"silver"</span>, <span class="s">"gold"</span>]:
+    s3.Bucket(
+        self, <span class="s">f"Lake{zone.title()}"</span>,
+        bucket_name=<span class="s">f"bcbs-lake-{zone}-{self.account}"</span>,
+        encryption=s3.BucketEncryption.KMS,
+        encryption_key=phi_key,
+        block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
+        enforce_ssl=<span class="k">True</span>,
+        versioned=<span class="k">True</span>,
+        object_ownership=s3.ObjectOwnership.BUCKET_OWNER_ENFORCED,
+    )</pre>
+      <div class="gap"><b>Gap.</b> Versioning plus a customer-managed key plus seven-year retention is a real cost line. Model it before you turn it on, and put a lifecycle rule to Glacier Instant Retrieval on bronze from day one.</div>
+    </div>
+  </details>
+
+  <details class="step">
+    <summary><span class="n">03</span><span class="t">Batch ingest &mdash; the EDI landing zone</span><span class="g">Where most payer data arrives</span></summary>
+    <div class="bd">
+      <p>Trading partners drop files over SFTP. Transfer Family writes straight into bronze with the partner identity in the prefix, so provenance is in the path rather than in a spreadsheet.</p>
+      <div class="filename">stacks/ingest_stack.py</div>
+<pre>server = transfer.CfnServer(
+    self, <span class="s">"EdiSftp"</span>,
+    identity_provider_type=<span class="s">"AWS_DIRECTORY_SERVICE"</span>,
+    endpoint_type=<span class="s">"VPC"</span>,             <span class="c"># never PUBLIC for PHI</span>
+    protocols=[<span class="s">"SFTP"</span>],
+    logging_role=logging_role.role_arn,
+)
+
+<span class="c"># s3://bcbs-lake-bronze/edi/partner=&lt;id&gt;/txn=837/arrival_date=YYYY-MM-DD/</span>
+<span class="c"># Partition on arrival, never on a date parsed out of the file:</span>
+<span class="c"># the file's own dates lie more often than you expect.</span></pre>
+      <div class="trap"><b>Trap.</b> Partitioning bronze by the service date inside the claim. Files arrive late, get corrected and get resubmitted. Arrival date is the only thing you know is true at landing time.</div>
+    </div>
+  </details>
+
+  <details class="step">
+    <summary><span class="n">04</span><span class="t">Streaming ingest &mdash; clinical events</span><span class="g">The only real-time source</span></summary>
+    <div class="bd">
+      <p>ADT messages into a stream, a Lambda that parses and redacts, and a Firehose that keeps the raw message in bronze regardless. Two destinations from one event: the alert path and the history path.</p>
+      <div class="filename">lambda/adt_processor.py</div>
+<pre><span class="k">import</span> base64, json, os, boto3
+
+events = boto3.client(<span class="s">"events"</span>)
+BUS = os.environ[<span class="s">"EVENT_BUS"</span>]
+
+<span class="k">def</span> handler(event, context):
+    <span class="k">for</span> record <span class="k">in</span> event[<span class="s">"Records"</span>]:
+        raw = base64.b64decode(record[<span class="s">"kinesis"</span>][<span class="s">"data"</span>]).decode()
+        msg = parse_hl7(raw)                 <span class="c"># MSH, PID, PV1 segments</span>
+        <span class="k">if</span> msg[<span class="s">"trigger"</span>] <span class="k">not in</span> (<span class="s">"A01"</span>, <span class="s">"A03"</span>, <span class="s">"A08"</span>):
+            <span class="k">continue</span>                         <span class="c"># admit, discharge, update only</span>
+        events.put_events(Entries=[{
+            <span class="s">"EventBusName"</span>: BUS,
+            <span class="s">"Source"</span>: <span class="s">"bcbs.clinical"</span>,
+            <span class="s">"DetailType"</span>: <span class="s">"AdtEvent"</span>,
+            <span class="c"># minimum necessary: identifiers and codes, never the note text</span>
+            <span class="s">"Detail"</span>: json.dumps({
+                <span class="s">"member_id"</span>: msg[<span class="s">"member_id"</span>],
+                <span class="s">"trigger"</span>: msg[<span class="s">"trigger"</span>],
+                <span class="s">"facility"</span>: msg[<span class="s">"facility"</span>],
+                <span class="s">"occurred_at"</span>: msg[<span class="s">"occurred_at"</span>],
+            }),
+        }])
+    <span class="k">return</span> {<span class="s">"processed"</span>: len(event[<span class="s">"Records"</span>])}</pre>
+      <div class="trap"><b>Trap.</b> Putting the whole HL7 message on the event bus because it is convenient. Every downstream subscriber now receives free-text clinical notes it has no right to. Minimum necessary applies to internal fan-out as much as to external sharing.</div>
+    </div>
+  </details>
+
+  <details class="step">
+    <summary><span class="n">05</span><span class="t">CDC from the core platform</span><span class="g">Current state without querying the source</span></summary>
+    <div class="bd">
+      <p>DMS reads the transaction log rather than the tables, so you get changes without load on a system that is adjudicating claims. Land the change events, then merge.</p>
+      <div class="gap"><b>Gap.</b> DMS full-load plus ongoing replication needs a maintenance window and a DBA who trusts you. That conversation takes longer than the build. Start it in week one.</div>
+      <div class="trap"><b>Trap.</b> Treating CDC output as a table. It is an ordered log of changes including deletes. If you append it and query the result you will double-count every corrected claim in the plan.</div>
+    </div>
+  </details>
+
+  <details class="step">
+    <summary><span class="n">06</span><span class="t">Bronze to silver &mdash; the job that matters</span><span class="g">Where the real work is</span></summary>
+    <div class="bd">
+      <p>Parse, type, validate, de-duplicate, conform keys, tag PHI columns, write Iceberg. This job is three times the size anyone estimates.</p>
+      <div class="filename">glue/bronze_to_silver_claims.py</div>
+<pre><span class="k">from</span> pyspark.sql <span class="k">import</span> functions <span class="k">as</span> F
+
+raw = spark.read.text(<span class="s">f"s3://bcbs-lake-bronze/edi/txn=837/arrival_date={run_date}/"</span>)
+
+claims = (
+    parse_x12_837(raw)                                <span class="c"># segment parser, tested separately</span>
+    .withColumn(<span class="s">"ingested_at"</span>, F.current_timestamp())
+    .withColumn(<span class="s">"source_file"</span>, F.input_file_name())
+    <span class="c"># conform to the enterprise member id, never the payer-assigned one</span>
+    .join(member_xref, on=<span class="s">"subscriber_id"</span>, how=<span class="s">"left"</span>)
+    <span class="c"># de-duplicate on the natural key: a resubmission is not a new claim</span>
+    .withColumn(<span class="s">"rn"</span>, F.row_number().over(
+        Window.partitionBy(<span class="s">"claim_control_number"</span>).orderBy(F.desc(<span class="s">"ingested_at"</span>))))
+    .filter(<span class="s">"rn = 1"</span>).drop(<span class="s">"rn"</span>)
+)
+
+<span class="c"># fail the run loudly rather than writing something plausible but wrong</span>
+orphans = claims.filter(<span class="s">"enterprise_member_id IS NULL"</span>).count()
+<span class="k">if</span> orphans &gt; threshold:
+    <span class="k">raise</span> ValueError(<span class="s">f"{orphans} claims without a member match"</span>)
+
+(claims.writeTo(<span class="s">"glue_catalog.silver.claim_line"</span>)
+       .using(<span class="s">"iceberg"</span>)
+       .partitionedBy(<span class="s">"service_month"</span>)
+       .createOrReplace())</pre>
+      <div class="trap"><b>Trap.</b> Silently dropping unmatched rows. A claim without a member match is a data problem someone must see. Quarantine it to a table with an owner and an alert; never let it vanish into a filter.</div>
+    </div>
+  </details>
+
+  <details class="step">
+    <summary><span class="n">07</span><span class="t">Orchestration and quality gates</span><span class="g">Failure has to be loud</span></summary>
+    <div class="bd">
+      <p>Step Functions rather than cron. Every stage has an explicit failure path, and a data quality gate sits between silver and gold so a bad load cannot reach a business report.</p>
+      <div class="filename">stacks/process_stack.py</div>
+<pre>quality_gate = tasks.CallAwsService(
+    self, <span class="s">"RunDataQuality"</span>,
+    service=<span class="s">"glue"</span>, action=<span class="s">"startDataQualityRulesetEvaluationRun"</span>,
+    parameters={<span class="s">"RulesetNames"</span>: [<span class="s">"claim_line_rules"</span>], ...},
+)
+
+definition = (
+    load_bronze_to_silver
+    .next(quality_gate)
+    .next(sfn.Choice(self, <span class="s">"QualityPassed?"</span>)
+          .when(sfn.Condition.string_equals(<span class="s">"$.result"</span>, <span class="s">"PASS"</span>), build_gold)
+          .otherwise(notify_steward_and_stop))
+)</pre>
+      <p>Rules worth having on day one: row count within a band of the trailing average, no nulls in the natural key, referential integrity to member and provider, and freshness &mdash; the newest service date must be within an expected window of the run date.</p>
+      <div class="trap"><b>Trap.</b> Quality rules that only alert. If a failing load still lands in gold, the rule is documentation. Stop the pipeline and page the steward.</div>
+    </div>
+  </details>
+
+  <details class="step">
+    <summary><span class="n">08</span><span class="t">Catalogue and permissions</span><span class="g">Where governance becomes real</span></summary>
+    <div class="bd">
+      <p>Register the buckets with Lake Formation, create the tag taxonomy, and grant on tags. Do this before the second table exists.</p>
+      <div class="filename">stacks/governance_stack.py</div>
+<pre><span class="k">for</span> key, values <span class="k">in</span> {
+    <span class="s">"classification"</span>: [<span class="s">"phi"</span>, <span class="s">"pii"</span>, <span class="s">"confidential"</span>, <span class="s">"internal"</span>],
+    <span class="s">"domain"</span>: [<span class="s">"member"</span>, <span class="s">"provider"</span>, <span class="s">"claim"</span>, <span class="s">"clinical"</span>, <span class="s">"pharmacy"</span>],
+    <span class="s">"zone"</span>: [<span class="s">"bronze"</span>, <span class="s">"silver"</span>, <span class="s">"gold"</span>],
+}.items():
+    lakeformation.CfnTag(self, <span class="s">f"Tag{key}"</span>, tag_key=key, tag_values=values)
+
+<span class="c"># An analyst role that may read gold claim data with PHI columns removed</span>
+lakeformation.CfnPrincipalPermissions(
+    self, <span class="s">"AnalystGoldClaim"</span>,
+    principal={<span class="s">"dataLakePrincipalIdentifier"</span>: analyst_role.role_arn},
+    resource={<span class="s">"lfTagPolicy"</span>: {
+        <span class="s">"resourceType"</span>: <span class="s">"TABLE"</span>,
+        <span class="s">"expression"</span>: [
+            {<span class="s">"tagKey"</span>: <span class="s">"zone"</span>, <span class="s">"tagValues"</span>: [<span class="s">"gold"</span>]},
+            {<span class="s">"tagKey"</span>: <span class="s">"domain"</span>, <span class="s">"tagValues"</span>: [<span class="s">"claim"</span>]},
+            {<span class="s">"tagKey"</span>: <span class="s">"classification"</span>, <span class="s">"tagValues"</span>: [<span class="s">"internal"</span>, <span class="s">"confidential"</span>]},
+        ],
+    }},
+    permissions=[<span class="s">"SELECT"</span>], permissions_with_grant_option=[],
+)</pre>
+      <div class="note"><b>Read the last expression again.</b> The analyst is granted on tags, not tables. When a new gold claim table appears next quarter and is tagged correctly, they can already read it, and the PHI columns are already invisible. Nobody files a ticket.</div>
+    </div>
+  </details>
+
+  <details class="step">
+    <summary><span class="n">09</span><span class="t">Serving layer</span><span class="g">Chosen per query pattern</span></summary>
+    <div class="bd">
+      <p>Athena for exploration and anything infrequent. Redshift where a known join pattern runs constantly and concurrency matters &mdash; actuarial and finance usually justify it, ad hoc analytics usually do not. The CMS Patient Access API serves from a purpose-built store, never from the lake.</p>
+      <div class="gap"><b>Gap.</b> The regulated APIs have latency and availability expectations that a lakehouse does not meet. Budget for a separate serving store for anything a member or regulator hits directly.</div>
+    </div>
+  </details>
+
+  <details class="step">
+    <summary><span class="n">10</span><span class="t">Deploy</span><span class="g">And then keep it honest</span></summary>
+    <div class="bd">
+<pre>python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+
+cdk bootstrap aws://&lt;account&gt;/&lt;region&gt;
+cdk synth
+cdk deploy BcbsFoundation
+cdk deploy BcbsIngest
+cdk deploy BcbsProcess
+cdk deploy BcbsGovernance</pre>
+      <p>Then, quarterly: which gold tables has nobody queried, which quality rules have never fired, which LF-Tags have drifted, and which decision records are now describing a system that no longer exists.</p>
+    </div>
+  </details>
+
+  <div class="eyebrow">WORKED EXAMPLES</div>
+  <h2>Configuration and code</h2>
+  <p class="sub">Open what you need. These are the artefacts, not illustrations of them.</p>
+<details class="ex"><summary><span class="tag cfg">CONFIG</span>DMS task &mdash; CDC settings that avoid the usual damage</summary><div class="exb">
+<p>Two settings matter more than the rest: reading the transaction log rather than the tables, and emitting the operation column so downstream can tell an update from an insert.</p>
+<div class="filename">infra/dms-task-settings.json</div><pre>{
+  "TargetMetadata": {
+    "SupportLobs": true,
+    "LobMaxSize": 32,
+    "ParallelLoadThreads": 8,
+    "BatchApplyEnabled": true
+  },
+  "FullLoadSettings": {
+    "TargetTablePrepMode": "DO_NOTHING",
+    "MaxFullLoadSubTasks": 8,
+    "CommitRate": 50000
+  },
+  "Logging": {
+    "EnableLogging": true,
+    "LogComponents": [
+      {"Id": "SOURCE_CAPTURE", "Severity": "LOGGER_SEVERITY_DEFAULT"},
+      {"Id": "TARGET_APPLY",   "Severity": "LOGGER_SEVERITY_DEFAULT"}
+    ]
+  },
+  "ChangeProcessingTuning": {
+    "BatchApplyTimeoutMin": 1,
+    "BatchApplyTimeoutMax": 30,
+    "MemoryLimitTotal": 1024
+  },
+  "ErrorBehavior": {
+    "DataErrorPolicy": "LOG_ERROR",
+    "TableErrorPolicy": "SUSPEND_TABLE",
+    "StopTaskCachedChangesApplied": false
+  }
+}
+
+/* Table mapping: emit the operation column, or downstream cannot tell
+   an update from an insert and you will double-count every corrected
+   claim in the plan. */
+{
+  "rules": [
+    {"rule-type": "selection", "rule-id": "1", "rule-name": "claims",
+     "object-locator": {"schema-name": "CLAIMS", "table-name": "CLAIM_%"},
+     "rule-action": "include"},
+    {"rule-type": "transformation", "rule-id": "2", "rule-name": "add-op",
+     "rule-target": "column", "object-locator": {"schema-name": "%", "table-name": "%"},
+     "rule-action": "add-column", "value": "op",
+     "expression": "$AR_H_OPERATION", "data-type": {"type": "string", "length": 1}}
+  ]
+}</pre></div></details>
+<details class="ex"><summary><span class="tag cfg">CONFIG</span>EventBridge rule &mdash; routing an admission to care management</summary><div class="exb">
+<p>The filter is the control. Care management receives admissions and discharges only, and only the four fields it needs.</p>
+<div class="filename">infra/eventbridge-adt-rule.json</div><pre>{
+  "Name": "adt-to-care-management",
+  "EventBusName": "bcbs-clinical",
+  "EventPattern": {
+    "source": ["bcbs.clinical"],
+    "detail-type": ["AdtEvent"],
+    "detail": {
+      "trigger": ["A01", "A03"]
+    }
+  },
+  "Targets": [
+    {
+      "Id": "care-management-queue",
+      "Arn": "arn:aws:sqs:us-east-1:111122223333:care-mgmt-adt",
+      "DeadLetterConfig": {
+        "Arn": "arn:aws:sqs:us-east-1:111122223333:care-mgmt-adt-dlq"
+      },
+      "RetryPolicy": {
+        "MaximumRetryAttempts": 4,
+        "MaximumEventAgeInSeconds": 3600
+      },
+      "InputTransformer": {
+        "InputPathsMap": {
+          "member": "$.detail.member_id",
+          "trigger": "$.detail.trigger",
+          "facility": "$.detail.facility",
+          "when": "$.detail.occurred_at"
+        },
+        "InputTemplate": "{\"memberId\":\"&lt;member&gt;\",\"event\":\"&lt;trigger&gt;\",\"facility\":\"&lt;facility&gt;\",\"occurredAt\":\"&lt;when&gt;\"}"
+      }
+    }
+  ]
+}</pre></div></details>
+<details class="ex"><summary><span class="tag money">MONEY</span>Cost model &mdash; the numbers to have before the steering committee</summary><div class="exb">
+<p>Order of magnitude for a three million member plan. Get within a factor of two before you are asked, because you will be asked.</p>
+<div class="scroll"><div class="tbl"><table>
+<thead><tr><th>Component</th><th>Driver</th><th>Monthly, order of magnitude</th><th>What moves it</th></tr></thead>
+<tbody>
+<tr><td>S3 bronze</td><td>~40 TB growing 2 TB/month</td><td>$900 standard, $250 after tiering</td><td>Versioning and retention. Tier at 30 days.</td></tr>
+<tr><td>S3 silver + gold</td><td>~15 TB, columnar</td><td>$350</td><td>Compaction. Small files are the hidden cost.</td></tr>
+<tr><td>Glue ETL</td><td>~400 DPU-hours</td><td>$1,800</td><td>Worker sizing and shuffle. Most jobs are over-provisioned.</td></tr>
+<tr><td>Kinesis on-demand</td><td>~50M ADT events</td><td>$600</td><td>Event volume, not member count.</td></tr>
+<tr><td>Lambda</td><td>~50M invocations</td><td>$400</td><td>Memory setting. Test at 512 and 1024.</td></tr>
+<tr><td>DMS</td><td>2 replication instances</td><td>$700</td><td>Instance class, not row count.</td></tr>
+<tr><td>Athena</td><td>~120 TB scanned</td><td>$600</td><td>Partition pruning. Halve it with one fix.</td></tr>
+<tr><td>Redshift</td><td>4 ra3.4xlarge</td><td>$9,500</td><td>The largest line. Justify it per workload or drop it.</td></tr>
+<tr><td>KMS + CloudTrail data events</td><td>Request volume</td><td>$800</td><td>Data events on every bucket is not free.</td></tr>
+<tr><td><b>Total</b></td><td></td><td><b>$15k&ndash;$18k</b></td><td>Redshift is 55% of it</td></tr>
+</tbody></table></div></div>
+<p style="margin:0"><b>The question you will be asked:</b> what does one more data product cost? Answer in marginal terms &mdash; storage plus the Glue hours to build it plus the Athena scan its consumers will run &mdash; not as a share of the platform.</p>
+</div></details>
+<details class="ex"><summary><span class="tag cfg">CONFIG</span>CI pipeline &mdash; what runs before anything reaches an account</summary><div class="exb">
+<p>Synthesise, scan, unit-test the transforms against recorded partner files, then deploy. The recorded-file tests are the ones that catch real breakage.</p>
+<div class="filename">.github/workflows/data-platform.yml</div><pre>name: data-platform
+on: { pull_request: {}, push: { branches: [main] } }
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+
+      # 1. The infrastructure compiles
+      - run: cdk synth --all
+
+      # 2. Policy as code over the synthesised template
+      - run: |
+          pip install checkov
+          checkov -d cdk.out --framework cloudformation \
+                  --check CKV_AWS_18,CKV_AWS_21,CKV_AWS_145
+
+      # 3. Transform logic against recorded partner files
+      #    These are the tests that catch real breakage: a partner
+      #    changing a segment without telling anyone.
+      - run: pytest tests/ -v --cov=glue --cov-fail-under=80
+
+      # 4. No secrets, ever
+      - run: gitleaks detect --no-git --redact
+
+      # 5. Data contracts parse and every gold table has one
+      - run: python scripts/validate_contracts.py contracts/
+
+  deploy-nonprod:
+    needs: validate
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: nonprod
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::111122223333:role/GitHubDeploy
+          aws-region: us-east-1        # OIDC, no static keys
+      - run: cdk deploy --all --require-approval never</pre></div></details>
+</div>
+
+<!-- ==================================================== 7 TRAPS -->
+<div class="pane" id="p-7" role="tabpanel" aria-labelledby="t-7">
+  <h2>Gaps and traps, collected</h2>
+  <p class="sub">Everything that has gone wrong for someone else, in the order you will meet it.</p>
+
+  <div class="scroll"><div class="tbl"><table>
+    <thead><tr><th>Stage</th><th>The trap</th><th>What it costs</th><th>What to do instead</th></tr></thead>
+    <tbody>
+      <tr><td>Foundations</td><td>Starting with the technology layer because it is the fun one</td><td>A platform nobody asked for, defended for years</td><td>Capability map first, even a rough one</td></tr>
+      <tr><td>Foundations</td><td>No decision records</td><td>Every past choice relitigated by each new hire</td><td>One page per decision, append only</td></tr>
+      <tr><td>Estate</td><td>Clinical data with no steward</td><td>Whoever asks most recently sets the design</td><td>Name a steward before the first clinical pipeline</td></tr>
+      <tr><td>Estate</td><td>Believing the stated latency requirements</td><td>Streaming built for a report read at 9am</td><td>Ask what the consumer does in the gap</td></tr>
+      <tr><td>Architecture</td><td>Editing bronze to fix a bad record</td><td>Replay is gone, and so is your audit position</td><td>Never edit. Reprocess forward.</td></tr>
+      <tr><td>Architecture</td><td>Partitioning bronze on a date inside the file</td><td>Late and corrected files land in the wrong place</td><td>Partition on arrival</td></tr>
+      <tr><td>Architecture</td><td>Letting analysts into silver because gold is late</td><td>Silver becomes a de facto product you cannot change</td><td>Ship a thin gold table instead</td></tr>
+      <tr><td>Patterns</td><td>Treating CDC output as an append-only table</td><td>Every corrected claim double-counted</td><td>Merge into Iceberg on the natural key</td></tr>
+      <tr><td>Patterns</td><td>ELT used as a reason not to model</td><td>A populated lake nobody can answer a question from</td><td>Fund silver properly &mdash; it is most of the work</td></tr>
+      <tr><td>Ingest</td><td>Whole HL7 messages on the internal event bus</td><td>Clinical notes fan out to subscribers with no right to them</td><td>Publish identifiers and codes only</td></tr>
+      <tr><td>Transform</td><td>Silently filtering unmatched rows</td><td>A quiet, growing hole in every downstream number</td><td>Quarantine with an owner and an alert</td></tr>
+      <tr><td>Quality</td><td>Rules that alert but do not stop the load</td><td>Bad data in a board report; trust gone for a year</td><td>Fail the pipeline and page the steward</td></tr>
+      <tr><td>Governance</td><td>Granting on table names</td><td>Collapses somewhere past a hundred tables</td><td>Tag-based access from the first table</td></tr>
+      <tr><td>Governance</td><td>A catalogue nobody can self-serve from</td><td>The catalogue becomes decoration and a ticket queue</td><td>Subscription and approval flow, no platform ticket</td></tr>
+      <tr><td>Security</td><td>One account with prefix separation</td><td>A single broad policy exposes every zone</td><td>Account per zone under an SCP</td></tr>
+      <tr><td>Cost</td><td>Versioning plus CMK plus long retention, unmodelled</td><td>A budget surprise in month four</td><td>Lifecycle to Glacier on bronze from day one</td></tr>
+      <tr><td>Serving</td><td>Regulated APIs served from the lake</td><td>Latency and availability you cannot meet</td><td>A separate serving store for member-facing APIs</td></tr>
+      <tr><td>Programme</td><td>Turning off the old warehouse before gold is trusted</td><td>Two broken reporting estates instead of one</td><td>Run both until reconciliation passes for two cycles</td></tr>
+    </tbody>
+  </table></div></div>
+
+  <div class="callout">
+    <h3>The one that ends programmes</h3>
+    <p>Reconciliation. The day someone runs the old report and the new one and gets different numbers, every argument about architecture stops and the platform is on trial. Build reconciliation against the existing warehouse into the definition of done for every gold table &mdash; not as a phase at the end.</p>
+    <p class="rule">You will be judged on whether the numbers tie out, not on whether the lakehouse is elegant.</p>
+  </div>
+</div>
+
+
+<div class="pane" id="p-8" role="tabpanel" aria-labelledby="t-8">
+  <h2>Interview</h2>
+  <p class="sub">Enterprise architecture interviews are not knowledge tests. They are watching how you reason under incomplete information, and whether you can hold a position without being rigid about it.</p>
+
+  <div class="callout">
+    <h3>The structure that works for any question</h3>
+    <p><b>Clarify</b> what decision the thing supports &mdash; <b>constrain</b> by naming the two or three things that actually bind &mdash; <b>choose</b> and say why &mdash; <b>concede</b> the cost of choosing it &mdash; <b>check</b> what you would measure to know you were wrong.</p>
+    <p class="rule">Ten seconds of clarifying is worth two minutes of answering the wrong question. Interviewers grade the clarifying.</p>
+  </div>
+
+  <div class="eyebrow">ARCHITECTURE JUDGEMENT</div>
+  <h2>The questions you will actually get</h2>
+<details class="ex"><summary><span class="tag q">QUESTION</span>Walk me through how you would design our claims data platform.</summary><div class="exb"><div class="ans"><b>The answer that lands.</b> Do not start drawing. Ask three things: what decisions does the business make on claims data and how often; where does the data come from and in what form; and what is already in place that we cannot switch off. Then draw the five stages, name the three zones and their contracts, and say explicitly that governance and security are overlays rather than a phase. Finish with the sequence &mdash; batch first because it serves most of the value, streaming last because only a few use cases justify it.</div><div class="bad"><b>What sinks it.</b> Opening with a technology list. The moment you say Kinesis before you say what decision expires, you have told them you design from the tooling up.</div><p style="margin:10px 0 0"><b>Follow-up they will ask:</b> why medallion rather than a data vault or a warehouse? Answer: medallion is a contract about mutability, not a modelling technique. You can put a vault or a star inside gold. What medallion buys you is an immutable replay source, which is what lets you reprocess when a risk adjustment rule changes retroactively.</p></div></details>
+<details class="ex"><summary><span class="tag q">QUESTION</span>How do you decide between streaming and batch?</summary><div class="exb"><div class="ans"><b>The answer that lands.</b> By asking what the consumer does in the gap. If a nightly refresh means someone acts at nine in the morning on something they would have acted on at nine anyway, there is no streaming requirement &mdash; there is a habit. Streaming is justified when the decision expires: a care-gap alert after discharge is worthless. I would also point out that the source often decides for you. An 837 file drop is a batch whatever you wrap around it.</div><div class="bad"><b>What sinks it.</b> Saying "real time is always better". It is a cost and complexity multiplier and it makes replay harder, and an interviewer who has run a platform knows that.</div></div></details>
+<details class="ex"><summary><span class="tag q">QUESTION</span>ETL or ELT? Defend your choice.</summary><div class="exb"><div class="ans"><b>The answer that lands.</b> ELT by default, because storage is cheaper than reacquiring data and because I will need to reprocess history when a rule changes &mdash; which in risk adjustment and quality happens constantly. ETL only where an obligation says a form of the data must not exist at rest: de-identification before it crosses into a research boundary, or a contract forbidding retention of the source payload. Then I do that transformation as early in the path as the obligation demands, and I record which clause required it.</div><div class="bad"><b>What sinks it.</b> Framing it as a trend. "ELT is the modern approach" is not an argument. The argument is reprocessing and lineage.</div></div></details>
+<details class="ex"><summary><span class="tag q">QUESTION</span>You have inherited a warehouse everyone hates and a two-year mandate. What do you do first?</summary><div class="exb"><div class="ans"><b>The answer that lands.</b> Not turn it off. I would find the twenty reports that actually get read, trace their lineage back, and build gold tables that reconcile to them within a tolerance the finance team agrees to. Run both estates until reconciliation passes for two consecutive cycles. The programme is judged on whether the numbers tie out, not on whether the lakehouse is elegant &mdash; and the day someone runs both reports and gets different answers is the day the architecture goes on trial.</div><div class="bad"><b>What sinks it.</b> A big-bang migration plan with a cutover date. Everyone in the room has seen one of those fail.</div></div></details>
+<details class="ex"><summary><span class="tag q">QUESTION</span>How do you handle PHI in a data lake?</summary><div class="exb"><div class="ans"><b>The answer that lands.</b> Three things, in order. Classification first, because handling is derived from the class rather than negotiated per project. Then the key policy, because a role without kms:Decrypt cannot read the object whatever the bucket policy says. Then Lake Formation tag-based access with column exclusion and row filters, because that is how minimum necessary becomes evidence rather than intention. And I would say plainly that bronze holds PHI in its rawest form, so no human principal is ever granted on the bronze zone tag.</div><div class="bad"><b>What sinks it.</b> Saying "we encrypt everything". Everyone encrypts everything. The question is who holds decrypt, and how you prove minimum necessary to an auditor.</div></div></details>
+<details class="ex"><summary><span class="tag q">QUESTION</span>What is the hardest part of this build?</summary><div class="exb"><div class="ans"><b>The answer that lands.</b> Silver, and it is the layer every estimate underestimates by about three times. Bronze is a landing job. Gold is SQL. Silver is where you conform member identifiers across lines of business, de-duplicate resubmissions on the natural key, decide what a corrected claim means, and handle late arrivals. The second hardest is organisational: clinical data usually has no steward, and until someone owns the golden record every clinical design decision gets made by whoever asked most recently.</div><div class="bad"><b>What sinks it.</b> Naming a technology as the hard part. Nobody senior believes the hard part was choosing a query engine.</div></div></details>
+<details class="ex"><summary><span class="tag q">QUESTION</span>How would you use the Well-Architected Framework here?</summary><div class="exb"><div class="ans"><b>The answer that lands.</b> As six questions asked before a design is built, not as a review at the end. For this platform, security asks who can read PHI and how minimum necessary is evidenced; reliability asks what happens when a partner sends nothing on Tuesday and then sends it twice on Wednesday. I would also use the Data Analytics and Healthcare lenses, because the base framework will not ask about de-identification methodology or PHI in intermediate storage, and those are the two findings that matter most for a payer.</div><div class="bad"><b>What sinks it.</b> Treating it as a checklist. If your answer is "we did a WAR and closed the findings", you have described an audit, not an architecture practice.</div></div></details>
+<details class="ex"><summary><span class="tag q">QUESTION</span>The CFO asks why this costs fifteen thousand a month. What do you say?</summary><div class="exb"><div class="ans"><b>The answer that lands.</b> I break it down and lead with the largest line, which is almost always Redshift at around half. Then I answer the question actually being asked, which is marginal cost: what does one more data product cost? Storage plus the Glue hours to build it plus the scan its consumers run. And I would bring one number showing what came off the other side of the ledger &mdash; the reports retired, the extracts no longer hand-built, the hours the actuarial team stopped spending reconciling spreadsheets.</div><div class="bad"><b>What sinks it.</b> Defending the total. Nobody is asking you to justify the platform; they are asking whether the next thing is affordable.</div></div></details>
+<details class="ex"><summary><span class="tag q">QUESTION</span>How do you get an application team to adopt your reference architecture?</summary><div class="exb"><div class="ans"><b>The answer that lands.</b> By making the compliant path the fast one. A reference architecture with no module, template or pipeline behind it is a slide, and teams route around slides. I would ship the account vending, the golden pipeline and the module library first, and put the guardrail behind them in warn mode with a published enforcement date. Enforcement before paving is what creates a permanent exception queue, and the exception queue then becomes the real architecture.</div><div class="bad"><b>What sinks it.</b> Governance-first answers. "I would take it to the architecture review board" tells them you expect compliance rather than adoption.</div></div></details>
+<details class="ex"><summary><span class="tag q">QUESTION</span>Tell me about an architecture decision you got wrong.</summary><div class="exb"><div class="ans"><b>The answer that lands.</b> Pick a real one where the cost was visible and the lesson was structural, not personal. The shape that works: what you chose, the constraint you underweighted, how you found out, what you changed, and what you now ask earlier because of it. The best answers end with a question that is now permanently on your checklist.</div><div class="bad"><b>What sinks it.</b> A humblebrag reversal, or a decision that turned out fine. They are testing whether you can hold a mistake without either minimising it or performing contrition.</div></div></details>
+
+  <div class="eyebrow">THE WHITEBOARD</div>
+  <h2>How to run the design exercise</h2>
+  <div class="grid g2">
+    <div class="card" style="border-left:3px solid var(--green)">
+      <h3 style="margin-top:0">The first five minutes</h3>
+      <ul>
+        <li>Write the question at the top of the board in your own words. Get agreement before you draw.</li>
+        <li>List what you are told, what you are assuming, and what you would go and find out. Keep all three visible.</li>
+        <li>Name the two or three constraints that actually bind. Everything else is detail.</li>
+        <li>Sketch the boxes before any service names. Service names are the last thing you write.</li>
+      </ul>
+    </div>
+    <div class="card" style="border-left:3px solid var(--rose)">
+      <h3 style="margin-top:0">Signals they are grading</h3>
+      <ul>
+        <li>Did you ask what decision the data supports, or start with the pipeline?</li>
+        <li>Did you name a trade-off unprompted, or wait to be caught?</li>
+        <li>Did you say what you would measure to learn you were wrong?</li>
+        <li>When challenged, did you defend or did you update? Both are wrong at the extremes.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="eyebrow">TURNING IT ROUND</div>
+  <h2>What to ask them</h2>
+  <p class="sub">Three questions that tell you more about the role than the job description does &mdash; and signal seniority while you ask.</p>
+  <div class="scroll"><div class="tbl"><table>
+    <thead><tr><th>Ask this</th><th>What the answer tells you</th></tr></thead>
+    <tbody>
+      <tr><td>Who owns the clinical data domain today?</td><td>If nobody, you now know your first six months. If the answer is a committee, worse.</td></tr>
+      <tr><td>When an architect says no, what happens next?</td><td>Whether the role has authority or is advisory with a nice title.</td></tr>
+      <tr><td>What was the last architecture decision that got reversed, and why?</td><td>Whether decisions are recorded, and whether the organisation can change its mind without blame.</td></tr>
+      <tr><td>How does a team get data today, and how long does it take?</td><td>The honest measure of whether the catalogue is real or decoration.</td></tr>
+      <tr><td>What does the CMS interoperability roadmap look like here?</td><td>Whether regulatory work is planned or perpetually a fire.</td></tr>
+    </tbody>
+  </table></div></div>
+</div>
+
+<div class="pane" id="p-9" role="tabpanel" aria-labelledby="t-9">
+  <h2>Practice</h2>
+  <p class="sub">Reading an architecture does not make you able to produce one under pressure. These are drills &mdash; do them on paper, timed, without looking anything up.</p>
+
+  <div class="eyebrow">DRILLS</div>
+  <h2>Five exercises, in order of difficulty</h2>
+<details class="ex"><summary><span class="tag q">DRILL</span>1 &middot; The fifteen-minute lane assignment</summary><div class="exb">
+<p>For each use case below, write the pattern, the AWS services and the single reason. Fifteen minutes total, no more than ninety seconds each.</p>
+<ol>
+<li>Provider directory accuracy check against the NPI registry, weekly</li>
+<li>Member calls the service desk and the agent needs current claim status</li>
+<li>Fraud model scores a claim before it is released for payment</li>
+<li>Price transparency machine-readable file, monthly, 40 GB output</li>
+<li>Prior authorisation decision must be returned inside a regulated clock</li>
+<li>Annual HEDIS hybrid chart review sample selection</li>
+<li>Member opens the app and sees their explanation of benefits</li>
+<li>Actuarial trend analysis over three years of claims</li>
+</ol>
+<p><b>Mark yourself:</b> two of the eight are traps. Items 2 and 7 look like streaming and are not &mdash; 2 is CDC into a serving store, 7 is a read from gold through an API with its own store. If you put Kinesis on either, you have designed for the verb rather than the decision.</p>
+</div></details>
+<details class="ex"><summary><span class="tag q">DRILL</span>2 &middot; Write a zone contract from memory</summary><div class="exb">
+<p>Blank sheet. Draw the three-column table and fill in seven rows: what it holds, format, partitioned by, who may read, quality gate, what you do with a defect, retention. Twelve minutes.</p>
+<p><b>The two rows people get wrong:</b> partitioning (arrival in bronze, business date in silver &mdash; and being able to say why in one sentence) and defect handling (never edit bronze, reprocess forward). If you can produce this table cold you can hold your own in any lakehouse design discussion.</p>
+</div></details>
+<details class="ex"><summary><span class="tag q">DRILL</span>3 &middot; The reconciliation conversation</summary><div class="exb">
+<p>Role-play, out loud, five minutes. Finance says the new claim mart shows 0.4% less allowed amount than the legacy warehouse for March. Your pipeline is correct. Explain what you do.</p>
+<div class="ans"><b>What a strong answer contains.</b> You do not defend the pipeline. You decompose the variance: is it a row-count difference or an amount difference; is it concentrated in one line of business, one month, one claim type; does the legacy report include voided claims that you exclude; is the service-month boundary handled differently. You name the most likely cause first &mdash; usually the treatment of adjustments and voids &mdash; and you agree a tolerance with finance rather than arguing about who is right. Then you write it into the data contract so the same conversation never happens twice.</div>
+</div></details>
+<details class="ex"><summary><span class="tag q">DRILL</span>4 &middot; Design a de-identification approach in twenty minutes</summary><div class="exb">
+<p>A research partner wants three years of claims and clinical data. Produce: the method you would use and why, what happens to dates, what happens to ZIP codes and ages, how you keep a member linkable across extracts without being identifiable, who signs it off, and what you would put in the data use agreement.</p>
+<p><b>The two things that separate a good answer:</b> a per-member consistent date shift rather than a global one, because a global shift is reversible from any known event and a per-member shift still preserves the within-member intervals researchers need. And knowing that Safe Harbor and Expert Determination are different routes with different consequences &mdash; the first is a checklist, the second is a documented statistical opinion that lets you retain more.</p>
+</div></details>
+<details class="ex"><summary><span class="tag q">DRILL</span>5 &middot; The ninety-minute full exercise</summary><div class="exb">
+<p>Set a timer. Produce, on paper, a complete design for one of these. Then leave it a day and mark it against the traps table.</p>
+<ol>
+<li><b>CMS Patient Access API.</b> Members can pull their claims and clinical data through a third-party app. Design the serving path, the identity model, the throttling, and where the data comes from. Note that serving this from the lake is the trap.</li>
+<li><b>Real-time fraud hold.</b> Score a claim before payment release without adding more than 400ms to adjudication. Where does the model live, how does it get features, and what happens when it is unavailable?</li>
+<li><b>Payer-to-payer data exchange.</b> A member switches plans and their prior plan must hand over five years of data. Design the exchange, the consent model, and the reconciliation.</li>
+</ol>
+<p><b>Mark against:</b> did you name the steward for every dataset; did you say what happens when the source is late, duplicated or absent; did you state a latency requirement and justify it with a decision; did you say what you would measure to know it was working; did you write down what you deliberately did not build.</p>
+</div></details>
+
+  <div class="eyebrow">RECALL</div>
+  <h2>Numbers and terms to have cold</h2>
+  <div class="grid g2">
+    <div class="card">
+      <h3 style="margin-top:0">Payer vocabulary</h3>
+      <div class="scroll"><table>
+        <tbody>
+        <tr><td>837 / 835</td><td>Claim submitted / remittance advice returned</td></tr>
+        <tr><td>834 / 820</td><td>Enrolment maintenance / premium payment</td></tr>
+        <tr><td>270 / 271</td><td>Eligibility enquiry / response</td></tr>
+        <tr><td>278</td><td>Prior authorisation request and response</td></tr>
+        <tr><td>NCPDP</td><td>Pharmacy claim standard, not X12</td></tr>
+        <tr><td>ADT</td><td>Admit, discharge, transfer &mdash; HL7v2 event feed</td></tr>
+        <tr><td>CCDA / FHIR</td><td>Clinical document / modern resource API</td></tr>
+        <tr><td>HCC / RAF</td><td>Condition category / risk adjustment factor</td></tr>
+        <tr><td>HEDIS / STARS</td><td>Quality measure set / CMS plan rating</td></tr>
+        <tr><td>MLR</td><td>Medical loss ratio &mdash; the number the CFO watches</td></tr>
+        <tr><td>EMPI</td><td>Enterprise master patient index &mdash; your identity crosswalk</td></tr>
+        <tr><td>TPA / PBM</td><td>Third-party administrator / pharmacy benefit manager</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Orders of magnitude, 3M member plan</h3>
+      <div class="scroll"><table>
+        <tbody>
+        <tr><td>Claim lines per year</td><td>~60 million</td></tr>
+        <tr><td>Pharmacy scripts per year</td><td>~30 million</td></tr>
+        <tr><td>ADT events per year</td><td>tens of millions</td></tr>
+        <tr><td>Providers in network</td><td>~200,000</td></tr>
+        <tr><td>Bronze growth</td><td>~2 TB per month</td></tr>
+        <tr><td>Platform run cost</td><td>$15k&ndash;18k per month</td></tr>
+        <tr><td>Claims retention</td><td>10 years, driven by regulation</td></tr>
+        <tr><td>Care-gap alert window</td><td>Hours &mdash; before discharge</td></tr>
+        <tr><td>Nightly batch window</td><td>Load complete by 06:00 ET</td></tr>
+        <tr><td>Reconciliation tolerance</td><td>0.1% on allowed amount</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <div class="eyebrow">WHAT TO BUILD NEXT</div>
+  <h2>If you want one more thing on your desk</h2>
+  <div class="grid g3">
+    <div class="card" style="border-left:3px solid var(--blue)">
+      <h3 style="margin-top:0">The X12 parser</h3>
+      <p style="margin:0">The single highest-value thing you can build and test properly. Recorded partner files, unit tests per segment, and a golden-file suite that fails when a partner changes something without telling you.</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--green)">
+      <h3 style="margin-top:0">The reconciliation harness</h3>
+      <p style="margin:0">Automated variance reporting between every gold table and its legacy equivalent. This is what turns "do you trust it" from an opinion into a number, and it is what gets the old warehouse switched off.</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--sand)">
+      <h3 style="margin-top:0">The decision log</h3>
+      <p style="margin:0">Twenty ADRs covering the choices already made before you arrived, reconstructed by interviewing whoever remembers. Tedious, unglamorous, and the thing that stops the next two years being spent relitigating.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <h3>The habit that makes an architect</h3>
+    <p>Write down what you decided, what you ruled out, and what would change your mind &mdash; every time, even when it feels obvious. The value is not in the document. It is that writing the third line forces you to know whether you have a reason or a preference.</p>
+    <p class="rule">Most architecture failures are preferences that were never tested because nobody wrote them down as claims.</p>
+  </div>
+</div>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <b>Enterprise architecture &mdash; payer data platform on AWS</b><br>
+    Tutorial and reference architectures. Service names and code are illustrative of the pattern; validate against current AWS documentation and your own landing zone standards before deploying anything that will hold protected health information.
+  </div>
+</footer>
+
+<script>
+(function(){
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(o){
+        o.setAttribute('aria-selected', o === t ? 'true' : 'false');
+        var p = document.getElementById(o.getAttribute('data-pane'));
+        if(p) p.classList.toggle('on', o === t);
+      });
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    });
+  });
+})();
+</script>
+</body>
+</html>
