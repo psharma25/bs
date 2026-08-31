@@ -1,1 +1,40 @@
+{
+  // Put this at .devcontainer/devcontainer.json
+  //
+  // Opening a Codespace on this repo gives you a real https:// origin, which is
+  // what the direct-from-the-browser setup was missing. GEMINI_API_KEY arrives
+  // as an environment variable from your Codespaces secret, so serve.py picks it
+  // up on its own and the browser never sees it.
+  "name": "Hairstyle try-on",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
 
+  // Codespaces shows this on the create screen if the secret isn't set yet.
+  // It does not create the secret for you — see the README for that.
+  "secrets": {
+    "GEMINI_API_KEY": {
+      "description": "Google AI Studio key. Used only by serve.py inside the container; never sent to the browser.",
+      "documentationUrl": "https://aistudio.google.com/apikey"
+    }
+  },
+
+  "forwardPorts": [8000],
+  "portsAttributes": {
+    "8000": {
+      "label": "Hairstyle app",
+      "onAutoForward": "openPreview",
+      // Keep this private. A public port is an open endpoint that spends your
+      // Google credits, and anyone with the URL can use it.
+      "visibility": "private"
+    }
+  },
+
+  // Starts the server every time you attach. Ctrl-C in that terminal to stop it,
+  // then `python3 serve.py` to start it again.
+  "postAttachCommand": "python3 serve.py",
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python"]
+    }
+  }
+}
