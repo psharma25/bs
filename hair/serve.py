@@ -173,9 +173,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.do_save()
         if not self.path.startswith("/api/gen"):
             return self._json(404, {"error": {"message": "Unknown endpoint."}})
-        if not API_KEY:
-            return self._json(400, {"error": {"message": "No API key on the server."}})
-
         try:
             length = int(self.headers.get("Content-Length") or 0)
             req = json.loads(self.rfile.read(length) or b"{}")
@@ -183,6 +180,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             payload = req.get("payload") or {}
         except Exception as exc:
             return self._json(400, {"error": {"message": "Bad request: %s" % exc}})
+
+        # a key typed into the page's test panel wins for this request only; it is
+        # never written to disk and never logged
+        key = (req.get("key") or "").strip() or API_KEY
+        if not key:
+            return self._json(400, {"error": {"message": "No API key on the server, and none supplied."}})
 
         label = ""
         ref = req.get("ref") or {}
@@ -193,7 +196,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         out = urllib.request.Request(
             url,
             data=json.dumps(payload).encode(),
-            headers={"Content-Type": "application/json", "x-goog-api-key": API_KEY},
+            headers={"Content-Type": "application/json", "x-goog-api-key": key},
             method="POST",
         )
         try:
@@ -354,17 +357,20 @@ def main():
     API_KEY = args.key or os.environ.get("GEMINI_API_KEY", "")
     if not API_KEY and not in_codespace:
         try:
-            API_KEY = input("Google AI Studio API key: ").strip()
+            API_KEY = input("Google AI Studio API key (blank to type one in the page): ").strip()
         except (EOFError, KeyboardInterrupt):
             pass
+
     if not API_KEY:
+        # not fatal: the page has a test panel that can supply a key per request
+        print("No key configured, so the server starts without one.")
         if in_codespace:
-            print("GEMINI_API_KEY is not set in this Codespace.")
-            print("Add it at github.com/settings/codespaces > Codespace secrets,")
-            print("give this repository access, then rebuild or restart the Codespace.")
+            print("For normal use add GEMINI_API_KEY at github.com/settings/codespaces >")
+            print("Codespace secrets, give this repository access, then restart the Codespace.")
         else:
-            print("No key given. Get one free at https://aistudio.google.com/apikey")
-        return 1
+            print("For normal use pass --key, set GEMINI_API_KEY, or get one free at")
+            print("https://aistudio.google.com/apikey")
+        print("Otherwise open the page and use \"Use a different key for testing\".")
 
     if not (HERE / "index.html").exists():
         print("index.html isn't next to this script. Keep the two files together.")

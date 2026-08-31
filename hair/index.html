@@ -68,7 +68,15 @@ button{font:inherit;color:inherit}
 .shot{margin-top:.2rem;display:flex;gap:.9rem;align-items:center}
 .shot img{width:96px;height:auto;border-radius:.4rem;border:1px solid var(--line)}
 .shot button{background:none;border:0;text-decoration:underline;cursor:pointer;color:var(--muted);font-size:.9rem;padding:0}
-.keyrow{display:flex;gap:.6rem;flex-wrap:wrap}
+.keyrow{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:.6rem}
+.connfold{margin-top:1.4rem;background:var(--card);border:1px solid var(--line);border-radius:.7rem}
+.connfold>summary{cursor:pointer;list-style:none;padding:.85rem 1.4rem;font-family:var(--disp);
+  color:var(--navy);display:flex;align-items:center;gap:.6rem}
+.connfold>summary::-webkit-details-marker{display:none}
+.connfold>summary::before{content:"\25B8";font-size:.8rem;transition:transform .15s ease}
+.connfold[open]>summary::before{transform:rotate(90deg)}
+.connbody{padding:0 1.4rem 1.2rem;max-width:46rem}
+#keyMsg{margin-top:.5rem}
 .keyrow input{
   flex:1 1 16rem;font:inherit;font-size:.95rem;padding:.6rem .8rem;
   border:1px solid var(--line);border-radius:.5rem;background:#FCFBFF;
@@ -164,6 +172,7 @@ table.usage th,table.usage td{text-align:left;padding:.45rem .6rem;border-top:1p
 table.usage th{font-family:var(--disp);font-weight:600;color:var(--navy)}
 table.usage td.num,table.usage th.num{text-align:right;font-variant-numeric:tabular-nums}
 table.usage tr.over td{background:#FBF3F1}
+.linkbtn{background:none;border:0;color:var(--muted);cursor:pointer;text-decoration:underline;font-size:.9rem;padding:0}
 .del{background:none;border:0;color:#8A4B3B;cursor:pointer;text-decoration:underline;font-size:.88rem;padding:0;margin-left:.8rem}
 .saverow input{flex:1 1 12rem;font:inherit;font-size:.95rem;padding:.55rem .8rem;
   border:1px solid var(--line);border-radius:.5rem;background:#FCFBFF}
@@ -221,8 +230,7 @@ table.usage tr.over td{background:#FBF3F1}
       <input type="file" id="file" accept="image/*" class="sr">
     </div>
     <div>
-      <h2>Connection</h2>
-      <p class="note" id="connNote">Checking for the server…</p>
+      <h2>This session</h2>
       <div class="clientrow">
         <span class="lbl">Client</span>
         <input id="refId" placeholder="Client ID" aria-label="Client ID">
@@ -241,16 +249,6 @@ table.usage tr.over td{background:#FBF3F1}
       </div>
       <button class="go" id="go" disabled>Show me these styles</button>
 
-      <details class="howto">
-        <summary>How do I run this?</summary>
-        <p class="note">This page needs its small server alongside it. In a terminal, in the
-          folder holding <code>index.html</code> and <code>serve.py</code>:</p>
-        <pre>python3 serve.py</pre>
-        <p class="note">It asks for your key once, then opens
-          <code>http://localhost:8000</code>. On Windows use <code>py serve.py</code>.
-          In a Codespace it starts on its own and the key comes from your
-          <code>GEMINI_API_KEY</code> secret.</p>
-      </details>
     </div>
   </section>
   </details>
@@ -328,6 +326,34 @@ table.usage tr.over td{background:#FBF3F1}
     </div>
     <div id="usageTable"></div>
   </section>
+
+  <details class="connfold" id="connFold">
+    <summary id="connSummary">Connection and API key</summary>
+    <div class="connbody">
+      <p class="note" id="connNote">Checking for the server…</p>
+
+      <p class="note">Normally the key lives on the server and never reaches this page.
+        You can paste one here to try a different key or a fresh quota — it is used for this
+        browser session only, is never saved, and never goes into the repo.</p>
+      <div class="keyrow">
+        <input type="password" id="key" placeholder="AIza…" autocomplete="off" aria-label="Test API key">
+        <button class="redo" id="useKey">Use this key</button>
+        <button class="linkbtn" id="clearKey">Clear</button>
+      </div>
+      <p class="note" id="keyMsg"></p>
+
+      <details class="howto">
+        <summary>How do I run this?</summary>
+        <p class="note">This page needs its small server alongside it. In a terminal, in the
+          folder holding <code>index.html</code> and <code>serve.py</code>:</p>
+        <pre>python3 serve.py</pre>
+        <p class="note">It asks for your key once, then opens
+          <code>http://localhost:8000</code>. On Windows use <code>py serve.py</code>.
+          In a Codespace it starts on its own and the key comes from your
+          <code>GEMINI_API_KEY</code> secret.</p>
+      </details>
+    </div>
+  </details>
 
   <p class="footnote">Each picture is your own photo re-rendered by an image model. Faces shift a little
     between generations, so take them to the salon as a guide, not a promise.</p>
@@ -434,6 +460,7 @@ var detecting = null;                       // in-flight read of the photo
 var limit = 4;   // requests in flight; drops to 2 if Google starts rate limiting
 function wait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
 var PROXY = false;   // true when serve.py is hosting this page and holds the key
+var testKey = "";    // optional override typed into the collapsible panel
 var look = {colour:"", hl:"", brow:""};
 var results = {};
 
@@ -506,6 +533,27 @@ function updateSetup(){
   // closed it themselves
   if (photo && PROXY && !setupTouched) $("setupFold").open = false;
 }
+
+/* ---------------- test key ---------------- */
+function keyMsg(m, bad){
+  var el = $("keyMsg");
+  el.textContent = m || "";
+  el.style.color = bad ? "#8A4B3B" : "var(--muted)";
+}
+$("useKey").addEventListener("click", function(){
+  testKey = $("key").value.trim();
+  if (!testKey) return keyMsg("Paste a key first.", true);
+  keyMsg("Using the key you pasted. Clear it to go back to the server's own.");
+  refreshGo();
+  // the face read may have run before a key existed; give it another go
+  if (!genderSet){ detecting = null; maybeDetect(); }
+});
+$("clearKey").addEventListener("click", function(){
+  testKey = "";
+  $("key").value = "";
+  keyMsg("Back to the key your server holds.");
+  refreshGo();
+});
 
 function refreshGo(){ $("go").disabled = !(photo && PROXY); updateSetup(); }
 
@@ -641,7 +689,7 @@ function generateOne(style, view){
     return fetch(api("/api/gen"), {
       method:"POST",
       headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ model:model, payload:body, ref:refFields() })
+      body: JSON.stringify({ model:model, payload:body, ref:refFields(), key:testKey || undefined })
     });
   }
 
@@ -695,7 +743,7 @@ function detectSet(){
     if (i >= models.length) return Promise.resolve(null);
     var req = fetch(api("/api/gen"), {
       method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({model:models[i], payload:payload, ref:refFields()})
+      body: JSON.stringify({model:models[i], payload:payload, ref:refFields(), key:testKey || undefined})
     });
     return req.then(function(r){
       return r.json().then(function(j){
@@ -941,16 +989,21 @@ fetch(api("/api/health")).then(function(r){ return r.ok ? r.json() : null; })
   .then(function(j){
     if (!j || !j.ok) throw new Error("no server");
     PROXY = true;
+    $("connSummary").textContent = "Connection and API key \u2014 " +
+      (j.key ? "connected" : "connected, no key on the server");
     $("connNote").innerHTML = j.key
       ? "Connected. The server is holding the key \u2014 nothing to paste."
-      : "Connected, but the server has no key. Set GEMINI_API_KEY and restart it.";
+      : "Connected, but the server has no key. Set GEMINI_API_KEY and restart it, " +
+        "or paste one below just for this session.";
+    if (!j.key) $("connFold").open = true;
     refreshGo();
-    if (!j.key) return;
     maybeDetect();
     loadLibrary();
     loadUsage();
   })
   .catch(function(){
+    $("connSummary").textContent = "Connection and API key \u2014 no server";
+    $("connFold").open = true;
     updateSetup();
     $("connNote").innerHTML = "No server behind this page, so nothing can be generated. " +
       "This page never holds an API key itself \u2014 run <code>python3 serve.py</code> and open the " +
