@@ -1,0 +1,71 @@
+# Put this at .github/workflows/deploy-hair.yml
+#
+# Deploys the Worker and pushes your API key into it. The key lives as a GitHub
+# Actions secret and is copied to Cloudflare at deploy time; it is never in the
+# repository and never reaches the browser.
+#
+# Repository secrets to set (Settings > Secrets and variables > Actions):
+#   GEMINI_API_KEY         your Google AI Studio key
+#   CLOUDFLARE_API_TOKEN   Cloudflare token with "Edit Cloudflare Workers"
+#   CLOUDFLARE_ACCOUNT_ID  from the Cloudflare dashboard sidebar
+
+name: Deploy hair
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "hair/**"
+      - ".github/workflows/deploy-hair.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-hair
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: hair
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Rebuild the Worker so it carries the current index.html. This is why you
+      # edit index.html and never touch the embedded copy by hand.
+      - name: Embed the page into the Worker
+        run: |
+          python3 - <<'PY'
+          import gzip, base64, pathlib, re
+          html = pathlib.Path("index.html").read_bytes()
+          blob = base64.b64encode(gzip.compress(html, 9)).decode()
+          src  = pathlib.Path("hair-worker.js").read_text()
+          chunks = '" +\n  "'.join(blob[i:i+100] for i in range(0, len(blob), 100))
+          src = re.sub(r'const PAGE_GZ_B64 = [\s\S]*?;\n',
+                       'const PAGE_GZ_B64 =\n  "' + chunks + '";\n', src, count=1)
+          pathlib.Path("hair-worker.js").write_text(src)
+          print("embedded", len(html), "bytes of page")
+          PY
+
+      - name: Refuse to deploy if a key got into a file
+        run: |
+          if grep -REq 'AIza[0-9A-Za-z_-]{20,}' index.html hair-worker.js wrangler.toml; then
+            echo "A Google API key is present in a committed file. Not deploying."
+            exit 1
+          fi
+
+      - name: Push the key to the Worker
+        run: printf '%s' "$GEMINI_API_KEY" | npx wrangler@latest secret put GEMINI_API_KEY
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+      - name: Deploy
+        run: npx wrangler@latest deploy
