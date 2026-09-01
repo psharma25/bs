@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Model Landscape &amp; Bill-of-Materials Toolchain Atlas</title>
+<style>
+:root{
+  --petrol:#1b4965; --petrol-d:#123449; --petrol-l:#3f7ba0;
+  --amber:#B45309;
+  --ink:#2b3440; --ink-2:#5b6774; --ink-3:#8a95a1;
+  --line:#e3e8ed; --line-2:#f0f3f6;
+  --bg:#f7f8fa; --card:#ffffff;
+  --mint:#e8f4ef; --mint-b:#a8d6c2; --mint-t:#2f6b52;
+  --sky:#e8f1fa; --sky-b:#a8c9e6; --sky-t:#2c5c86;
+  --lilac:#f0ebf8; --lilac-b:#c4b5e2; --lilac-t:#5a4785;
+  --blush:#fceded; --blush-b:#eebfba; --blush-t:#8f4a42;
+  --butter:#fdf5e3; --butter-b:#e8d3a4; --butter-t:#856224;
+  --peach:#fdefe6; --peach-b:#efc5a8; --peach-t:#8c5330;
+  --raise:0 1px 2px rgba(27,73,101,.05), 0 2px 6px rgba(27,73,101,.06);
+  --raise-lg:0 1px 2px rgba(27,73,101,.05), 0 4px 14px rgba(27,73,101,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:Calibri,Inter,"Segoe UI",system-ui,-apple-system,sans-serif;background:var(--bg);
+  color:var(--ink);font-size:15.5px;line-height:1.58;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1280px;margin:0 auto;padding:0 20px 64px}
+header.masthead{background:var(--card);border-bottom:1px solid var(--line);padding:26px 0 0}
+h1{font-size:25px;font-weight:600;margin:0 0 4px;color:var(--petrol)}
+.sub{font-size:14.5px;color:var(--ink-2);margin:0 0 14px;max-width:880px}
+.meta{font-size:12.5px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:6px 18px;margin-bottom:14px}
+.meta b{color:var(--petrol);font-weight:600}
+.togglerow{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.tgl{display:inline-flex;align-items:center;gap:9px;border-radius:20px;padding:6px 15px;
+  font-size:13.5px;cursor:pointer;font-weight:600;box-shadow:var(--raise);border:1px solid}
+.tgl.a{background:var(--butter);border-color:var(--butter-b);color:var(--butter-t)}
+.tgl.b{background:var(--sky);border-color:var(--sky-b);color:var(--sky-t)}
+.tgl input{accent-color:var(--amber);width:15px;height:15px;cursor:pointer;margin:0}
+nav.tabs{display:flex;flex-wrap:wrap;gap:4px}
+nav.tabs button{font:inherit;font-size:14px;font-weight:600;background:transparent;color:var(--ink-2);
+  border:1px solid transparent;border-bottom:0;padding:9px 16px;cursor:pointer;border-radius:8px 8px 0 0}
+nav.tabs button:hover{background:var(--bg);color:var(--petrol)}
+nav.tabs button[aria-selected="true"]{background:var(--bg);color:var(--petrol);border-color:var(--line);position:relative;top:1px}
+nav.tabs button:focus-visible{outline:2px solid var(--petrol-l);outline-offset:2px}
+section.panel{display:none;padding-top:26px}
+section.panel.active{display:block}
+h2{font-size:20px;font-weight:600;color:var(--petrol);margin:0 0 6px}
+h3{font-size:15.5px;font-weight:600;color:var(--petrol-d);margin:0 0 6px}
+h4{font-size:13.5px;font-weight:600;color:var(--petrol-d);margin:0 0 5px}
+p.lede{color:var(--ink-2);font-size:14.5px;margin:0 0 20px;max-width:900px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--amber);margin:0 0 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--raise);margin-bottom:18px;overflow:hidden}
+.card .body{padding:18px 20px}
+.card .body>h3:first-child{margin-top:0}
+.strip{height:4px;width:100%}
+.strip.mint{background:var(--mint-b)}.strip.sky{background:var(--sky-b)}
+.strip.lilac{background:var(--lilac-b)}.strip.blush{background:var(--blush-b)}
+.strip.butter{background:var(--butter-b)}.strip.peach{background:var(--peach-b)}
+.eli5{background:var(--butter);border:1px solid var(--butter-b);border-radius:12px;padding:15px 18px;
+  margin:0 0 20px;color:#6b4f1d;font-size:14.5px;box-shadow:var(--raise)}
+.eli5 .h{display:block;font-size:11px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--amber);margin-bottom:6px}
+.eli5 p{margin:0 0 8px}.eli5 p:last-child{margin-bottom:0}
+.eli5 b{color:#5a4116}
+body.plain-off .eli5{display:none}
+.keynote{background:var(--sky);border:1px solid var(--sky-b);border-radius:12px;padding:16px 19px;
+  margin:0 0 18px;box-shadow:var(--raise);color:#20486a;font-size:14.5px}
+.keynote h3{color:var(--sky-t);margin-top:0}
+.keynote p{margin:0 0 8px}.keynote p:last-child{margin-bottom:0}
+.modgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:14px;margin-bottom:20px}
+.modcard{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--raise);overflow:hidden}
+.modcard .body{padding:15px 17px}
+.modcard h3{margin:0 0 2px}
+.modcard .fam{font-size:12.5px;color:var(--ink-3);margin:0 0 10px}
+.modcard .plain{font-size:13.5px;color:var(--ink-2);margin:0 0 11px;font-style:italic}
+body.plain-off .modcard .plain{display:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12.5px;border-radius:20px;padding:3px 11px;border:1px solid}
+.chip.mint{background:var(--mint);border-color:var(--mint-b);color:var(--mint-t)}
+.chip.sky{background:var(--sky);border-color:var(--sky-b);color:var(--sky-t)}
+.chip.peach{background:var(--peach);border-color:var(--peach-b);color:var(--peach-t)}
+.chip.lilac{background:var(--lilac);border-color:var(--lilac-b);color:var(--lilac-t)}
+.modcard .share{font-size:12.5px;color:var(--ink-2);margin:12px 0 0;padding-top:10px;border-top:1px solid var(--line-2)}
+.modcard .share b{font-weight:600;font-size:15px;color:var(--petrol)}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.controls input[type=search],.controls select{font:inherit;font-size:14px;padding:7px 11px;
+  border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);box-shadow:var(--raise)}
+.controls input[type=search]{min-width:210px;flex:1 1 210px}
+.controls label{font-size:12.5px;color:var(--ink-3);font-weight:600}
+.controls button{font:inherit;font-size:13.5px;font-weight:600;padding:7px 15px;cursor:pointer;
+  background:var(--card);border:1px solid var(--sky-b);color:var(--sky-t);border-radius:8px;box-shadow:var(--raise)}
+.controls button:hover{background:var(--sky)}
+.count{font-size:12.5px;color:var(--ink-3);margin-left:auto}
+.tblwrap{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--raise-lg);overflow:hidden}
+.tblscroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:1180px}
+body.compact table{min-width:780px;font-size:13px}
+th{text-align:left;background:var(--sky);color:var(--sky-t);font-weight:600;font-size:12.5px;padding:10px 12px;
+  white-space:nowrap;border-bottom:1px solid var(--sky-b)}
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover{background:#dbe9f6}
+th .ar{opacity:.35;margin-left:5px;font-size:11px}
+th[aria-sort="ascending"] .ar,th[aria-sort="descending"] .ar{opacity:1}
+td{padding:10px 12px;border-top:1px solid var(--line-2);vertical-align:top;background:var(--card)}
+body.compact td{padding:6px 12px}
+tbody tr.mrow:hover td{background:#fafcfe}
+td.nm{font-weight:600;color:var(--petrol-d);white-space:nowrap}
+td.desc{color:var(--ink-2);min-width:270px}
+td.own{min-width:170px}
+td.own .ent{color:var(--ink);display:block}
+td.own .jur{color:var(--ink-3);font-size:12px;display:block;margin-top:1px}
+td.adopt{min-width:150px;font-size:12.5px;color:var(--ink-2)}
+td.adopt .none{color:var(--ink-3);font-style:italic}
+td.adopt .asrc{display:block;color:var(--ink-3);font-size:11.5px;margin-top:3px}
+body.compact .col-desc,body.compact .col-adopt,body.compact .col-task,body.compact .col-host{display:none}
+.hide-own .col-own,.hide-adopt .col-adopt,.hide-cost .col-cost,.hide-run .col-run,
+.hide-host .col-host,.hide-access .col-access,.hide-mod .col-mod,.hide-task .col-task,
+.hide-lic .col-lic,.hide-desc .col-desc{display:none}
+.colbar{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-bottom:12px;padding:11px 13px;
+  background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--raise)}
+.colbar .lbl{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--amber);margin-right:3px}
+.colbar .sep{width:1px;height:20px;background:var(--line);margin:0 4px}
+.colpill{font:inherit;font-size:12.5px;font-weight:600;padding:4px 12px;border-radius:20px;cursor:pointer;
+  border:1px solid var(--line);background:var(--line-2);color:var(--ink-3)}
+.colpill[aria-pressed="true"]{background:var(--sky);border-color:var(--sky-b);color:var(--sky-t)}
+.preset{font:inherit;font-size:12.5px;font-weight:600;padding:4px 12px;border-radius:20px;cursor:pointer;
+  border:1px solid var(--lilac-b);background:var(--card);color:var(--lilac-t)}
+.preset:hover{background:var(--lilac)}
+td.cost{min-width:130px}
+td.run{min-width:160px;font-size:12.5px;color:var(--ink-2)}
+td.host{min-width:180px;font-size:12.5px;color:var(--ink-2)}
+.costbadge{display:inline-block;font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:20px;
+  white-space:nowrap;border:1px solid;margin-bottom:3px}
+.costbadge.freeship{background:var(--mint);color:var(--mint-t);border-color:var(--mint-b)}
+.costbadge.freetry{background:var(--blush);color:var(--blush-t);border-color:var(--blush-b)}
+.costbadge.freecond{background:var(--butter);color:var(--butter-t);border-color:var(--butter-b)}
+.costbadge.paid{background:var(--lilac);color:var(--lilac-t);border-color:var(--lilac-b)}
+.costnote{display:block;font-size:11.5px;color:var(--ink-3);margin-top:2px}
+.runbadge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
+  padding:2px 9px;border-radius:20px;border:1px solid;margin-bottom:3px}
+.runbadge.laptop{background:var(--mint);color:var(--mint-t);border-color:var(--mint-b)}
+.runbadge.gpu{background:var(--sky);color:var(--sky-t);border-color:var(--sky-b)}
+.runbadge.server{background:var(--peach);color:var(--peach-t);border-color:var(--peach-b)}
+.runbadge.api{background:var(--lilac);color:var(--lilac-t);border-color:var(--lilac-b)}
+.card .body>h3.fold,.keynote h3.fold{cursor:pointer;display:flex;align-items:center;gap:9px;
+  margin-bottom:6px;user-select:none}
+.card .body>h3.fold:hover,.keynote h3.fold:hover{color:var(--petrol-l)}
+h3.fold .fchev{font-size:11px;color:var(--ink-3);margin-left:auto;font-weight:400}
+.card .body.folded>*:not(h3.fold),.keynote.folded>*:not(h3.fold){display:none}
+.card .body.folded>h3.fold,.keynote.folded h3.fold{margin-bottom:0}
+body.compact td.own .jur{display:inline;margin-left:6px}
+body.compact td.own .ent{display:inline}
+body.compact .flagnote{display:none}
+body.compact .lic .txt{display:none}
+.pill{display:inline-block;font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap;border:1px solid}
+.pill.open{background:var(--mint);color:var(--mint-t);border-color:var(--mint-b)}
+.pill.api{background:var(--lilac);color:var(--lilac-t);border-color:var(--lilac-b)}
+.licbadge{display:inline-block;font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:20px;
+  margin-bottom:3px;white-space:nowrap;border:1px solid}
+.licbadge.permissive{background:var(--mint);color:var(--mint-t);border-color:var(--mint-b)}
+.licbadge.restricted{background:var(--blush);color:var(--blush-t);border-color:var(--blush-b)}
+.licbadge.bespoke{background:var(--butter);color:var(--butter-t);border-color:var(--butter-b)}
+.licbadge.proprietary{background:var(--line-2);color:var(--ink-2);border-color:var(--line)}
+.lic .txt{display:block;color:var(--ink-2);font-size:12px}
+.flagnote{display:block;font-size:11.5px;margin-top:5px;padding:4px 9px;border-radius:6px;border:1px solid;line-height:1.4}
+.flagnote.alert{background:var(--blush);border-color:var(--blush-b);color:var(--blush-t)}
+.flagnote.watch{background:var(--butter);border-color:var(--butter-b);color:var(--butter-t)}
+.empty{padding:26px;text-align:center;color:var(--ink-3);font-size:14px;background:var(--card)}
+.bombtn{font:inherit;font-size:12px;font-weight:600;padding:4px 11px;cursor:pointer;background:var(--card);
+  border:1px solid var(--mint-b);color:var(--mint-t);border-radius:20px;white-space:nowrap}
+.bombtn:hover{background:var(--mint)}
+.bombtn[aria-expanded="true"]{background:var(--mint)}
+tr.mrow.expanded td{background:#f4faf7}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-bottom:14px}
+.fact{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:11px 13px}
+.fact .fh{font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--amber);margin:0 0 4px}
+.fact .fv{font-size:13.5px;color:var(--ink);margin:0}
+.fact .fs{font-size:12.5px;color:var(--ink-3);margin:4px 0 0}
+.fact.wide{grid-column:1/-1}
+.factflag{border-color:var(--blush-b);background:var(--blush)}
+.factflag .fh{color:var(--blush-t)}
+.factflag .fv{color:var(--blush-t)}
+.factwatch{border-color:var(--butter-b);background:var(--butter)}
+.factwatch .fh{color:var(--butter-t)}
+.factwatch .fv{color:var(--butter-t)}
+.exportbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.exportbar button{font:inherit;font-size:13px;font-weight:600;padding:6px 14px;cursor:pointer;
+  background:var(--card);border:1px solid var(--mint-b);color:var(--mint-t);border-radius:8px;box-shadow:var(--raise)}
+.exportbar button:hover{background:var(--mint)}
+.exportbar .hint{font-size:12.5px;color:var(--ink-3)}
+tr.bomrow td{padding:0;background:var(--bg);border-top:0}
+.bompanel{padding:16px 18px;border-top:1px solid var(--line)}
+.bomintro{font-size:13px;color:var(--ink-2);margin:0 0 12px;max-width:900px}
+.acc{background:var(--card);border:1px solid var(--line);border-radius:9px;margin-bottom:8px;overflow:hidden}
+.acc>button{width:100%;text-align:left;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;
+  background:var(--card);border:0;padding:10px 13px;display:flex;align-items:center;gap:10px;color:var(--petrol-d)}
+.acc>button:hover{background:var(--line-2)}
+.acc .tagm{font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:2px 9px;border-radius:20px;border:1px solid}
+.acc .tagm.mint{background:var(--mint);border-color:var(--mint-b);color:var(--mint-t)}
+.acc .tagm.sky{background:var(--sky);border-color:var(--sky-b);color:var(--sky-t)}
+.acc .tagm.peach{background:var(--peach);border-color:var(--peach-b);color:var(--peach-t)}
+.acc .tagm.lilac{background:var(--lilac);border-color:var(--lilac-b);color:var(--lilac-t)}
+.acc .tagm.blush{background:var(--blush);border-color:var(--blush-b);color:var(--blush-t)}
+.acc .cap{font-weight:400;color:var(--ink-3);font-size:12.5px;flex:1}
+.acc .chev{color:var(--ink-3);font-size:12px}
+.acc .inner{display:none;padding:0 13px 13px;border-top:1px solid var(--line-2)}
+.acc.open .inner{display:block}
+.acc pre{background:#fbfcfd;border:1px solid var(--line);border-radius:8px;padding:12px;overflow-x:auto;
+  font-family:Consolas,"SF Mono",Menlo,monospace;font-size:11.5px;line-height:1.5;color:var(--ink);margin:10px 0 0;max-height:340px}
+.dl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:11px}
+.dl a,.dl button{font:inherit;font-size:12.5px;font-weight:600;padding:5px 13px;border-radius:8px;
+  text-decoration:none;cursor:pointer;border:1px solid var(--sky-b);background:var(--card);color:var(--sky-t)}
+.dl a:hover,.dl button:hover{background:var(--sky)}
+.gaps{background:var(--blush);border:1px solid var(--blush-b);border-radius:8px;padding:10px 13px;margin-top:11px;
+  font-size:12.5px;color:var(--blush-t)}
+.gaps ul{margin:5px 0 0;padding-left:18px}
+.gaps li{margin-bottom:3px}
+.row{display:grid;grid-template-columns:196px 1fr 62px;gap:10px;align-items:center;margin-bottom:8px}
+.row .lab{font-size:13px;color:var(--ink-2);text-align:right;line-height:1.3}
+.track{background:var(--line-2);border-radius:20px;height:22px;overflow:hidden;border:1px solid var(--line)}
+.bar{height:100%;border-radius:20px}
+.bar.b1{background:var(--sky-b)}.bar.b2{background:var(--mint-b)}.bar.b3{background:var(--peach-b)}
+.bar.b4{background:var(--lilac-b)}.bar.b5{background:var(--blush-b)}
+.row .val{font-size:13.5px;font-weight:600;color:var(--petrol);text-align:right;font-variant-numeric:tabular-nums}
+.src{font-size:12px;color:var(--ink-3);margin:14px 0 0;padding-top:10px;border-top:1px solid var(--line-2)}
+.src b{color:var(--ink-2)}
+.chartgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(430px,1fr));gap:18px}
+.covers{font-size:13.5px;color:var(--ink-2);margin:0 0 12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--raise);overflow:hidden}
+.stat .body{padding:13px 16px}
+.stat .n{font-size:25px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--petrol)}
+.stat .k{font-size:12.5px;color:var(--ink-2);margin-top:3px}
+.reftier{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;align-items:center}
+.tierbtn{font:inherit;font-size:13px;font-weight:600;padding:6px 14px;border-radius:20px;cursor:pointer;
+  border:1px solid var(--line);background:var(--card);color:var(--ink-2);box-shadow:var(--raise)}
+.tierbtn[aria-pressed="true"].t-primary{background:var(--mint);border-color:var(--mint-b);color:var(--mint-t)}
+.tierbtn[aria-pressed="true"].t-secondary{background:var(--sky);border-color:var(--sky-b);color:var(--sky-t)}
+.tierbtn[aria-pressed="true"].t-unverified{background:var(--blush);border-color:var(--blush-b);color:var(--blush-t)}
+.tierbtn[aria-pressed="true"].t-all{background:var(--lilac);border-color:var(--lilac-b);color:var(--lilac-t)}
+.refgroup{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--raise);margin-bottom:16px;overflow:hidden}
+.refgroup .body{padding:17px 19px}
+.refgroup h3{margin:0 0 3px}
+.refgroup .gnote{font-size:13.5px;color:var(--ink-2);margin:0 0 4px}
+.refgroup .gplain{font-size:13.5px;color:var(--ink-2);font-style:italic;margin:0 0 13px}
+body.plain-off .refgroup .gplain{display:none}
+.refitem{background:#fcfdfe;border:1px solid var(--line);border-radius:9px;padding:11px 14px;margin-bottom:9px}
+.refitem:last-child{margin-bottom:0}
+.refitem .rt{font-size:14px;font-weight:600;color:var(--petrol-d);margin:0 0 2px}
+.refitem .ru{font-size:12px;word-break:break-all;margin:0 0 6px}
+.refitem .ru a{color:var(--petrol-l);text-decoration:none}
+.refitem .ru a:hover{text-decoration:underline}
+.refitem .rs{font-size:13px;color:var(--ink-2);margin:0}
+.tierchip{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+  padding:2px 9px;border-radius:20px;margin-left:8px;vertical-align:2px;border:1px solid}
+.tierchip.primary{background:var(--mint);color:var(--mint-t);border-color:var(--mint-b)}
+.tierchip.secondary{background:var(--sky);color:var(--sky-t);border-color:var(--sky-b)}
+.tierchip.unverified{background:var(--blush);color:var(--blush-t);border-color:var(--blush-b)}
+.refcount{font-size:12.5px;color:var(--ink-3);margin-left:auto}
+ul.tight{margin:6px 0 0;padding-left:19px}
+ul.tight li{margin-bottom:6px;font-size:14px;color:var(--ink-2)}
+code{font-family:Consolas,"SF Mono",Menlo,monospace;font-size:12.5px;background:var(--line-2);
+  border:1px solid var(--line);padding:1px 6px;border-radius:5px;color:var(--petrol-d)}
+.bomhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin-bottom:5px}
+.bomhead .tag{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;padding:3px 11px;border-radius:20px;border:1px solid}
+.bomhead .tag.sky{background:var(--sky);border-color:var(--sky-b);color:var(--sky-t)}
+.bomhead .tag.mint{background:var(--mint);border-color:var(--mint-b);color:var(--mint-t)}
+.bomhead .tag.peach{background:var(--peach);border-color:var(--peach-b);color:var(--peach-t)}
+.bomhead .tag.lilac{background:var(--lilac);border-color:var(--lilac-b);color:var(--lilac-t)}
+.bomhead .tag.butter{background:var(--butter);border-color:var(--butter-b);color:var(--butter-t)}
+.bomhead .tag.blush{background:var(--blush);border-color:var(--blush-b);color:var(--blush-t)}
+footer.foot{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+@media (max-width:640px){
+  .row{grid-template-columns:112px 1fr 52px}.row .lab{font-size:12px}
+  h1{font-size:21px}.chartgrid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap" style="padding-bottom:0">
+    <h1>AI model landscape &amp; bill-of-materials toolchain atlas</h1>
+    <p class="sub">Who owns each model and under which jurisdiction, which companies have publicly said they use it, where usage concentrates, which BOM standards cover which layer — and a downloadable CycloneDX skeleton per model.</p>
+    <div class="meta">
+      <span><b>Compiled</b> 20 August 2026</span>
+      <span><b>Scope</b> Hugging Face Hub, OpenAI API, BOM standards and tooling</span>
+      <span><b>Status</b> Reference — verify ownership and licences at source before use</span>
+    </div>
+    <div class="togglerow">
+      <label class="tgl a" for="plainToggle"><input type="checkbox" id="plainToggle" checked> Plain English explanations</label>
+      <label class="tgl b" for="compactToggle"><input type="checkbox" id="compactToggle"> Concise table</label>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-panel="taxonomy">Model taxonomy</button>
+      <button role="tab" aria-selected="false" data-panel="catalog">Model catalog</button>
+      <button role="tab" aria-selected="false" data-panel="usage">Usage spread</button>
+      <button role="tab" aria-selected="false" data-panel="bom">BOM libraries</button>
+      <button role="tab" aria-selected="false" data-panel="refs">References</button>
+      <button role="tab" aria-selected="false" data-panel="sources">Caveats</button>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- TAXONOMY -->
+<section class="panel active" id="taxonomy">
+  <p class="eyebrow">How the hub is organised</p>
+  <h2>Four modalities, one pipeline tag each</h2>
+  <div class="eli5"><span class="h">In plain English</span>
+    <p>Hugging Face is a website where people upload finished AI models so others can download and use them. An app store, except the apps are trained models.</p>
+    <p>There are about three million, far too many to browse. Every upload carries a <b>tag</b> saying what job it does. That tag is how you find anything. Below are the four big families of jobs.</p>
+  </div>
+  <p class="lede">Every repository carries a pipeline tag naming the task the model performs. That tag is the real browsing index for a three-million-repo population — not the model name, and not the vendor.</p>
+  <div class="modgrid">
+    <div class="modcard"><div class="strip mint"></div><div class="body">
+      <h3>Text and language</h3><p class="fam">Qwen, Llama, Gemma, DeepSeek, BERT</p>
+      <p class="plain">Models that read and write words.</p>
+      <div class="chips"><span class="chip mint">text generation</span><span class="chip mint">embeddings</span>
+      <span class="chip mint">classification</span><span class="chip mint">translation</span>
+      <span class="chip mint">summarisation</span><span class="chip mint">question answering</span></div>
+      <p class="share"><b>58.1%</b> of Hub download volume</p></div></div>
+    <div class="modcard"><div class="strip sky"></div><div class="body">
+      <h3>Vision</h3><p class="fam">ViT, SAM, YOLO, Stable Diffusion, FLUX</p>
+      <p class="plain">Models that look at pictures, or make them.</p>
+      <div class="chips"><span class="chip sky">image classification</span><span class="chip sky">object detection</span>
+      <span class="chip sky">segmentation</span><span class="chip sky">image generation</span>
+      <span class="chip sky">depth estimation</span><span class="chip sky">OCR</span></div>
+      <p class="share"><b>21.2%</b> of Hub download volume</p></div></div>
+    <div class="modcard"><div class="strip peach"></div><div class="body">
+      <h3>Audio</h3><p class="fam">Whisper, Wav2Vec2, Bark, XTTS</p>
+      <p class="plain">Models that listen, or speak.</p>
+      <div class="chips"><span class="chip peach">speech to text</span><span class="chip peach">text to speech</span>
+      <span class="chip peach">audio classification</span><span class="chip peach">speaker identification</span></div>
+      <p class="share"><b>15.1%</b> of Hub download volume</p></div></div>
+    <div class="modcard"><div class="strip lilac"></div><div class="body">
+      <h3>Multimodal</h3><p class="fam">Qwen-VL, LLaVA, CLIP, LayoutLM</p>
+      <p class="plain">Models that mix senses — see a picture and talk about it.</p>
+      <div class="chips"><span class="chip lilac">vision language</span><span class="chip lilac">document QA</span>
+      <span class="chip lilac">video analysis</span><span class="chip lilac">any to any</span></div>
+      <p class="share"><b>~5.6%</b> remainder, derived</p></div></div>
+  </div>
+  <div class="keynote"><h3>Why this matters for a bill of materials</h3>
+    <p>The pipeline tag is the closest thing the Hub has to a declared purpose, and purpose is what EU AI Act Annex IV asks for. A model card that omits the tag omits the one field an assessor reaches for first.</p></div>
+  <div class="card"><div class="strip sky"></div><div class="body">
+    <h3>What a model repository actually contains</h3>
+    <ul class="tight">
+      <li><code>README.md</code> — the model card. YAML front matter carries licence, base model, datasets, language and pipeline tag. Everything below is free prose and is not machine-readable.</li>
+      <li><code>config.json</code> — architecture, hidden size, layer count, vocabulary size. Reliable, because the loader depends on it.</li>
+      <li>Weight files — <code>.safetensors</code> (safe to load) or <code>.bin</code> / <code>.pt</code> (pickle, executes code on load). A control finding, not a preference.</li>
+      <li>Per-file SHA-256 and a commit SHA via the Hub API. Pin the commit SHA — a model ID without a revision is a bookmark, not an inventory entry.</li>
+    </ul></div></div>
+</section>
+
+<!-- CATALOG -->
+<section class="panel" id="catalog">
+  <p class="eyebrow">Named models, owners, adopters, BOMs</p>
+  <h2>Model catalog</h2>
+
+  <div class="eli5"><span class="h">In plain English</span>
+    <p>Forty real models. Click any column heading to sort by it. Tick "Concise table" at the top to strip it down to the essentials.</p>
+    <p><b>Owner</b> is the legal entity that controls the model and the country whose laws they answer to. <b>Known adopters</b> lists companies that have publicly said they use it — almost every row is empty, and that emptiness is real, not laziness. <b>Licence</b> is the rulebook: green use freely, pink cannot sell, yellow get a lawyer, grey subscription only.</p>
+    <p>The <b>BOMs</b> button on each row opens a ready-made ingredients label for that model, which you can download.</p>
+  </div>
+
+  <div class="keynote"><h3>On the adopters column, before you read it</h3>
+    <p>There is no telemetry anywhere that links companies to models. This column contains only cases where a company or the model's owner has said so publicly, on the record. Two of forty rows are populated — Llama and Mistral, the two families whose vendors actively publish customer names. The other thirty-eight are not gaps in the research; they are the actual state of disclosure, and a client deck claiming otherwise has invented its data.</p>
+    <p>Note too that disclosures name a <em>family</em>, not a version. A bank that announced Llama 2 in 2024 is not evidence about Llama 4 today.</p></div>
+
+  <div class="controls">
+    <input type="search" id="q" placeholder="Search model, owner, jurisdiction, adopter, task" aria-label="Search models">
+    <label for="fAccess">Access</label>
+    <select id="fAccess"><option value="">All</option><option>Open weights</option><option>API only</option></select>
+    <label for="fJur">Jurisdiction</label>
+    <select id="fJur"><option value="">All</option></select>
+    <label for="fLic">Licence</label>
+    <select id="fLic"><option value="">All</option><option>Permissive</option><option>Restricted</option><option>Bespoke</option><option>Proprietary</option></select>
+    <label for="fFlag">Flags</label>
+    <select id="fFlag"><option value="">All</option><option value="any">Flagged only</option><option value="alert">Alert only</option><option value="none">Clear only</option></select>
+    <label for="fAdopt">Adopters</label>
+    <select id="fAdopt"><option value="">All</option><option value="yes">Disclosed only</option><option value="no">Undisclosed only</option></select>
+    <label for="fCost">Cost</label>
+    <select id="fCost"><option value="">All</option>
+      <option value="freeship">Free to ship</option>
+      <option value="freetry">Free to try only</option>
+      <option value="freecond">Free with conditions</option>
+      <option value="paid">Paid per use</option></select>
+    <label for="fRun">Runs</label>
+    <select id="fRun"><option value="">All</option>
+      <option value="laptop">Laptop / CPU</option>
+      <option value="gpu">Single GPU</option>
+      <option value="server">Server / data centre</option>
+      <option value="api">Vendor API only</option></select>
+    <button id="reset" type="button">Reset</button>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div class="colbar">
+    <span class="lbl">Columns</span>
+    <button type="button" class="colpill" data-col="own" aria-pressed="true">Owner</button>
+    <button type="button" class="colpill" data-col="adopt" aria-pressed="true">Adopters</button>
+    <button type="button" class="colpill" data-col="cost" aria-pressed="true">Cost</button>
+    <button type="button" class="colpill" data-col="run" aria-pressed="true">Runs where</button>
+    <button type="button" class="colpill" data-col="host" aria-pressed="true">Hosting</button>
+    <button type="button" class="colpill" data-col="access" aria-pressed="true">Access</button>
+    <button type="button" class="colpill" data-col="mod" aria-pressed="true">Modality</button>
+    <button type="button" class="colpill" data-col="task" aria-pressed="true">Task</button>
+    <button type="button" class="colpill" data-col="lic" aria-pressed="true">Licence</button>
+    <button type="button" class="colpill" data-col="desc" aria-pressed="true">Description</button>
+    <span class="sep"></span>
+    <span class="lbl">Views</span>
+    <button type="button" class="preset" data-preset="essentials">Essentials</button>
+    <button type="button" class="preset" data-preset="deployment">Deployment</button>
+    <button type="button" class="preset" data-preset="governance">Governance</button>
+    <button type="button" class="preset" data-preset="all">Everything</button>
+  </div>
+
+  <div class="keynote"><h3>Reading the cost and deployment columns</h3>
+    <p><b>Cost to use</b> separates two things people routinely conflate. Every open-weight model is free to <em>download</em>. Only some are free to <em>ship</em> in a product. A green badge means you can put it in a commercial product; pink means you can prototype but not sell; amber means the owner wrote conditions you need read; purple means you rent it by the token and never hold the weights.</p>
+    <p><b>Runs where</b> is the honest hardware floor, not the vendor's claim. Several families span a size ladder — the badge reflects the variant most teams actually deploy, and the note says so where the range is wide. Frontier open-weight models are nominally local and practically data-centre, which is why quantised GGUF conversions carry most of their real traffic.</p>
+    <p><b>Hosting routes</b> matters for jurisdiction. Self-hosting puts the weights inside your boundary. Using the owner's own API does not — and for the PRC-domiciled models that is a materially different legal position from downloading the same weights.</p></div>
+
+  <div class="exportbar">
+    <button type="button" id="expandAll">Expand all rows</button>
+    <button type="button" id="collapseAll">Collapse all rows</button>
+    <button type="button" id="exportCatalog">Export catalog as models.json</button>
+    <button type="button" id="exportAllBoms">Export every AIBOM as one file</button>
+    <span class="hint">models.json is the input file for the batch generator script.</span>
+  </div>
+
+  <div class="tblwrap"><div class="tblscroll">
+    <table>
+      <thead><tr>
+        <th class="sortable" data-key="n">Model<span class="ar">&#9650;</span></th>
+        <th class="sortable col-own" data-key="o">Owner / jurisdiction<span class="ar">&#9650;</span></th>
+        <th class="sortable col-adopt" data-key="adc">Known adopters<span class="ar">&#9650;</span></th>
+        <th class="sortable col-cost" data-key="ship">Cost to use<span class="ar">&#9650;</span></th>
+        <th class="sortable col-run" data-key="runrank">Runs where<span class="ar">&#9650;</span></th>
+        <th class="col-host">Hosting routes</th>
+        <th class="sortable col-access" data-key="a">Access<span class="ar">&#9650;</span></th>
+        <th class="sortable col-mod" data-key="m">Modality<span class="ar">&#9650;</span></th>
+        <th class="sortable col-task" data-key="t">Task<span class="ar">&#9650;</span></th>
+        <th class="sortable col-lic" data-key="lc">Licence<span class="ar">&#9650;</span></th>
+        <th class="col-desc">What it does</th>
+        <th>Detail</th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty" id="empty" hidden>No models match those filters.</div>
+  </div></div>
+
+  <div class="card" style="margin-top:18px"><div class="strip blush"></div><div class="body">
+    <h3>What the generated BOMs are, and are not</h3>
+    <p class="covers">Each row produces a <b>CycloneDX 1.6 skeleton</b> built from what this catalog knows: the model identity, its owning entity, jurisdiction, licence, task, access model, and any export-control or corporate-status flag. Jurisdiction and regulatory standing are carried as custom properties, because neither CycloneDX nor SPDX defines a native field for them.</p>
+    <p class="covers">A skeleton is a starting artifact, not an assessment record. It cannot know your pinned commit SHA, your resolved dependency versions, your accelerator inventory, or the training-data disclosure the upstream owner never wrote. Every skeleton ships with an explicit gap list naming what it could not fill. Run the OWASP AIBOM Generator or cdxgen against the live model to complete it, then merge.</p>
+  </div></div>
+</section>
+
+<!-- USAGE -->
+<section class="panel" id="usage">
+  <p class="eyebrow">Where the volume actually is</p>
+  <h2>Usage spread</h2>
+  <div class="eli5"><span class="h">In plain English</span>
+    <p>Two very different kinds of number below. The <b>counted</b> charts are facts — Hugging Face knows exactly how many downloads happened. The <b>asked</b> charts are opinion polls. Compare bars within one chart, never across two.</p>
+  </div>
+  <p class="lede">Hub download data is measured platform telemetry. Industry data is survey-reported adoption — whether a sector uses AI at all, not which model it runs.</p>
+  <div class="stats">
+    <div class="stat"><div class="strip sky"></div><div class="body"><div class="n">2.96M</div><div class="k">public model repos, Aug 2026</div></div></div>
+    <div class="stat"><div class="strip mint"></div><div class="body"><div class="n">1.00M</div><div class="k">datasets, first time past a million</div></div></div>
+    <div class="stat"><div class="strip lilac"></div><div class="body"><div class="n">1.44M</div><div class="k">Spaces (demo apps)</div></div></div>
+    <div class="stat"><div class="strip peach"></div><div class="body"><div class="n">151,448</div><div class="k">Qwen-derived repositories</div></div></div>
+  </div>
+  <div class="chartgrid">
+    <div class="card"><div class="strip mint"></div><div class="body"><h3>Download share by modality</h3>
+      <p class="covers">Counted. Share of Hub download volume.</p><div id="c-modality"></div>
+      <p class="src"><b>Source</b> Hugging Face Hub model statistics, January 2026. Multimodal is the derived remainder.</p></div></div>
+    <div class="card"><div class="strip mint"></div><div class="body"><h3>Download share by parameter count</h3>
+      <p class="covers">Counted. Models that declare a parameter count.</p><div id="c-params"></div>
+      <p class="src"><b>Source</b> HF State of Open Models, Summer 2026. For 2026 downloads alone, only 3% of volume goes above 70B.</p></div></div>
+    <div class="card"><div class="strip mint"></div><div class="body"><h3>Repository concentration</h3>
+      <p class="covers">Counted. Share of the repository population.</p><div id="c-conc"></div>
+      <p class="src"><b>Source</b> HF State of Open Models, Jan–Aug 2026. The load sits in a very small corner of the ecosystem.</p></div></div>
+    <div class="card"><div class="strip mint"></div><div class="body"><h3>Hub growth, Jan to Aug 2026</h3>
+      <p class="covers">Counted. Percentage growth over seven months.</p><div id="c-growth"></div>
+      <p class="src"><b>Source</b> HF State of Open Models, Summer 2026. Qwen derivatives alone appear at 180–210 per day.</p></div></div>
+    <div class="card"><div class="strip peach"></div><div class="body"><h3>AI in production, by industry</h3>
+      <p class="covers">Asked, not counted. At least one AI workload in production, large enterprises.</p><div id="c-industry"></div>
+      <p class="src"><b>Source</b> Presenc AI compilation, Q1 2026, drawing on McKinsey, Deloitte and IDC. Healthcare uses a different denominator — directional only.</p></div></div>
+    <div class="card"><div class="strip peach"></div><div class="body"><h3>AI agents in production, by sector</h3>
+      <p class="covers">Asked, not counted. Enterprises with at least one agent in production.</p><div id="c-agents"></div>
+      <p class="src"><b>Source</b> S&amp;P Global Market Intelligence and McKinsey, April 2026. No respondent roster is published.</p></div></div>
+  </div>
+  <div class="keynote"><h3>The security read</h3>
+    <p>The counted charts say the same thing from different angles: the model your engineers actually pulled into production is small, obscure, and several fine-tunes downstream of a base nobody documented. It is not the frontier model in the press release. Any AIBOM programme that inventories only the named flagship models will miss almost all of the real exposure.</p></div>
+</section>
+
+<!-- BOM -->
+<section class="panel" id="bom">
+  <p class="eyebrow">Standards and tooling</p>
+  <h2>BOM libraries by layer</h2>
+  <div class="eli5"><span class="h">In plain English</span>
+    <p>A <b>bill of materials</b> is an ingredients label. When a flaw is found in one ingredient, everyone searches their labels and knows in minutes whether they're affected.</p>
+    <p>An AI system has five kinds of ingredient and no single label covers them all. Code is one list. The model and its training data are a second. The chips are a third. The encryption is a fourth. The outside services are a fifth. The middle three are far less mature than the first.</p>
+  </div>
+  <p class="lede">There is no single BOM that covers an AI system. There are five overlapping ones. The useful question is which layer a given tool can actually see.</p>
+
+  <div class="card"><div class="strip sky"></div><div class="body">
+    <div class="bomhead"><span class="tag sky">SBOM</span><h3>Software bill of materials</h3></div>
+    <p class="covers"><b>Covers</b> packages, libraries, frameworks, versions, transitive dependencies, container layers.</p>
+    <p class="covers"><b>Standards</b> CycloneDX (OWASP) and SPDX 3.0 (Linux Foundation, ISO-standardised).</p>
+    <p class="covers"><b>Tooling</b> Syft, cdxgen, Trivy, Microsoft sbom-tool, sbom4python, Amazon Inspector SBOM Generator. Dependency-Track for continuous consumption. Protobom and bomctl translate between formats.</p>
+    <p class="covers"><b>Regulatory hook</b> FDA §524B for cyber devices. The practice survived the partial rollback of US Executive Order 14028 and is now a standard procurement term.</p></div></div>
+
+  <div class="card"><div class="strip mint"></div><div class="body">
+    <div class="bomhead"><span class="tag mint">AIBOM</span><h3>AI / ML bill of materials</h3></div>
+    <p class="covers"><b>Covers</b> models, weights, base-model lineage, training and evaluation datasets, hyperparameters, hardware requirements, governance metadata. Also called AI SBOM, ML-BOM, or SBOM for AI.</p>
+    <p class="covers"><b>Standards</b> CycloneDX ML-BOM and the SPDX 3.0 AI Profile plus Dataset Profile. Generate CycloneDX internally where tooling matters; require SPDX 3.0 from vendors where regulatory weight matters.</p>
+    <p class="covers"><b>Tooling</b> OWASP AIBOM Generator (model ID in, CycloneDX 1.6 plus a completeness score out); cdxgen with the <code>aibom</code> alias, which also reads Modelfiles, GGUF artifacts and MCP configs; ALOHA; AIBoMGen-cli and its GitHub Action.</p>
+    <p class="covers"><b>Known gap</b> neither format carries native fields for bias assessment, human-oversight design, owner jurisdiction or regulatory standing. Those stay as custom properties — which is exactly what the per-model skeletons in the catalog tab do.</p></div></div>
+
+  <div class="card"><div class="strip peach"></div><div class="body">
+    <div class="bomhead"><span class="tag peach">HBOM</span><h3>Hardware bill of materials</h3></div>
+    <p class="covers"><b>Covers</b> physical components, silicon, boards, firmware-bearing parts, country of origin, supplier tiering.</p>
+    <p class="covers"><b>Standards</b> the CISA ICT SCRM Task Force HBOM Framework, which defines use-case-driven attribute sets rather than one fixed schema. CycloneDX represents hardware through the <code>device</code> component type. IPC-1752A and IPC-1754 cover materials declaration.</p>
+    <p class="covers"><b>Maturity</b> the weakest of the five. Most HBOM production is still spreadsheet and ERP extract rather than pipeline-generated.</p>
+    <p class="covers"><b>Where it bites for AI</b> accelerator provenance and firmware. If the model runs on an inference card, that card has its own supply chain, vulnerability stream and export-control posture.</p></div></div>
+
+  <div class="card"><div class="strip lilac"></div><div class="body">
+    <div class="bomhead"><span class="tag lilac">CBOM</span><h3>Cryptography bill of materials</h3></div>
+    <p class="covers"><b>Covers</b> algorithms, key lengths, certificates, protocols and cryptographic library dependencies.</p>
+    <p class="covers"><b>Standards</b> CycloneDX added first-class cryptographic asset support from 1.6.</p>
+    <p class="covers"><b>Tooling</b> cdxgen, plus <code>tracebom</code> which profiles a running application and captures negotiated TLS suites and dynamically resolved crypto libraries.</p>
+    <p class="covers"><b>Driver</b> post-quantum migration. You cannot schedule an algorithm replacement across an estate you have not inventoried.</p></div></div>
+
+  <div class="card"><div class="strip butter"></div><div class="body">
+    <div class="bomhead"><span class="tag butter">SaaSBOM / OBOM</span><h3>Service and operations bills of materials</h3></div>
+    <p class="covers"><b>SaaSBOM</b> covers external services, endpoints, data flows and trust boundaries — where an agentic system's tool calls and MCP servers live. CycloneDX defines the services schema. This is also where a hosted model endpoint's jurisdiction becomes recordable.</p>
+    <p class="covers"><b>OBOM</b> covers the running host: installed packages, configuration drift, persistence mechanisms. cdxgen ships an <code>obom</code> mode for Linux, Windows and macOS.</p>
+    <p class="covers"><b>Why both matter</b> for an agent runtime, the model file is a minority of the attack surface. Prompts, tools, retrieval sources, guardrails and MCP configurations are the rest.</p></div></div>
+
+  <div class="card"><div class="strip blush"></div><div class="body">
+    <div class="bomhead"><span class="tag blush">VEX</span><h3>Companion artifact</h3></div>
+    <p class="covers">A BOM tells you what is present. A Vulnerability Exploitability eXchange document tells you whether a vulnerability in a listed component is actually exploitable in your product. Formats: CSAF VEX, OpenVEX, CycloneDX VEX.</p>
+    <p class="covers">Without VEX, an SBOM published to customers generates a support queue rather than assurance — every downstream scanner flags every CVE in every listed dependency.</p></div></div>
+</section>
+
+<!-- REFERENCES -->
+<section class="panel" id="refs">
+  <p class="eyebrow">Provenance</p>
+  <h2>References</h2>
+  <div class="eli5"><span class="h">In plain English</span>
+    <p>Every claim came from somewhere. <b>Green</b> — the organisation that owns the data published it. <b>Blue</b> — someone else summarised it. <b>Pink</b> — came from my own knowledge and was never checked against a live page; verify before relying on it.</p>
+  </div>
+  <div class="reftier">
+    <button class="tierbtn t-all" data-tier="" aria-pressed="true" type="button">All</button>
+    <button class="tierbtn t-primary" data-tier="Primary" aria-pressed="false" type="button">Primary source</button>
+    <button class="tierbtn t-secondary" data-tier="Secondary" aria-pressed="false" type="button">Secondary source</button>
+    <button class="tierbtn t-unverified" data-tier="Unverified" aria-pressed="false" type="button">Needs verifying</button>
+    <span class="refcount" id="refcount"></span>
+  </div>
+  <div id="refbody"></div>
+</section>
+
+<!-- CAVEATS -->
+<section class="panel" id="sources">
+  <p class="eyebrow">Read before use</p>
+  <h2>Caveats</h2>
+  <div class="eli5"><span class="h">In plain English</span>
+    <p>Download counts include robots. Licences change without warning. Owners change too. Two surveys are never comparable. Nobody publishes which company runs which model, so the adopters column is nearly empty on purpose. And the generated BOMs are starting drafts, not finished records.</p>
+  </div>
+  <div class="card"><div class="strip mint"></div><div class="body"><h3>What is counted</h3>
+    <ul class="tight">
+      <li>All Hugging Face repository counts, download shares and derivative counts come from Hugging Face's own State of Open Models reporting for January–August 2026 and its model statistics blog. Platform telemetry, not survey estimates.</li>
+      <li>Download counts are unfiltered and include bot and CI traffic. A relative signal between models, not a count of humans.</li>
+      <li>Parameter-count analysis covers only models that declare a parameter count.</li>
+    </ul></div></div>
+  <div class="card"><div class="strip peach"></div><div class="body"><h3>What is asked, and what is simply absent</h3>
+    <ul class="tight">
+      <li>Industry and sector figures are survey-reported adoption rates with different definitions, denominators and sampling frames. Do not compute differences between bars from different sources.</li>
+      <li>There is no published dataset mapping models to industries, and no telemetry mapping models to companies. The adopters column carries only on-the-record public statements.</li>
+      <li>Disclosures name a model family and a point in time. Treat them as existence proofs, not as current-state inventory.</li>
+      <li>Survey panels are confidential, so there is no company-level roster behind the adoption or agent charts.</li>
+      <li>The multimodal modality share is a derived remainder, not a reported figure.</li>
+    </ul></div></div>
+  <div class="card"><div class="strip blush"></div><div class="body"><h3>What changes fastest</h3>
+    <ul class="tight">
+      <li><b>Model licences.</b> A model can be relicensed, and derivatives frequently misstate the base model's terms. Verify against the live card and the base model's card.</li>
+      <li><b>Owner standing.</b> Entity List designations are added and removed, companies are acquired or wound up, names change. The two flagged entries were verified in August 2026 and should be rechecked against the BIS Entity List before any procurement decision.</li>
+      <li><b>OpenAI model availability.</b> IDs retire on published sunset schedules, and ChatGPT retirements do not always coincide with API retirements.</li>
+      <li><b>EU AI Act dates.</b> The AI Omnibus of 27 July 2026 moved Annex III high-risk obligations to 2 December 2027 and product-embedded high-risk AI to 2 August 2028. The dates moved; the inventory requirement did not.</li>
+    </ul></div></div>
+  <div class="card"><div class="strip sky"></div><div class="body"><h3>Suggested workflow</h3>
+    <ul class="tight">
+      <li>Enumerate every model reference in the codebase, including those loaded by string at runtime, then resolve each to a commit SHA.</li>
+      <li>Download the skeleton from this tool as a starting frame, then run the OWASP AIBOM Generator or cdxgen against the live model and merge the resolved fields in.</li>
+      <li>Record owning entity and jurisdiction as custom properties. Neither CycloneDX nor SPDX has a native field.</li>
+      <li>Separate weight downloads from hosted-API calls in the inventory. Different legal acts, different exposure.</li>
+      <li>Merge the AIBOM with the application SBOM, add the SaaSBOM for tool and MCP surfaces, hold the HBOM separately if the workload runs on dedicated accelerators.</li>
+      <li>Regenerate on every commit. A bill of materials produced once is stale the day it is signed.</li>
+    </ul></div></div>
+  <footer class="foot">Compiled 20 August 2026. Point-in-time figures. Ownership and export-control status are not legal advice — confirm with counsel. A working reference, not an assessment record.</footer>
+</section>
+
+</div>
+
+<script>
+"use strict";
+
+var MODELS = [
+ {n:"Qwen 3.x",o:"Alibaba Cloud (Alibaba Group Holding Ltd)",j:"China",fl:"watch",fn:"PRC-domiciled owner. Weights are openly published; the hosted API routes data through Chinese infrastructure and is subject to PRC data-access law.",p:"Alibaba",a:"Open weights",m:"Text / multimodal",t:"text generation",l:"Apache 2.0",lc:"Permissive",hf:"Qwen/Qwen3",ad:[],adsrc:"",d:"The dominant open-weight family by derivative count. Mixture-of-experts across a wide size ladder. If a fine-tune has an unnamed base, this is the statistically likely ancestor."},
+ {n:"Qwen3-VL",o:"Alibaba Cloud (Alibaba Group Holding Ltd)",j:"China",fl:"watch",fn:"PRC-domiciled owner. Same weights-versus-API distinction as the rest of the Qwen family.",p:"Alibaba",a:"Open weights",m:"Multimodal",t:"vision language",l:"Apache 2.0",lc:"Permissive",hf:"Qwen/Qwen3-VL",ad:[],adsrc:"",d:"Vision-language variant of the Qwen line. Reads images and documents alongside text; used for screenshot understanding and extraction from scanned forms."},
+ {n:"DeepSeek V4.1",o:"Hangzhou DeepSeek AI Basic Technology Research Co. (High-Flyer affiliated)",j:"China",fl:"watch",fn:"PRC-domiciled owner. Openly published weights; hosted API subject to PRC data-access law.",p:"DeepSeek",a:"Open weights",m:"Text",t:"text generation",l:"MIT",lc:"Permissive",hf:"deepseek-ai/DeepSeek-V4.1",ad:[],adsrc:"",d:"Frontier-class open-weight reasoning model. Unreachable for most self-hosters at full precision — reaches practitioners through quantised GGUF conversions."},
+ {n:"DeepSeek R1",o:"Hangzhou DeepSeek AI Basic Technology Research Co.",j:"China",fl:"watch",fn:"PRC-domiciled owner. Most deployments use community distillations onto Qwen or Llama backbones, which changes the effective ownership chain.",p:"DeepSeek",a:"Open weights",m:"Text",t:"text generation",l:"MIT",lc:"Permissive",hf:"deepseek-ai/DeepSeek-R1",ad:[],adsrc:"",d:"The reasoning model that reset expectations for open weights. Its distillations into smaller backbones are far more widely deployed than the original."},
+ {n:"Gemma 4",o:"Google DeepMind (Alphabet Inc.)",j:"United States",fl:"",fn:"",p:"Google",a:"Open weights",m:"Text / multimodal",t:"text generation",l:"Verify on card",lc:"Bespoke",hf:"google/gemma-4",ad:[],adsrc:"",d:"Google's open-weight family, sized for single-GPU and edge deployment. Historically under Google's own Gemma terms rather than a standard OSI licence; confirm before commercial use."},
+ {n:"Llama 4",o:"Meta Platforms, Inc.",j:"United States",fl:"",fn:"",p:"Meta",a:"Open weights",m:"Text / multimodal",t:"text generation",l:"Llama Community License",lc:"Bespoke",hf:"meta-llama/Llama-4",ad:["Wells Fargo","Nomura","Shopify","Zoom","Niantic","Accenture","Infosys","KPMG","IBM","The Grammy Awards"],adsrc:"VentureBeat enterprise open-source LLM reporting. Names the Llama family across versions, not Llama 4 specifically; Wells Fargo's disclosure was for Llama 2 internal use.",d:"Meta's open-weight line. The licence carries an acceptable-use policy and a monthly-active-user threshold above which separate terms apply — a real constraint at scale."},
+ {n:"Mistral / Mixtral",o:"Mistral AI SAS",j:"France (EU)",fl:"",fn:"",p:"Mistral AI",a:"Open weights",m:"Text",t:"text generation",l:"Apache 2.0",lc:"Permissive",hf:"mistralai/Mixtral-8x7B-v0.1",ad:["HSBC","Brave","IBM watsonx"],adsrc:"HSBC announced a multi-year strategic partnership with Mistral AI on 1 December 2025. Brave's Leo assistant defaults to Mixtral 8x7B. IBM distributes Mistral Large on watsonx.ai.",d:"European open-weight family including sparse mixture-of-experts variants. Clean licensing and EU domicile make it a default where data-residency questions are in scope."},
+ {n:"GLM-6",o:"Beijing Zhipu Huazhang Technology Co., Ltd. (Z.ai) — Tsinghua KEG spin-out",j:"China",fl:"alert",fn:"On the US Commerce Entity List since January 2025 with a Footnote 4 designation and presumption of denial. Downloading published weights is not itself an export to Zhipu; sending controlled technology into the hosted Z.ai API is an export requiring a licence BIS presumptively denies.",p:"Z.ai / Zhipu",a:"Open weights",m:"Text",t:"text generation",l:"Verify on card",lc:"Bespoke",hf:"zai-org/GLM-6",ad:[],adsrc:"",d:"Chinese frontier open-weight release from the GLM architecture line, originating in Tsinghua University research. Licence terms vary by size variant."},
+ {n:"gpt-oss-120b / 20b",o:"OpenAI",j:"United States",fl:"",fn:"",p:"OpenAI",a:"Open weights",m:"Text",t:"text generation",l:"Apache 2.0",lc:"Permissive",hf:"openai/gpt-oss-120b",ad:[],adsrc:"",d:"OpenAI's open-weight release. Lets you self-host something in the OpenAI lineage with no API dependency and a permissive licence — a rare combination from a frontier lab."},
+ {n:"all-MiniLM-L6-v2",o:"sentence-transformers community org (origin: UKP Lab, TU Darmstadt)",j:"Germany / community",fl:"watch",fn:"No corporate owner. A community-maintained organisation account, so there is no vendor to serve a security advisory or sign a supplier attestation.",p:"sentence-transformers",a:"Open weights",m:"Text",t:"embeddings",l:"Apache 2.0",lc:"Permissive",hf:"sentence-transformers/all-MiniLM-L6-v2",ad:[],adsrc:"",d:"A 22M-parameter sentence embedding model, routinely the most-downloaded artifact on the Hub. Powers an enormous share of RAG pipelines. Small enough that nobody notices it entering the estate."},
+ {n:"BGE-M3",o:"Beijing Academy of Artificial Intelligence (BAAI)",j:"China",fl:"watch",fn:"State-backed non-profit research institute rather than a commercial vendor. No commercial support channel, and PRC jurisdiction.",p:"BAAI",a:"Open weights",m:"Text",t:"embeddings",l:"MIT",lc:"Permissive",hf:"BAAI/bge-m3",ad:[],adsrc:"",d:"Multilingual embedding model handling dense, sparse and multi-vector retrieval in one checkpoint. Common upgrade from MiniLM when languages beyond English are involved."},
+ {n:"NV-Embed",o:"NVIDIA Corporation",j:"United States",fl:"",fn:"",p:"NVIDIA",a:"Open weights",m:"Text",t:"embeddings",l:"CC-BY-NC-4.0",lc:"Restricted",hf:"nvidia/NV-Embed-v2",ad:[],adsrc:"",d:"High-ranking retrieval embedding model — and non-commercial. Turns up in prototypes constantly and cannot ship in a product. One of the most common licence traps in the retrieval stack."},
+ {n:"BERT base uncased",o:"Google Research (Alphabet Inc.)",j:"United States",fl:"",fn:"",p:"Google",a:"Open weights",m:"Text",t:"fill-mask / classification",l:"Apache 2.0",lc:"Permissive",hf:"google-bert/bert-base-uncased",ad:[],adsrc:"",d:"The 2018 encoder that still underpins a large share of production text classification. Cheap, deterministic, well understood."},
+ {n:"DistilBERT",o:"Hugging Face, Inc.",j:"United States",fl:"",fn:"",p:"Hugging Face",a:"Open weights",m:"Text",t:"classification",l:"Apache 2.0",lc:"Permissive",hf:"distilbert/distilbert-base-uncased",ad:[],adsrc:"",d:"Distilled BERT at roughly 40% fewer parameters with most of the accuracy. The default when a classifier must run on CPU inside a request path."},
+ {n:"RoBERTa",o:"Meta Platforms, Inc. (FAIR)",j:"United States",fl:"",fn:"",p:"Meta",a:"Open weights",m:"Text",t:"classification",l:"MIT",lc:"Permissive",hf:"FacebookAI/roberta-base",ad:[],adsrc:"",d:"Retrained BERT variant with stronger downstream performance. Still the backbone for many sentiment, intent and toxicity classifiers in production."},
+ {n:"ViT",o:"Google Research (Alphabet Inc.)",j:"United States",fl:"",fn:"",p:"Google",a:"Open weights",m:"Vision",t:"image classification",l:"Apache 2.0",lc:"Permissive",hf:"google/vit-base-patch16-224",ad:[],adsrc:"",d:"Vision Transformer — treats an image as a sequence of patches. The standard image encoder backbone most later vision work builds on."},
+ {n:"SAM 2",o:"Meta Platforms, Inc. (FAIR)",j:"United States",fl:"",fn:"",p:"Meta",a:"Open weights",m:"Vision",t:"segmentation",l:"Apache 2.0",lc:"Permissive",hf:"facebook/sam2-hiera-large",ad:[],adsrc:"",d:"Promptable segmentation across images and video with no task-specific training. Widely used for annotation tooling and medical image pre-processing."},
+ {n:"YOLO (v8 / v11)",o:"Ultralytics, Inc.",j:"United States",fl:"watch",fn:"The YOLO name originated in academic work by other authors; Ultralytics controls the v5, v8 and v11 releases and their licensing. Confirm which lineage a checkpoint belongs to before assuming terms.",p:"Ultralytics",a:"Open weights",m:"Vision",t:"object detection",l:"AGPL-3.0",lc:"Restricted",hf:"Ultralytics/YOLO11",ad:[],adsrc:"",d:"The default real-time object detector — and AGPL-3.0, which reaches through network use. Embedding it without the commercial licence is the most frequent open-source compliance failure in computer vision."},
+ {n:"DETR",o:"Meta Platforms, Inc. (FAIR)",j:"United States",fl:"",fn:"",p:"Meta",a:"Open weights",m:"Vision",t:"object detection",l:"Apache 2.0",lc:"Permissive",hf:"facebook/detr-resnet-50",ad:[],adsrc:"",d:"Transformer-based detection that removes the anchor and non-max-suppression machinery. The permissively licensed alternative when YOLO's terms are unacceptable."},
+ {n:"Stable Diffusion XL",o:"Stability AI Ltd",j:"United Kingdom",fl:"",fn:"",p:"Stability AI",a:"Open weights",m:"Vision",t:"image generation",l:"CreativeML OpenRAIL++",lc:"Bespoke",hf:"stabilityai/stable-diffusion-xl-base-1.0",ad:[],adsrc:"",d:"Latent diffusion text-to-image model. The OpenRAIL licence permits commercial use but attaches behavioural use restrictions that propagate to derivatives."},
+ {n:"FLUX.1",o:"Black Forest Labs GmbH",j:"Germany (EU)",fl:"",fn:"",p:"Black Forest Labs",a:"Open weights",m:"Vision",t:"image generation",l:"Split: dev non-commercial",lc:"Restricted",hf:"black-forest-labs/FLUX.1-dev",ad:[],adsrc:"",d:"Current quality leader among open image models. The schnell variant is Apache 2.0; the dev variant is non-commercial. Teams prototype on dev and discover the constraint at launch."},
+ {n:"Whisper large-v3",o:"OpenAI",j:"United States",fl:"",fn:"",p:"OpenAI",a:"Open weights",m:"Audio",t:"speech to text",l:"MIT",lc:"Permissive",hf:"openai/whisper-large-v3",ad:[],adsrc:"",d:"Multilingual speech recognition and translation. The de facto open standard for transcription, including clinical documentation — where hallucination during silence is a documented safety concern."},
+ {n:"Wav2Vec2",o:"Meta Platforms, Inc. (FAIR)",j:"United States",fl:"",fn:"",p:"Meta",a:"Open weights",m:"Audio",t:"speech to text",l:"MIT / Apache 2.0",lc:"Permissive",hf:"facebook/wav2vec2-base-960h",ad:[],adsrc:"",d:"Self-supervised speech representation model. Preferred over Whisper for tasks needing frame-level alignment or fine-tuning on a narrow acoustic domain."},
+ {n:"Bark",o:"Suno, Inc.",j:"United States",fl:"watch",fn:"Owner has been subject to music-industry copyright litigation. Confirm current status before using generated audio commercially.",p:"Suno",a:"Open weights",m:"Audio",t:"text to speech",l:"MIT",lc:"Permissive",hf:"suno/bark",ad:[],adsrc:"",d:"Generative text-to-audio producing speech with non-verbal sounds, music and tone. Capable of voice cloning, which makes it a synthetic-media governance question."},
+ {n:"XTTS-v2",o:"Coqui (dissolved) — community fork at Idiap Research Institute",j:"Germany / United States (defunct)",fl:"alert",fn:"Owner ceased operations in January 2024. Weights remain under the non-commercial Coqui Public Model License and no surviving entity can sell or honour a commercial licence. The library code is MPL 2.0 and separately usable; the weights are locked. Substitute a permissive engine for commercial work.",p:"Coqui",a:"Open weights",m:"Audio",t:"text to speech",l:"Coqui Public Model License",lc:"Restricted",hf:"coqui/XTTS-v2",ad:[],adsrc:"",d:"Multilingual voice cloning from seconds of reference audio. Still best-in-class for open local cloning, which is why it persists in codebases long after the company disappeared."},
+ {n:"CLIP",o:"OpenAI",j:"United States",fl:"",fn:"",p:"OpenAI",a:"Open weights",m:"Multimodal",t:"image-text retrieval",l:"MIT",lc:"Permissive",hf:"openai/clip-vit-base-patch32",ad:[],adsrc:"",d:"Joint image and text embedding space. The quiet workhorse behind image search, zero-shot classification and the conditioning path of most diffusion models."},
+ {n:"LLaVA",o:"Academic consortium — UW–Madison, Microsoft Research, Columbia University",j:"United States",fl:"watch",fn:"No single corporate owner. Individual checkpoints inherit the terms of whichever base model they were built on, so the effective owner varies checkpoint by checkpoint.",p:"Academic consortium",a:"Open weights",m:"Multimodal",t:"vision language",l:"Apache 2.0 (weights inherit base)",lc:"Bespoke",hf:"llava-hf/llava-1.5-7b-hf",ad:[],adsrc:"",d:"Visual instruction-tuned assistant. The code is permissive but checkpoints inherit their base model — a clear illustration of why a fine-tune's own licence field cannot be trusted alone."},
+ {n:"LayoutLMv3",o:"Microsoft Corporation",j:"United States",fl:"",fn:"",p:"Microsoft",a:"Open weights",m:"Multimodal",t:"document QA",l:"CC-BY-NC-SA-4.0",lc:"Restricted",hf:"microsoft/layoutlmv3-base",ad:[],adsrc:"",d:"Document understanding across text, layout and image. Excellent at forms and invoices, and non-commercial with a share-alike term — regularly found in commercial pipelines by accident."},
+ {n:"TrOCR",o:"Microsoft Corporation",j:"United States",fl:"",fn:"",p:"Microsoft",a:"Open weights",m:"Multimodal",t:"OCR",l:"MIT",lc:"Permissive",hf:"microsoft/trocr-base-handwritten",ad:[],adsrc:"",d:"Transformer OCR for printed and handwritten text. The permissive option where LayoutLM's terms rule it out."},
+ {n:"BioBERT",o:"Korea University (DMIS Lab)",j:"South Korea",fl:"watch",fn:"Academic owner. No commercial support channel and no security advisory process — a consideration if it sits in a regulated clinical pipeline.",p:"Korea University",a:"Open weights",m:"Text",t:"biomedical NLP",l:"Apache 2.0",lc:"Permissive",hf:"dmis-lab/biobert-v1.1",ad:[],adsrc:"",d:"BERT pre-trained on PubMed abstracts and PMC full text. Standard starting point for biomedical entity recognition and adverse-event extraction."},
+ {n:"PubMedBERT",o:"Microsoft Research",j:"United States",fl:"",fn:"",p:"Microsoft",a:"Open weights",m:"Text",t:"biomedical NLP",l:"MIT",lc:"Permissive",hf:"microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract",ad:[],adsrc:"",d:"Pre-trained from scratch on biomedical text rather than adapted from general-domain BERT. Common backbone for regulatory and pharmacovigilance NLP."},
+ {n:"MedGemma",o:"Google (Health AI Developer Foundations, Alphabet Inc.)",j:"United States",fl:"watch",fn:"Released under health-specific developer terms with explicit not-for-clinical-use language. Read those terms in full before any medical device context.",p:"Google",a:"Open weights",m:"Multimodal",t:"medical imaging / text",l:"Health AI Developer Foundations terms",lc:"Bespoke",hf:"google/medgemma-4b-it",ad:[],adsrc:"",d:"Medical-domain variant of Gemma covering radiology, pathology and clinical text."},
+ {n:"GPT-5.6 Sol",o:"OpenAI",j:"United States",fl:"",fn:"",p:"OpenAI",a:"API only",m:"Text / multimodal",t:"reasoning",l:"Proprietary",lc:"Proprietary",hf:"",api:"gpt-5.6",ad:[],adsrc:"",d:"Current flagship, tuned for biology, chemistry and cybersecurity. Roughly 1.05M context, 128K max output, knowledge cutoff February 2026, $5 / $30 per million tokens at launch."},
+ {n:"GPT-5.6 Terra",o:"OpenAI",j:"United States",fl:"",fn:"",p:"OpenAI",a:"API only",m:"Text / multimodal",t:"general purpose",l:"Proprietary",lc:"Proprietary",hf:"",api:"gpt-5.6-terra",ad:[],adsrc:"",d:"The balanced everyday tier, positioned as matching the prior flagship at roughly half the cost. Repriced to $2 / $12 per million tokens on 30 July 2026."},
+ {n:"GPT-5.6 Luna",o:"OpenAI",j:"United States",fl:"",fn:"",p:"OpenAI",a:"API only",m:"Text",t:"high-volume tasks",l:"Proprietary",lc:"Proprietary",hf:"",api:"gpt-5.6-luna",ad:[],adsrc:"",d:"Fast, low-cost tier for classification, extraction and routing at volume. Repriced to $0.20 / $1.20 per million tokens on 30 July 2026."},
+ {n:"GPT-5.6 Cyber / Daybreak",o:"OpenAI",j:"United States",fl:"watch",fn:"Gated access limited to approved defenders. Eligibility and permitted-use terms are contractual and should be recorded alongside the model in any inventory.",p:"OpenAI",a:"API only",m:"Text",t:"security research",l:"Proprietary, gated",lc:"Proprietary",hf:"",api:"gpt-5.6-cyber",ad:[],adsrc:"",d:"Cybersecurity-specific models for authorised vulnerability research and security testing. Daybreak Red and Daybreak Blue are the offensive-research and defensive aliases."},
+ {n:"GPT-5.3-Codex",o:"OpenAI",j:"United States",fl:"",fn:"",p:"OpenAI",a:"API / Codex",m:"Text",t:"agentic coding",l:"Proprietary",lc:"Proprietary",hf:"",api:"gpt-5.3-codex",ad:[],adsrc:"",d:"Agentic coding model that searches repositories, runs terminal commands and debugs. The shift from code completion to a coding agent you steer while it works."},
+ {n:"text-embedding-3-large",o:"OpenAI",j:"United States",fl:"watch",fn:"Hosted endpoint. Every document embedded leaves your boundary, which makes this a data-flow question before it is a model question.",p:"OpenAI",a:"API only",m:"Text",t:"embeddings",l:"Proprietary",lc:"Proprietary",hf:"",api:"text-embedding-3-large",ad:[],adsrc:"",d:"Hosted embedding endpoint. Convenient, and the reason many organisations send their entire document corpus to a third party without a data-flow review."},
+ {n:"gpt-image-1",o:"OpenAI",j:"United States",fl:"",fn:"",p:"OpenAI",a:"API only",m:"Vision",t:"image generation",l:"Proprietary",lc:"Proprietary",hf:"",api:"gpt-image-1",ad:[],adsrc:"",d:"Current hosted image generation and editing endpoint. The DALL·E 2 and 3 snapshots it replaced have been deprecated."},
+ {n:"Sora",o:"OpenAI",j:"United States",fl:"watch",fn:"Synthetic-media output. EU AI Act Article 50 transparency obligations attach to the content, not the model, so the governance record sits with the publishing workflow.",p:"OpenAI",a:"API / product",m:"Multimodal",t:"video generation",l:"Proprietary",lc:"Proprietary",hf:"",api:"sora",ad:[],adsrc:"",d:"Text and image to video. Relevant to governance mainly through synthetic-content transparency obligations rather than model risk."}
+];
+
+var REFS = [
+ {g:"Disclosed model adopters",tint:"lilac",
+  note:"The only sources behind the Known adopters column. Two of forty rows.",
+  plain:"These are the only places a company has actually said on the record which open model it runs.",
+  items:[
+   {t:"How enterprises are using open source LLMs: 16 examples",u:"https://venturebeat.com/ai/how-enterprises-are-using-open-source-llms-16-examples",tier:"Secondary",s:"Wells Fargo deploying Llama 2 internally per its CIO; Brave's Leo assistant defaulting to Mixtral 8x7B; IBM leveraging open models from Hugging Face and Meta alongside Granite."},
+   {t:"The enterprise verdict on AI models",u:"https://venturebeat.com/ai/the-enterprise-verdict-on-ai-models-why-open-source-will-win",tier:"Secondary",s:"The Llama adopter list: Niantic, Nomura, Shopify, Zoom, Accenture, Infosys, KPMG, Wells Fargo, IBM and The Grammy Awards. Family-level, not version-level."},
+   {t:"Mistral Large 3 explained — enterprise adoption",u:"https://intuitionlabs.ai/articles/mistral-large-3-moe-llm-explained",tier:"Secondary",s:"HSBC's multi-year strategic partnership with Mistral AI announced 1 December 2025, covering current and future models."},
+   {t:"IBM makes Mistral Large available on watsonx",u:"https://newsroom.ibm.com/Blog-Start-Up-Innovation-Meets-Enterprise-Scale-as-IBM-Makes-Mistral-Large-Model-Available-on-watsonx",tier:"Primary",s:"IBM's own announcement of Mistral Large distribution on watsonx.ai. Distribution, which is not the same as internal deployment."}
+  ]},
+ {g:"Model ownership and export control",tint:"blush",
+  note:"The two flagged catalog entries. Verified against live sources.",
+  plain:"These two have a real legal edge, so I checked them rather than trusting memory.",
+  items:[
+   {t:"Choosing between US and Chinese AI models: export control risks",u:"https://natlawreview.com/article/choosing-between-us-and-chinese-ai-models-export-control-risks-both-sides",tier:"Secondary",s:"Z.ai as Zhipu's international brand; Entity List since January 2025 at 90 FR 4619 with presumption of denial; downloading published weights is not an export to Zhipu but sending controlled technology into the hosted API is."},
+   {t:"US blacklists Chinese companies over TSMC chips (Reuters)",u:"https://finance.yahoo.com/news/us-adds-16-entities-trade-143501437.html",tier:"Secondary",s:"The January 2025 Entity List addition of Zhipu AI among 25 China-based and two Singapore-based entities; licences generally denied."},
+   {t:"Zhipu AI response and Footnote 4 designation",u:"https://www.geopolitechs.org/p/zhipu-ai-not-relying-on-us-large",tier:"Secondary",s:"The Section 744.11 EAR rationale and the Footnote 4 designation extending licence requirements to foreign-produced items containing US technology under 734.9(e)(2)."},
+   {t:"Coqui is shutting down — project discussion",u:"https://github.com/coqui-ai/TTS/discussions/3489",tier:"Primary",s:"The shutdown announcement in the project's own repository, and the unanswered question of whether rights were transferred."},
+   {t:"XTTS licence after shutdown — issue thread",u:"https://github.com/coqui-ai/TTS/issues/3490",tier:"Primary",s:"The community request to relicense XTTS permissively after the shutdown, and its outcome."},
+   {t:"Is XTTS v2 free for commercial use? (2026)",u:"https://localaimaster.com/blog/xtts-coqui-commercial-license",tier:"Secondary",s:"Non-commercial Coqui Public Model License with no surviving entity to issue a commercial licence; the MPL-2.0 code versus locked-weights distinction; permissive substitutes."}
+  ]},
+ {g:"Hugging Face Hub usage data",tint:"mint",
+  note:"Every counted figure in the usage tab.",
+  plain:"Hugging Face's own numbers about their own website.",
+  items:[
+   {t:"State of Open Models: Summer 2026",u:"https://huggingface.co/blog/state-of-open-models-summer-2026",tier:"Primary",s:"Repo, dataset and Spaces growth; the parameter-size download split; Qwen GGUF conversion counts."},
+   {t:"Hugging Face 2026 Open Model Report summary",u:"https://www.tun.com/home/hugging-faces-2026-open-model-report-qwen-leads-hype-vs-reality/",tier:"Secondary",s:"Long-tail concentration figures and the 151,448 Qwen derivative count."},
+   {t:"Hugging Face 2026 statistics summary",u:"https://www.programming-helper.com/tech/hugging-face-2026-2-million-models-80-percent-downloads-python",tier:"Secondary",s:"The modality split of 58.1 / 21.2 / 15.1. Weakest source here — a secondary summary of an October 2025 HF blog."},
+   {t:"State of Open Source on Hugging Face: Spring 2026",u:"https://huggingface.co/blog/huggingface/state-of-os-hf-spring-2026",tier:"Primary",s:"Companion report; national and regional model trends."}
+  ]},
+ {g:"Industry and agent adoption",tint:"peach",
+  note:"Every survey-reported figure.",
+  plain:"People phoning companies and asking questions. Not the same kind of fact as a download count.",
+  items:[
+   {t:"Presenc AI — Enterprise AI Adoption Statistics 2026",u:"https://presenc.ai/research/enterprise-ai-adoption-statistics-2026",tier:"Secondary",s:"Sector adoption: technology 94%, financial services 87%, professional services 81%, telecoms 78%."},
+   {t:"Presenc AI — AI Adoption Statistics by Industry 2026",u:"https://presenc.ai/research/ai-adoption-by-industry",tier:"Secondary",s:"The healthcare 67% figure. Different denominator from the chart above."},
+   {t:"AI Agent Adoption 2026 (S&P Global, McKinsey)",u:"https://www.digitalapplied.com/blog/ai-agent-adoption-2026-enterprise-data-points",tier:"Secondary",s:"Agent production rates: 31% cross-sector, banking and insurance 47%, healthcare 18%, government 14%."},
+   {t:"Enterprise AI Agents Adoption Statistics 2026",u:"https://paul-okhrem.com/enterprise-ai-agents-statistics-2026/",tier:"Secondary",s:"Independent corroboration of the same S&P Global and McKinsey figures."}
+  ]},
+ {g:"Named sector deployments",tint:"sky",
+  note:"Disclosure-based. Who announced, not who deployed.",
+  plain:"Press releases and trackers. They over-represent big companies with PR teams.",
+  items:[
+   {t:"Agentic AI updates reshaping compliance in 2026",u:"https://www.360factors.com/blog/agentic-ai-updates/",tier:"Secondary",s:"FIS and Anthropic Financial Crimes AI Agent; BMO and Amalgamated Bank as first deployers; Fiserv agentOS."},
+   {t:"Agentic AI in financial services research roundup",u:"https://neurons-lab.com/articles/agentic-ai-in-financial-services-2026/",tier:"Secondary",s:"McKinsey's count of 50 major banks announcing 160+ use cases in 2025; HSBC, Visa and AXA references."},
+   {t:"AI in banking just got real (CB Insights AI 100)",u:"https://www.ccgcatalyst.com/thought-leadership/commentary/ai-in-banking-just-got-real/",tier:"Secondary",s:"Salient's loan-servicing deployments at Westlake Financial, American Credit Acceptance and Exeter Finance."},
+   {t:"Insurance AI trends, Q2 2026",u:"https://www.scnsoft.com/insurance/insurance-ai-trends",tier:"Secondary",s:"The Travelers AI Claim Assistant voice agent."},
+   {t:"AI for insurance companies: 2026 costs, rules and roadmap",u:"https://www.tommasomariaricci.com/blog/ai-for-insurance-companies",tier:"Secondary",s:"Progressive, Allstate, AXA, Allianz, Direct Line and Ping An shipping underwriting and fraud systems."},
+   {t:"CB Insights insurtech predictions 2026",u:"https://www.cbinsights.com/research/report/cb-insights_insurtech-predictions-2026",tier:"Secondary",s:"Hiring signals showing Aviva, Chubb and MetLife building capability in-house."},
+   {t:"Evident insurance AI use case tracker",u:"https://www.generative-ai-in-insurance-usa.com/",tier:"Secondary",s:"68% of publicly disclosed insurance AI deployments generative or agentic; agentic at 21%."},
+   {t:"Engageware agentic AI deployment playbook",u:"https://www.businesswire.com/news/home/20260318009725/en/Engageware-to-Share-Agentic-AI-Deployment-Playbook-for-Financial-Services-at-Fintech-Americas-2026",tier:"Secondary",s:"Bank of America, Citi and Banco de Córdoba executives on scaling agentic AI."}
+  ]},
+ {g:"BOM standards and tooling",tint:"mint",
+  note:"Everything in the BOM libraries tab and the skeleton generators.",
+  plain:"Mostly the actual project pages and repositories, which is the best kind of reference for a tool.",
+  items:[
+   {t:"OWASP AIBOM Generator — repository",u:"https://github.com/GenAI-Security-Project/aibom-generator",tier:"Primary",s:"CLI usage, CycloneDX 1.6 output, completeness scoring, cyclonedx-python-lib foundation."},
+   {t:"OWASP AIBOM Generator — project page",u:"https://genai.owasp.org/resource/owasp-aibom-generator/",tier:"Primary",s:"Scope statement and SPDX alignment."},
+   {t:"Evolving AI transparency: the AIBOM Generator's new home",u:"https://genai.owasp.org/2025/12/18/evolving-ai-transparency-the-journey-of-the-aibom-generator-and-its-new-home-at-owasp/",tier:"Primary",s:"RSAC 2025 launch and the move to OWASP governance."},
+   {t:"AIBOM generator finds new home at OWASP",u:"https://www.scworld.com/feature/aibom-generator-finds-new-home-at-owasp-to-boost-ai-transparency",tier:"Secondary",s:"Independent reporting on the governance transfer."},
+   {t:"ALOHA — EASE 2025 paper",u:"https://dl.acm.org/doi/10.1145/3756681.3756998",tier:"Primary",s:"Method and the 312-model evaluation; the metadata-completeness finding."},
+   {t:"ALOHA — tool repository",u:"https://github.com/MSR4SBOM/ALOHA",tier:"Primary",s:"The generator itself and its AIBOM structure documentation."},
+   {t:"Example ALOHA pull request on a live model repo",u:"https://huggingface.co/01-ai/Yi-34B/commit/5fbd3444881b17ec3d630df9384a92d72848ba1f",tier:"Primary",s:"What an upstream-contributed AIBOM looks like in place."},
+   {t:"cdxgen",u:"https://github.com/cdxgen/cdxgen",tier:"Primary",s:"AI-BOM from Hugging Face purls, Modelfiles and GGUF; the aibom, obom, tracebom and CBOM modes."},
+   {t:"CycloneDX Tool Center",u:"https://cyclonedx.org/tool-center/",tier:"Primary",s:"AIBoMGen-cli, the GitHub Action, Parlay and the wider generator ecosystem."},
+   {t:"Implementing AI Bill of Materials with SPDX 3.0",u:"https://www.linuxfoundation.org/hubfs/LF%20Research/lfr_spdx_aibom_102524a.pdf",tier:"Primary",s:"The SPDX AI and Dataset profiles, compared against model cards, datasheets and FactSheets."},
+   {t:"What is an AIBOM? — O3 Security",u:"https://o3.security/academy/aibom-ai-bill-of-materials",tier:"Secondary",s:"The CycloneDX-internally / SPDX-for-vendors split, and Protobom and bomctl as translators."},
+   {t:"AIBOM procurement guide — Kognitos",u:"https://www.kognitos.com/blog/ai-bill-of-materials-aibom-procurement-guide/",tier:"Secondary",s:"CycloneDX ML-BOM v1.7 positioning and the six coverage areas of a defensible AIBOM."}
+  ]},
+ {g:"OpenAI models",tint:"butter",
+  note:"The API-only entries in the model catalog.",
+  plain:"Model names and prices change every few weeks. Check the first link rather than trusting the table.",
+  items:[
+   {t:"OpenAI API — Models",u:"https://developers.openai.com/api/docs/models",tier:"Primary",s:"Live lineup, pricing, context windows, knowledge cutoffs, and the Daybreak and Cyber security models."},
+   {t:"OpenAI Help Centre — Model release notes",u:"https://help.openai.com/en/articles/9624314-model-release-notes",tier:"Primary",s:"GPT-5.3-Codex launch; o3 and GPT-4.5 retirement schedules."},
+   {t:"OpenAI API changelog",u:"https://developers.openai.com/api/docs/changelog",tier:"Primary",s:"DALL·E snapshot deprecation and endpoint changes."},
+   {t:"Best AI models, August 2026",u:"https://felloai.com/best-ai-models/",tier:"Secondary",s:"GPT-5.6 general availability 9 July 2026; the Sol, Terra and Luna tiers; the 30 July repricing."}
+  ]},
+ {g:"EU AI Act",tint:"lilac",
+  note:"The regulatory framing throughout.",
+  plain:"The law's deadlines moved in July 2026. The requirement to know what is inside your system did not.",
+  items:[
+   {t:"Annex IV — Technical documentation",u:"https://artificialintelligenceact.eu/annex/4/",tier:"Primary",s:"The documentation set an assessor will ask for under Article 11."},
+   {t:"Implementation timeline — AI Act Service Desk",u:"https://ai-act-service-desk.ec.europa.eu/en/ai-act/timeline/timeline-implementation-eu-ai-act",tier:"Primary",s:"Official timeline including Digital Omnibus amendments."},
+   {t:"What is an AI-BOM? EU AI Act Annex IV guide",u:"https://www.cybedefend.com/en/blog/ai-bill-of-materials-eu-ai-act",tier:"Secondary",s:"AI Omnibus entry into force 27 July 2026; Annex III deferred to 2 December 2027; product-embedded high-risk to 2 August 2028."}
+  ]},
+ {g:"Not verified in this session",tint:"blush",
+  note:"Prior knowledge, not checked against a live page. Verify before relying on any of it.",
+  plain:"I knew these already rather than looking them up. Check them anyway, especially licences and ownership entities.",
+  items:[
+   {t:"Licences in the model catalog",u:"",tier:"Unverified",s:"YOLO AGPL-3.0; NV-Embed CC-BY-NC-4.0; LayoutLMv3 CC-BY-NC-SA-4.0; the FLUX.1 dev and schnell split; SDXL CreativeML OpenRAIL++; the Llama Community License MAU threshold; MedGemma health developer terms. XTTS and GLM were verified separately."},
+   {t:"Owning legal entities and jurisdictions",u:"",tier:"Unverified",s:"Corporate names, parent relationships and country of domicile for every entry other than Zhipu and Coqui."},
+   {t:"Hugging Face repository identifiers",u:"",tier:"Unverified",s:"The org/model IDs used to build purls in the generated skeletons. Confirm each against the live Hub before treating a purl as resolvable."},
+   {t:"Suno litigation status",u:"",tier:"Unverified",s:"The music-industry copyright litigation flag on Bark."},
+   {t:"HBOM standards",u:"",tier:"Unverified",s:"CISA ICT SCRM Task Force HBOM Framework; the CycloneDX device component type; IPC-1752A and IPC-1754."},
+   {t:"CBOM and VEX details",u:"",tier:"Unverified",s:"CycloneDX cryptography support arriving in 1.6; the CSAF VEX, OpenVEX and CycloneDX VEX format set."},
+   {t:"Hugging Face API specifics",u:"",tier:"Unverified",s:"Hub API field names such as sha, cardData and siblings, and the pkg:huggingface purl type."},
+   {t:"Whisper clinical behaviour",u:"",tier:"Unverified",s:"The documented hallucination-during-silence behaviour in clinical transcription contexts."}
+  ]}
+];
+
+/* Hardware floor and hosting routes. runc: laptop | gpu | server | api.
+   The badge reflects the variant most teams actually deploy, not the smallest that exists. */
+var RUNTIME={
+ "Qwen 3.x":{runc:"gpu",run:"Single GPU upward. Family spans sub-1B to frontier, so a small variant runs on a laptop and the largest does not.",host:"Self-host anywhere. Alibaba's own hosted API is PRC-jurisdiction; the weights are not."},
+ "Qwen3-VL":{runc:"gpu",run:"Single GPU. Vision encoders raise the memory floor above the text-only siblings.",host:"Self-host anywhere. Vendor API is PRC-jurisdiction."},
+ "DeepSeek V4.1":{runc:"server",run:"Data centre at full precision. Most real usage is quantised GGUF on smaller rigs.",host:"Self-host if you have the hardware. Vendor API is PRC-jurisdiction."},
+ "DeepSeek R1":{runc:"server",run:"Data centre at full precision. The distillations onto smaller backbones run on a single GPU.",host:"Self-host. Distillations are widely redistributed by third parties."},
+ "Gemma 4":{runc:"laptop",run:"Laptop to single GPU. Explicitly sized for edge and single-device deployment.",host:"Self-host. Also served through Google Cloud and the major model catalogues."},
+ "Llama 4":{runc:"gpu",run:"Single GPU for smaller variants, multi-GPU server for the large ones.",host:"Self-host. Offered by all major cloud providers and embedded in several enterprise suites."},
+ "Mistral / Mixtral":{runc:"gpu",run:"Single GPU for the small models; multi-GPU for the mixture-of-experts variants.",host:"Self-host. Mistral's own API is EU-domiciled. Also distributed on IBM watsonx."},
+ "GLM-6":{runc:"server",run:"Data centre at full precision.",host:"Self-host. Do not route controlled technology into the vendor's hosted API — see the flag."},
+ "gpt-oss-120b / 20b":{runc:"gpu",run:"Single GPU for the 20b, multi-GPU for the 120b.",host:"Self-host with no OpenAI dependency at all. Also available through cloud catalogues."},
+ "all-MiniLM-L6-v2":{runc:"laptop",run:"Laptop CPU. 22M parameters — it will run inside a request path without a GPU.",host:"Self-host, trivially. Also on HF Inference Endpoints."},
+ "BGE-M3":{runc:"laptop",run:"Laptop CPU or a small GPU for batch throughput.",host:"Self-host. Also on HF Inference Endpoints."},
+ "NV-Embed":{runc:"gpu",run:"Single GPU.",host:"Self-host only, and non-commercially — see the licence."},
+ "BERT base uncased":{runc:"laptop",run:"Laptop CPU.",host:"Self-host. Also on HF Inference Endpoints."},
+ "DistilBERT":{runc:"laptop",run:"Laptop CPU. Fast enough to sit inside a synchronous request path.",host:"Self-host. Also on HF Inference Endpoints."},
+ "RoBERTa":{runc:"laptop",run:"Laptop CPU.",host:"Self-host. Also on HF Inference Endpoints."},
+ "ViT":{runc:"laptop",run:"Laptop CPU or a small GPU.",host:"Self-host. Also on HF Inference Endpoints."},
+ "SAM 2":{runc:"gpu",run:"Single GPU. Video segmentation is the memory-hungry path.",host:"Self-host. Commonly wrapped in annotation tooling."},
+ "YOLO (v8 / v11)":{runc:"laptop",run:"Laptop CPU through to embedded edge devices. Designed for real-time inference on modest hardware.",host:"Self-host, including on-device. Licence, not hardware, is the constraint here."},
+ "DETR":{runc:"gpu",run:"Single GPU.",host:"Self-host. Also on HF Inference Endpoints."},
+ "Stable Diffusion XL":{runc:"gpu",run:"Single GPU, roughly 8GB VRAM and up.",host:"Self-host. Widely offered as a hosted generation endpoint by third parties."},
+ "FLUX.1":{runc:"gpu",run:"Single GPU, roughly 16GB VRAM and up for the dev variant.",host:"Self-host. Hosted offerings exist but check which variant they run."},
+ "Whisper large-v3":{runc:"gpu",run:"Single GPU for large-v3. The small and base variants run on a laptop CPU.",host:"Self-host. Also available as OpenAI's hosted transcription endpoint."},
+ "Wav2Vec2":{runc:"laptop",run:"Laptop CPU or a small GPU.",host:"Self-host. Also on HF Inference Endpoints."},
+ "Bark":{runc:"gpu",run:"Single GPU for usable latency.",host:"Self-host. No first-party hosted endpoint; third-party wrappers exist but inherit the owner's litigation exposure."},
+ "XTTS-v2":{runc:"gpu",run:"Single GPU. CPU works but is slow enough to be impractical.",host:"Self-host only. No vendor remains — the community fork is the maintained path."},
+ "CLIP":{runc:"laptop",run:"Laptop CPU for embedding at modest volume.",host:"Self-host. Embedded in most diffusion pipelines by default."},
+ "LLaVA":{runc:"gpu",run:"Single GPU. Floor depends entirely on which base model the checkpoint used.",host:"Self-host. Checkpoints are distributed by many third parties."},
+ "LayoutLMv3":{runc:"laptop",run:"Laptop CPU or a small GPU.",host:"Self-host only, and non-commercially — see the licence."},
+ "TrOCR":{runc:"laptop",run:"Laptop CPU.",host:"Self-host. Also on HF Inference Endpoints."},
+ "BioBERT":{runc:"laptop",run:"Laptop CPU.",host:"Self-host. Common inside on-premise clinical NLP pipelines."},
+ "PubMedBERT":{runc:"laptop",run:"Laptop CPU.",host:"Self-host. Common inside on-premise regulatory NLP pipelines."},
+ "MedGemma":{runc:"gpu",run:"Single GPU.",host:"Self-host, subject to the health developer terms. Also on Google Cloud."},
+ "GPT-5.6 Sol":{runc:"api",run:"Vendor API only. No weights, no local option.",host:"OpenAI API, US-domiciled. Also reachable via Amazon Bedrock through an OpenAI-compatible endpoint, with availability varying by AWS Region."},
+ "GPT-5.6 Terra":{runc:"api",run:"Vendor API only. No weights, no local option.",host:"OpenAI API, US-domiciled. Also via Amazon Bedrock, availability varying by Region."},
+ "GPT-5.6 Luna":{runc:"api",run:"Vendor API only. No weights, no local option.",host:"OpenAI API, US-domiciled. Also via Amazon Bedrock, availability varying by Region."},
+ "GPT-5.6 Cyber / Daybreak":{runc:"api",run:"Vendor API only, and gated to approved defenders.",host:"OpenAI API under contract. Eligibility is contractual, not technical."},
+ "GPT-5.3-Codex":{runc:"api",run:"Vendor API and the Codex product. No local option.",host:"OpenAI API and Codex clients."},
+ "text-embedding-3-large":{runc:"api",run:"Vendor API only. Every document you embed leaves your boundary.",host:"OpenAI API, US-domiciled. Self-hosted alternatives exist at comparable quality."},
+ "gpt-image-1":{runc:"api",run:"Vendor API only.",host:"OpenAI API, US-domiciled."},
+ "Sora":{runc:"api",run:"Vendor API and product. No local option.",host:"OpenAI API and product surfaces."}
+};
+
+var COST={
+ Permissive:{k:"freeship",t:"Free to ship",n:"Download free, use commercially, redistribute."},
+ Restricted:{k:"freetry",t:"Free to try only",n:"Download free. You may not ship it in a commercial product without resolving the licence."},
+ Bespoke:{k:"freecond",t:"Free with conditions",n:"Download free. Vendor-written terms carry conditions that need legal review."},
+ Proprietary:{k:"paid",t:"Paid per use",n:"Metered by token or call. You never receive the weights."}
+};
+var RUNRANK={laptop:1,gpu:2,server:3,api:4};
+
+for(var z=0;z<MODELS.length;z++){
+  var mm=MODELS[z];
+  mm.adc = mm.ad.length; mm.idx = z;
+  var rt = RUNTIME[mm.n] || {runc:"gpu",run:"UNRESOLVED",host:"UNRESOLVED"};
+  mm.runc=rt.runc; mm.run=rt.run; mm.host=rt.host; mm.runrank=RUNRANK[rt.runc]||9;
+  var c = COST[mm.lc] || COST.Bespoke;
+  mm.ship=c.t; mm.shipk=c.k; mm.shipn=c.n;
+}
+
+function esc(s){
+  return String(s).replace(/[&<>"]/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];
+  });
+}
+function uuid(){
+  var s="0123456789abcdef",o="";
+  for(var i=0;i<32;i++){ o+=s.charAt(Math.floor(Math.random()*16)); }
+  return o.slice(0,8)+"-"+o.slice(8,12)+"-4"+o.slice(13,16)+"-a"+o.slice(17,20)+"-"+o.slice(20,32);
+}
+function nowISO(){ return new Date().toISOString().replace(/\.\d{3}Z$/,"Z"); }
+function slug(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); }
+
+var TOOL_META = {
+  components:[{type:"application",name:"model-landscape-bom-atlas",version:"4.0",
+    description:"Generates a CycloneDX skeleton from catalogued model metadata. Not an assessment record."}]
+};
+
+function baseBom(){
+  return {bomFormat:"CycloneDX",specVersion:"1.6",serialNumber:"urn:uuid:"+uuid(),version:1};
+}
+
+/* ---------- AIBOM ---------- */
+function makeAibom(m){
+  var b=baseBom();
+  var ref="model/"+slug(m.n);
+  var comp={
+    type:"machine-learning-model","bom-ref":ref,name:m.n,
+    version:"UNRESOLVED — pin the upstream commit SHA",
+    supplier:{name:m.o},publisher:m.o,
+    description:m.d,
+    licenses:[{license:{name:m.l}}],
+    modelCard:{
+      "bom-ref":"modelcard/"+slug(m.n),
+      modelParameters:{task:m.t,modelArchitecture:"UNRESOLVED — read from config.json",
+        datasets:[{type:"other",name:"UNDISCLOSED — training data not published by owner"}]},
+      considerations:{
+        technicalLimitations:["Skeleton generated from catalogue metadata; not evaluated in situ."],
+        ethicalConsiderations:[{name:"UNRESOLVED — no bias assessment field exists natively in CycloneDX"}]
+      }
+    },
+    properties:[
+      {name:"atlas:owner:legalEntity",value:m.o},
+      {name:"atlas:owner:jurisdiction",value:m.j},
+      {name:"atlas:access:model",value:m.a},
+      {name:"atlas:licence:class",value:m.lc},
+      {name:"atlas:licence:declared",value:m.l},
+      {name:"atlas:modality",value:m.m},
+      {name:"atlas:supplyChain:flag",value:m.fl?m.fl:"none"}
+    ]
+  };
+  if(m.fl){ comp.properties.push({name:"atlas:supplyChain:note",value:m.fn}); }
+  if(m.hf){ comp.purl="pkg:huggingface/"+m.hf+"@UNRESOLVED-COMMIT-SHA"; }
+  if(m.api){ comp.properties.push({name:"atlas:api:modelId",value:m.api}); }
+  if(m.adc){ comp.properties.push({name:"atlas:adopters:disclosed",value:m.ad.join("; ")});
+             comp.properties.push({name:"atlas:adopters:source",value:m.adsrc}); }
+  b.metadata={timestamp:nowISO(),tools:TOOL_META,
+    component:{type:"application",name:"REPLACE — your application name",version:"0.0.0"},
+    supplier:{name:m.o},
+    properties:[{name:"atlas:artifact:status",value:"SKELETON — incomplete, not an assessment record"}]};
+  b.components=[comp];
+  b.dependencies=[{ref:ref,dependsOn:[]}];
+  return b;
+}
+
+/* ---------- SBOM ---------- */
+var STACK={
+ "Text":["transformers","tokenizers","safetensors","torch"],
+ "Text / multimodal":["transformers","tokenizers","safetensors","torch","accelerate"],
+ "Vision":["transformers","torchvision","safetensors","pillow","torch"],
+ "Multimodal":["transformers","torchvision","tokenizers","safetensors","torch"],
+ "Audio":["transformers","torchaudio","safetensors","librosa","torch"]
+};
+function makeSbom(m){
+  var b=baseBom();
+  var libs = STACK[m.m] || STACK["Text"];
+  var comps=[];
+  if(m.a.indexOf("Open")===0){
+    for(var i=0;i<libs.length;i++){
+      comps.push({type:"library","bom-ref":"lib/"+libs[i],name:libs[i],
+        version:"UNRESOLVED — resolve from your lockfile",
+        purl:"pkg:pypi/"+libs[i]+"@UNRESOLVED",
+        properties:[{name:"atlas:source",value:"declared inference stack, not observed"}]});
+    }
+  } else {
+    comps.push({type:"library","bom-ref":"lib/openai",name:"openai",
+      version:"UNRESOLVED — resolve from your lockfile",purl:"pkg:pypi/openai@UNRESOLVED",
+      properties:[{name:"atlas:source",value:"declared client library for a hosted endpoint"}]});
+  }
+  b.metadata={timestamp:nowISO(),tools:TOOL_META,
+    component:{type:"application",name:"REPLACE — your application name",version:"0.0.0"},
+    properties:[
+      {name:"atlas:artifact:status",value:"SKELETON — declared stack only; run Syft or cdxgen against the real build"},
+      {name:"atlas:relatedModel",value:m.n}]};
+  b.components=comps;
+  return b;
+}
+
+/* ---------- HBOM ---------- */
+function makeHbom(m){
+  var b=baseBom();
+  var openW = m.a.indexOf("Open")===0;
+  b.metadata={timestamp:nowISO(),tools:TOOL_META,
+    component:{type:"application",name:"REPLACE — your application name",version:"0.0.0"},
+    properties:[
+      {name:"atlas:artifact:status",value:"SKELETON — hardware cannot be inferred from model metadata"},
+      {name:"atlas:relatedModel",value:m.n},
+      {name:"atlas:hosting",value:openW?"self-hosted — accelerator inventory applies":"vendor-hosted — accelerator is the provider's, not yours"}]};
+  b.components = openW ? [{
+      type:"device","bom-ref":"hw/accelerator",name:"REPLACE — inference accelerator",
+      manufacturer:{name:"UNRESOLVED"},
+      version:"UNRESOLVED",
+      properties:[
+        {name:"atlas:hw:countryOfOrigin",value:"UNRESOLVED"},
+        {name:"atlas:hw:firmwareVersion",value:"UNRESOLVED"},
+        {name:"atlas:hw:supplierTier",value:"UNRESOLVED"},
+        {name:"atlas:hw:exportControlPosture",value:"UNRESOLVED — accelerators carry their own controls"}]
+    },{
+      type:"device","bom-ref":"hw/host",name:"REPLACE — host platform",
+      manufacturer:{name:"UNRESOLVED"},version:"UNRESOLVED",
+      properties:[{name:"atlas:hw:countryOfOrigin",value:"UNRESOLVED"}]
+    }] : [];
+  if(!openW){
+    b.metadata.properties.push({name:"atlas:hbom:applicability",
+      value:"Not applicable to your estate. The provider's hardware supply chain is covered by contract and attestation, not by your HBOM."});
+  }
+  return b;
+}
+
+/* ---------- SaaSBOM ---------- */
+function makeSaasbom(m){
+  var b=baseBom();
+  var hosted = m.a.indexOf("Open")!==0;
+  b.metadata={timestamp:nowISO(),tools:TOOL_META,
+    component:{type:"application",name:"REPLACE — your application name",version:"0.0.0"},
+    properties:[
+      {name:"atlas:artifact:status",value:"SKELETON — trust boundaries must be confirmed against your architecture"},
+      {name:"atlas:relatedModel",value:m.n}]};
+  b.services = hosted ? [{
+    "bom-ref":"svc/"+slug(m.n),name:m.n,
+    provider:{name:m.o},
+    endpoints:["https://api.openai.com/v1 — CONFIRM against current documentation"],
+    authenticated:true,"x-trust-boundary":true,
+    data:[{flow:"bi-directional",classification:"UNRESOLVED — classify what you send"}],
+    properties:[
+      {name:"atlas:service:jurisdiction",value:m.j},
+      {name:"atlas:service:apiModelId",value:m.api||"UNRESOLVED"},
+      {name:"atlas:service:retentionTerms",value:"UNRESOLVED — read the data-processing terms"}]
+  }] : [];
+  if(!hosted){
+    b.metadata.properties.push({name:"atlas:saasbom:applicability",
+      value:"No service entry: weights run inside your boundary. Add entries here for any tool, retrieval source or MCP server the model reaches."});
+  }
+  return b;
+}
+
+/* ---------- VEX ---------- */
+function makeVex(m){
+  return {"@context":"https://openvex.dev/ns/v0.2.0",
+    "@id":"https://REPLACE.example/vex/"+slug(m.n)+"/"+uuid(),
+    author:"REPLACE — your PSIRT contact",timestamp:nowISO(),version:1,
+    tooling:"model-landscape-bom-atlas 4.0",
+    statements:[],
+    _note:"SKELETON. Statements are intentionally empty. Populate one statement per CVE that a scanner raises against the components in the SBOM, with a status of not_affected, affected, fixed or under_investigation and a justification. An SBOM published without VEX generates a support queue rather than assurance."};
+}
+
+function gapsFor(m){
+  var g=["Commit SHA and per-file SHA-256 — pin from the Hub API before this resolves",
+    "Resolved dependency versions — take from your lockfile, or run Syft or cdxgen",
+    "Training and evaluation dataset disclosure — usually absent upstream",
+    "Bias assessment and human-oversight design — no native field in either standard",
+    "Accelerator make, model, firmware and country of origin"];
+  if(m.a.indexOf("Open")===0){ g.push("Weight file format — confirm safetensors versus pickle before load"); }
+  else { g.push("Data-processing and retention terms for the hosted endpoint"); }
+  if(m.fl==="alert"){ g.push("Legal review of the flagged supply-chain condition before any production use"); }
+  if(!m.adc){ g.push("No disclosed adopters — no external deployment evidence to cite"); }
+  return g;
+}
+
+var BOMS=[
+ {k:"aibom",label:"AIBOM",tint:"mint",cap:"CycloneDX 1.6 ML-BOM — model identity, owner, jurisdiction, licence",fn:makeAibom},
+ {k:"sbom",label:"SBOM",tint:"sky",cap:"CycloneDX 1.6 — declared inference stack",fn:makeSbom},
+ {k:"hbom",label:"HBOM",tint:"peach",cap:"CycloneDX 1.6 device components — accelerator and host",fn:makeHbom},
+ {k:"saasbom",label:"SaaSBOM",tint:"lilac",cap:"CycloneDX 1.6 services — endpoints and trust boundaries",fn:makeSaasbom},
+ {k:"vex",label:"VEX",tint:"blush",cap:"OpenVEX 0.2.0 — exploitability statements, empty by design",fn:makeVex}
+];
+
+function download(name,text){
+  var blob=new Blob([text],{type:"application/json"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");
+  a.href=url; a.download=name; document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(url);},1200);
+}
+
+var plainToggle=document.getElementById("plainToggle");
+function syncPlain(){ document.body.classList.toggle("plain-off",!plainToggle.checked); }
+plainToggle.addEventListener("change",syncPlain); syncPlain();
+
+var compactToggle=document.getElementById("compactToggle");
+compactToggle.addEventListener("change",function(){
+  document.body.classList.toggle("compact",compactToggle.checked);
+});
+
+var rowsEl=document.getElementById("rows"),emptyEl=document.getElementById("empty"),
+    countEl=document.getElementById("count"),qEl=document.getElementById("q"),
+    fAccess=document.getElementById("fAccess"),fJur=document.getElementById("fJur"),
+    fLic=document.getElementById("fLic"),fFlag=document.getElementById("fFlag"),
+    fAdopt=document.getElementById("fAdopt");
+
+(function(){
+  var seen=[];
+  for(var i=0;i<MODELS.length;i++){ if(seen.indexOf(MODELS[i].j)===-1) seen.push(MODELS[i].j); }
+  seen.sort();
+  for(var k=0;k<seen.length;k++){
+    var o=document.createElement("option"); o.textContent=seen[k]; fJur.appendChild(o);
+  }
+})();
+
+var sortKey="n",sortDir=1,openBoms={};
+var RUNLABEL={laptop:"Laptop / CPU",gpu:"Single GPU",server:"Server",api:"API only"};
+var fCost=document.getElementById("fCost"),fRun=document.getElementById("fRun");
+
+function filtered(){
+  var q=qEl.value.trim().toLowerCase(),va=fAccess.value,vj=fJur.value,
+      vl=fLic.value,vf=fFlag.value,vad=fAdopt.value,
+      vc=fCost.value,vr=fRun.value,out=[];
+  for(var i=0;i<MODELS.length;i++){
+    var m=MODELS[i];
+    if(va && m.a.indexOf(va)===-1) continue;
+    if(vj && m.j!==vj) continue;
+    if(vl && m.lc!==vl) continue;
+    if(vf==="any" && !m.fl) continue;
+    if(vf==="alert" && m.fl!=="alert") continue;
+    if(vf==="none" && m.fl) continue;
+    if(vad==="yes" && !m.adc) continue;
+    if(vad==="no" && m.adc) continue;
+    if(vc && m.shipk!==vc) continue;
+    if(vr && m.runc!==vr) continue;
+    if(q){
+      var hay=(m.n+" "+m.o+" "+m.j+" "+m.p+" "+m.t+" "+m.d+" "+m.m+" "+m.l+" "+m.fn+" "
+        +m.ad.join(" ")+" "+m.run+" "+m.host+" "+m.ship).toLowerCase();
+      if(hay.indexOf(q)===-1) continue;
+    }
+    out.push(m);
+  }
+  out.sort(function(x,y){
+    var a=x[sortKey],b=y[sortKey];
+    if(typeof a==="number" && typeof b==="number"){
+      if(a!==b) return (a-b)*sortDir;
+    } else {
+      var r=String(a).toLowerCase().localeCompare(String(b).toLowerCase());
+      if(r!==0) return r*sortDir;
+    }
+    return x.idx-y.idx;
+  });
+  return out;
+}
+
+function factsPanel(m){
+  var h="<div class='facts'>";
+  h+="<div class='fact"+(m.fl==="alert"?" factflag":(m.fl==="watch"?" factwatch":""))
+    +"'><p class='fh'>Owner</p><p class='fv'>"+esc(m.o)+"</p><p class='fs'>"+esc(m.j)+"</p></div>";
+  h+="<div class='fact'><p class='fh'>Cost to use</p><p class='fv'>"+esc(m.ship)+"</p><p class='fs'>"+esc(m.shipn)+"</p></div>";
+  h+="<div class='fact'><p class='fh'>Runs where</p><p class='fv'>"+esc(RUNLABEL[m.runc])+"</p><p class='fs'>"+esc(m.run)+"</p></div>";
+  h+="<div class='fact'><p class='fh'>Hosting routes</p><p class='fv'>"+esc(m.host)+"</p></div>";
+  h+="<div class='fact'><p class='fh'>Licence</p><p class='fv'>"+esc(m.l)+"</p><p class='fs'>Class: "+esc(m.lc)+"</p></div>";
+  h+="<div class='fact'><p class='fh'>Access and task</p><p class='fv'>"+esc(m.a)+"</p><p class='fs'>"
+    +esc(m.m)+" — "+esc(m.t)+"</p></div>";
+  h+="<div class='fact'><p class='fh'>Known adopters</p><p class='fv'>"
+    +(m.adc?esc(m.ad.join(", ")):"None publicly disclosed")+"</p>"
+    +(m.adc?"<p class='fs'>"+esc(m.adsrc)+"</p>":"<p class='fs'>No company or owner has stated this on the record.</p>")+"</div>";
+  h+="<div class='fact"+(m.fl?(m.fl==="alert"?" factflag":" factwatch"):"")+" wide'><p class='fh'>"
+    +(m.fl?"Supply-chain flag":"What it does")+"</p><p class='fv'>"+esc(m.fl?m.fn:m.d)+"</p>"
+    +(m.fl?"<p class='fs'>"+esc(m.d)+"</p>":"")+"</div>";
+  h+="</div>";
+  return h;
+}
+
+function bomPanel(m){
+  var html="<div class='bompanel'><p class='bomintro'><b>Generated skeletons for "+esc(m.n)
+    +".</b> Built from catalogued metadata only. Fields that cannot be inferred are marked UNRESOLVED or UNDISCLOSED rather than guessed. Complete each against the live model before treating it as a record.</p>";
+  for(var i=0;i<BOMS.length;i++){
+    var spec=BOMS[i],json=JSON.stringify(spec.fn(m),null,2);
+    var fname=slug(m.n)+"."+spec.k+".json";
+    html+="<div class='acc' data-bom='"+spec.k+"'><button type='button' aria-expanded='false'>"
+      +"<span class='tagm "+spec.tint+"'>"+spec.label+"</span>"
+      +"<span class='cap'>"+esc(spec.cap)+"</span><span class='chev'>&#9660;</span></button>"
+      +"<div class='inner'><pre>"+esc(json)+"</pre>"
+      +"<div class='dl'><button type='button' class='dlbtn' data-file='"+esc(fname)+"'>Download "+spec.label+" JSON</button></div>"
+      +"</div></div>";
+  }
+  var g=gapsFor(m);
+  html+="<div class='gaps'><b>What these skeletons cannot fill</b><ul>";
+  for(var k=0;k<g.length;k++){ html+="<li>"+esc(g[k])+"</li>"; }
+  html+="</ul></div>";
+  html+="<div class='dl'><button type='button' class='dlall'>Download all five as one bundle</button></div></div>";
+  return html;
+}
+
+function renderCatalog(){
+  var list=filtered(),html="";
+  for(var i=0;i<list.length;i++){
+    var m=list[i];
+    var own="<td class='own col-own'><span class='ent'>"+esc(m.o)+"</span><span class='jur'>"+esc(m.j)+"</span>";
+    if(m.fl){ own+="<span class='flagnote "+m.fl+"'>"+esc(m.fn)+"</span>"; }
+    own+="</td>";
+    var ad = m.adc
+      ? "<td class='adopt col-adopt'>"+esc(m.ad.join(", "))+"<span class='asrc'>"+esc(m.adsrc)+"</span></td>"
+      : "<td class='adopt col-adopt'><span class='none'>None publicly disclosed</span></td>";
+    var cost="<td class='cost col-cost'><span class='costbadge "+m.shipk+"'>"+esc(m.ship)+"</span>"
+      +"<span class='costnote'>"+esc(m.shipn)+"</span></td>";
+    var run="<td class='run col-run'><span class='runbadge "+m.runc+"'>"+esc(RUNLABEL[m.runc])+"</span><br>"
+      +esc(m.run)+"</td>";
+    var host="<td class='host col-host'>"+esc(m.host)+"</td>";
+    var isOpen = !!openBoms[m.idx];
+    html+="<tr class='mrow"+(isOpen?" expanded":"")+"' data-idx='"+m.idx+"'><td class='nm'>"+esc(m.n)+"</td>"+own+ad+cost+run+host
+      +"<td class='col-access'><span class='pill "+(m.a.indexOf("Open")===0?"open":"api")+"'>"+esc(m.a)+"</span></td>"
+      +"<td class='col-mod'>"+esc(m.m)+"</td><td class='col-task'>"+esc(m.t)+"</td>"
+      +"<td class='lic col-lic'><span class='licbadge "+m.lc.toLowerCase()+"'>"+esc(m.lc)+"</span>"
+      +"<span class='txt'>"+esc(m.l)+"</span></td>"
+      +"<td class='desc col-desc'>"+esc(m.d)+"</td>"
+      +"<td><button type='button' class='bombtn' data-idx='"+m.idx+"' aria-expanded='"+(isOpen?"true":"false")+"'>"
+      +(isOpen?"\u25B2 Close":"\u25BC Detail")+"</button></td></tr>";
+    if(isOpen){
+      html+="<tr class='bomrow' data-for='"+m.idx+"'><td colspan='12'><div class='bompanel'>"
+        +factsPanel(m)+"</div>"+bomPanel(m)+"</td></tr>";
+    }
+  }
+  rowsEl.innerHTML=html;
+  emptyEl.hidden=list.length!==0;
+  countEl.textContent=list.length+" of "+MODELS.length+" models";
+  var ths=document.querySelectorAll("th.sortable");
+  for(var t=0;t<ths.length;t++){
+    if(ths[t].getAttribute("data-key")===sortKey){
+      ths[t].setAttribute("aria-sort",sortDir===1?"ascending":"descending");
+      ths[t].querySelector(".ar").innerHTML = sortDir===1?"&#9650;":"&#9660;";
+    } else {
+      ths[t].removeAttribute("aria-sort");
+      ths[t].querySelector(".ar").innerHTML="&#9650;";
+    }
+  }
+}
+
+rowsEl.addEventListener("click",function(e){
+  var b=e.target.closest ? e.target.closest("button") : null;
+  if(!b) return;
+  if(b.classList.contains("bombtn")){
+    var idx=parseInt(b.getAttribute("data-idx"),10);
+    openBoms[idx]=!openBoms[idx];
+    renderCatalog();
+    return;
+  }
+  if(b.classList.contains("dlbtn")){
+    var acc=b.closest(".acc"), kind=acc.getAttribute("data-bom");
+    var trow=b.closest("tr.bomrow"); var mi=parseInt(trow.getAttribute("data-for"),10);
+    var mm=MODELS[mi];
+    for(var i=0;i<BOMS.length;i++){
+      if(BOMS[i].k===kind){ download(b.getAttribute("data-file"),JSON.stringify(BOMS[i].fn(mm),null,2)); }
+    }
+    return;
+  }
+  if(b.classList.contains("dlall")){
+    var tr2=b.closest("tr.bomrow"); var mi2=parseInt(tr2.getAttribute("data-for"),10);
+    var m2=MODELS[mi2],bundle={model:m2.n,owner:m2.o,jurisdiction:m2.j,
+      generated:nowISO(),status:"SKELETON BUNDLE — complete each artifact before use",
+      gaps:gapsFor(m2),artifacts:{}};
+    for(var j=0;j<BOMS.length;j++){ bundle.artifacts[BOMS[j].k]=BOMS[j].fn(m2); }
+    download(slug(m2.n)+".bom-bundle.json",JSON.stringify(bundle,null,2));
+    return;
+  }
+  var accBtn=b.closest(".acc");
+  if(accBtn && b.parentNode===accBtn){
+    var opened=accBtn.classList.toggle("open");
+    b.setAttribute("aria-expanded",opened?"true":"false");
+    b.querySelector(".chev").innerHTML = opened?"&#9650;":"&#9660;";
+  }
+});
+
+var sortThs=document.querySelectorAll("th.sortable");
+for(var s=0;s<sortThs.length;s++){
+  sortThs[s].addEventListener("click",function(){
+    var k=this.getAttribute("data-key");
+    if(sortKey===k){ sortDir=-sortDir; } else { sortKey=k; sortDir=1; }
+    renderCatalog();
+  });
+}
+
+qEl.addEventListener("input",renderCatalog);
+fAccess.addEventListener("change",renderCatalog);
+fJur.addEventListener("change",renderCatalog);
+fLic.addEventListener("change",renderCatalog);
+fFlag.addEventListener("change",renderCatalog);
+fAdopt.addEventListener("change",renderCatalog);
+fCost.addEventListener("change",renderCatalog);
+fRun.addEventListener("change",renderCatalog);
+
+/* ---- column visibility ---- */
+var ALLCOLS=["own","adopt","cost","run","host","access","mod","task","lic","desc"];
+var PRESETS={
+  essentials:["cost","run","access","lic"],
+  deployment:["cost","run","host","access","mod"],
+  governance:["own","cost","access","lic","adopt"],
+  all:ALLCOLS.slice()
+};
+var colPills=document.querySelectorAll(".colpill");
+function applyCols(on){
+  for(var i=0;i<ALLCOLS.length;i++){
+    document.body.classList.toggle("hide-"+ALLCOLS[i], on.indexOf(ALLCOLS[i])===-1);
+  }
+  for(var j=0;j<colPills.length;j++){
+    colPills[j].setAttribute("aria-pressed", on.indexOf(colPills[j].getAttribute("data-col"))!==-1?"true":"false");
+  }
+}
+function currentCols(){
+  var on=[];
+  for(var i=0;i<ALLCOLS.length;i++){
+    if(!document.body.classList.contains("hide-"+ALLCOLS[i])) on.push(ALLCOLS[i]);
+  }
+  return on;
+}
+for(var cp=0;cp<colPills.length;cp++){
+  colPills[cp].addEventListener("click",function(){
+    var c=this.getAttribute("data-col"),on=currentCols(),k=on.indexOf(c);
+    if(k===-1){ on.push(c); } else { on.splice(k,1); }
+    applyCols(on);
+  });
+}
+var presetBtns=document.querySelectorAll(".preset");
+for(var pb=0;pb<presetBtns.length;pb++){
+  presetBtns[pb].addEventListener("click",function(){
+    applyCols(PRESETS[this.getAttribute("data-preset")].slice());
+  });
+}
+
+/* ---- collapsible explanatory blocks ---- */
+function makeFoldable(){
+  var hosts=document.querySelectorAll(".card .body, .keynote");
+  for(var i=0;i<hosts.length;i++){
+    var h=hosts[i],head=h.querySelector(":scope > h3");
+    if(!head || head.classList.contains("fold")) continue;
+    if(h.children.length<2) continue;
+    head.classList.add("fold");
+    var ch=document.createElement("span");
+    ch.className="fchev"; ch.innerHTML="&#9650;";
+    head.appendChild(ch);
+    head.setAttribute("role","button");
+    head.setAttribute("tabindex","0");
+    head.setAttribute("aria-expanded","true");
+    head.addEventListener("click",function(){
+      var box=this.parentNode.classList.contains("keynote")?this.parentNode:this.parentNode;
+      var folded=box.classList.toggle("folded");
+      this.setAttribute("aria-expanded",folded?"false":"true");
+      this.querySelector(".fchev").innerHTML = folded?"&#9660;":"&#9650;";
+    });
+    head.addEventListener("keydown",function(e){
+      if(e.key==="Enter"||e.key===" "){ e.preventDefault(); this.click(); }
+    });
+  }
+}
+
+document.getElementById("expandAll").addEventListener("click",function(){
+  var list=filtered();
+  for(var i=0;i<list.length;i++){ openBoms[list[i].idx]=true; }
+  renderCatalog();
+});
+document.getElementById("collapseAll").addEventListener("click",function(){
+  openBoms={}; renderCatalog();
+});
+document.getElementById("exportCatalog").addEventListener("click",function(){
+  var out=[];
+  var list=filtered();
+  for(var i=0;i<list.length;i++){
+    var m=list[i];
+    out.push({name:m.n,hfRepoId:m.hf||null,apiModelId:m.api||null,
+      owner:m.o,jurisdiction:m.j,access:m.a,modality:m.m,task:m.t,
+      licence:m.l,licenceClass:m.lc,costClass:m.shipk,runsOn:m.runc,
+      hostingRoutes:m.host,supplyChainFlag:m.fl||null,supplyChainNote:m.fn||null,
+      disclosedAdopters:m.ad,adopterSource:m.adsrc||null});
+  }
+  download("models.json",JSON.stringify({
+    generated:nowISO(),source:"model-landscape-bom-atlas 6.0",
+    note:"Input for aibom_batch.py. hfRepoId values are unverified — the script resolves and reports failures.",
+    count:out.length,models:out},null,2));
+});
+document.getElementById("exportAllBoms").addEventListener("click",function(){
+  var list=filtered(),arr=[];
+  for(var i=0;i<list.length;i++){ arr.push(makeAibom(list[i])); }
+  download("aibom-skeletons.json",JSON.stringify({
+    generated:nowISO(),status:"SKELETON SET — resolve against live models before use",
+    count:arr.length,aiboms:arr},null,2));
+});
+
+document.getElementById("reset").addEventListener("click",function(){
+  qEl.value="";fAccess.value="";fJur.value="";fLic.value="";fFlag.value="";fAdopt.value="";
+  fCost.value="";fRun.value="";
+  sortKey="n";sortDir=1;openBoms={};
+  applyCols(ALLCOLS.slice());
+  renderCatalog();
+});
+
+var CHARTS={
+ "c-modality":[{l:"Text / NLP",v:58.1},{l:"Computer vision",v:21.2},{l:"Audio",v:15.1},{l:"Multimodal (derived)",v:5.6}],
+ "c-params":[{l:"Under 1B",v:83},{l:"1B to 100B",v:16},{l:"Above 100B",v:1}],
+ "c-conc":[{l:"Repos under 200 downloads",v:85.6},{l:"Downloads from top 1.5%",v:99.2},{l:"Repos carrying that traffic",v:1.5}],
+ "c-growth":[{l:"Spaces (apps)",v:44},{l:"Datasets",v:41},{l:"Model repos",v:22}],
+ "c-industry":[{l:"Technology / software",v:94},{l:"Financial services",v:87},{l:"Professional services",v:81},{l:"Telecommunications",v:78},{l:"Healthcare",v:67}],
+ "c-agents":[{l:"Banking & insurance",v:47},{l:"Cross-sector average",v:31},{l:"Healthcare",v:18},{l:"Government",v:14}]
+};
+var BAR_CLASS={
+ "c-modality":["b1","b2","b3","b4"],"c-params":["b1","b2","b3"],
+ "c-conc":["b2","b1","b3"],"c-growth":["b4","b2","b1"],
+ "c-industry":["b3","b3","b5","b5","b4"],"c-agents":["b3","b4","b5","b5"]
+};
+function drawCharts(){
+  for(var id in CHARTS){
+    if(!Object.prototype.hasOwnProperty.call(CHARTS,id)) continue;
+    var host=document.getElementById(id); if(!host) continue;
+    var data=CHARTS[id],cls=BAR_CLASS[id]||[],max=0;
+    for(var k=0;k<data.length;k++){ if(data[k].v>max) max=data[k].v; }
+    var out="";
+    for(var i=0;i<data.length;i++){
+      var pct=max?Math.round((data[i].v/max)*1000)/10:0;
+      out+="<div class='row'><div class='lab'>"+esc(data[i].l)+"</div>"
+        +"<div class='track'><div class='bar "+(cls[i]||"")+"' style='width:"+pct+"%'></div></div>"
+        +"<div class='val'>"+data[i].v+"%</div></div>";
+    }
+    host.innerHTML=out;
+  }
+}
+
+var refBody=document.getElementById("refbody"),refCount=document.getElementById("refcount"),activeTier="";
+function renderRefs(){
+  var html="",shown=0,total=0;
+  for(var i=0;i<REFS.length;i++){
+    var grp=REFS[i],inner="",n=0;
+    for(var j=0;j<grp.items.length;j++){
+      var it=grp.items[j]; total++;
+      if(activeTier && it.tier!==activeTier) continue;
+      n++; shown++;
+      inner+="<div class='refitem'><p class='rt'>"+esc(it.t)
+        +"<span class='tierchip "+it.tier.toLowerCase()+"'>"+esc(it.tier)+"</span></p>";
+      if(it.u){ inner+="<p class='ru'><a href='"+esc(it.u)+"' target='_blank' rel='noopener'>"+esc(it.u)+"</a></p>"; }
+      inner+="<p class='rs'>"+esc(it.s)+"</p></div>";
+    }
+    if(n===0) continue;
+    html+="<div class='refgroup'><div class='strip "+grp.tint+"'></div><div class='body'>"
+      +"<h3>"+esc(grp.g)+"</h3><p class='gnote'>"+esc(grp.note)+"</p>"
+      +"<p class='gplain'>"+esc(grp.plain)+"</p>"+inner+"</div></div>";
+  }
+  refBody.innerHTML=html || "<div class='card'><div class='body'><p class='covers'>No references in that category.</p></div></div>";
+  refCount.textContent=shown+" of "+total+" references";
+}
+var tierBtns=document.querySelectorAll(".tierbtn");
+for(var tb=0;tb<tierBtns.length;tb++){
+  tierBtns[tb].addEventListener("click",function(){
+    activeTier=this.getAttribute("data-tier");
+    for(var a=0;a<tierBtns.length;a++){ tierBtns[a].setAttribute("aria-pressed",tierBtns[a]===this?"true":"false"); }
+    renderRefs();
+  });
+}
+
+var tabs=document.querySelectorAll("nav.tabs button");
+for(var t2=0;t2<tabs.length;t2++){
+  tabs[t2].addEventListener("click",function(){
+    var target=this.getAttribute("data-panel");
+    for(var a=0;a<tabs.length;a++){ tabs[a].setAttribute("aria-selected",tabs[a]===this?"true":"false"); }
+    var panels=document.querySelectorAll("section.panel");
+    for(var b=0;b<panels.length;b++){ panels[b].classList.toggle("active",panels[b].id===target); }
+    window.scrollTo(0,0);
+  });
+}
+
+applyCols(PRESETS.essentials.slice());
+renderCatalog();
+drawCharts();
+renderRefs();
+makeFoldable();
+</script>
+</body>
+</html>
