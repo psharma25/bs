@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>An AI governance operating model — paved roads, not roadblocks</title>
+<style>
+:root{
+  --paper:#F6F4EF; --card:#FFFFFF; --card-2:#FBFAF7;
+  --ink:#17323F; --ink-2:#3E5A66; --muted:#7C8F97;
+  --petrol:#2F6B7A; --petrol-soft:#E4EEF0;
+  --sage:#6E9A88; --sage-soft:#E7EFEA;
+  --indigo:#767FA6; --indigo-soft:#EAEBF3;
+  --clay:#B0783F; --clay-soft:#F4EADD;
+  --slate:#8A8FA0; --slate-soft:#EDEEF2;
+  --rose:#A5707A; --rose-soft:#F3E7E8;
+  --gold:#BFA463; --gold-soft:#F3EEDF;
+  --line:#E2DED4; --line-2:#EFECE4;
+  --d:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --b:Inter,Calibri,"Segoe UI",system-ui,-apple-system,sans-serif;
+  --m:ui-monospace,"SFMono-Regular","Cascadia Mono",Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--b);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px 80px}
+svg.ic{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+svg.ic.lg{width:24px;height:24px}
+svg.ic.sm{width:14px;height:14px}
+
+/* ---------- masthead ---------- */
+.mast{padding:38px 0 22px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--m);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--petrol)}
+h1{font-family:var(--d);font-weight:400;font-size:clamp(28px,3.8vw,42px);line-height:1.08;letter-spacing:-.012em;margin:10px 0 0;max-width:20ch}
+h1 em{font-style:italic;color:var(--petrol)}
+.deck{max-width:72ch;margin:14px 0 0;color:var(--ink-2);font-size:14.5px;line-height:1.6}
+.deck b{font-weight:600;color:var(--ink)}
+
+/* ---------- tabs ---------- */
+.tabs{display:flex;gap:6px;margin:26px 0 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;padding:11px 16px;margin-bottom:-1px;
+  font-family:var(--m);font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);cursor:pointer}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{color:var(--petrol);border-bottom-color:var(--petrol)}
+.tab:focus-visible{outline:2px solid var(--petrol);outline-offset:2px;border-radius:3px}
+.panel[hidden]{display:none}
+
+/* ---------- section shell ---------- */
+.sec{margin:44px 0 0}
+.sec-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.num{font-family:var(--m);font-size:12px;color:var(--petrol);letter-spacing:.1em}
+h2{font-family:var(--d);font-weight:400;font-size:clamp(23px,2.7vw,30px);letter-spacing:-.01em;margin:0}
+.was{font-family:var(--m);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+.lede{color:var(--ink-2);max-width:74ch;margin:0 0 18px;font-size:14.5px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+.grid{display:grid;gap:14px}
+.note{background:var(--card-2);border:1px solid var(--line);border-left:3px solid var(--petrol);border-radius:8px;
+  padding:12px 14px;color:var(--ink-2);font-size:13.5px;margin-top:14px}
+.note b{color:var(--ink)}
+h3{font-family:var(--b);font-size:12px;font-weight:650;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-2);margin:0 0 10px}
+ul{margin:0;padding:0;list-style:none}
+li{font-size:13.4px;color:var(--ink-2);margin:0 0 6px;display:flex;gap:8px;align-items:flex-start;line-height:1.42}
+li .tick{color:var(--sage);flex:none;margin-top:2px}
+li .dot{width:4px;height:4px;border-radius:50%;background:var(--muted);flex:none;margin-top:8px}
+
+/* ---------- signature: operating loop ---------- */
+.loop{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px 20px 20px;position:relative;overflow:hidden}
+.loop-track{display:grid;grid-template-columns:repeat(9,1fr);gap:4px;position:relative}
+.loop-track.five{grid-template-columns:repeat(5,1fr);gap:10px}
+.loop-track.five .step-s{font-size:11.5px}
+.loop-track:before{content:"";position:absolute;left:5.5%;right:5.5%;top:26px;height:1px;background:var(--line);z-index:0}
+.step{position:relative;z-index:1;text-align:center;padding:0 2px;cursor:default}
+.dotmark{width:52px;height:52px;margin:0 auto 10px;border-radius:50%;background:var(--petrol-soft);border:1px solid #CFE0E3;
+  display:flex;align-items:center;justify-content:center;color:var(--petrol);transition:transform .25s ease,background .25s ease}
+.step:hover .dotmark{transform:translateY(-3px);background:#D6E6E9}
+.step-n{font-family:var(--m);font-size:9.5px;color:var(--muted);letter-spacing:.1em}
+.step-t{font-family:var(--b);font-size:11.5px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;margin:3px 0 3px}
+.step-s{font-size:11px;color:var(--muted);line-height:1.35}
+.loop-back{display:flex;align-items:center;gap:9px;justify-content:center;margin-top:18px;padding-top:14px;border-top:1px dashed var(--line);
+  font-family:var(--m);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--petrol)}
+
+/* ---------- accountability ---------- */
+.tierbar{border-radius:9px;padding:11px 14px;text-align:center;font-weight:650;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase}
+.tb1{background:var(--petrol);color:#fff}
+.tb2{background:#4A8394;color:#fff}
+.stack{display:grid;gap:9px}
+.row5{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}
+.row6{display:grid;grid-template-columns:repeat(6,1fr);gap:9px}
+.pill{background:var(--petrol-soft);border:1px solid #D3E2E5;border-radius:8px;padding:10px 8px;text-align:center;font-size:12px;font-weight:600;color:var(--ink)}
+.pill span{display:block;font-weight:400;font-size:10.5px;color:var(--muted);margin-top:2px}
+.pill.thin{background:var(--card-2);border-color:var(--line);font-weight:500}
+.minilabel{font-family:var(--m);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);margin:4px 0 -2px}
+.ln,.pill .ln{display:inline-block;font-family:var(--m);font-size:9.5px;font-weight:600;color:#fff;background:var(--petrol);
+  border-radius:4px;padding:1px 5px;margin:0 6px 0 0;letter-spacing:.04em;vertical-align:1px}
+.pill .ln{display:inline-block;margin:0 0 5px}
+.ln.la{background:var(--petrol)}.ln.lb{background:var(--sage)}.ln.lc{background:var(--indigo)}
+.ln.ld{background:var(--clay)}.ln.le{background:var(--slate)}
+.owners{display:grid;gap:8px}
+.owner{display:flex;gap:10px;align-items:flex-start;font-size:13.4px;color:var(--ink-2)}
+.owner b{color:var(--ink);font-weight:650}
+.split{display:grid;grid-template-columns:1fr 300px;gap:14px}
+
+/* ---------- inventory ---------- */
+.inv{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.inv-col{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:15px;border-top:3px solid var(--petrol)}
+.inv-col.c2{border-top-color:var(--sage)}
+.inv-col.c3{border-top-color:var(--indigo)}
+.inv-col.c4{border-top-color:var(--clay)}
+.inv-col.c5{border-top-color:var(--slate)}
+.inv-col h4{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:0 0 10px;color:var(--petrol)}
+.inv-col.c2 h4{color:#5A8874}.inv-col.c3 h4{color:var(--indigo)}.inv-col.c4 h4{color:var(--clay)}.inv-col.c5 h4{color:#6E7484}
+.subl{font-family:var(--m);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);
+  margin:12px 0 8px;padding-top:10px;border-top:1px solid var(--line-2)}
+.icons-row{display:flex;gap:9px;color:var(--muted);margin-top:12px;padding-top:11px;border-top:1px solid var(--line-2)}
+.register{margin-top:14px;background:var(--sage-soft);border:1px solid #D5E4DB;border-radius:11px;padding:16px 18px;text-align:center}
+.register .rt{font-family:var(--d);font-size:19px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:9px;color:var(--ink)}
+.fields{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
+.field{background:#fff;border:1px solid #D5E4DB;border-radius:999px;padding:4px 11px;font-size:11.5px;color:var(--ink-2);font-family:var(--m);letter-spacing:.02em}
+
+/* ---------- risk engine ---------- */
+.engine{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center}
+.factors{display:grid;gap:7px}
+.factor{display:flex;gap:10px;align-items:center;background:var(--card-2);border:1px solid var(--line-2);border-radius:8px;padding:8px 11px;font-size:13px;color:var(--ink-2)}
+.factor .ic{color:var(--petrol)}
+.orb{width:112px;height:112px;border-radius:50%;background:var(--petrol);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-family:var(--d);font-size:30px;letter-spacing:.02em;margin:0 auto;box-shadow:0 0 0 10px var(--petrol-soft)}
+.verdicts{display:grid;gap:9px}
+.verdict{border-radius:9px;padding:12px 14px;border:1px solid}
+.v-low{background:var(--sage-soft);border-color:#CFE0D6}
+.v-med{background:var(--gold-soft);border-color:#E6DCC0}
+.v-high{background:var(--rose-soft);border-color:#E7D2D5}
+.verdict b{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.v-low b{color:#4E7C67}.v-med b{color:#96803F}.v-high b{color:#8F5A64}
+.verdict span{font-size:12.5px;color:var(--ink-2)}
+
+/* ---------- tiers table ---------- */
+table{width:100%;border-collapse:collapse;font-size:13.2px}
+thead th{text-align:left;font-family:var(--m);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  font-weight:400;padding:0 12px 9px;border-bottom:1px solid var(--line)}
+tbody td{padding:13px 12px;border-bottom:1px solid var(--line-2);vertical-align:top;color:var(--ink-2)}
+tbody tr:last-child td{border-bottom:0}
+.tiercell{display:flex;gap:9px;align-items:center;font-weight:650;color:var(--ink);white-space:nowrap}
+.chip{width:9px;height:9px;border-radius:3px;flex:none}
+.c-t1{background:var(--sage)}.c-t2{background:var(--gold)}.c-t3{background:var(--clay)}.c-t4{background:var(--rose)}
+td.appr{font-weight:600;color:var(--ink)}
+
+/* ---------- lanes ---------- */
+.lanes{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.lane{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:15px}
+.lane-h{display:flex;align-items:center;gap:9px;margin-bottom:12px;padding-bottom:11px;border-bottom:1px solid var(--line-2)}
+.lane-h b{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase}
+.l-a{background:var(--petrol-soft)}.l-a .lane-h{color:var(--petrol)}
+.l-b{background:var(--sage-soft)}.l-b .lane-h{color:#4E7C67}
+.l-c{background:var(--indigo-soft)}.l-c .lane-h{color:#5F6890}
+.l-d{background:var(--clay-soft)}.l-d .lane-h{color:var(--clay)}
+.l-e{background:var(--slate-soft)}.l-e .lane-h{color:#6E7484}
+.lane li{font-size:12.5px;color:var(--ink-2)}
+
+/* ---------- flows ---------- */
+.flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.node{background:var(--card-2);border:1px solid var(--line);border-radius:9px;padding:12px 14px;text-align:center;flex:1;min-width:120px}
+.node .ic{color:var(--petrol);margin-bottom:6px}
+.node b{display:block;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink)}
+.node span{font-size:11.5px;color:var(--muted)}
+.arrow{color:var(--muted);flex:none}
+.pep{background:var(--petrol-soft);border:1px solid #CFE0E3;border-radius:11px;padding:15px;flex:2;min-width:250px}
+.pep h3{color:var(--petrol)}
+.exec{background:var(--sage-soft);border:1px solid #CFE0D6;color:#4E7C67}
+
+/* ---------- vendor ---------- */
+.q7{display:grid;grid-template-columns:repeat(8,1fr);gap:9px}
+.q{text-align:center;padding:12px 6px;background:var(--card-2);border:1px solid var(--line-2);border-radius:9px}
+.q .ic{color:var(--petrol)}
+.q span{display:block;font-size:11px;color:var(--ink-2);margin-top:7px;line-height:1.3}
+.boxes{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.bx{background:var(--clay-soft);border:1px solid #E8DCC9;border-radius:8px;padding:10px 8px;font-size:11px;color:#7C5527;text-align:center;line-height:1.32}
+.trig{background:var(--card-2);border:1px solid var(--line);border-radius:9px;padding:12px 14px;min-width:210px}
+
+/* ---------- shadow ---------- */
+.four{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;align-items:stretch}
+.decide{display:grid;gap:8px}
+.dec{border-radius:8px;padding:10px 12px;border:1px solid}
+.d-allow{background:var(--sage-soft);border-color:#CFE0D6}
+.d-coach{background:var(--gold-soft);border-color:#E6DCC0}
+.d-block{background:var(--rose-soft);border-color:#E7D2D5}
+.dec b{display:block;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase}
+.d-allow b{color:#4E7C67}.d-coach b{color:#96803F}.d-block b{color:#8F5A64}
+.dec span{font-size:11.5px;color:var(--ink-2)}
+
+/* ---------- lifecycle ---------- */
+.life{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.stage{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:15px;position:relative}
+.stage h4{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--petrol);margin:10px 0 10px}
+.stage .ic{color:var(--petrol)}
+.feedback{margin-top:12px;text-align:center;font-family:var(--m);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--petrol);
+  border:1px dashed #CFE0E3;border-radius:999px;padding:9px 14px}
+
+
+/* ---------- 09 pipeline ---------- */
+.pipe{display:flex;align-items:stretch;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 14px}
+.pstage{flex:1 1 0;min-width:0;padding:0 6px}
+.pdot{width:44px;height:44px;border-radius:50%;background:var(--petrol-soft);border:1px solid #CFE0E3;color:var(--petrol);
+  display:flex;align-items:center;justify-content:center;margin-bottom:11px}
+.pstage .pt{font-size:11.5px;font-weight:650;letter-spacing:.07em;text-transform:uppercase;color:var(--ink);margin-bottom:9px}
+.pstage li{font-size:12.5px}
+.parrow{flex:0 0 26px;display:flex;align-items:center;justify-content:center;color:#C9C3B6}
+.preturn{display:flex;align-items:center;gap:9px;justify-content:center;margin-top:12px;padding:10px 16px;
+  border:1px dashed #CFE0E3;border-radius:999px;color:var(--petrol);font-size:12.5px}
+.preturn .ic{flex:none}
+@media (max-width:900px){
+  .pipe{flex-direction:column;padding:18px}
+  .pstage{padding:0}
+  .parrow{flex:0 0 26px;justify-content:flex-start;padding-left:12px}
+  .parrow svg{transform:rotate(90deg)}
+}
+
+
+/* ---------- vendor chain & AI-BOM ---------- */
+.chain{display:flex;align-items:stretch;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 12px}
+.ch{flex:1 1 0;min-width:0;padding:0 8px}
+.ch .tier{font-family:var(--m);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.ch b{display:block;font-size:13px;color:var(--ink);margin-bottom:4px}
+.ch span{display:block;font-size:12px;color:var(--ink-2);line-height:1.4}
+.ch .need{margin-top:9px;padding-top:8px;border-top:1px dashed var(--line-2);font-size:11.5px;color:var(--petrol)}
+.ch.c-you b{color:var(--petrol)}
+.bomgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.bom{background:var(--card-2);border:1px solid var(--line-2);border-radius:8px;padding:10px 11px}
+.bom .ic{color:var(--petrol)}
+.bom b{display:block;font-size:12px;color:var(--ink);margin:5px 0 2px}
+.bom span{font-size:11.5px;color:var(--ink-2);line-height:1.35}
+@media (max-width:900px){.chain{flex-direction:column;padding:18px}.ch{padding:0}
+  .chain .parrow{flex:0 0 26px;justify-content:flex-start;padding-left:12px}
+  .chain .parrow svg{transform:rotate(90deg)}}
+@media (max-width:640px){.bomgrid{grid-template-columns:1fr}}
+
+/* ---------- assurance ---------- */
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.soc{width:100px;height:100px;border-radius:50%;background:var(--ink);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;font-size:11px;letter-spacing:.06em;line-height:1.3;margin:14px auto 0;font-family:var(--m)}
+
+/* ---------- approval ---------- */
+.appr-flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* ---------- framework map ---------- */
+.map th:first-child,.map td:first-child{width:20%}
+.tag{display:inline-block;font-family:var(--m);font-size:10.5px;letter-spacing:.02em;background:var(--petrol-soft);color:var(--petrol);
+  border:1px solid #D3E2E5;border-radius:5px;padding:2px 6px;margin:0 4px 4px 0}
+.tag.iso{background:var(--sage-soft);color:#4E7C67;border-color:#CFE0D6}
+.tag.eu{background:var(--indigo-soft);color:#5F6890;border-color:#DCDEEA}
+.tag.alt{background:var(--card-2);color:var(--ink-2);border-color:var(--line)}
+
+/* ---------- commitments ---------- */
+.commit{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:44px;padding-top:26px;border-top:1px solid var(--line)}
+.cm b{display:block;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--petrol);margin:9px 0 5px}
+.cm span{font-size:12.5px;color:var(--ink-2)}
+.cm .ic{color:var(--petrol)}
+footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+
+/* ---------- tooling tab ---------- */
+.tcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:12px}
+.tcard-h{display:flex;align-items:center;gap:11px;margin-bottom:13px;padding-bottom:11px;border-bottom:1px solid var(--line-2)}
+.tcard-h .p-n{background:var(--petrol)}
+.tcard-h h3{margin:0;font-size:12.5px;letter-spacing:.08em}
+.trow{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:start;padding:7px 0}
+.trow + .trow{border-top:1px dashed var(--line-2)}
+.tlabel{font-family:var(--m);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:4px;display:flex;gap:7px;align-items:flex-start}
+.tlabel .ic{color:var(--petrol);flex:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.c{display:inline-block;font-size:12px;background:var(--petrol-soft);border:1px solid #D3E2E5;color:var(--ink);border-radius:6px;padding:3px 9px;line-height:1.35}
+.c.os{background:transparent;border-style:dashed;border-color:var(--sage);color:#4E7C67}
+.c.own{background:var(--sage-soft);border-color:#CFE0D6;color:#4E7C67}
+.legend{display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--muted);margin:16px 0 4px}
+.legend .c{font-size:11px}
+.reg-paths{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.path{border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--card)}
+.path.p1{border-top:3px solid var(--sage)}
+.path.p2{border-top:3px solid var(--gold)}
+.path.p3{border-top:3px solid var(--petrol)}
+.path .when{font-family:var(--m);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.path h4{font-family:var(--d);font-weight:400;font-size:20px;margin:4px 0 10px}
+.path .tradeoff{font-size:12px;color:var(--muted);margin-top:11px;padding-top:10px;border-top:1px dashed var(--line-2)}
+.picker{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.pick{background:var(--card-2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;font-size:12.5px;color:var(--ink-2)}
+.pick b{display:block;color:var(--petrol);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.feeds{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.feed{background:var(--card-2);border:1px solid var(--line-2);border-radius:9px;padding:11px;text-align:center;font-size:11.5px;color:var(--ink-2)}
+.feed .ic{color:var(--petrol);margin-bottom:5px}
+.musts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.must{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--ink-2)}
+.must .ic{color:var(--sage);flex:none;margin-top:2px}
+
+
+/* ---------- provenance & framework tables ---------- */
+.scroller{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.prov{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pv{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;border-top:3px solid var(--petrol)}
+.pv.d2{border-top-color:var(--sage)}.pv.d3{border-top-color:var(--indigo)}.pv.d4{border-top-color:var(--clay)}
+.pv h4{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:650;letter-spacing:.07em;text-transform:uppercase;margin:0 0 4px;color:var(--ink)}
+.pv .ask{font-size:12.5px;color:var(--muted);margin:0}
+.pv .sig{font-family:var(--m);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:12px 0 7px;padding-top:10px;border-top:1px solid var(--line-2)}
+.evid{margin-top:11px;font-size:12px;color:var(--ink-2);background:var(--card-2);border:1px solid var(--line-2);border-radius:7px;padding:8px 10px}
+.evid b{font-family:var(--m);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--petrol);display:block;margin-bottom:2px}
+table.cov{font-size:12px;min-width:760px}
+table.cov thead th{padding:0 6px 8px;text-align:center}
+table.cov thead th:first-child{text-align:left;width:210px}
+table.cov td{padding:9px 6px;text-align:center;font-size:15px;line-height:1}
+table.cov td:first-child{text-align:left;font-size:12.5px;color:var(--ink)}
+.f{color:var(--sage)}.pt{color:var(--gold)}.n{color:#D9D4C8}
+.covkey{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:12px 0 0}
+.fwtab td:first-child{font-weight:650;color:var(--ink);width:19%}
+.fwtab .kind{font-family:var(--m);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--petrol);display:block;font-weight:400;margin-top:3px}
+.stack-l{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-top:14px}
+.sl{background:var(--card-2);border:1px solid var(--line);border-radius:9px;padding:12px}
+.sl b{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--petrol);margin-bottom:4px}
+.sl span{font-size:12px;color:var(--ink-2)}
+@media (max-width:1020px){.prov{grid-template-columns:1fr}.stack-l{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.stack-l{grid-template-columns:1fr}
+  table.cov,table.cov thead,table.cov tbody,table.cov tr,table.cov td,table.cov th{display:revert}
+  table.cov thead{display:table-header-group}}
+
+
+
+table.xw{font-size:12.5px}
+table.xw td{padding:8px 12px}
+table.xw td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
+tr.fnhead td{background:var(--petrol-soft);color:var(--petrol);font-family:var(--m);font-size:10.5px;letter-spacing:.11em;
+  text-transform:uppercase;padding:8px 12px;border-bottom:1px solid #D3E2E5}
+tr.fnhead.cross td{background:var(--sand);color:#7B6A4E;border-bottom-color:#DCD2BE}
+
+/* ---------- 14 framework tiers, bars, gaps ---------- */
+.tiers2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tcol{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.tcol.must{border-top:3px solid var(--petrol)}
+.tcol.nice{border-top:3px solid var(--sage)}
+.tch{display:flex;align-items:center;gap:8px;font-family:var(--m);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--petrol);margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line-2)}
+.tcol.nice .tch{color:#4E7C67}
+.fw{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:8px 0;border-bottom:1px dashed var(--line-2)}
+.fw:last-child{border-bottom:0}
+.fw b{font-size:13px;color:var(--ink)}
+.fw span{grid-column:1;font-size:12px;color:var(--ink-2)}
+.fw i{grid-row:1/3;align-self:center;font-style:normal;font-family:var(--m);font-size:10.5px;color:var(--muted);text-align:right;white-space:nowrap}
+.bars{display:grid;gap:9px}
+.bar{display:grid;grid-template-columns:170px 1fr 46px;gap:12px;align-items:center}
+.bl{font-size:12.5px;color:var(--ink)}
+.btrack{height:16px;background:var(--card-2);border:1px solid var(--line-2);border-radius:4px;overflow:hidden}
+.bfill{height:100%;background:var(--petrol);border-radius:3px 0 0 3px}
+.bfill.b2{background:#4A8394}.bfill.b3{background:var(--sage)}.bfill.b0{background:transparent}
+.bv{font-family:var(--m);font-size:12px;color:var(--ink);text-align:right}
+.bv.zero{color:var(--clay)}
+.gapgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.gp{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px}
+.gp b{display:block;font-size:12.5px;color:var(--ink);margin-bottom:4px}
+.gp span{display:block;font-size:11.5px;color:var(--ink-2);line-height:1.35;margin-bottom:9px}
+.gp i{font-style:normal;font-family:var(--m);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+  border-radius:5px;padding:2px 7px;display:inline-block}
+.gp i.none{background:var(--rose-soft);color:#8F5A64;border:1px solid #E7D2D5}
+.gp i.part{background:var(--gold-soft);color:#8A7538;border:1px solid #E6DCC0}
+@media (max-width:1020px){.tiers2{grid-template-columns:1fr}.gapgrid{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.gapgrid{grid-template-columns:1fr}.bar{grid-template-columns:120px 1fr 40px;gap:8px}.bl{font-size:11.5px}}
+
+
+
+.gp.red{border-color:#E2C6CA;background:var(--rose-soft)}
+.gp.red b{color:#8F5A64}
+.alarm{margin-top:14px;background:var(--rose-soft);border:1px solid #E2C6CA;border-left:3px solid var(--rose);
+  border-radius:10px;padding:15px 18px}
+.alarm-h{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:650;letter-spacing:.03em;color:#8F5A64;margin-bottom:9px}
+.alarm p{margin:0 0 9px;font-size:13px;color:var(--ink-2);line-height:1.55}
+.alarm p:last-child{margin-bottom:0}
+.alarm b{color:#8F5A64}
+
+/* ---------- third level + operate accordions ---------- */
+details.sub3{border:1px solid var(--line-2);border-radius:9px;background:var(--card-2);margin:12px 0}
+details.sub3 > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:11px 14px}
+details.sub3 > summary::-webkit-details-marker{display:none}
+.s3t{font-size:12.5px;font-weight:650;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2);flex:1}
+details.sub3 > summary:hover .s3t{color:var(--petrol)}
+details.sub3 > summary .chev{color:var(--muted);transition:transform .2s ease;flex:none}
+details.sub3[open] > summary .chev{transform:rotate(180deg)}
+.sub3body{padding:2px 14px 14px}
+details.grp.spine > summary{background:var(--sand)}
+details.grp.spine[open] > summary{border-bottom-color:#DCD2BE}
+details.grp.spine .gn{background:#7B6A4E}
+.role.bare,.dy.bare{border:0;padding:0;background:none}
+.role.bare h4{display:none}
+.role.bare .owns{display:none}
+.dy.bare .dhead{display:none}
+#p4 .grpbody > .lede:first-child{margin-top:10px}
+
+/* ---------- collapsible groups ---------- */
+details.grp{border:1px solid var(--line);border-radius:13px;background:var(--card);margin:14px 0;overflow:hidden}
+details.grp > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;padding:16px 20px;
+  background:var(--petrol-soft);border-bottom:1px solid transparent}
+details.grp[open] > summary{border-bottom-color:#D3E2E5}
+details.grp > summary::-webkit-details-marker{display:none}
+.gn{font-family:var(--m);font-size:12px;color:#fff;background:var(--petrol);border-radius:6px;padding:3px 9px;flex:none}
+.gt{font-family:var(--d);font-size:23px;color:var(--ink);letter-spacing:-.01em;flex:none}
+.gs{font-size:13px;color:var(--ink-2);flex:1;min-width:0}
+details.grp > summary .chev{color:var(--petrol);transition:transform .2s ease;flex:none}
+details.grp[open] > summary .chev{transform:rotate(180deg)}
+.grpbody{padding:6px 18px 18px}
+.xref{font-size:12.5px;color:var(--ink-2);background:var(--card-2);border:1px solid var(--line);border-left:3px solid var(--sage);
+  border-radius:8px;padding:10px 13px;margin:12px 0 4px}
+.xref a{color:var(--petrol)}
+
+details.sub{border-bottom:1px solid var(--line-2)}
+details.sub:last-child{border-bottom:0}
+details.sub > summary{list-style:none;cursor:pointer;display:flex;align-items:baseline;gap:12px;padding:15px 4px}
+details.sub > summary::-webkit-details-marker{display:none}
+details.sub > summary:hover .st{color:var(--petrol)}
+.sn{font-family:var(--m);font-size:11.5px;color:var(--petrol);flex:none;letter-spacing:.06em}
+.st{font-family:var(--d);font-size:19px;color:var(--ink);flex:none}
+.sw{font-size:12.5px;color:var(--muted);flex:1;min-width:0}
+details.sub > summary .chev{color:var(--muted);transition:transform .2s ease;flex:none;align-self:center}
+details.sub[open] > summary .chev{transform:rotate(180deg)}
+.subbody{padding:0 2px 20px}
+.subbody > .lede:first-child{margin-top:0}
+summary:focus-visible{outline:2px solid var(--petrol);outline-offset:-2px;border-radius:6px}
+a.step{text-decoration:none;color:inherit;display:block;border-radius:10px;padding:6px 2px;transition:background .2s ease}
+a.step:hover{background:var(--petrol-soft)}
+a.step:focus-visible{outline:2px solid var(--petrol);outline-offset:2px}
+.expander{display:flex;gap:8px;margin-top:14px}
+.expander button{font-family:var(--m);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--petrol);
+  background:none;border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+.expander button:hover{background:var(--petrol-soft)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:900px){.two{grid-template-columns:1fr}.gt{font-size:19px}.gs{display:none}}
+:target > summary{background:var(--sage-soft)}
+@media print{details{open:true}details > .grpbody,details > .subbody{display:block!important}
+  details.grp > summary,details.sub > summary{background:none}}
+.toolstrip{display:flex;gap:12px;align-items:flex-start;margin-top:14px;padding:12px 14px;background:var(--card-2);
+  border:1px solid var(--line);border-radius:9px}
+.toolstrip .tl{font-family:var(--m);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);padding-top:4px;flex:none}
+@media (max-width:640px){.toolstrip{flex-direction:column;gap:7px}}
+
+/* ---------- operate tab ---------- */
+table.rb td,table.raci td,table.rsk td{vertical-align:top}
+table.rb{min-width:900px}
+table.rb td:first-child b{color:var(--ink)}
+.acc{color:var(--petrol);font-weight:600}
+.sla{font-family:var(--m);font-size:11.5px;color:var(--ink-2)}
+.rk{color:var(--clay);font-size:12.5px}
+table.raci{min-width:820px;font-size:12.5px}
+table.raci thead th{text-align:center;font-size:9.5px;line-height:1.25}
+table.raci thead th:first-child{text-align:left;width:22%}
+table.raci td{text-align:center;color:var(--muted)}
+table.raci td:first-child{text-align:left;color:var(--ink);font-size:12.5px}
+.ra{display:inline-block;background:var(--petrol);color:#fff;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:700}
+table.rsk{min-width:720px}
+table.rsk td:first-child{width:36%}
+table.rsk td:nth-child(2){width:60px;text-align:center}
+.cad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.cd{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:15px;border-left:3px solid var(--petrol)}
+.cd.ev{border-left-color:var(--clay);background:var(--card-2)}
+.cad-h{font-family:var(--m);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--petrol);margin-bottom:10px}
+.cd.ev .cad-h{color:var(--clay)}
+.who{margin-top:11px;padding-top:9px;border-top:1px dashed var(--line-2);font-size:11.5px;color:var(--muted)}
+.roles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.role{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:16px}
+.role h4{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;margin:0 0 8px;color:var(--ink)}
+.role h4 .ic{color:var(--petrol)}
+.owns{font-size:12.5px;color:var(--petrol);margin-bottom:11px;padding-bottom:10px;border-bottom:1px solid var(--line-2)}
+.esc{margin-top:11px;padding-top:10px;border-top:1px dashed var(--line-2);font-size:12px;color:var(--muted)}
+.days{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.dy{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:16px}
+.dhead{font-family:var(--d);font-size:19px;margin-bottom:11px;color:var(--ink)}
+@media (max-width:1020px){.cad,.roles,.days{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.cad,.roles,.days{grid-template-columns:1fr}
+  table.rb,table.raci,table.rsk{display:table}
+  table.rb thead,table.raci thead,table.rsk thead{display:table-header-group}
+  table.rb tr,table.raci tr,table.rsk tr{display:table-row}
+  table.rb td,table.raci td,table.rsk td,table.rb th,table.raci th,table.rsk th{display:table-cell}}
+
+/* ---------- as-is tab ---------- */
+.asis-note{background:var(--card-2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;color:var(--ink-2);font-size:13.5px;margin:26px 0 0}
+.asis{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.p{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:17px}
+.p.wide{grid-column:1/-1}
+.p-h{display:flex;align-items:center;gap:10px;margin-bottom:13px}
+.p-n{width:23px;height:23px;border-radius:6px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-family:var(--m);font-size:11.5px;flex:none}
+.p-h h3{margin:0;font-size:12.5px;letter-spacing:.08em;color:var(--ink)}
+.sub{font-size:12.5px;color:var(--muted);margin:-7px 0 12px}
+.mini{display:grid;gap:10px}
+.mini h5{margin:0 0 6px;font-size:10.5px;font-family:var(--m);letter-spacing:.1em;text-transform:uppercase;color:var(--petrol);font-weight:400}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cols3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+
+@media (max-width:1020px){
+  .inv,.lanes,.life,.commit{grid-template-columns:repeat(2,1fr)}
+  .loop-track{grid-template-columns:repeat(3,1fr);gap:16px}
+  .loop-track:before{display:none}
+  .q7{grid-template-columns:repeat(4,1fr)}
+  .boxes{grid-template-columns:repeat(3,1fr)}
+  .four,.three,.row5,.row6{grid-template-columns:1fr 1fr}
+  .split,.engine{grid-template-columns:1fr}
+  .asis,.cols3,.cols4{grid-template-columns:1fr 1fr}
+  .reg-paths,.picker,.musts{grid-template-columns:1fr}
+  .feeds{grid-template-columns:repeat(2,1fr)}
+  .trow{grid-template-columns:1fr;gap:6px}
+}
+@media (max-width:640px){
+  .inv,.lanes,.life,.commit,.four,.three,.row5,.row6,.asis,.cols2,.cols3,.cols4{grid-template-columns:1fr}
+  .loop-track{grid-template-columns:repeat(2,1fr)}
+  .q7,.boxes{grid-template-columns:repeat(2,1fr)}
+  table,thead,tbody,tr,td,th{display:block}
+  thead{display:none}
+  tbody tr{border-bottom:1px solid var(--line);padding:6px 0}
+  tbody td{border:0;padding:5px 0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media print{
+  body{background:#fff}.tabs{display:none}.panel[hidden]{display:block!important}
+  .sec{break-inside:avoid}.card,.p{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<svg style="display:none" aria-hidden="true">
+<defs>
+<symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5"/><path d="M16 6.2a3 3 0 010 5.6M18 20c0-2.4-1-4-2.5-4.7"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></symbol>
+<symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 4v16M6 8h12M4 8l-2 5h4zM20 8l-2 5h4z"/><path d="M8 20h8"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3L5 14h6l-1 7 8-11h-6z"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3M15 12v2"/></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a4 4 0 006 .5l2-2a4 4 0 00-5.7-5.7l-1 1"/><path d="M14 11a4 4 0 00-6-.5l-2 2A4 4 0 009.7 18l1-1"/></symbol>
+<symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 000-8 5.5 5.5 0 00-10.6 1.5A3.5 3.5 0 007 18z"/></symbol>
+<symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></symbol>
+<symbol id="i-brain" viewBox="0 0 24 24"><path d="M12 5a3 3 0 00-5.7 1.3A3 3 0 005 12a3 3 0 002 5.7A2.6 2.6 0 0012 19zM12 5a3 3 0 015.7 1.3A3 3 0 0119 12a3 3 0 01-2 5.7"/><path d="M12 5v14"/></symbol>
+<symbol id="i-api" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="3"/><path d="M7 12h2M11 12h2M15 12h2"/></symbol>
+<symbol id="i-mask" viewBox="0 0 24 24"><path d="M3 11h18M5 11c0-2 1-4 3-4s3 1 4 1 2-1 4-1 3 2 3 4"/><circle cx="8" cy="15" r="2.5"/><circle cx="16" cy="15" r="2.5"/></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c2.5 2.6 2.5 12.4 0 16M12 4c-2.5 2.6-2.5 12.4 0 16"/></symbol>
+<symbol id="i-robot" viewBox="0 0 24 24"><rect x="5" y="8" width="14" height="11" rx="3"/><path d="M12 5v3M9 5h6"/><circle cx="9.5" cy="13" r="1"/><circle cx="14.5" cy="13" r="1"/><path d="M2 13v3M22 13v3"/></symbol>
+<symbol id="i-wrench" viewBox="0 0 24 24"><path d="M15 4a5 5 0 00-4.6 7L4 17.4 6.6 20l6.4-6.4A5 5 0 1015 4z"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.4-3 8-7 10-4-2-7-5.6-7-10V6z"/></symbol>
+<symbol id="i-shieldcheck" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.4-3 8-7 10-4-2-7-5.6-7-10V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M10 9l5 3-5 3z"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M16 16l4 4"/></symbol>
+<symbol id="i-clip" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM8 12h8M8 16h5"/></symbol>
+<symbol id="i-gauge" viewBox="0 0 24 24"><path d="M4 17a8 8 0 1116 0"/><path d="M12 17l4-5"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6"/></symbol>
+<symbol id="i-checkc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8 12.2l2.6 2.6L16 9.4"/></symbol>
+<symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M9 21h6M12 17v4"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17.2v.1"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0113.7-5.7L20 8"/><path d="M20 4v4h-4"/><path d="M20 12a8 8 0 01-13.7 5.7L4 16"/><path d="M4 20v-4h4"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="M9 7l-5 5 5 5M15 7l5 5-5 5"/></symbol>
+<symbol id="i-cog" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></symbol>
+<symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 19V5M4 19h16"/><path d="M8 15l4-5 3 3 4-6"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></symbol>
+<symbol id="i-cap" viewBox="0 0 24 24"><path d="M2 9l10-4 10 4-10 4z"/><path d="M6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></symbol>
+<symbol id="i-net" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="18" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="M12 7.5v4M12 11.5L6.5 16M12 11.5L17.5 16"/></symbol>
+<symbol id="i-git" viewBox="0 0 24 24"><circle cx="7" cy="6" r="2.5"/><circle cx="7" cy="18" r="2.5"/><circle cx="17" cy="10" r="2.5"/><path d="M7 8.5v7M17 12.5c0 3-4 2.5-7 3.5"/></symbol>
+<symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M6 14h4"/></symbol>
+<symbol id="i-browser" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18M6.5 7h.1M9 7h.1"/></symbol>
+<symbol id="i-box" viewBox="0 0 24 24"><path d="M12 3l8 4.2v9.6L12 21l-8-4.2V7.2z"/><path d="M4 7.2l8 4.3 8-4.3M12 11.5V21"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.8-6 10-6 10 6 10 6-3.8 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/></symbol>
+<symbol id="i-binoc" viewBox="0 0 24 24"><circle cx="6" cy="16" r="3.5"/><circle cx="18" cy="16" r="3.5"/><path d="M9.5 16h5M6 12.5V6h3v6.5M18 12.5V6h-3v6.5"/></symbol>
+<symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></symbol>
+<symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 9l9-5 9 5H3z"/><path d="M5 9v8M10 9v8M14 9v8M19 9v8M3 20h18"/></symbol>
+<symbol id="i-chev" viewBox="0 0 24 24"><path d="M8 10l4 4 4-4"/></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M14 7l5 5-5 5"/></symbol>
+<symbol id="i-arrowback" viewBox="0 0 24 24"><path d="M20 12H5M10 7l-5 5 5 5"/></symbol>
+<symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 5h12l-2 4 2 4H5"/></symbol>
+<symbol id="i-lamp" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a5.5 5.5 0 00-3 10v2h6v-2a5.5 5.5 0 00-3-10z"/></symbol>
+<symbol id="i-hand" viewBox="0 0 24 24"><path d="M3 12l4-3 5 3 4-2 5 4"/><path d="M3 12v3l5 4h9l4-4v-3"/></symbol>
+</defs>
+</svg>
+
+<div class="wrap">
+
+<header class="mast">
+  <div class="eyebrow">Paved roads, not roadblocks</div>
+  <h1>An AI governance <em>operating model</em></h1>
+  <p class="deck">Most AI governance arrives as a policy nobody can act on. This one starts at the other end &mdash; the operating model that runs every day, the people accountable for it, and one register everything else hangs off. <b>Govern AI like any other critical capability: proportionate, risk-based, automated where it can be, accountable always.</b></p>
+
+  <div class="tabs" role="tablist" aria-label="Views">
+    <button class="tab" id="t1" role="tab" aria-selected="true" aria-controls="p1">Principles &amp; Practice</button>
+    <button class="tab" id="t4" role="tab" aria-selected="false" aria-controls="p4">Operate</button>
+  </div>
+</header>
+
+<!-- ============================ TAB 1 ============================ -->
+<div class="panel" id="p1" role="tabpanel" aria-labelledby="t1">
+<div class="expander" style="margin:26px 0 0"><button type="button" class="xall">Expand all</button><button type="button" class="call">Collapse all</button></div>
+
+<!-- SPINE -->
+<details class="grp spine" id="spine" open>
+  <summary><span class="gn">01</span><span class="gt">The operating model</span><span class="gs">Five moves &middot; everything below sits under one of them</span><svg class="ic chev"><use href="#i-chev"/></svg></summary>
+  <div class="grpbody">
+  <p class="lede">Each move is a section below. Select one to jump to it.</p>
+  <div class="loop">
+    <div class="loop-track five">
+      <a class="step" href="#g1"><div class="dotmark"><svg class="ic lg"><use href="#i-binoc"/></svg></div><div class="step-n">1</div><div class="step-t">Discover</div><div class="step-s">Find it, register it, name an owner</div></a>
+      <a class="step" href="#g2"><div class="dotmark"><svg class="ic lg"><use href="#i-gauge"/></svg></div><div class="step-n">2</div><div class="step-t">Decide</div><div class="step-s">Tier the risk, approve or refuse</div></a>
+      <a class="step" href="#g3"><div class="dotmark"><svg class="ic lg"><use href="#i-shield"/></svg></div><div class="step-n">3</div><div class="step-t">Control</div><div class="step-s">Apply the guardrails the tier demands</div></a>
+      <a class="step" href="#g4"><div class="dotmark"><svg class="ic lg"><use href="#i-chart"/></svg></div><div class="step-n">4</div><div class="step-t">Monitor</div><div class="step-s">Watch, detect, contain, recover</div></a>
+      <a class="step" href="#g5"><div class="dotmark"><svg class="ic lg"><use href="#i-shieldcheck"/></svg></div><div class="step-n">5</div><div class="step-t">Assure</div><div class="step-s">Test, evidence, learn, strengthen</div></a>
+    </div>
+    <div class="loop-back"><svg class="ic sm"><use href="#i-arrowback"/></svg> What Assure learns changes what Discover looks for</div>
+  </div>
+  <div class="toolstrip"><span class="tl">Tools</span><div class="chips"><span class="c">ServiceNow AI Control Tower</span><span class="c">IBM watsonx.governance</span><span class="c">Credo AI</span><span class="c">OneTrust</span><span class="c">Holistic AI</span><span class="c">Vanta</span><span class="c">Drata</span></div></div>
+  <div class="expander"><button type="button" class="xall">Expand all</button><button type="button" class="call">Collapse all</button></div>
+</div>
+</details>
+
+
+<details open class="grp" id="g0">
+  <summary><span class="gn">&#8226;</span><span class="gt">Accountable throughout</span><span class="gs">Cross-cutting &mdash; applies to all five moves</span><svg class="ic chev"><use href="#i-chev"/></svg></summary>
+  <div class="grpbody">
+<details open class="sub" id="s0-1">
+  <summary><span class="sn">0.1</span><span class="st">Who owns what</span><span class="sw">Lane owners &amp; the council</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+  <p class="lede">A model with no owner is an incident with a delay. Name the owner before the use case ships.</p>
+  <div class="split">
+    <div class="card">
+      <div class="stack">
+        <div class="tierbar tb1"><svg class="ic sm" style="vertical-align:-2px"><use href="#i-bank"/></svg> &nbsp;Board / Risk Committee</div>
+        <div class="tierbar tb2">Executive AI Risk Council</div>
+        <div class="row5">
+          <div class="pill">CISO<span>Security</span></div>
+          <div class="pill">CIO / CTO<span>Technology</span></div>
+          <div class="pill">Legal<span>Interpretation</span></div>
+          <div class="pill">Privacy<span>Data</span></div>
+          <div class="pill">Business<span>Product owners</span></div>
+        </div>
+        <div class="tierbar tb2" style="background:#5E93A2">AI Security</div>
+        <div class="minilabel">Lane owners &mdash; one named owner per AI population in the inventory</div>
+        <div class="row5">
+          <div class="pill"><span class="ln la">A</span>Enterprise AI<span>Copilots, assistants, productivity</span></div>
+          <div class="pill"><span class="ln lb">B</span>Product AI<span>Customer-facing, RAG, models</span></div>
+          <div class="pill"><span class="ln lc">C</span>Agentic AI<span>Tools, actions, workflows</span></div>
+          <div class="pill"><span class="ln ld">D</span>Vendor AI<span>SaaS, APIs, managed services</span></div>
+          <div class="pill"><span class="ln le">E</span>Shadow AI<span>Browser tools, free SaaS</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Who owns what</h3>
+      <div class="owners">
+        <div class="owner"><svg class="ic"><use href="#i-person"/></svg><div><b>Business / product owner</b> owns the AI risk.</div></div>
+        <div class="owner"><svg class="ic"><use href="#i-shield"/></svg><div><b>Security</b> reduces it.</div></div>
+        <div class="owner"><svg class="ic"><use href="#i-scale"/></svg><div><b>Legal</b> interprets it.</div></div>
+        <div class="owner"><svg class="ic"><use href="#i-lock"/></svg><div><b>Privacy</b> governs the data.</div></div>
+        <div class="owner"><svg class="ic"><use href="#i-code"/></svg><div><b>Engineering</b> builds it.</div></div>
+        <div class="owner"><svg class="ic"><use href="#i-clip"/></svg><div><b>GRC</b> provides governance and evidence.</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="toolstrip"><span class="tl">Tools</span><div class="chips"><span class="c own">Entra ID groups</span><span class="c">Okta</span><span class="c own">ServiceNow assignment groups</span><span class="c own">Confluence RACI</span></div></div>
+  </div>
+</details>
+</div>
+</details>
+
+
+<details open class="grp" id="g1">
+  <summary><span class="gn">1</span><span class="gt">Discover</span><span class="gs">Find it, register it, name an owner</span><svg class="ic chev"><use href="#i-chev"/></svg></summary>
+  <div class="grpbody">
+<details open class="sub" id="s1-1">
+  <summary><span class="sn">1.1</span><span class="st">The AI inventory and its register</span><span class="sw">Five populations &middot; A&ndash;E</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+  <p class="lede">You cannot govern what you don't know &mdash; and what you know needs different guardrails depending on how it reaches a person. What's in each population, and what you apply to it, in one view. Lettered A&ndash;E, and the same five carry through accountability (02) and tooling.</p>
+  <div class="inv">
+
+    <div class="inv-col"><h4><span class="ln la">A</span>Enterprise AI</h4>
+      <ul>
+        <li><span class="dot"></span>Copilots (M365, Google)</li><li><span class="dot"></span>ChatGPT / Claude</li>
+        <li><span class="dot"></span>Coding assistants</li><li><span class="dot"></span>HR / Finance AI</li><li><span class="dot"></span>Productivity tools</li></ul>
+      <div class="subl">Controls</div>
+      <ul>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Identity &amp; access</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>Acceptable use</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Data classification</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>Retention</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Connectors / plugins</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>DLP &amp; logging</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Monitoring</li></ul>
+      <div class="icons-row"><svg class="ic"><use href="#i-person"/></svg><svg class="ic"><use href="#i-doc"/></svg><svg class="ic"><use href="#i-brain"/></svg><svg class="ic"><use href="#i-code"/></svg></div></div>
+
+    <div class="inv-col c2"><h4><span class="ln lb">B</span>Product AI</h4>
+      <ul>
+        <li><span class="dot"></span>Product LLMs</li><li><span class="dot"></span>RAG / vector DB</li>
+        <li><span class="dot"></span>ML models</li><li><span class="dot"></span>AI features</li><li><span class="dot"></span>Customer facing AI</li></ul>
+      <div class="subl">Controls</div>
+      <ul>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>AI gateway</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>Input validation</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Prompt protection</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>RAG security</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Model management</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>Output controls</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Observability</li></ul>
+      <div class="icons-row"><svg class="ic"><use href="#i-db"/></svg><svg class="ic"><use href="#i-net"/></svg><svg class="ic"><use href="#i-brain"/></svg></div></div>
+
+    <div class="inv-col c3"><h4><span class="ln lc">C</span>Agentic AI</h4>
+      <ul>
+        <li><span class="dot"></span>AI agents</li><li><span class="dot"></span>Tool calling</li>
+        <li><span class="dot"></span>API actions</li><li><span class="dot"></span>Autonomous workflows</li></ul>
+      <div class="subl">Controls</div>
+      <ul>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Agent identity</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>Tools &amp; actions</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Permissions</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>Human approval</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Least privilege</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>Kill switch</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Audit / logging</li></ul>
+      <div class="icons-row"><svg class="ic"><use href="#i-robot"/></svg><svg class="ic"><use href="#i-wrench"/></svg></div></div>
+
+    <div class="inv-col c4"><h4><span class="ln ld">D</span>Vendor AI</h4>
+      <ul>
+        <li><span class="dot"></span>SaaS with AI</li><li><span class="dot"></span>Vendor copilots</li>
+        <li><span class="dot"></span>APIs / models</li><li><span class="dot"></span>Managed AI services</li></ul>
+      <div class="subl">Controls</div>
+      <ul>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Model &amp; data</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>Training / retention</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Subprocessors</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>Security testing</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>AI change management</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>Incident notification</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Contractual controls</li></ul>
+      <div class="icons-row"><svg class="ic"><use href="#i-cloud"/></svg><svg class="ic"><use href="#i-api"/></svg></div></div>
+
+    <div class="inv-col c5"><h4><span class="ln le">E</span>Shadow AI</h4>
+      <ul>
+        <li><span class="dot"></span>Browser tools</li><li><span class="dot"></span>Free SaaS</li>
+        <li><span class="dot"></span>Unsanctioned LLMs</li><li><span class="dot"></span>Unapproved uploads</li></ul>
+      <div class="subl">Controls</div>
+      <ul>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Discover</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>Classify risk</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Coach / approve</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>Block if needed</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Provide alternatives</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>Monitor usage</li></ul>
+      <div class="icons-row"><svg class="ic"><use href="#i-mask"/></svg><svg class="ic"><use href="#i-browser"/></svg></div></div>
+
+  </div>
+  <div class="register">
+    <div class="rt"><svg class="ic lg"><use href="#i-db"/></svg> AI Register &mdash; the system of record</div>
+    <div class="fields">
+      <span class="field">Owner</span><span class="field">Business use</span><span class="field">Users</span><span class="field">Model</span>
+      <span class="field">Data</span><span class="field">Vendor</span><span class="field">RAG?</span><span class="field">Agent?</span>
+      <span class="field">Tools / actions</span><span class="field">External exposure</span><span class="field">Decision impact</span>
+      <span class="field">Risk tier</span><span class="field">Controls</span><span class="field">Approval</span><span class="field">Monitoring</span>
+    </div>
+  </div>
+  <div class="note">Same principles across all five. Different controls, because the way the AI reaches a person is different.</div>
+  <div class="toolstrip"><span class="tl">Discovery tools</span><div class="chips"><span class="c">Wiz AI-SPM</span><span class="c">Orca</span><span class="c">Prisma Cloud AI-SPM</span><span class="c own">Defender for Cloud Apps</span><span class="c">Netskope One</span><span class="c">Nudge Security</span><span class="c">SailPoint</span><span class="c">JFrog AI Catalog</span><span class="c os">MLflow</span></div></div>
+
+
+<details open class="sub3"><summary><span class="s3t">What runs the register</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+<div class="sub3body">
+  <p class="lede">The register is the one thing that must exist before anything else works. Three honest paths — start where you are, not where you want to be.</p>
+
+  <div class="reg-paths">
+    <div class="path p1">
+      <div class="when">Under ~50 AI systems</div>
+      <h4>Spreadsheet</h4>
+      <div class="chips">
+        <span class="c">SharePoint list</span><span class="c">Excel</span><span class="c">Airtable</span>
+        <span class="c">Notion DB</span><span class="c">Google Sheets</span>
+      </div>
+      <div class="tradeoff">Live in a week. No workflow, no evidence trail, no audit history.</div>
+    </div>
+    <div class="path p2">
+      <div class="when">~50–300 · approvals needed</div>
+      <h4>Your ITSM / GRC</h4>
+      <div class="chips">
+        <span class="c">ServiceNow CMDB class + IRM</span><span class="c">Jira + Confluence</span>
+        <span class="c">Power Apps + Dataverse</span><span class="c">Archer</span><span class="c">LogicGate</span>
+        <span class="c">Vanta / Drata custom objects</span>
+      </div>
+      <div class="tradeoff">Reuses your approval engine and CMDB. Configuration effort, no AI-specific content.</div>
+    </div>
+    <div class="path p3">
+      <div class="when">Regulated · auditor coming</div>
+      <h4>AI governance platform</h4>
+      <div class="chips">
+        <span class="c">ServiceNow AI Control Tower</span><span class="c">IBM watsonx.governance</span>
+        <span class="c">Credo AI</span><span class="c">OneTrust AI Governance</span><span class="c">Holistic AI</span>
+        <span class="c">Modulos</span><span class="c">Collibra</span><span class="c">Dataiku Govern</span>
+        <span class="c">Databricks Unity Catalog</span>
+      </div>
+      <div class="tradeoff">Pre-built EU AI Act / ISO 42001 / NIST evidence. Cost, and a new platform to run.</div>
+    </div>
+  </div>
+
+  <div class="picker">
+    <div class="pick"><b>Choose by</b>Volume — under 50, a list beats a platform.</div>
+    <div class="pick"><b>Choose by</b>Workflow — if approvals must route, use ITSM.</div>
+    <div class="pick"><b>Choose by</b>Evidence — if an auditor is dated, buy the platform.</div>
+  </div>
+</div>
+</details>
+
+<details open class="sub3"><summary><span class="s3t">What fills it automatically</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+<div class="sub3body">
+  <p class="lede">A hand-typed register is stale in a month. Wire the feeds first, the fields second.</p>
+  <div class="feeds">
+    <div class="feed"><svg class="ic lg"><use href="#i-cloud"/></svg>CASB / SSE<br>usage</div>
+    <div class="feed"><svg class="ic lg"><use href="#i-shield"/></svg>AI-SPM<br>cloud models</div>
+    <div class="feed"><svg class="ic lg"><use href="#i-key"/></svg>IdP app<br>registrations</div>
+    <div class="feed"><svg class="ic lg"><use href="#i-card"/></svg>Expense &amp;<br>procurement</div>
+    <div class="feed"><svg class="ic lg"><use href="#i-db"/></svg>Model<br>registry</div>
+    <div class="feed"><svg class="ic lg"><use href="#i-git"/></svg>Repos &amp;<br>artifacts</div>
+    <div class="feed"><svg class="ic lg"><use href="#i-api"/></svg>AI gateway<br>logs</div>
+    <div class="feed"><svg class="ic lg"><use href="#i-clip"/></svg>Intake<br>form</div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <h3>Non-negotiable fields</h3>
+    <div class="musts">
+      <div class="must"><svg class="ic sm"><use href="#i-check"/></svg>One named human owner</div>
+      <div class="must"><svg class="ic sm"><use href="#i-check"/></svg>Stable unique ID</div>
+      <div class="must"><svg class="ic sm"><use href="#i-check"/></svg>Risk tier + date set</div>
+      <div class="must"><svg class="ic sm"><use href="#i-check"/></svg>Link to CMDB / vendor record</div>
+      <div class="must"><svg class="ic sm"><use href="#i-check"/></svg>Evidence attachments</div>
+      <div class="must"><svg class="ic sm"><use href="#i-check"/></svg>Change history</div>
+    </div>
+    <div class="note">If it has no owner, it isn't registered — it's just listed.</div>
+  </div></div>
+</details>
+
+  </div>
+</details>
+
+<details open class="sub" id="s1-2">
+  <summary><span class="sn">1.2</span><span class="st">Shadow AI</span><span class="sw">What discovery turns up that nobody declared</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+  <p class="lede">People reach for shadow AI because the approved path is slower. Fix the path, not just the policy.</p>
+  <div class="four">
+    <div class="card"><h3>Signals</h3><ul>
+      <li><svg class="ic sm" style="color:var(--petrol)"><use href="#i-key"/></svg>SSO / identity</li>
+      <li><svg class="ic sm" style="color:var(--petrol)"><use href="#i-cloud"/></svg>CASB / SSE</li>
+      <li><svg class="ic sm" style="color:var(--petrol)"><use href="#i-browser"/></svg>Browser / DNS</li>
+      <li><svg class="ic sm" style="color:var(--petrol)"><use href="#i-card"/></svg>Expense / cards</li>
+      <li><svg class="ic sm" style="color:var(--petrol)"><use href="#i-db"/></svg>Cloud accounts</li>
+      <li><svg class="ic sm" style="color:var(--petrol)"><use href="#i-git"/></svg>Git repos / code</li>
+      <li><svg class="ic sm" style="color:var(--petrol)"><use href="#i-net"/></svg>Network / proxy</li></ul></div>
+    <div class="card"><h3>Discovery &amp; classification</h3><ul>
+      <li><svg class="ic sm tick"><use href="#i-check"/></svg>Identify tools</li>
+      <li><svg class="ic sm tick"><use href="#i-check"/></svg>Assess risk</li>
+      <li><svg class="ic sm tick"><use href="#i-check"/></svg>Map data flow</li>
+      <li><svg class="ic sm tick"><use href="#i-check"/></svg>User impact</li></ul></div>
+    <div class="card"><h3>Decision</h3><div class="decide">
+      <div class="dec d-allow"><b>Allow</b><span>Low risk</span></div>
+      <div class="dec d-coach"><b>Coach</b><span>Move to an approved tool</span></div>
+      <div class="dec d-block"><b>Block</b><span>High risk</span></div></div></div>
+    <div class="card"><h3>Outcomes</h3><ul>
+      <li><svg class="ic sm tick"><use href="#i-check"/></svg>Approved tools list</li>
+      <li><svg class="ic sm tick"><use href="#i-check"/></svg>Better alternatives</li>
+      <li><svg class="ic sm tick"><use href="#i-check"/></svg>Guidance &amp; training</li>
+      <li><svg class="ic sm tick"><use href="#i-check"/></svg>Usage monitoring</li>
+      <li><svg class="ic sm tick"><use href="#i-check"/></svg>Periodic review</li></ul></div>
+  </div>
+  <div class="note"><b>Enable the right AI.</b> Give employees approved, secure alternatives — that is the control that actually works.</div>
+  <div class="toolstrip"><span class="tl">Tools</span><div class="chips"><span class="c own">Defender for Cloud Apps</span><span class="c">Netskope</span><span class="c">Zscaler</span><span class="c">Cloudflare</span><span class="c">Nudge Security</span><span class="c">Cisco AI Guardrails</span><span class="c">JFrog Shadow AI Detection</span><span class="c">Island</span><span class="c own">Chrome Enterprise Premium</span><span class="c own">Ramp / Brex / Coupa</span></div></div>
+  </div>
+</details>
+</div>
+</details>
+
+
+<details open class="grp" id="g2">
+  <summary><span class="gn">2</span><span class="gt">Decide</span><span class="gs">Tier the risk, approve or refuse</span><svg class="ic chev"><use href="#i-chev"/></svg></summary>
+  <div class="grpbody">
+<details open class="sub" id="s2-1">
+  <summary><span class="sn">2.1</span><span class="st">The risk engine</span><span class="sw">Seven factors in, one tier out</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+  <p class="lede">Seven factors in, one tier out. Meeting summaries and autonomous clinical decisions should never meet the same committee.</p>
+  <div class="card">
+    <div class="engine">
+      <div class="factors">
+        <div class="factor"><svg class="ic"><use href="#i-lock"/></svg>Data sensitivity</div>
+        <div class="factor"><svg class="ic"><use href="#i-users"/></svg>Customer exposure</div>
+        <div class="factor"><svg class="ic"><use href="#i-scale"/></svg>Regulatory impact</div>
+        <div class="factor"><svg class="ic"><use href="#i-bolt"/></svg>Autonomous actions</div>
+        <div class="factor"><svg class="ic"><use href="#i-key"/></svg>Privileged access</div>
+        <div class="factor"><svg class="ic"><use href="#i-hand"/></svg>Decision consequence</div>
+        <div class="factor"><svg class="ic"><use href="#i-link"/></svg>External model / vendor</div>
+      </div>
+      <div><div class="orb">AI</div><div style="text-align:center;font-family:var(--m);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:12px">Risk engine</div></div>
+      <div class="verdicts">
+        <div class="verdict v-low"><b>Low</b><span>Auto-approve</span></div>
+        <div class="verdict v-med"><b>Medium</b><span>Review</span></div>
+        <div class="verdict v-high"><b>High / Critical</b><span>Assurance + approval</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="toolstrip"><span class="tl">Tools</span><div class="chips"><span class="c own">ServiceNow IRM</span><span class="c">OneTrust</span><span class="c">Credo AI policy packs</span><span class="c">Archer</span><span class="c">LogicGate</span><span class="c own">Power Apps</span><span class="c os">NIST AI RMF profile</span></div></div>
+  </div>
+</details>
+
+<details open class="sub" id="s2-2">
+  <summary><span class="sn">2.2</span><span class="st">Risk tiers</span><span class="sw">What each tier actually demands</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+  <p class="lede">The tier determines the controls. Not just a colour on a dashboard.</p>
+  <div class="card">
+    <table>
+      <thead><tr><th>Tier</th><th>Example</th><th>Governance approach</th><th>Key requirements</th></tr></thead>
+      <tbody>
+        <tr><td><div class="tiercell"><span class="chip c-t1"></span>Tier 1 — Low</div></td>
+          <td>Meeting summaries, basic Q&amp;A, non-sensitive data</td>
+          <td class="appr">Register + baseline controls</td>
+          <td>Acceptable use, data classification, logging, DLP, training</td></tr>
+        <tr><td><div class="tiercell"><span class="chip c-t2"></span>Tier 2 — Moderate</div></td>
+          <td>Internal RAG over company data, document analysis</td>
+          <td class="appr">Security &amp; privacy review + testing</td>
+          <td>Access controls, data protection, prompt/RAG security, vendor review</td></tr>
+        <tr><td><div class="tiercell"><span class="chip c-t3"></span>Tier 3 — High</div></td>
+          <td>Customer chatbot, coding agent, HR AI</td>
+          <td class="appr">Threat model + AI red team + monitoring + approval</td>
+          <td>Comprehensive security testing, continuous monitoring, human oversight</td></tr>
+        <tr><td><div class="tiercell"><span class="chip c-t4"></span>Tier 4 — Critical</div></td>
+          <td>Medical or financial decisions, autonomous agents</td>
+          <td class="appr">Executive &amp; risk approval + continuous assurance</td>
+          <td>Formal risk acceptance, continuous testing, human-in-the-loop, incident response</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="toolstrip"><span class="tl">Tools</span><div class="chips"><span class="c own">Register field + ITSM rules</span><span class="c os">OPA policy-as-code</span><span class="c">Dataiku Govern sign-offs</span></div></div>
+  </div>
+</details>
+
+<details open class="sub" id="s2-3">
+  <summary><span class="sn">2.3</span><span class="st">The approval workflow</span><span class="sw">Intake, tiering, decision</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+  <p class="lede">If asking permission is harder than going around it, people go around it.</p>
+  <div class="card">
+    <div class="appr-flow">
+      <div class="node"><svg class="ic lg"><use href="#i-person"/></svg><b>I want to use AI</b></div>
+      <svg class="ic arrow"><use href="#i-arrow"/></svg>
+      <div class="node"><svg class="ic lg"><use href="#i-monitor"/></svg><b>AI intake portal</b><span>8–10 useful questions</span></div>
+      <svg class="ic arrow"><use href="#i-arrow"/></svg>
+      <div class="node"><svg class="ic lg"><use href="#i-cog"/></svg><b>Automated tiering</b></div>
+      <svg class="ic arrow"><use href="#i-arrow"/></svg>
+      <div class="decide" style="flex:1;min-width:190px">
+        <div class="dec d-allow"><b>Low</b><span>Auto-approve</span></div>
+        <div class="dec d-coach"><b>Medium</b><span>Security review</span></div>
+        <div class="dec d-block"><b>High</b><span>AI assurance review</span></div>
+      </div>
+      <svg class="ic arrow"><use href="#i-arrow"/></svg>
+      <div class="node"><svg class="ic lg"><use href="#i-db"/></svg><b>AI register</b><span>+ controls + monitoring</span></div>
+    </div>
+    <div class="note">Simple intake. Fast decisions. Transparent outcomes.</div>
+  </div>
+  <div class="toolstrip"><span class="tl">Tools</span><div class="chips"><span class="c own">ServiceNow</span><span class="c own">Jira Service Management</span><span class="c">Freshservice</span><span class="c own">Microsoft Forms</span><span class="c own">Power Automate</span><span class="c">Credo AI</span></div></div>
+  </div>
+</details>
+</div>
+</details>
+
+
+<details open class="grp" id="g3">
+  <summary><span class="gn">3</span><span class="gt">Control</span><span class="gs">Apply the guardrails the tier demands</span><svg class="ic chev"><use href="#i-chev"/></svg></summary>
+  <div class="grpbody"><div class="xref">Lane controls A&ndash;E live with the inventory in <a href="#s1-1">1.1</a> &mdash; the three below are the ones that need their own design.</div>
+<details open class="sub" id="s3-1">
+  <summary><span class="sn">3.1</span><span class="st">Agentic control plane</span><span class="sw">Never let the model authorize itself</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+  <p class="lede">Agents can do things — so they need guardrails, not just guidance.</p>
+  <div class="card">
+    <div class="flow">
+      <div class="node"><svg class="ic lg"><use href="#i-person"/></svg><b>User / application</b></div>
+      <svg class="ic arrow"><use href="#i-arrow"/></svg>
+      <div class="node"><svg class="ic lg"><use href="#i-robot"/></svg><b>AI agent</b><span>Tools · APIs · systems</span></div>
+      <svg class="ic arrow"><use href="#i-arrow"/></svg>
+      <div class="pep">
+        <h3><svg class="ic sm" style="vertical-align:-2px"><use href="#i-shield"/></svg> Policy enforcement point</h3>
+        <ul>
+          <li><span class="dot"></span>Is the agent authorized?</li>
+          <li><span class="dot"></span>Is the user authorized?</li>
+          <li><span class="dot"></span>Is the action allowed?</li>
+          <li><span class="dot"></span>Is the amount / destination allowed?</li>
+          <li><span class="dot"></span>Is human approval required?</li>
+          <li><span class="dot"></span>Context and risk checks</li>
+        </ul>
+      </div>
+      <svg class="ic arrow"><use href="#i-arrow"/></svg>
+      <div class="node exec"><svg class="ic lg"><use href="#i-play"/></svg><b>Execute action</b></div>
+    </div>
+    <div class="note"><b>Never let the LLM decide authorization.</b> Agents get their own identities and least-privilege permissions, the same as any other principal.</div>
+  </div>
+  <div class="toolstrip"><span class="tl">Tools</span><div class="chips"><span class="c own">Entra Agent ID</span><span class="c">Okta</span><span class="c os">SPIFFE/SPIRE</span><span class="c os">OPA</span><span class="c os">Cedar</span><span class="c">Permit.io</span><span class="c own">HashiCorp Vault</span><span class="c">Cloudflare MCP Portals</span><span class="c os">E2B sandbox</span><span class="c os">Temporal</span><span class="c os">Langfuse</span><span class="c">AgentOps</span></div></div>
+  </div>
+</details>
+
+<details open class="sub" id="s3-2">
+  <summary><span class="sn">3.2</span><span class="st">Vendor AI and the AI-BOM</span><span class="sw">The chain behind the contract</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+  <p class="lede">Your contract is with one company. Your data reaches four. Map the chain, put the answers in writing, take delivery of an AI-BOM, then keep watching &mdash; because the vendor's model will change without asking you.</p>
+
+  <div class="pipe">
+    <div class="pstage">
+      <div class="pdot"><svg class="ic lg"><use href="#i-net"/></svg></div>
+      <div class="pt">Map the chain</div>
+      <ul><li><span class="dot"></span>Who is the contracting party</li><li><span class="dot"></span>Who is underneath them</li>
+        <li><span class="dot"></span>Whose model is it really</li><li><span class="dot"></span>Where does data land</li></ul>
+    </div>
+    <div class="parrow"><svg class="ic"><use href="#i-arrow"/></svg></div>
+    <div class="pstage">
+      <div class="pdot"><svg class="ic lg"><use href="#i-search"/></svg></div>
+      <div class="pt">Ask</div>
+      <ul><li><span class="dot"></span>Eight questions</li><li><span class="dot"></span>Model, data, location</li>
+        <li><span class="dot"></span>Training and retention</li><li><span class="dot"></span>Agent capabilities</li></ul>
+    </div>
+    <div class="parrow"><svg class="ic"><use href="#i-arrow"/></svg></div>
+    <div class="pstage">
+      <div class="pdot"><svg class="ic lg"><use href="#i-doc"/></svg></div>
+      <div class="pt">Require</div>
+      <ul><li><span class="dot"></span>Contract terms</li><li><span class="dot"></span>DPA and BAA flow-down</li>
+        <li><span class="dot"></span>AI-BOM at each release</li><li><span class="dot"></span>Notification rights</li></ul>
+    </div>
+    <div class="parrow"><svg class="ic"><use href="#i-arrow"/></svg></div>
+    <div class="pstage">
+      <div class="pdot"><svg class="ic lg"><use href="#i-shieldcheck"/></svg></div>
+      <div class="pt">Verify</div>
+      <ul><li><span class="dot"></span>Ingest and scan the AI-BOM</li><li><span class="dot"></span>Certifications and reports</li>
+        <li><span class="dot"></span>Subprocessor list</li><li><span class="dot"></span>Test what you can</li></ul>
+    </div>
+    <div class="parrow"><svg class="ic"><use href="#i-arrow"/></svg></div>
+    <div class="pstage">
+      <div class="pdot"><svg class="ic lg"><use href="#i-refresh"/></svg></div>
+      <div class="pt">Monitor</div>
+      <ul><li><span class="dot"></span>Model or version change</li><li><span class="dot"></span>New subprocessor</li>
+        <li><span class="dot"></span>New agent actions</li><li><span class="dot"></span>Re-assess or exit</li></ul>
+    </div>
+  </div>
+  <div class="preturn"><svg class="ic sm"><use href="#i-arrowback"/></svg><span>Any material change sends the vendor back to Ask</span></div>
+
+  
+<details open class="sub3"><summary><span class="s3t">The chain behind the contract</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+<div class="sub3body">
+  <div class="chain">
+    <div class="ch c-you"><div class="tier">You</div><b>Controller</b><span>Accountable to the regulator and the patient or customer, whatever the contract says.</span></div>
+    <div class="parrow"><svg class="ic"><use href="#i-arrow"/></svg></div>
+    <div class="ch"><div class="tier">Tier 1</div><b>Vendor</b><span>The SaaS you signed with.</span>
+      <div class="need">DPA &middot; BAA &middot; AI-BOM &middot; audit rights</div></div>
+    <div class="parrow"><svg class="ic"><use href="#i-arrow"/></svg></div>
+    <div class="ch"><div class="tier">Tier 2</div><b>Subprocessors</b><span>Cloud, storage, analytics, support.</span>
+      <div class="need">Named list &middot; change notice &middot; right to object</div></div>
+    <div class="parrow"><svg class="ic"><use href="#i-arrow"/></svg></div>
+    <div class="ch"><div class="tier">Tier 3</div><b>Model provider</b><span>Whoever actually serves the inference.</span>
+      <div class="need">No-training terms &middot; region &middot; retention</div></div>
+    <div class="parrow"><svg class="ic"><use href="#i-arrow"/></svg></div>
+    <div class="ch"><div class="tier">Tier 4</div><b>Data services</b><span>Labelling, fine-tuning, RAG sources.</span>
+      <div class="need">Human review disclosure &middot; licence &middot; consent</div></div>
+  </div>
+  <div class="note"><b>Most programmes stop at Tier 1.</b> The questions that actually matter &mdash; is my data training a model, is a human reading it, which country is it in &mdash; are usually answered two or three tiers down, by a company you have no contract with. Ask the vendor to answer for the whole chain, and make the flow-down obligation contractual.</div>
+
+  </div>
+</details>
+
+<details open class="sub3"><summary><span class="s3t">The AI-BOM</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+<div class="sub3body">
+  <div class="split">
+    <div class="card">
+      <h3>What it has to contain</h3>
+      <div class="bomgrid">
+        <div class="bom"><svg class="ic sm"><use href="#i-brain"/></svg><b>Models</b><span>Name, version, provider, licence, weights hash</span></div>
+        <div class="bom"><svg class="ic sm"><use href="#i-db"/></svg><b>Datasets</b><span>Training, fine-tune and RAG corpora, licence, consent basis</span></div>
+        <div class="bom"><svg class="ic sm"><use href="#i-doc"/></svg><b>Prompts</b><span>System instructions and their version</span></div>
+        <div class="bom"><svg class="ic sm"><use href="#i-wrench"/></svg><b>Tools &amp; actions</b><span>What the agent can invoke, and against what</span></div>
+        <div class="bom"><svg class="ic sm"><use href="#i-code"/></svg><b>Software</b><span>Ordinary SBOM: libraries, frameworks, transitive deps</span></div>
+        <div class="bom"><svg class="ic sm"><use href="#i-globe"/></svg><b>Serving</b><span>Infrastructure, region, subprocessors</span></div>
+        <div class="bom"><svg class="ic sm"><use href="#i-gauge"/></svg><b>Evaluations</b><span>Results, known limitations, guardrails in place</span></div>
+        <div class="bom"><svg class="ic sm"><use href="#i-shield"/></svg><b>Attestation</b><span>Signature, build provenance, VEX for known CVEs</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Formats</h3>
+      <div class="chips">
+        <span class="c os">CycloneDX ML-BOM</span><span class="c os">SPDX 3.0 AI profile</span>
+        <span class="c os">SPDX dataset profile</span><span class="c os">Model cards</span><span class="c os">OpenVEX / CSAF</span>
+      </div>
+      <h3 style="margin-top:16px">Generate &amp; sign</h3>
+      <div class="chips">
+        <span class="c os">cdxgen</span><span class="c os">Syft</span><span class="c os">CycloneDX CLI</span>
+        <span class="c os">Sigstore / cosign</span><span class="c os">in-toto + SLSA</span>
+      </div>
+      <h3 style="margin-top:16px">Ingest, scan &amp; watch</h3>
+      <div class="chips">
+        <span class="c os">Dependency-Track</span><span class="c">Manifest Cyber</span><span class="c">Finite State</span>
+        <span class="c">JFrog Curation</span><span class="c">Anchore</span><span class="c">ReversingLabs</span>
+        <span class="c">HiddenLayer</span><span class="c">Prisma AIRS</span>
+      </div>
+      <div class="evid" style="margin-top:14px"><b>Cadence</b>At onboarding, at every material release, and on demand after an incident. A one-off AI-BOM at procurement is a snapshot of a system that no longer exists.</div>
+    </div>
+  </div>
+
+  </div>
+</details>
+
+<details open class="sub3"><summary><span class="s3t">Ask</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+<div class="sub3body">
+  <div class="card">
+    <div class="q7">
+      <div class="q"><svg class="ic lg"><use href="#i-brain"/></svg><span>What model?</span></div>
+      <div class="q"><svg class="ic lg"><use href="#i-db"/></svg><span>What data?</span></div>
+      <div class="q"><svg class="ic lg"><use href="#i-globe"/></svg><span>Where processed?</span></div>
+      <div class="q"><svg class="ic lg"><use href="#i-cap"/></svg><span>Training on our data?</span></div>
+      <div class="q"><svg class="ic lg"><use href="#i-trash"/></svg><span>Retention &amp; deletion?</span></div>
+      <div class="q"><svg class="ic lg"><use href="#i-users"/></svg><span>Subprocessors?</span></div>
+      <div class="q"><svg class="ic lg"><use href="#i-shieldcheck"/></svg><span>Security testing?</span></div>
+      <div class="q"><svg class="ic lg"><use href="#i-robot"/></svg><span>Agent capabilities?</span></div>
+    </div>
+    <h3 style="margin-top:20px">Require in the contract</h3>
+    <div class="boxes">
+      <div class="bx">No training on our data without authorization</div>
+      <div class="bx">Data retention &amp; deletion requirements</div>
+      <div class="bx">Security incident notification</div>
+      <div class="bx">Material AI change notification</div>
+      <div class="bx">Audit / assurance rights</div>
+      <div class="bx">Data-location requirements</div>
+      <div class="bx">Exit &amp; data deletion</div>
+      <div class="bx">AI-BOM at every material release</div>
+      <div class="bx">Named subprocessor list &amp; right to object</div>
+      <div class="bx">Processor terms flow down the full chain</div>
+      <div class="bx">Disclosure of any human review</div>
+      <div class="bx">Model version pinning or notice before change</div>
+    </div>
+  </div>
+  <div class="toolstrip"><span class="tl">Tools</span><div class="chips"><span class="c">OneTrust TPRM</span><span class="c">Whistic</span><span class="c">Panorays</span><span class="c">UpGuard</span><span class="c">Ironclad</span><span class="c os">CycloneDX ML-BOM</span><span class="c os">cdxgen</span><span class="c os">Syft</span><span class="c os">Dependency-Track</span><span class="c">Manifest Cyber</span><span class="c">Finite State</span><span class="c">JFrog Curation</span><span class="c own">Subprocessor list monitoring</span></div></div></div>
+</details>
+
+  </div>
+</details>
+
+<details open class="sub" id="s3-3">
+  <summary><span class="sn">3.3</span><span class="st">The engineering lifecycle</span><span class="sw">Controls in the pipeline, not the policy</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+  <p class="lede">Governance that lives in a document gets skipped. Governance that lives in the pipeline gets run.</p>
+  <div class="pipe">
+    <div class="pstage">
+      <div class="pdot"><svg class="ic lg"><use href="#i-chart"/></svg></div>
+      <div class="pt">Plan / design</div>
+      <ul><li><span class="dot"></span>AI use case review</li><li><span class="dot"></span>Threat modeling</li>
+        <li><span class="dot"></span>Privacy assessment</li><li><span class="dot"></span>Risk tiering</li></ul>
+    </div>
+    <div class="parrow"><svg class="ic"><use href="#i-arrow"/></svg></div>
+    <div class="pstage">
+      <div class="pdot"><svg class="ic lg"><use href="#i-code"/></svg></div>
+      <div class="pt">Code</div>
+      <ul><li><span class="dot"></span>Secure AI assistant</li><li><span class="dot"></span>Secrets scanning</li>
+        <li><span class="dot"></span>SAST / SCA / IaC</li><li><span class="dot"></span>AI policy checks</li></ul>
+    </div>
+    <div class="parrow"><svg class="ic"><use href="#i-arrow"/></svg></div>
+    <div class="pstage">
+      <div class="pdot"><svg class="ic lg"><use href="#i-monitor"/></svg></div>
+      <div class="pt">Build / test</div>
+      <ul><li><span class="dot"></span>Model validation</li><li><span class="dot"></span>Prompt tests</li>
+        <li><span class="dot"></span>RAG tests</li><li><span class="dot"></span>Agent tests</li><li><span class="dot"></span>Red team tests</li></ul>
+    </div>
+    <div class="parrow"><svg class="ic"><use href="#i-arrow"/></svg></div>
+    <div class="pstage">
+      <div class="pdot"><svg class="ic lg"><use href="#i-cog"/></svg></div>
+      <div class="pt">Deploy</div>
+      <ul><li><span class="dot"></span>Policy-as-code</li><li><span class="dot"></span>Infrastructure</li>
+        <li><span class="dot"></span>Security checks</li><li><span class="dot"></span>Approval</li></ul>
+    </div>
+    <div class="parrow"><svg class="ic"><use href="#i-arrow"/></svg></div>
+    <div class="pstage">
+      <div class="pdot"><svg class="ic lg"><use href="#i-person"/></svg></div>
+      <div class="pt">Runtime</div>
+      <ul><li><span class="dot"></span>AI gateway</li><li><span class="dot"></span>DLP</li>
+        <li><span class="dot"></span>Abuse detection</li><li><span class="dot"></span>Observability</li><li><span class="dot"></span>SIEM / logging</li></ul>
+    </div>
+  </div>
+  <div class="preturn"><svg class="ic sm"><use href="#i-arrowback"/></svg><span>Monitoring, telemetry, incidents and user feedback go back to plan</span></div>
+  <div class="toolstrip"><span class="tl">Tools</span><div class="chips"><span class="c own">GitHub Advanced Security</span><span class="c os">Semgrep</span><span class="c">Snyk</span><span class="c os">Gitleaks</span><span class="c os">Checkov</span><span class="c os">promptfoo</span><span class="c os">DeepEval</span><span class="c os">Ragas</span><span class="c os">Giskard</span><span class="c os">Inspect</span><span class="c os">OPA Gatekeeper</span><span class="c os">Kyverno</span><span class="c os">Sigstore</span></div></div>
+  </div>
+</details>
+</div>
+</details>
+
+
+<details open class="grp" id="g4">
+  <summary><span class="gn">4</span><span class="gt">Monitor &amp; Respond</span><span class="gs">Watch, detect, contain, recover</span><svg class="ic chev"><use href="#i-chev"/></svg></summary>
+  <div class="grpbody">
+<details open class="sub" id="s4-1">
+  <summary><span class="sn">4.1</span><span class="st">Runtime monitoring and response</span><span class="sw">Telemetry, detection, the AI SOC</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+  <p class="lede">A model that passed review in March is a different model in September. Watch it in production, and be able to reconstruct what happened.</p>
+  <div class="two">
+<div class="card"><h3>Runtime monitoring</h3><ul>
+      <li><svg class="ic sm" style="color:var(--petrol)"><use href="#i-api"/></svg>AI gateway logs</li>
+      <li><svg class="ic sm" style="color:var(--petrol)"><use href="#i-robot"/></svg>Agent actions</li>
+      <li><svg class="ic sm" style="color:var(--petrol)"><use href="#i-gauge"/></svg>Model telemetry</li>
+      <li><svg class="ic sm" style="color:var(--petrol)"><use href="#i-key"/></svg>IAM events</li>
+      <li><svg class="ic sm" style="color:var(--petrol)"><use href="#i-lock"/></svg>DLP events</li>
+      <li><svg class="ic sm" style="color:var(--petrol)"><use href="#i-users"/></svg>User feedback</li></ul>
+      <div class="soc">SIEM<br>/ AI SOC</div></div>
+    <div class="card"><h3>Detect &amp; respond</h3><ul>
+      <li><svg class="ic sm" style="color:var(--clay)"><use href="#i-alert"/></svg>Prompt attacks</li>
+      <li><svg class="ic sm" style="color:var(--clay)"><use href="#i-alert"/></svg>Data leakage</li>
+      <li><svg class="ic sm" style="color:var(--clay)"><use href="#i-alert"/></svg>Abuse / anomalies</li>
+      <li><svg class="ic sm" style="color:var(--clay)"><use href="#i-alert"/></svg>Excessive actions</li>
+      <li><svg class="ic sm" style="color:var(--clay)"><use href="#i-alert"/></svg>Privilege escalation</li>
+      <li><svg class="ic sm" style="color:var(--clay)"><use href="#i-alert"/></svg>Model behaviour drift</li></ul></div>
+  </div>
+  <div class="toolstrip"><span class="tl">Tools</span><div class="chips"><span class="c os">PyRIT</span><span class="c os">garak</span><span class="c os">promptfoo redteam</span><span class="c">Mindgard</span><span class="c">HiddenLayer</span><span class="c">Cisco AI Defense</span><span class="c own">Splunk</span><span class="c own">Microsoft Sentinel</span><span class="c own">Elastic</span><span class="c os">MITRE ATLAS</span></div></div>
+  <div class="esc">Detection without a response path is an alert nobody can act on &mdash; see <a href="#s4-2">4.2 Respond</a>.</div>
+  </div>
+</details>
+
+<details open class="sub" id="s4-2">
+  <summary><span class="sn">4.2</span><span class="st">Respond</span><span class="sw">What to do when something goes wrong</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+  <p class="lede">Detection is not response. This part gets written before the afternoon an agent has already emailed four hundred customers the wrong price &mdash; or it does not get written at all.</p>
+
+  <div class="card">
+    <div class="appr-flow">
+      <div class="node"><svg class="ic lg"><use href="#i-alert"/></svg><b>Detect</b><span>Alert, user report, vendor notice</span></div>
+      <svg class="ic arrow"><use href="#i-arrow"/></svg>
+      <div class="node"><svg class="ic lg"><use href="#i-hand"/></svg><b>Contain</b><span>Turn it off at the gateway</span></div>
+      <svg class="ic arrow"><use href="#i-arrow"/></svg>
+      <div class="node"><svg class="ic lg"><use href="#i-lock"/></svg><b>Preserve</b><span>Freeze the trace first</span></div>
+      <svg class="ic arrow"><use href="#i-arrow"/></svg>
+      <div class="node"><svg class="ic lg"><use href="#i-search"/></svg><b>Assess</b><span>Blast radius</span></div>
+      <svg class="ic arrow"><use href="#i-arrow"/></svg>
+      <div class="node"><svg class="ic lg"><use href="#i-scale"/></svg><b>Notify</b><span>Whoever has a clock</span></div>
+      <svg class="ic arrow"><use href="#i-arrow"/></svg>
+      <div class="node"><svg class="ic lg"><use href="#i-refresh"/></svg><b>Recover</b><span>Known-good version</span></div>
+      <svg class="ic arrow"><use href="#i-arrow"/></svg>
+      <div class="node"><svg class="ic lg"><use href="#i-lamp"/></svg><b>Learn</b><span>An eval case, a detection</span></div>
+    </div>
+    <div class="note"><b>Containment before diagnosis.</b> A non-deterministic system may never reproduce the exact failure. Stop the harm first and understand it second &mdash; the reverse order is how a two-hour incident becomes a two-day one.</div>
+  </div>
+
+  <div class="card">
+    <h3>Six ways it goes wrong</h3>
+    <table>
+      <thead><tr><th>What went wrong</th><th>What it looks like</th><th>First containment move</th><th>Owns the call</th></tr></thead>
+      <tbody>
+        <tr><td><b>Harmful or wrong output at scale</b></td><td>Fabricated fact, bad advice or offensive content reaching real users</td><td class="appr">Disable the route at the gateway and serve the fallback</td><td>Product owner</td></tr>
+        <tr><td><b>Sensitive data exposure</b></td><td>Regulated data in prompts, retrieved context, output or vendor logs</td><td class="appr">Quarantine the retrieval index; suspend the connector</td><td>AI Security + Privacy</td></tr>
+        <tr><td><b>Prompt injection or tool abuse</b></td><td>Untrusted content steering the model into calls nobody intended</td><td class="appr">Quarantine the content source; drop the tool from the manifest</td><td>AI Security</td></tr>
+        <tr><td><b>Agent overreach</b></td><td>Actions beyond intent &mdash; spend, send, delete, commit, escalate</td><td class="appr">Revoke the agent identity; freeze its entitlements</td><td>AI Security + Engineering</td></tr>
+        <tr><td><b>Upstream change or compromise</b></td><td>Provider silently changed the model, poisoned dependency, vendor incident</td><td class="appr">Pin to the last known-good version; fail over to the fallback model</td><td>Engineering + vendor owner</td></tr>
+        <tr><td><b>Runaway loop or cost</b></td><td>Recursion, retry storms, denial of wallet</td><td class="appr">Enforce the spend cap; kill the session</td><td>Engineering</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Severity, and who wakes up</h3>
+    <table>
+      <thead><tr><th>Severity</th><th>Trigger</th><th>Acknowledge</th><th>In the room</th><th>External clock</th></tr></thead>
+      <tbody>
+        <tr><td><div class="tiercell"><span class="chip c-t4"></span>S1 &mdash; Critical</div></td>
+          <td>Real-world harm, regulated data confirmed out, or an agent committed a financial or safety-relevant action</td>
+          <td class="sla">15 min, 24&times;7</td>
+          <td>Incident commander, exec sponsor, Legal, Privacy, Comms</td>
+          <td class="appr">Starts now</td></tr>
+        <tr><td><div class="tiercell"><span class="chip c-t3"></span>S2 &mdash; High</div></td>
+          <td>Exposure suspected but bounded, or wrong output to a limited, identifiable population</td>
+          <td class="sla">1 hour, on-call</td>
+          <td>AI Security, product owner, engineering lead</td>
+          <td class="appr">Legal on standby</td></tr>
+        <tr><td><div class="tiercell"><span class="chip c-t2"></span>S3 &mdash; Moderate</div></td>
+          <td>Policy breached, no confirmed exposure or harm</td>
+          <td class="sla">Next business day</td>
+          <td>AI Security, product owner</td>
+          <td class="appr">Internal only</td></tr>
+        <tr><td><div class="tiercell"><span class="chip c-t1"></span>S4 &mdash; Near miss</div></td>
+          <td>Caught by an eval, a guardrail or a user before it reached anyone</td>
+          <td class="sla">Backlog</td>
+          <td>Owning team</td>
+          <td class="appr">None &mdash; feeds Assure</td></tr>
+      </tbody>
+    </table>
+    <div class="esc">Severity is about impact, not tier. A Tier&nbsp;2 internal tool that leaks a payroll file is an S1.</div>
+  </div>
+
+  <div class="four">
+    <div class="pill"><span class="ln">SWITCH</span>Route disable<span>At the gateway, not the deployment</span></div>
+    <div class="pill"><span class="ln">SWITCH</span>Identity revocation<span>Agent credentials, in seconds</span></div>
+    <div class="pill"><span class="ln">SWITCH</span>Index quarantine<span>Retrieval source, isolated</span></div>
+    <div class="pill"><span class="ln">SWITCH</span>Version rollback<span>Model, prompt and config pinned</span></div>
+  </div>
+  <div class="note">These four have to exist <b>before</b> the incident, plus a hard spend cap. A kill switch you have to build during a response is not a kill switch &mdash; it is an outage with extra steps. Test each one in a tabletop, quarterly.</div>
+
+  <div class="two">
+    <div class="card"><h3>Preserve, before you fix</h3><ul>
+      <li><svg class="ic sm" style="color:var(--petrol)"><use href="#i-doc"/></svg>The prompt and system prompt exactly as sent</li>
+      <li><svg class="ic sm" style="color:var(--petrol)"><use href="#i-db"/></svg>Retrieved context and the documents it came from</li>
+      <li><svg class="ic sm" style="color:var(--petrol)"><use href="#i-wrench"/></svg>Every tool call, with arguments and result</li>
+      <li><svg class="ic sm" style="color:var(--petrol)"><use href="#i-brain"/></svg>Model name, version and hash at time of call</li>
+      <li><svg class="ic sm" style="color:var(--petrol)"><use href="#i-key"/></svg>The identity that made the call, human or agent</li>
+      <li><svg class="ic sm" style="color:var(--petrol)"><use href="#i-link"/></svg>Gateway request id, to stitch the chain together</li></ul>
+      <div class="who">A rollback destroys the evidence. Capture first, redeploy second.</div></div>
+    <div class="card"><h3>Recover to known good</h3><ul>
+      <li><svg class="ic sm" style="color:var(--sage)"><use href="#i-refresh"/></svg>Restore the pinned model, prompt and config from the last signed release</li>
+      <li><svg class="ic sm" style="color:var(--sage)"><use href="#i-play"/></svg>Re-run the evaluation suite &mdash; a rollback is itself a change</li>
+      <li><svg class="ic sm" style="color:var(--sage)"><use href="#i-shieldcheck"/></svg>Re-enable staged, behind a flag, internal users first</li>
+      <li><svg class="ic sm" style="color:var(--sage)"><use href="#i-person"/></svg>The route stays off until the product owner signs it back on</li>
+      <li><svg class="ic sm" style="color:var(--sage)"><use href="#i-gauge"/></svg>Watch the same signal that caught it, for a defined window</li></ul>
+      <div class="who">Reversal question, asked early: can the actions be undone at all &mdash; emails recalled, transactions reversed, commits reverted?</div></div>
+  </div>
+
+  <div class="card">
+    <h3>Who might have a clock</h3>
+    <div class="chips">
+      <span class="c">Affected users and customers</span>
+      <span class="c">Data protection authority</span>
+      <span class="c">Data subjects</span>
+      <span class="c">The model or platform provider</span>
+      <span class="c">Contractual notification terms</span>
+      <span class="c">Insurer</span>
+      <span class="c">Board or audit committee, at S1</span>
+    </div>
+    <div class="note">Notification windows differ by jurisdiction, sector and contract. The point of this row is that somebody looked them up <b>before</b> the incident and wrote the numbers next to the names. Counsel makes the call, not the responder &mdash; and none of this is legal advice.</div>
+  </div>
+
+  <div class="alarm">
+    <div class="alarm-h"><svg class="ic sm"><use href="#i-alert"/></svg>What makes an AI incident different</div>
+    <p><b>There is no stack trace.</b> The failure lives in a prompt, a retrieved document and a model version, and the same input may not reproduce it tomorrow.</p>
+    <p><b>The fix is often a prompt change</b> &mdash; which means the fix is a change nobody versioned, unless prompts were already release artefacts.</p>
+    <p><b>The vendor can change the model underneath you</b> between the incident and the review, and take your ability to reproduce it with them.</p>
+    <p><b>The evidence is gone unless it was logged at the time.</b> Nothing here is recoverable after the fact, which makes 4.1 the precondition for this whole page.</p>
+  </div>
+
+  <div class="card">
+    <h3>Every incident closes with something that stops it recurring</h3>
+    <ul>
+      <li><svg class="ic sm" style="color:var(--clay)"><use href="#i-check"/></svg>An evaluation case that reproduces the failure, added to the suite</li>
+      <li><svg class="ic sm" style="color:var(--clay)"><use href="#i-check"/></svg>A detection that would have caught it earlier</li>
+      <li><svg class="ic sm" style="color:var(--clay)"><use href="#i-check"/></svg>A guardrail, or a tier change, or a scope reduction on the agent</li>
+      <li><svg class="ic sm" style="color:var(--clay)"><use href="#i-check"/></svg>A named owner and a date, not an action item</li>
+    </ul>
+    <div class="esc">Blameless on people, ruthless on the control that was missing. The output feeds <a href="#g5">5 Assure</a>; if nothing changed, the review did not happen.</div>
+  </div>
+
+  <div class="toolstrip"><span class="tl">Tools</span><div class="chips"><span class="c">PagerDuty</span><span class="c">incident.io</span><span class="c own">ServiceNow SecOps</span><span class="c own">Jira</span><span class="c own">Splunk</span><span class="c own">Microsoft Sentinel</span><span class="c os">Langfuse</span><span class="c os">OpenTelemetry GenAI</span><span class="c os">MITRE ATLAS</span><span class="c os">NIST SP 800-61</span></div></div>
+  </div>
+</details>
+
+</div>
+</details>
+
+
+<details open class="grp" id="g5">
+  <summary><span class="gn">5</span><span class="gt">Assure</span><span class="gs">Test, evidence, learn, strengthen</span><svg class="ic chev"><use href="#i-chev"/></svg></summary>
+  <div class="grpbody">
+<details open class="sub" id="s5-1">
+  <summary><span class="sn">5.1</span><span class="st">Pre-production assurance and provenance</span><span class="sw">What you prove before it ships, and how you know it hasn't changed</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+  <p class="lede">Assurance is a subscription, not a purchase. Prove it before it ships, then keep proving it.</p>
+  <div class="card"><h3>Before production</h3><ul>
+      <li><svg class="ic sm tick"><use href="#i-check"/></svg>Architecture review</li>
+      <li><svg class="ic sm tick"><use href="#i-check"/></svg>AI threat model</li>
+      <li><svg class="ic sm tick"><use href="#i-check"/></svg>Privacy assessment</li>
+      <li><svg class="ic sm tick"><use href="#i-check"/></svg>Security testing</li>
+      <li><svg class="ic sm tick"><use href="#i-check"/></svg>AI red team</li>
+      <li><svg class="ic sm tick"><use href="#i-check"/></svg>Risk acceptance</li></ul></div>
+  
+<details open class="sub3"><summary><span class="s3t">Detecting change, proving provenance</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+<div class="sub3body">
+  <p class="lede">Four things move under you: the data, where it came from, the model, and where <em>it</em> came from. Two need a signal. Two need a signed record.</p>
+  <div class="prov">
+
+    <div class="pv">
+      <h4><svg class="ic"><use href="#i-chart"/></svg>Data change</h4>
+      <p class="ask">Did the input distribution move?</p>
+      <div class="sig">Watch for</div>
+      <div class="chips"><span class="c own">Schema drift</span><span class="c own">Volume &amp; freshness</span><span class="c own">Distribution shift</span><span class="c own">Null &amp; range breaks</span></div>
+      <div class="sig">Tools</div>
+      <div class="chips">
+        <span class="c os">Great Expectations</span><span class="c os">Soda Core</span><span class="c os">dbt tests</span><span class="c os">Evidently</span>
+        <span class="c">Monte Carlo</span><span class="c">Anomalo</span><span class="c">Bigeye</span><span class="c">Datafold</span><span class="c">Databricks Lakehouse Monitoring</span>
+      </div>
+      <div class="evid"><b>Evidence produced</b>Dated drift report and failed-check log, attached to the register entry.</div>
+    </div>
+
+    <div class="pv d2">
+      <h4><svg class="ic"><use href="#i-net"/></svg>Data provenance</h4>
+      <p class="ask">Where did it come from, who touched it, what did it feed?</p>
+      <div class="sig">Capture</div>
+      <div class="chips"><span class="c own">Source system</span><span class="c own">Transform chain</span><span class="c own">Consent &amp; licence</span><span class="c own">Downstream use</span></div>
+      <div class="sig">Tools</div>
+      <div class="chips">
+        <span class="c os">OpenLineage + Marquez</span><span class="c os">DataHub</span><span class="c os">Apache Atlas</span><span class="c os">dbt docs</span><span class="c os">C2PA Content Credentials</span>
+        <span class="c">Unity Catalog lineage</span><span class="c">Collibra</span><span class="c">Alation</span><span class="c">Atlan</span>
+      </div>
+      <div class="evid"><b>Evidence produced</b>Column-level lineage graph tracing source to model input.</div>
+    </div>
+
+    <div class="pv d3">
+      <h4><svg class="ic"><use href="#i-gauge"/></svg>Model change</h4>
+      <p class="ask">Is it still the model that passed review?</p>
+      <div class="sig">Watch for</div>
+      <div class="chips"><span class="c own">Version &amp; weights</span><span class="c own">System prompt edits</span><span class="c own">Output drift</span><span class="c own">Eval regression</span><span class="c own">Silent vendor upgrade</span></div>
+      <div class="sig">Tools</div>
+      <div class="chips">
+        <span class="c os">MLflow Model Registry</span><span class="c os">Evidently</span><span class="c os">NannyML</span><span class="c os">Deepchecks</span><span class="c os">promptfoo regression</span>
+        <span class="c">Weights &amp; Biases</span><span class="c">Arize</span><span class="c">Fiddler</span><span class="c">WhyLabs</span>
+      </div>
+      <div class="evid"><b>Evidence produced</b>Golden-set eval run per version, with a pass/fail gate before promotion.</div>
+    </div>
+
+    <div class="pv d4">
+      <h4><svg class="ic"><use href="#i-shieldcheck"/></svg>Model provenance</h4>
+      <p class="ask">Is this model what it claims to be?</p>
+      <div class="sig">Capture</div>
+      <div class="chips"><span class="c own">Origin &amp; licence</span><span class="c own">Training data claims</span><span class="c own">Fine-tune history</span><span class="c own">Signature &amp; hash</span></div>
+      <div class="sig">Tools</div>
+      <div class="chips">
+        <span class="c os">CycloneDX ML-BOM</span><span class="c os">SPDX 3.0 AI profile</span><span class="c os">Sigstore / cosign</span><span class="c os">in-toto + SLSA</span><span class="c os">Model cards</span>
+        <span class="c">HiddenLayer Model Scanner</span><span class="c">Prisma AIRS</span><span class="c">JFrog ML</span>
+      </div>
+      <div class="evid"><b>Evidence produced</b>Signed AI-BOM plus a scan attestation, stored with the release.</div>
+    </div>
+
+  </div>
+  <div class="note"><b>You can't instrument a model you don't host.</b> For vendor and API models, provenance is contractual and change detection is behavioural: pin the version, subscribe to the deprecation feed, and run a canary eval on a fixed golden set on a schedule. When the canary moves and you changed nothing, the vendor did.</div></div>
+</details>
+
+  </div>
+</details>
+
+<details open class="sub" id="s5-2">
+  <summary><span class="sn">5.2</span><span class="st">Where this maps</span><span class="sw">Practice &rarr; framework crosswalk</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+  <p class="lede">Build it once, evidence it many times.</p>
+  <div class="card">
+    <div class="scroller"><table class="xw">
+      <thead><tr><th>Practice</th><th>NIST AI RMF</th><th>ISO/IEC 42001</th><th>EU AI Act</th></tr></thead>
+      <tbody>
+        <tr><td>01 Operating model</td><td>GOVERN 1</td><td>Cl. 4&ndash;10 &middot; A.2 &middot; A.6</td><td>Art. 17</td></tr>
+        <tr><td>02 Accountability</td><td>GOVERN 2, 3</td><td>A.3</td><td>Art. 4 &middot; 26</td></tr>
+        <tr><td>03 Inventory &amp; lane controls</td><td>MAP 1, 4 &middot; MANAGE 2</td><td>A.4 &middot; A.6 &middot; A.7</td><td>Art. 10 &middot; 11 &middot; 15 &middot; 49</td></tr>
+        <tr><td>04 Risk engine</td><td>MAP 5 &middot; MEASURE 1</td><td>A.5</td><td>Art. 6 &middot; Annex III</td></tr>
+        <tr><td>05 Risk tiers</td><td>MANAGE 1</td><td>A.5 &middot; A.9</td><td>Art. 9</td></tr>
+        <tr><td>06 Agentic control plane</td><td>MANAGE 2.3 &middot; MEASURE 2</td><td>A.6.2 &middot; A.9.3</td><td>Art. 14 &middot; 15</td></tr>
+        <tr><td>07 Vendor AI</td><td>GOVERN 6 &middot; MANAGE 3</td><td>A.10</td><td>Art. 25 &middot; 26</td></tr>
+        <tr><td>08 Shadow AI</td><td>GOVERN 1.6 &middot; MAP 4.1</td><td>A.4.2 &middot; A.9.2</td><td>Art. 4 &middot; 26</td></tr>
+        <tr><td>09 Engineering lifecycle</td><td>MEASURE 2 &middot; MANAGE 4</td><td>A.6</td><td>Art. 15 &middot; 17</td></tr>
+        <tr><td>10 Continuous assurance</td><td>MEASURE 3, 4</td><td>A.6.2</td><td>Art. 72 &middot; 73</td></tr>
+        <tr><td>11 Approval workflow</td><td>GOVERN 1.3 &middot; MANAGE 1.1</td><td>A.5.4 &middot; A.9.2</td><td>Art. 9 &middot; 26</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note">Indicative crosswalk for programme design and gap analysis &mdash; not a conformity assessment. Also credits NIST CSF 2.0, SSDF SP 800-218A, OWASP LLM Top 10, MITRE ATLAS and, in medtech, FDA &sect;524B with ISO 14971.</div>
+  </div>
+  </div>
+</details>
+
+<details open class="sub" id="s5-3">
+  <summary><span class="sn">5.3</span><span class="st">Read it the other way</span><span class="sw">NIST AI RMF &rarr; practice</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+  <p class="lede">An assessor starts from their framework, not yours. MAP, MEASURE and MANAGE run the lifecycle; GOVERN sits across all three, which is why it comes last here and first in a maturity conversation.</p>
+  <div class="card">
+    <div class="scroller"><table class="xw">
+      <thead><tr><th>Function</th><th>Category</th><th>What it asks for</th><th>Delivered by</th></tr></thead>
+      <tbody>
+        <tr class="fnhead"><td colspan="4">MAP &mdash; understand the system in context</td></tr>
+        <tr><td></td><td><span class="tag">MAP 1</span></td><td>Context, purpose and users established</td><td class="appr">03 Inventory</td></tr>
+        <tr><td></td><td><span class="tag">MAP 2</span></td><td>AI system categorized</td><td class="appr">04 Risk engine &middot; 05 Tiers</td></tr>
+        <tr><td></td><td><span class="tag">MAP 3</span></td><td>Capabilities, targets, costs and benefits</td><td class="appr">11 Approval intake</td></tr>
+        <tr><td></td><td><span class="tag">MAP 4</span></td><td>Risks mapped across all components, third party included</td><td class="appr">03 Inventory &middot; 07 Vendor AI</td></tr>
+        <tr><td></td><td><span class="tag">MAP 5</span></td><td>Impacts to individuals, groups and society</td><td class="appr">04 Decision consequence factor</td></tr>
+        <tr class="fnhead"><td colspan="4">MEASURE &mdash; test it, and keep testing it</td></tr>
+        <tr><td></td><td><span class="tag">MEASURE 1</span></td><td>Methods and metrics identified</td><td class="appr">09 Lifecycle tests &middot; 10 Assurance</td></tr>
+        <tr><td></td><td><span class="tag">MEASURE 2</span></td><td>Evaluated for trustworthy characteristics</td><td class="appr">09 Build / test &middot; 10 Before production</td></tr>
+        <tr><td></td><td><span class="tag">MEASURE 3</span></td><td>Mechanisms for tracking identified risks</td><td class="appr">10 Runtime monitoring</td></tr>
+        <tr><td></td><td><span class="tag">MEASURE 4</span></td><td>Feedback on whether the measurement works</td><td class="appr">01 Assure</td></tr>
+        <tr class="fnhead"><td colspan="4">MANAGE &mdash; act on what you found</td></tr>
+        <tr><td></td><td><span class="tag">MANAGE 1</span></td><td>Risks prioritized and responded to</td><td class="appr">05 Tiers &middot; 11 Approval</td></tr>
+        <tr><td></td><td><span class="tag">MANAGE 2</span></td><td>Strategies to maximize benefit, minimize harm</td><td class="appr">03 Lane controls &middot; 06 Agentic control plane</td></tr>
+        <tr><td></td><td><span class="tag">MANAGE 3</span></td><td>Third-party risks managed</td><td class="appr">07 Vendor AI</td></tr>
+        <tr><td></td><td><span class="tag">MANAGE 4</span></td><td>Treatments documented and monitored, incidents handled</td><td class="appr">10 Detect &amp; respond &middot; 01 Monitor</td></tr>
+        <tr class="fnhead cross"><td colspan="4">GOVERN &mdash; cross-cutting, sits over all three</td></tr>
+        <tr><td></td><td><span class="tag">GOVERN 1</span></td><td>Policies, processes and procedures in place</td><td class="appr">01 Operating model &middot; 11 Approval</td></tr>
+        <tr><td></td><td><span class="tag">GOVERN 2</span></td><td>Accountability structures and named roles</td><td class="appr">02 Accountability</td></tr>
+        <tr><td></td><td><span class="tag">GOVERN 3</span></td><td>Workforce competency and team composition</td><td class="appr">02 Accountability &mdash; <em>thin</em></td></tr>
+        <tr><td></td><td><span class="tag">GOVERN 4</span></td><td>Culture of risk awareness</td><td class="appr">08 Shadow AI coaching</td></tr>
+        <tr><td></td><td><span class="tag">GOVERN 5</span></td><td>Stakeholder engagement and feedback</td><td class="appr">10 User feedback &mdash; <em>thin</em></td></tr>
+        <tr><td></td><td><span class="tag">GOVERN 6</span></td><td>Third-party and supply chain policy</td><td class="appr">07 Vendor AI</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note"><b>GOVERN 3 and GOVERN 5 come out weak, and they are the same two every security-led programme misses.</b> Workforce competency and stakeholder engagement have no real home here. An assessor working the GOVERN layer will stop there first.</div>
+  </div>
+  </div>
+</details>
+
+<details open class="sub" id="s5-4">
+  <summary><span class="sn">5.4</span><span class="st">Which frameworks, and in what order</span><span class="sw">Must have, nice to have, and the agentic gap</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+  <p class="lede">They are not competing options. Buy the must-haves, borrow from the nice-to-haves, and know what none of them covers.</p>
+
+  <div class="tiers2">
+    <div class="tcol must">
+      <div class="tch"><svg class="ic"><use href="#i-checkc"/></svg>Must have</div>
+      <div class="fw"><b>ISO/IEC 42001</b><span>The management system. Certifiable.</span><i>38 controls</i></div>
+      <div class="fw"><b>ISO/IEC 27001</b><span>Your security baseline underneath it.</span><i>93 controls</i></div>
+      <div class="fw"><b>NIST AI RMF</b><span>The language you use with the board.</span><i>0 controls &middot; 19 categories</i></div>
+      <div class="fw"><b>EU AI Act</b><span>If you touch the EU. Not optional.</span><i>Obligations, from 2 Aug 2026</i></div>
+      <div class="fw"><b>Sector regulation</b><span>FDA &sect;524B, ISO 14971, IEC 62304 in medtech.</span><i>Evidence packages</i></div>
+    </div>
+    <div class="tcol nice">
+      <div class="tch"><svg class="ic"><use href="#i-lamp"/></svg>Nice to have</div>
+      <div class="fw"><b>CSA AICM</b><span>Where the real AI security controls live.</span><i>200+ objectives</i></div>
+      <div class="fw"><b>OWASP LLM &amp; Agentic</b><span>What you red team against.</span><i>Threat lists</i></div>
+      <div class="fw"><b>MITRE ATLAS</b><span>Adversary techniques for scenario design.</span><i>Knowledge base</i></div>
+      <div class="fw"><b>NIST SP 800-218A</b><span>Secure development for generative AI.</span><i>Practices</i></div>
+      <div class="fw"><b>ISO 23894 &amp; 42005</b><span>How to run risk and impact assessment.</span><i>Guidance</i></div>
+    </div>
+  </div>
+
+  
+<details open class="sub3"><summary><span class="s3t">Where the actual controls are</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+<div class="sub3body">
+  <div class="card">
+    <div class="bars">
+      <div class="bar"><span class="bl">CSA AICM</span><div class="btrack"><div class="bfill" style="width:100%"></div></div><span class="bv">200+</span></div>
+      <div class="bar"><span class="bl">ISO/IEC 27001 Annex A</span><div class="btrack"><div class="bfill b2" style="width:46%"></div></div><span class="bv">93</span></div>
+      <div class="bar"><span class="bl">ISO/IEC 42001 Annex A</span><div class="btrack"><div class="bfill b3" style="width:19%"></div></div><span class="bv">38</span></div>
+      <div class="bar"><span class="bl">NIST AI RMF</span><div class="btrack"><div class="bfill b0" style="width:0"></div></div><span class="bv zero">0</span></div>
+      <div class="bar"><span class="bl">EU AI Act</span><div class="btrack"><div class="bfill b0" style="width:0"></div></div><span class="bv zero">0</span></div>
+      <div class="bar"><span class="bl">OWASP / ATLAS</span><div class="btrack"><div class="bfill b0" style="width:0"></div></div><span class="bv zero">0</span></div>
+    </div>
+    <div class="note"><b>The three most-cited frameworks contain no controls at all.</b> NIST AI RMF gives outcomes, the AI Act gives obligations, OWASP and ATLAS give threats. If your programme cites only those, you have described your risk without treating it.</div>
+  </div>
+
+  </div>
+</details>
+
+<details open class="sub3"><summary><span class="s3t">The agentic gap</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+<div class="sub3body">
+  <div class="gapgrid">
+    <div class="gp"><b>Agent identity</b><span>A non-human principal with its own credentials</span><i class="none">Nothing certifiable</i></div>
+    <div class="gp"><b>Tool &amp; action authorization</b><span>Policy decision before the action runs</span><i class="part">AICM &middot; OWASP, partial</i></div>
+    <div class="gp"><b>Human-in-the-loop</b><span>When approval is required, and by whom</span><i class="part">EU AI Act Art. 14, in principle</i></div>
+    <div class="gp"><b>Kill switch &amp; containment</b><span>Stopping an agent mid-trajectory</span><i class="none">Nothing certifiable</i></div>
+    <div class="gp"><b>Action audit trail</b><span>Reconstructing what an agent did and why</span><i class="part">27001 logging, not agent-aware</i></div>
+    <div class="gp"><b>Multi-agent delegation</b><span>Authority passed between agents</span><i class="none">Nothing at all</i></div>
+    <div class="gp red"><b>Agentic red teaming</b><span>Adversarial testing of an agent that plans, calls tools and keeps state</span><i class="none">Nothing at all</i></div>
+    <div class="gp red"><b>Trajectory &amp; tool-misuse testing</b><span>Testing the multi-step path, not the single prompt</span><i class="none">Nothing at all</i></div>
+    <div class="gp red"><b>Agent evaluation criteria</b><span>What "passed" even means for an autonomous system</span><i class="none">Nothing at all</i></div>
+  </div>
+  <div class="alarm">
+    <div class="alarm-h"><svg class="ic"><use href="#i-alert"/></svg>No framework tells you how to test an agent</div>
+    <p>Every red team tool in this deck &mdash; PyRIT, garak, promptfoo &mdash; tests a <b>prompt</b>. Agents fail somewhere else: on the third tool call, in a delegation chain, when state from turn one poisons turn nine. Nothing in ISO 42001, the AI Act, NIST AI RMF or the SSDF tells you how to test that, what coverage looks like, or when to stop. Even AICM and the OWASP agentic list describe the risk without prescribing the test.</p>
+    <p><b>Which means you write the method yourself.</b> Define your own trajectory test suite, your own tool-misuse cases, your own pass criteria &mdash; and document that you invented them, because an assessor will ask which standard you followed and there isn't one. Say so plainly rather than mapping it to a control that doesn't fit.</p>
+  </div>
+  <div class="note"><b>Two gaps survive the full stack.</b> Agentic runtime authorization is addressed only by CSA AICM and the OWASP agentic list, neither of which you can certify against. And shadow AI discovery appears in no framework as a control &mdash; every one assumes you already know what you have. Practices 06 and 08 exist because the standards don't cover them, and that is worth saying out loud rather than mapping around.</div></div>
+</details>
+
+  </div>
+</details>
+</div>
+</details>
+
+<div class="commit">
+  <div class="cm"><svg class="ic lg"><use href="#i-lamp"/></svg><b>Enable innovation</b><span>Make safe and approved AI easy to use.</span></div>
+  <div class="cm"><svg class="ic lg"><use href="#i-shield"/></svg><b>Protect what matters</b><span>Protect data, customers, and the business.</span></div>
+  <div class="cm"><svg class="ic lg"><use href="#i-checkc"/></svg><b>Build trust</b><span>Demonstrate responsibility and transparency.</span></div>
+  <div class="cm"><svg class="ic lg"><use href="#i-refresh"/></svg><b>Continuously improve</b><span>AI evolves. Governance must evolve too.</span></div>
+  <div class="cm"><svg class="ic lg"><use href="#i-net"/></svg><b>One enterprise</b><span>One framework. Many AI. Consistent everywhere.</span></div>
+</div>
+
+</div><!-- /p1 -->
+
+<!-- ============================ TAB 4 ============================ -->
+<div class="panel" id="p4" role="tabpanel" aria-labelledby="t4" hidden>
+<div class="expander" style="margin:26px 0 0"><button type="button" class="xall">Expand all</button><button type="button" class="call">Collapse all</button></div>
+
+<details open class="grp" id="oA">
+  <summary><span class="gn">A</span><span class="gt">The run book</span><span class="gs">Five moves, made concrete</span><svg class="ic chev"><use href="#i-chev"/></svg></summary>
+  <div class="grpbody">  <p class="lede">Each move in the operating model, turned into something a named person does on a trigger, produces a record for, and can be held to. One accountable owner per row &mdash; never two.</p>
+  <div class="card">
+    <div class="scroller"><table class="rb">
+      <thead><tr><th>Move</th><th>Trigger</th><th>Accountable</th><th>Produces</th><th>Target</th><th>If it doesn't happen</th></tr></thead>
+      <tbody>
+        <tr><td><b>Discover</b></td><td>Continuous feeds, or an intake form</td><td class="acc">AI Security &rarr; product owner on registration</td><td>Register entry with a named owner</td><td class="sla">Before first use</td><td class="rk">You govern a fraction of what exists, and nothing has an owner</td></tr>
+        <tr><td><b>Decide</b></td><td>Registration complete</td><td class="acc">GRC tiers &middot; AI Security approves T1&ndash;2 &middot; Council approves T3&ndash;4</td><td>Tier with rationale, decision, conditions</td><td class="sla">1 / 5 / 15 days / monthly</td><td class="rk">Critical systems get trivial scrutiny, and people route around you</td></tr>
+        <tr><td><b>Control</b></td><td>Approval with conditions</td><td class="acc">Engineering</td><td>Controls live, gated in the pipeline</td><td class="sla">Before go-live</td><td class="rk">Approved on paper, unprotected in production</td></tr>
+        <tr><td><b>Monitor</b></td><td>Go-live, then alerts</td><td class="acc">SOC, escalating to the product owner</td><td>Telemetry in the SIEM, incident records</td><td class="sla">Continuous &middot; triage 1h &middot; owner 4h</td><td class="rk">A customer tells you first, and the clock has already run</td></tr>
+        <tr><td><b>Assure</b></td><td>Schedule, or any material change</td><td class="acc">AI Security, with GRC on evidence</td><td>Test results, attestation, updated tier</td><td class="sla">Quarterly for Tier 3&ndash;4</td><td class="rk">Your evidence describes a system that no longer exists</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note">Targets shown are defaults, not law. Set your own &mdash; but set them, publish them, and report against them. An approval process with no stated turnaround is an approval process people avoid.</div>
+  </div></div>
+</details>
+
+<details open class="grp" id="oB">
+  <summary><span class="gn">B</span><span class="gt">Who does what</span><span class="gs">RACI</span><svg class="ic chev"><use href="#i-chev"/></svg></summary>
+  <div class="grpbody">  <p class="lede">One <b class="ra">A</b> per row. If two people are accountable, nobody is.</p>
+  <div class="card">
+    <div class="scroller"><table class="raci">
+      <thead><tr><th>Activity</th><th>Product<br>owner</th><th>Eng</th><th>AI<br>Security</th><th>Privacy</th><th>Legal</th><th>Procure<br>ment</th><th>GRC</th><th>SOC</th><th>Exec<br>council</th></tr></thead>
+      <tbody>
+        <tr><td>Discover AI in use</td><td>I</td><td>C</td><td class="ra">A</td><td>I</td><td>&mdash;</td><td>C</td><td>I</td><td>R</td><td>I</td></tr>
+        <tr><td>Register a system</td><td class="ra">A</td><td>R</td><td>C</td><td>C</td><td>&mdash;</td><td>&mdash;</td><td>R</td><td>&mdash;</td><td>I</td></tr>
+        <tr><td>Assign the risk tier</td><td>C</td><td>&mdash;</td><td>C</td><td>C</td><td>C</td><td>&mdash;</td><td class="ra">A</td><td>&mdash;</td><td>I</td></tr>
+        <tr><td>Approve Tier 1&ndash;2</td><td>R</td><td>I</td><td class="ra">A</td><td>C</td><td>&mdash;</td><td>&mdash;</td><td>I</td><td>&mdash;</td><td>&mdash;</td></tr>
+        <tr><td>Approve Tier 3&ndash;4</td><td>R</td><td>C</td><td>R</td><td>C</td><td>C</td><td>C</td><td>R</td><td>&mdash;</td><td class="ra">A</td></tr>
+        <tr><td>Threat model &amp; red team</td><td>C</td><td>R</td><td class="ra">A</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>I</td><td>C</td><td>I</td></tr>
+        <tr><td>Apply lane controls</td><td>C</td><td class="ra">A</td><td>R</td><td>C</td><td>&mdash;</td><td>&mdash;</td><td>I</td><td>C</td><td>&mdash;</td></tr>
+        <tr><td>Agent authorization design</td><td>C</td><td>R</td><td class="ra">A</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>I</td><td>C</td><td>I</td></tr>
+        <tr><td>Vendor assessment &amp; AI-BOM</td><td>C</td><td>C</td><td>R</td><td>R</td><td>R</td><td class="ra">A</td><td>C</td><td>&mdash;</td><td>I</td></tr>
+        <tr><td>Shadow AI decision</td><td>C</td><td>&mdash;</td><td class="ra">A</td><td>C</td><td>&mdash;</td><td>C</td><td>I</td><td>R</td><td>&mdash;</td></tr>
+        <tr><td>Pipeline gates</td><td>I</td><td class="ra">A</td><td>R</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>C</td><td>&mdash;</td><td>&mdash;</td></tr>
+        <tr><td>Runtime monitoring</td><td>I</td><td>R</td><td>R</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>I</td><td class="ra">A</td><td>&mdash;</td></tr>
+        <tr><td>AI incident response</td><td>R</td><td>R</td><td>R</td><td>C</td><td>C</td><td>&mdash;</td><td>C</td><td class="ra">A</td><td>I</td></tr>
+        <tr><td>Re-review &amp; re-tier</td><td>R</td><td>C</td><td>C</td><td>C</td><td>&mdash;</td><td>C</td><td class="ra">A</td><td>&mdash;</td><td>I</td></tr>
+        <tr><td>Report to the board</td><td>I</td><td>&mdash;</td><td>C</td><td>C</td><td>C</td><td>&mdash;</td><td>R</td><td>&mdash;</td><td class="ra">A</td></tr>
+      </tbody>
+    </table></div>
+    <div class="covkey"><span><b class="ra">A</b> Accountable</span><span><b>R</b> Responsible</span><span><b>C</b> Consulted</span><span><b>I</b> Informed</span></div>
+  </div></div>
+</details>
+
+<details open class="grp" id="oC">
+  <summary><span class="gn">C</span><span class="gt">The rhythm</span><span class="gs">What happens, how often</span><svg class="ic chev"><use href="#i-chev"/></svg></summary>
+  <div class="grpbody">  <p class="lede">Governance that only happens at approval is a gate. Governance on a calendar is an operating model.</p>
+  <div class="cad">
+    <div class="cd"><div class="cad-h">Continuous</div><ul>
+      <li><span class="dot"></span>Discovery feeds ingesting</li><li><span class="dot"></span>Gateway, DLP and agent logs to SIEM</li>
+      <li><span class="dot"></span>Guardrails enforcing inline</li></ul><div class="who">SOC &middot; AI Security</div></div>
+    <div class="cd"><div class="cad-h">Weekly</div><ul>
+      <li><span class="dot"></span>Intake queue cleared</li><li><span class="dot"></span>New registrations reviewed</li>
+      <li><span class="dot"></span>Shadow AI findings triaged</li></ul><div class="who">AI Security &middot; GRC</div></div>
+    <div class="cd"><div class="cad-h">Monthly</div><ul>
+      <li><span class="dot"></span>Eval regression on Tier 3&ndash;4</li><li><span class="dot"></span>Vendor change alerts worked</li>
+      <li><span class="dot"></span>Register completeness and orphans</li><li><span class="dot"></span>Exec council meets</li></ul><div class="who">Product owners &middot; Exec council</div></div>
+    <div class="cd"><div class="cad-h">Quarterly</div><ul>
+      <li><span class="dot"></span>Re-tier Tier 3&ndash;4</li><li><span class="dot"></span>Red team the highest-risk systems</li>
+      <li><span class="dot"></span>Vendor re-assessment and AI-BOM refresh</li><li><span class="dot"></span>Subprocessor list diff</li></ul><div class="who">AI Security &middot; Procurement</div></div>
+    <div class="cd"><div class="cad-h">Annually</div><ul>
+      <li><span class="dot"></span>Policy and standard review</li><li><span class="dot"></span>Framework gap assessment</li>
+      <li><span class="dot"></span>AI incident tabletop</li><li><span class="dot"></span>Board report</li></ul><div class="who">GRC &middot; Board</div></div>
+    <div class="cd ev"><div class="cad-h">On event</div><ul>
+      <li><span class="dot"></span>Material vendor change &rarr; reassess in 30 days</li><li><span class="dot"></span>New agent action &rarr; re-authorize</li>
+      <li><span class="dot"></span>Incident &rarr; run book, then re-tier</li><li><span class="dot"></span>Regulation change &rarr; gap check</li></ul><div class="who">Triggered, not scheduled</div></div>
+  </div></div>
+</details>
+
+<details open class="grp" id="oD">
+  <summary><span class="gn">D</span><span class="gt">The risks you are managing</span><span class="gs">Name them, own them</span><svg class="ic chev"><use href="#i-chev"/></svg></summary>
+  <div class="grpbody">  <p class="lede">Twelve failure modes that show up in real programmes. Each has a lane, a control that addresses it, and one accountable owner.</p>
+  <div class="card">
+    <div class="scroller"><table class="rsk">
+      <thead><tr><th>Risk</th><th>Lane</th><th>What stops it</th><th>Accountable</th></tr></thead>
+      <tbody>
+        <tr><td><b>Sensitive data pasted into an unsanctioned tool</b></td><td><span class="ln le">E</span></td><td>Discovery, DLP, approved alternatives</td><td class="acc">AI Security &mdash; lane E</td></tr>
+        <tr><td><b>Prompt injection leads to data exfiltration</b></td><td><span class="ln lb">B</span></td><td>Input validation, output controls, gateway</td><td class="acc">Product Security</td></tr>
+        <tr><td><b>Agent takes an action nobody authorized</b></td><td><span class="ln lc">C</span></td><td>Policy enforcement point, least privilege</td><td class="acc">AI Security &mdash; lane C</td></tr>
+        <tr><td><b>Vendor changes the model without telling you</b></td><td><span class="ln ld">D</span></td><td>Version pinning, canary evals, notice clause</td><td class="acc">Procurement</td></tr>
+        <tr><td><b>Your data trains someone else's model</b></td><td><span class="ln ld">D</span></td><td>Contract terms, DPA flow-down, AI-BOM</td><td class="acc">Legal</td></tr>
+        <tr><td><b>RAG returns records the user shouldn't see</b></td><td><span class="ln lb">B</span></td><td>Entitlement-aware retrieval, index scoping</td><td class="acc">Engineering</td></tr>
+        <tr><td><b>Output drifts and a real decision goes wrong</b></td><td><span class="ln lb">B</span></td><td>Golden-set evals, drift monitoring, human review</td><td class="acc">Product owner</td></tr>
+        <tr><td><b>AI reaches production unregistered</b></td><td><span class="ln la">A</span></td><td>Pipeline gate on register ID</td><td class="acc">Engineering</td></tr>
+        <tr><td><b>A high-risk system ships with no impact assessment</b></td><td><span class="ln la">A</span></td><td>Tiering at intake, approval gate</td><td class="acc">GRC</td></tr>
+        <tr><td><b>No provenance for a model or dataset</b></td><td><span class="ln ld">D</span></td><td>AI-BOM at every release, signing</td><td class="acc">Product Security</td></tr>
+        <tr><td><b>Agent credentials escalate into other systems</b></td><td><span class="ln lc">C</span></td><td>Agent identity, scoped tokens, kill switch</td><td class="acc">IAM</td></tr>
+        <tr><td><b>An incident happens and there are no logs</b></td><td><span class="ln la">A</span></td><td>Observability as a go-live condition</td><td class="acc">SOC</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note"><b>This is a starting list, not your risk register.</b> Run it against your own environment and expect a third of it to be irrelevant and a third of it to be missing. What matters is the shape: a named failure, the control that addresses it, one owner.</div>
+  </div></div>
+</details>
+
+<details open class="grp" id="oE">
+  <summary><span class="gn">E</span><span class="gt">What this means for you</span><span class="gs">By role</span><svg class="ic chev"><use href="#i-chev"/></svg></summary>
+  <div class="grpbody">  <p class="lede">The same operating model, read from five different desks.</p>
+  
+<details open class="sub" id="oe-1">
+  <summary><span class="sn">E.1</span><span class="st">Product / business owner</span><span class="sw">You own the risk. Not security.</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+<div class="role bare">
+      <h4><svg class="ic lg"><use href="#i-person"/></svg>Product / business owner</h4>
+      <div class="owns">You own the risk. Not security.</div>
+      <ul><li><svg class="ic sm tick"><use href="#i-check"/></svg>Register it before anyone uses it</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Answer the intake honestly &mdash; it sets your tier</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Accept the conditions or don't ship</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Watch your evals; you see drift first</li></ul>
+      <div class="esc">Escalate when the AI starts making a decision a person used to make.</div>
+    </div>
+  </div>
+</details>
+
+<details open class="sub" id="oe-2">
+  <summary><span class="sn">E.2</span><span class="st">Engineer</span><span class="sw">You own that the controls are real.</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+<div class="role bare">
+      <h4><svg class="ic lg"><use href="#i-code"/></svg>Engineer</h4>
+      <div class="owns">You own that the controls are real.</div>
+      <ul><li><svg class="ic sm tick"><use href="#i-check"/></svg>No register ID, no deploy</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Route model calls through the gateway</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Give agents their own identity, never a shared one</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Log enough to investigate later</li></ul>
+      <div class="esc">Escalate when an agent needs a permission you'd hesitate to give a contractor.</div>
+    </div>
+  </div>
+</details>
+
+<details open class="sub" id="oe-3">
+  <summary><span class="sn">E.3</span><span class="st">AI Security</span><span class="sw">You own the lanes and the assurance.</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+<div class="role bare">
+      <h4><svg class="ic lg"><use href="#i-shield"/></svg>AI Security</h4>
+      <div class="owns">You own the lanes and the assurance.</div>
+      <ul><li><svg class="ic sm tick"><use href="#i-check"/></svg>Keep discovery running and the queue clear</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Threat model and red team Tier 3&ndash;4</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Approve fast at Tier 1&ndash;2, or lose the process</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Offer the better tool before you block one</li></ul>
+      <div class="esc">Escalate when the same unapproved tool keeps reappearing &mdash; that's a product gap.</div>
+    </div>
+  </div>
+</details>
+
+<details open class="sub" id="oe-4">
+  <summary><span class="sn">E.4</span><span class="st">Procurement, Legal &amp; Privacy</span><span class="sw">You own the chain beyond Tier 1.</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+<div class="role bare">
+      <h4><svg class="ic lg"><use href="#i-scale"/></svg>Procurement, Legal &amp; Privacy</h4>
+      <div class="owns">You own the chain beyond Tier 1.</div>
+      <ul><li><svg class="ic sm tick"><use href="#i-check"/></svg>Get the AI addendum into the contract</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Take delivery of the AI-BOM and file it</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Track the subprocessor list for changes</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Make processor terms flow down, in writing</li></ul>
+      <div class="esc">Escalate when the vendor won't answer for their own suppliers.</div>
+    </div>
+  </div>
+</details>
+
+<details open class="sub" id="oe-5">
+  <summary><span class="sn">E.5</span><span class="st">Everyone else</span><span class="sw">You own what you paste.</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+<div class="role bare">
+      <h4><svg class="ic lg"><use href="#i-users"/></svg>Everyone else</h4>
+      <div class="owns">You own what you paste.</div>
+      <ul><li><svg class="ic sm tick"><use href="#i-check"/></svg>Use the approved tools &mdash; they're on the list</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Ask before putting customer or patient data in</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Check the output before you act on it</li>
+        <li><svg class="ic sm tick"><use href="#i-check"/></svg>Tell someone when it gets something wrong</li></ul>
+      <div class="esc">Escalate when the approved tool can't do the job. That's information, not a complaint.</div>
+    </div>
+  </div>
+</details>
+</div>
+</details>
+
+<details open class="grp" id="oF">
+  <summary><span class="gn">F</span><span class="gt">First ninety days</span><span class="gs">If you're starting today</span><svg class="ic chev"><use href="#i-chev"/></svg></summary>
+  <div class="grpbody"><p class="lede">Order matters more than completeness. Each window assumes the one before it.</p>
+<details open class="sub" id="of-1">
+  <summary><span class="sn">F.1</span><span class="st">Days 1&ndash;30</span><span class="sw">Get something to attach everything else to</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+<ul><li><svg class="ic sm tick"><use href="#i-check"/></svg>Stand up the register, however crude</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>Name the five lane owners</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>Turn on discovery from what you already own</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>Publish the approved tools list</li></ul>
+  </div>
+</details>
+
+<details open class="sub" id="of-2">
+  <summary><span class="sn">F.2</span><span class="st">Days 31&ndash;60</span><span class="sw">Make the process usable, and use it</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+<ul><li><svg class="ic sm tick"><use href="#i-check"/></svg>Open the intake form and commit to a turnaround</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>Tier everything already in production</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>Add the AI addendum to new contracts</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>Get gateway and DLP logs into the SIEM</li></ul>
+  </div>
+</details>
+
+<details open class="sub" id="of-3">
+  <summary><span class="sn">F.3</span><span class="st">Days 61&ndash;90</span><span class="sw">Prove it works, then report it</span><svg class="ic sm chev"><use href="#i-chev"/></svg></summary>
+  <div class="subbody">
+<ul><li><svg class="ic sm tick"><use href="#i-check"/></svg>Gate the pipeline on a register ID</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>Red team your highest-tier system</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>Run one AI incident tabletop</li><li><svg class="ic sm tick"><use href="#i-check"/></svg>First report to the council</li></ul>
+  </div>
+</details>
+
+<div class="note"><b>Order matters more than completeness.</b> Register and owners first, because every later control needs something to attach to. Tooling last &mdash; you will pick better tools once you know what you actually have.</div></div>
+</details>
+
+</div><!-- /p4 -->
+
+<footer>
+  <span>An AI governance operating model</span>
+  <span>Innovate with AI confidently: paved roads, the right guardrails, continuous assurance.</span>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var tabs=[].slice.call(document.querySelectorAll('.tab'));
+  function select(t){
+    tabs.forEach(function(x){
+      var on=(x===t);
+      x.setAttribute('aria-selected',on?'true':'false');
+      document.getElementById(x.getAttribute('aria-controls')).hidden=!on;
+    });
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  tabs.forEach(function(t){
+    t.addEventListener('click',function(){select(t);});
+    t.addEventListener('keydown',function(e){
+      var i=tabs.indexOf(t);
+      if(e.key==='ArrowRight'){tabs[(i+1)%tabs.length].focus();select(tabs[(i+1)%tabs.length]);}
+      if(e.key==='ArrowLeft'){tabs[(i-1+tabs.length)%tabs.length].focus();select(tabs[(i-1+tabs.length)%tabs.length]);}
+    });
+  });
+})();
+</script>
+<script>
+(function(){
+  function all(v,scope){document.querySelectorAll((scope||'')+' details').forEach(function(d){d.open=v;});}
+  document.querySelectorAll('.expander .xall, #xall').forEach(function(b){
+    b.addEventListener('click',function(){all(true,'#'+b.closest('.panel').id);});});
+  document.querySelectorAll('.expander .call, #call').forEach(function(b){
+    b.addEventListener('click',function(){all(false,'#'+b.closest('.panel').id);});});
+  function openTo(el){while(el&&el!==document.body){if(el.tagName==='DETAILS')el.open=true;el=el.parentElement;}}
+  function fromHash(){var id=location.hash.slice(1);if(!id)return;var t=document.getElementById(id);
+    if(t){openTo(t);t.scrollIntoView({behavior:'smooth',block:'start'});}}
+  document.addEventListener('click',function(e){
+    var a=e.target.closest('a[href^="#"]'); if(!a)return;
+    var t=document.getElementById(a.getAttribute('href').slice(1));
+    if(t){e.preventDefault();openTo(t);history.replaceState(null,'',a.getAttribute('href'));
+      t.scrollIntoView({behavior:'smooth',block:'start'});}
+  });
+  window.addEventListener('hashchange',fromHash); fromHash();
+  window.addEventListener('beforeprint',function(){document.querySelectorAll('details').forEach(function(d){d.open=true;});});
+})();
+</script>
+</body>
+</html>
