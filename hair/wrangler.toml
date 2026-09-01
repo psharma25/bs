@@ -1,0 +1,22 @@
+# The whole prototype: page + API in one Worker on thebitsense.com/hair
+#
+# The key is NOT here and must never be. CI pushes it from your GitHub secret,
+# or set it by hand once with:
+#     npx wrangler secret put GEMINI_API_KEY
+
+name = "hair"
+main = "hair-worker.js"
+compatibility_date = "2026-01-01"
+
+# thebitsense.com must be a zone in this Cloudflare account, and its DNS record
+# must be proxied (orange cloud). Grey cloud bypasses Workers entirely.
+routes = [
+  { pattern = "thebitsense.com/hair", zone_name = "thebitsense.com" },
+  { pattern = "thebitsense.com/hair/*", zone_name = "thebitsense.com" }
+]
+
+# Optional. Delete this block and the app still generates pictures; the page
+# just downloads them to the device instead of saving them server-side.
+[[r2_buckets]]
+binding = "SAVES"
+bucket_name = "hairstyle-saves"
