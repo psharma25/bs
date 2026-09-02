@@ -6,20 +6,23 @@
 <title>Trust Center – PromptHalo</title>
 <meta name="description" content="Security, compliance, privacy, and reliability for PromptHalo.">
 <style>
+html{color-scheme:dark}
+
 :root{
-  --paper:#f5f7f9; --card:#ffffff;
-  --ink:#16232e; --ink-soft:#44586a; --ink-faint:#6d8092;
-  --petrol:#1b4965; --petrol-deep:#12344a;
-  --ok:#2e7d5b; --ok-tint:#eaf5ef;
-  --progress:#b07d2a; --progress-tint:#faf3e4;
-  --align:#3d6b8f; --align-tint:#edf3f8;
-  --plan:#6d8092; --plan-tint:#f0f3f5;
-  --line:#dbe3e9; --line-soft:#e9eef2;
+  --paper:#0a0f1c; --card:#1a2740;
+  --ink:#e9eefb; --ink-soft:#a7b6d2; --ink-faint:#7787a6;
+  --petrol:#7c74ff; --petrol-deep:#3c30f0;
+  --ok:#5ecf9e; --ok-tint:#0f2b22;
+  --progress:#e0a94a; --progress-tint:#2d2412;
+  --align:#8aa9ff; --align-tint:#17233f;
+  --plan:#8595b5; --plan-tint:#1a2135;
+  --line:#2e3f5f; --line-soft:#26344e;
   --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Menlo,Consolas,monospace;
   --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  --accent:var(--petrol); --accent-tint:#eef4f8;
+  --accent:var(--petrol); --accent-tint:#1b2140;
+  --accent2:#cc3cf0;
   --radius:14px;
-  --shadow:0 1px 2px rgba(18,52,74,.05),0 6px 18px rgba(18,52,74,.07);
+  --shadow:0 1px 2px rgba(0,0,0,.34),0 8px 24px rgba(0,0,0,.42);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;scroll-padding-top:86px}
@@ -31,7 +34,7 @@ a:hover{text-decoration:underline}
 button{font-family:inherit}
 
 /* ---------- Header ---------- */
-.topbar{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar{position:sticky;top:0;z-index:60;background:rgba(10,15,28,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .topbar-inner{max-width:1080px;margin:0 auto;padding:0 24px;height:66px;display:flex;align-items:center;gap:26px}
 .brand-lockup{display:flex;align-items:center;gap:10px;min-width:0}
 .brand-lockup svg{flex:none}
@@ -44,7 +47,7 @@ button{font-family:inherit}
 .menu>button:hover,.menu>button[aria-expanded="true"]{background:var(--line-soft);color:var(--ink)}
 .menu>button .car{font-size:9px;transition:transform .15s}
 .menu>button[aria-expanded="true"] .car{transform:rotate(180deg)}
-.menu-list{position:absolute;top:calc(100% + 8px);right:0;min-width:230px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 40px rgba(18,52,74,.16);padding:7px;display:none;z-index:70}
+.menu-list{position:absolute;top:calc(100% + 8px);right:0;min-width:230px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 40px rgba(18,52,74,.16);padding:7px;display:none;z-index:70}
 .menu-list.open{display:block}
 .menu-list a,.menu-list button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:transparent;cursor:pointer;padding:9px 11px;border-radius:8px;font-size:13.5px;color:var(--ink);font-weight:550}
 .menu-list a:hover,.menu-list button:hover{background:var(--accent-tint);text-decoration:none}
@@ -69,12 +72,12 @@ h1{font-size:33px;line-height:1.16;letter-spacing:-.022em;font-weight:800;max-wi
 .hero-meta:empty{display:none}
 .hero-meta strong{color:var(--ink-soft);font-weight:600}
 .pillars{margin-top:28px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.pillar{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 16px;display:block;color:inherit;box-shadow:var(--shadow)}
-.pillar:hover{text-decoration:none;border-color:var(--accent);background:#fff}
+.pillar{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 16px;display:block;color:inherit;box-shadow:var(--shadow)}
+.pillar:hover{text-decoration:none;border-color:var(--accent);background:var(--card)}
 .pillar .p-ico{width:32px;height:32px;border-radius:8px;background:var(--accent-tint);display:flex;align-items:center;justify-content:center;margin-bottom:10px;color:var(--accent)}
 .pillar h3{font-size:14px;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
 .pillar p{font-size:12.5px;color:var(--ink-soft);margin-top:3px}
-.ledger{margin-top:26px;border:1px solid var(--line);border-radius:13px;background:#fff;overflow:hidden}
+.ledger{margin-top:26px;border:1px solid var(--line);border-radius:13px;background:var(--card);overflow:hidden}
 .ledger-head{display:flex;align-items:baseline;gap:12px;padding:13px 20px;border-bottom:1px solid var(--line-soft);background:linear-gradient(to right,var(--accent-tint),transparent 60%)}
 .ledger-head h2{font-size:12.5px;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:600}
 .ledger-head span{font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);margin-left:auto}
@@ -84,8 +87,8 @@ h1{font-size:33px;line-height:1.16;letter-spacing:-.022em;font-weight:800;max-wi
 .seal-name{font-weight:700;font-size:13.5px}
 .seal-scope{font-size:12px;color:var(--ink-faint);margin-top:1px}
 .seal-status{display:inline-block;margin-top:7px;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:2.5px 8px;border-radius:5px;font-weight:600}
-.seal-req{background:none;border:0;border-bottom:1px solid #c5d3dd;padding:0;cursor:pointer;font-family:var(--mono);font-size:11px;color:var(--petrol)}.seal-link+.seal-link{margin-left:12px}
-.seal-link{display:inline-block;margin-top:7px;font-family:var(--mono);font-size:11px;color:var(--petrol);text-decoration:none;border-bottom:1px solid #c5d3dd}.seal-link:hover{border-color:var(--petrol)}
+.seal-req{background:none;border:0;border-bottom:1px solid var(--line);padding:0;cursor:pointer;font-family:var(--mono);font-size:11px;color:var(--petrol)}.seal-link+.seal-link{margin-left:12px}
+.seal-link{display:inline-block;margin-top:7px;font-family:var(--mono);font-size:11px;color:var(--petrol);text-decoration:none;border-bottom:1px solid var(--line)}.seal-link:hover{border-color:var(--petrol)}
 .seal-date{font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:6px}
 .st-ok{color:var(--ok);background:var(--ok-tint)}
 .st-progress{color:var(--progress);background:var(--progress-tint)}
@@ -105,10 +108,10 @@ details.panel>summary::-webkit-details-marker{display:none}
 .p-head{flex:1;min-width:0}
 .p-head .kicker{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:3px}
 .p-head h2{font-size:19px;letter-spacing:-.015em;font-weight:800}
-.chev{flex:none;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--ink-soft);transition:transform .18s;background:#fff}
+.chev{flex:none;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--ink-soft);transition:transform .18s;background:var(--card)}
 details.panel[open]>summary .chev{transform:rotate(180deg)}
 details.panel>summary:hover .chev{border-color:var(--accent);color:var(--accent)}
-.adm-edit{flex:none;display:none;border:1px solid var(--line);background:#fff;color:var(--ink-soft);font-size:11.5px;font-weight:650;padding:5px 12px;border-radius:7px;cursor:pointer;font-family:var(--mono)}
+.adm-edit{flex:none;display:none;border:1px solid var(--line);background:var(--card);color:var(--ink-soft);font-size:11.5px;font-weight:650;padding:5px 12px;border-radius:7px;cursor:pointer;font-family:var(--mono)}
 body.admin .adm-edit{display:inline-block}
 .adm-edit:hover{border-color:var(--accent);color:var(--accent)}
 .panel-body{padding:6px 26px 26px;border-top:1px solid var(--line-soft)}
@@ -119,7 +122,7 @@ body.admin .adm-edit{display:inline-block}
 .practice{background:var(--paper);border:1px solid var(--line);border-radius:11px;overflow:hidden;align-self:start}
 .practice>summary{list-style:none;cursor:pointer;padding:15px 18px;display:flex;align-items:center;gap:10px}
 .practice>summary::-webkit-details-marker{display:none}
-.practice>summary:hover{background:#eef2f5}
+.practice>summary:hover{background:var(--line-soft)}
 .practice>summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .practice h3{font-size:14px;font-weight:700;display:flex;align-items:center;gap:9px}
 .practice h3 .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
@@ -130,15 +133,15 @@ body.admin .adm-edit{display:inline-block}
 .prac-link{display:inline-block;margin-top:11px;font-size:12.5px;font-weight:600;color:var(--accent-deep);text-decoration:none;border-bottom:1px solid rgba(126,99,168,.35);padding-bottom:1px}
 .prac-link:hover{border-bottom-color:var(--accent-deep)}
 @media (prefers-reduced-motion:reduce){.practice .prac-chev{transition:none}}
-.tbl{margin-top:18px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff}
+.tbl{margin-top:18px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--card)}
 table{width:100%;border-collapse:collapse;font-size:13.5px}
 th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;text-align:left;padding:11px 18px;border-bottom:1px solid var(--line);background:var(--paper)}
 td{padding:12px 18px;border-bottom:1px solid var(--line-soft);vertical-align:top;color:var(--ink-soft)}
 td:first-child{color:var(--ink);font-weight:600}
 tr:last-child td{border-bottom:0}
 td .sub{display:block;font-size:12px;color:var(--ink-faint);font-weight:400;margin-top:2px}
-.reg-list{margin-top:18px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff}
-.reg-more{margin:10px 0 0}.reg-more a{font-family:var(--mono);font-size:12px;letter-spacing:.02em;color:var(--petrol);text-decoration:none;border-bottom:1px solid #c5d3dd}.reg-more a:hover{border-color:var(--petrol)}
+.reg-list{margin-top:18px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--card)}
+.reg-more{margin:10px 0 0}.reg-more a{font-family:var(--mono);font-size:12px;letter-spacing:.02em;color:var(--petrol);text-decoration:none;border-bottom:1px solid var(--line)}.reg-more a:hover{border-color:var(--petrol)}
 .reg-item{border-bottom:1px solid var(--line-soft)}
 .reg-item:last-child{border-bottom:0}
 .reg-item>summary{list-style:none;cursor:pointer;padding:15px 20px;display:flex;align-items:center;gap:14px}
@@ -153,7 +156,7 @@ td .sub{display:block;font-size:12px;color:var(--ink-faint);font-weight:400;marg
 .reg-name .sub{display:block;font-family:var(--mono);font-size:11px;color:var(--ink-faint);font-weight:500;margin-top:2px}
 .reg-item p{font-size:13.5px;color:var(--ink-soft)}
 
-.doc-group{border:1px solid var(--line);border-radius:11px;background:#fff;margin-top:18px;overflow:hidden}
+.doc-group{border:1px solid var(--line);border-radius:11px;background:var(--card);margin-top:18px;overflow:hidden}
 .doc-group>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:13px 20px;background:var(--paper);border-bottom:1px solid var(--line-soft)}
 .doc-group>summary::-webkit-details-marker{display:none}
 .doc-group:not([open])>summary{border-bottom:0}
@@ -162,23 +165,23 @@ td .sub{display:block;font-size:12px;color:var(--ink-faint);font-weight:400;marg
 .dg-chev{margin-left:auto;color:var(--ink-faint);font-size:12px;transition:transform .18s}
 .doc-group[open]>summary .dg-chev{transform:rotate(180deg)}
 .doc-group .doc-list{margin-top:0;border:0;border-radius:0}
-.doc-list{margin-top:18px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff}
+.doc-list{margin-top:18px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--card)}
 .doc-row{display:grid;grid-template-columns:1fr auto auto;gap:16px;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line-soft)}
 .doc-row:last-child{border-bottom:0}
 .doc-name{font-weight:650;font-size:14px}
 .doc-name .sub{display:block;font-size:12px;color:var(--ink-faint);font-weight:400;margin-top:1px}
 .gate{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);border:1px solid var(--line);border-radius:5px;padding:2px 8px;white-space:nowrap}
-.gate.open{color:var(--ok);border-color:#cde6d9;background:var(--ok-tint)}
-.btn{border:1px solid var(--accent);background:var(--accent);color:#fff;font-size:12.5px;font-weight:600;padding:8px 15px;border-radius:8px;cursor:pointer;transition:filter .15s;white-space:nowrap}
+.gate.open{color:var(--ok);border-color:rgba(94,207,158,.34);background:var(--ok-tint)}
+.btn{border:1px solid var(--accent);background:linear-gradient(100deg,var(--petrol-deep),var(--accent2));color:#fff;font-size:12.5px;font-weight:600;padding:8px 15px;border-radius:8px;cursor:pointer;transition:filter .15s;white-space:nowrap}
 .btn:hover{filter:brightness(1.1)}
 .btn.ghost{background:transparent;color:var(--accent)}
 .btn.ghost:hover{background:var(--accent-tint);filter:none}
-.btn.danger{border-color:#b3452f;background:#b3452f}
-.form-card{margin-top:16px;border:1px solid var(--line);border-radius:11px;background:#fff}
+.btn.danger{border-color:#f08a72;background:#f08a72}
+.form-card{margin-top:16px;border:1px solid var(--line);border-radius:11px;background:var(--card)}
 .req-form{padding:20px;display:grid;gap:14px;grid-template-columns:1fr 1fr}
 .req-form .full{grid-column:1/-1}
 .field label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:5px}
-.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-family:inherit;font-size:13.5px;background:#fff;color:var(--ink)}
+.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-family:inherit;font-size:13.5px;background:var(--card);color:var(--ink)}
 .field textarea{resize:vertical;min-height:80px}
 .field input:focus,.field textarea:focus,.field select:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
 .form-foot{grid-column:1/-1;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
@@ -188,8 +191,8 @@ td .sub{display:block;font-size:12px;color:var(--ink-faint);font-weight:400;marg
 .outbox-empty{font-size:12.5px;color:var(--ink-faint);padding:10px 20px;border-top:1px solid var(--line-soft)}
 
 .cvd-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-top:18px}
-.codebox{background:var(--petrol-deep);color:#dbe9f2;border-radius:11px;padding:18px 20px;font-family:var(--mono);font-size:12.5px;line-height:1.7;position:relative;overflow:auto}
-.codebox .cbtn{position:absolute;top:10px;right:10px;border:1px solid rgba(255,255,255,.25);background:transparent;color:#dbe9f2;font-size:11px;font-family:var(--mono);padding:4px 10px;border-radius:6px;cursor:pointer}
+.codebox{background:var(--petrol-deep);color:var(--line);border-radius:11px;padding:18px 20px;font-family:var(--mono);font-size:12.5px;line-height:1.7;position:relative;overflow:auto}
+.codebox .cbtn{position:absolute;top:10px;right:10px;border:1px solid rgba(255,255,255,.25);background:transparent;color:var(--line);font-size:11px;font-family:var(--mono);padding:4px 10px;border-radius:6px;cursor:pointer}
 .codebox .cbtn:hover{background:rgba(255,255,255,.1)}
 .safeharbor{padding:16px 20px;font-size:13px;color:var(--ink-soft);border:1px solid var(--line);border-radius:11px;background:var(--paper)}
 .safeharbor strong{color:var(--ink)}
@@ -204,7 +207,7 @@ details.faq summary::-webkit-details-marker{display:none}
 details.faq summary::before{content:"+";font-family:var(--mono);color:var(--accent);font-weight:600;width:14px;flex:none}
 details.faq[open] summary::before{content:"–"}
 details.faq .a{padding:0 20px 16px 44px;font-size:13.5px;color:var(--ink-soft)}
-.faq-wrap{margin-top:18px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff}
+.faq-wrap{margin-top:18px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--card)}
 
 /* Blueprint */
 .bp-grid{display:grid;grid-template-columns:320px 1fr;gap:26px;align-items:start;margin-top:30px}
@@ -218,9 +221,9 @@ details.faq .a{padding:0 20px 16px 44px;font-size:13.5px;color:var(--ink-soft)}
 .wf-el{display:flex;align-items:center;gap:8px;background:var(--accent-tint);border:1px solid var(--line);border-radius:6px;padding:6px 9px;margin-top:6px;font-size:12px;color:var(--ink-soft);font-weight:600}
 .wf-el:first-of-type{margin-top:0}
 .wf-el .n{font-family:var(--mono);font-size:10.5px;font-weight:700;color:var(--accent);flex:none;width:18px}
-.wf-el.t2{background:#fff}
-.wf-el.t3{background:#fff;border-style:dashed;color:var(--ink-faint)}
-.bp-cat{border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff}
+.wf-el.t2{background:var(--card)}
+.wf-el.t3{background:var(--card);border-style:dashed;color:var(--ink-faint)}
+.bp-cat{border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--card)}
 .bp-cat .cat-item{padding:17px 20px;border-bottom:1px solid var(--line-soft);display:grid;grid-template-columns:44px 1fr;gap:14px}
 .bp-cat .cat-item:last-child{border-bottom:0}
 .cat-num{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent);padding-top:2px}
@@ -231,7 +234,7 @@ details.faq .a{padding:0 20px 16px 44px;font-size:13.5px;color:var(--ink-soft)}
 .tier.t3{color:var(--plan);background:var(--plan-tint)}
 .cat-item .where{font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:2px}
 .cat-item p{font-size:13.5px;color:var(--ink-soft);margin-top:6px}
-.rs-list{border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff;margin-top:18px}
+.rs-list{border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--card);margin-top:18px}
 .rs-item{padding:16px 20px;border-bottom:1px solid var(--line-soft)}
 .rs-item:last-child{border-bottom:0}
 .rs-item h3{font-size:14px;font-weight:700}
@@ -240,21 +243,21 @@ details.faq .a{padding:0 20px 16px 44px;font-size:13.5px;color:var(--ink-soft)}
 /* Admin */
 .gate-overlay{position:fixed;inset:0;background:rgba(18,35,46,.55);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
 .gate-overlay.show{display:flex}
-.gate-modal{background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.3);padding:26px;width:min(380px,100%)}
+.gate-modal{background:var(--card);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.3);padding:26px;width:min(380px,100%)}
 .gate-modal h2{font-size:17px;font-weight:800}
 .gate-modal p{font-size:13px;color:var(--ink-soft);margin-top:6px}
 .gate-modal input{width:100%;margin-top:14px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px;font-family:var(--mono)}
 .gate-modal .row{display:flex;gap:10px;margin-top:14px;justify-content:flex-end}
-.gate-err{font-size:12.5px;color:#b3452f;margin-top:8px;display:none}
-.admin-drawer{position:fixed;top:0;right:0;bottom:0;width:min(470px,100vw);background:#fff;border-left:1px solid var(--line);box-shadow:-12px 0 40px rgba(18,52,74,.14);z-index:150;transform:translateX(102%);transition:transform .22s ease;display:flex;flex-direction:column}
+.gate-err{font-size:12.5px;color:#f08a72;margin-top:8px;display:none}
+.admin-drawer{position:fixed;top:0;right:0;bottom:0;width:min(470px,100vw);background:var(--card);border-left:1px solid var(--line);box-shadow:-12px 0 40px rgba(18,52,74,.14);z-index:150;transform:translateX(102%);transition:transform .22s ease;display:flex;flex-direction:column}
 .admin-drawer.open{transform:translateX(0)}
 .admin-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;flex:none}
 .admin-head h2{font-size:15px;font-weight:800}
 .admin-head .site-tag{font-family:var(--mono);font-size:11px;color:var(--accent);background:var(--accent-tint);border-radius:5px;padding:2px 8px;font-weight:700}
 .admin-head button{margin-left:auto}
 .admin-body{overflow-y:auto;padding:14px 20px 30px;flex:1}
-.admin-note{font-size:12px;color:var(--ink-soft);background:var(--progress-tint);border:1px solid #ecd9ae;border-radius:8px;padding:10px 12px;margin-bottom:14px}
-details.adm{border:1px solid var(--line);border-radius:9px;margin-bottom:10px;background:#fff}
+.admin-note{font-size:12px;color:var(--ink-soft);background:var(--progress-tint);border:1px solid rgba(224,169,74,.34);border-radius:8px;padding:10px 12px;margin-bottom:14px}
+details.adm{border:1px solid var(--line);border-radius:9px;margin-bottom:10px;background:var(--card)}
 details.adm summary{cursor:pointer;padding:11px 14px;font-weight:700;font-size:13.5px;list-style:none;display:flex;align-items:center;gap:9px}
 details.adm summary::-webkit-details-marker{display:none}
 details.adm summary::before{content:"▸";font-size:11px;color:var(--accent)}
@@ -262,22 +265,22 @@ details.adm[open] summary::before{content:"▾"}
 details.adm .adm-body{padding:4px 14px 14px;border-top:1px solid var(--line-soft)}
 .adm-field{margin-top:10px}
 .adm-field label{display:block;font-size:11.5px;font-weight:600;color:var(--ink-soft);margin-bottom:4px}
-.adm-field input,.adm-field textarea{width:100%;border:1px solid var(--line);border-radius:7px;padding:8px 10px;font-size:12.5px;font-family:var(--mono);background:#fff}
+.adm-field input,.adm-field textarea{width:100%;border:1px solid var(--line);border-radius:7px;padding:8px 10px;font-size:12.5px;font-family:var(--mono);background:var(--card)}
 .adm-field textarea{min-height:150px;resize:vertical;line-height:1.5}
 .adm-apply{margin-top:10px;display:flex;gap:10px;align-items:center}
 .adm-msg{font-size:11.5px;font-family:var(--mono)}
-.adm-msg.ok{color:var(--ok)} .adm-msg.err{color:#b3452f}
+.adm-msg.ok{color:var(--ok)} .adm-msg.err{color:#f08a72}
 .admin-global{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
 .adm-hint{font-size:11px;color:var(--ink-faint);margin-top:6px;line-height:1.5}
 
-footer{border-top:1px solid var(--line);margin-top:70px;background:#fff}
+footer{border-top:1px solid var(--line);margin-top:70px;background:var(--card)}
 .foot-inner{max-width:1080px;margin:0 auto;padding:26px 24px;display:flex;gap:20px;align-items:center;flex-wrap:wrap}
 .foot-inner .sp{margin-left:auto}
 .admin-link{border:1px solid var(--line);background:transparent;color:var(--ink-faint);font-size:11px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:6px;cursor:pointer}
 .admin-link:hover{color:var(--accent);border-color:var(--accent)}
 body.admin .admin-link{color:#fff;background:var(--accent);border-color:var(--accent)}
 .adm-sites{display:flex;gap:6px;margin-left:6px}
-.adm-sites button{border:1px solid var(--line);background:#fff;color:var(--ink-soft);font-size:11.5px;font-weight:650;padding:4px 11px;border-radius:999px;cursor:pointer}
+.adm-sites button{border:1px solid var(--line);background:var(--card);color:var(--ink-soft);font-size:11.5px;font-weight:650;padding:4px 11px;border-radius:999px;cursor:pointer}
 .adm-sites button.on{background:var(--accent);border-color:var(--accent);color:#fff}
 footer p{font-size:12.5px;color:var(--ink-faint)}
 footer a{color:var(--ink-soft)}
@@ -318,7 +321,7 @@ body{overflow-x:hidden}
 .hero-frame .hero-meta strong{color:rgba(255,255,255,.9)}
 .hero-frame .hero-note{color:rgba(255,255,255,.65)}
 .hero-ctas{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}
-.bbtn{display:inline-block;background:#fff;color:var(--accent);font-size:13.5px;font-weight:700;padding:11px 20px;border-radius:9px}
+.bbtn{display:inline-block;background:var(--card);color:var(--accent);font-size:13.5px;font-weight:700;padding:11px 20px;border-radius:9px}
 .bbtn:hover{text-decoration:none;filter:brightness(.96)}
 .bbtn.o{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.55)}
 .bbtn.o:hover{background:rgba(255,255,255,.12);filter:none}
@@ -330,20 +333,20 @@ body{overflow-x:hidden}
 .navlink{padding:9px 12px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--ink-soft)}
 .navlink:hover{background:var(--line-soft);color:var(--ink);text-decoration:none}
 /* ---- Footer ---- */
-footer{background:#12202b;border-top:0;color:#c3d2dd}
+footer{background:#0c1425;border-top:1px solid var(--line);color:var(--ink-soft)}
 .foot-cols{max-width:1080px;margin:0 auto;padding:44px 24px 30px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:34px}
-.fc h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#7e93a3;margin-bottom:12px;font-weight:600}
-.fc-links a{display:block;color:#c3d2dd;font-size:13.5px;padding:4px 0}
+.fc h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:12px;font-weight:600}
+.fc-links a{display:block;color:var(--line);font-size:13.5px;padding:4px 0}
 .fc-links a:hover{color:#fff;text-decoration:none}
-.fc-logo{width:40px;height:40px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.fc-logo{width:40px;height:40px;background:var(--card);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
 .fc-logo img,.fc-logo svg{width:26px;height:26px}
-#footTag{font-size:13px;color:#9fb2c0;max-width:280px}
+#footTag{font-size:13px;color:var(--ink-faint);max-width:280px}
 footer footer .foot-bottom{border-top:1px solid rgba(255,255,255,.1);max-width:1080px;margin:0 auto;padding:16px 24px 22px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
-.foot-bottom p{font-size:12px;color:#7e93a3}
+.foot-bottom p{font-size:12px;color:var(--ink-faint)}
 .fb-sp{margin-left:auto}
-.foot-bottom a{color:#9fb2c0;font-size:12.5px}
+.foot-bottom a{color:var(--ink-faint);font-size:12.5px}
 .foot-bottom a:hover{color:#fff}
-footer .admin-link{border-color:rgba(255,255,255,.2);color:#7e93a3}
+footer .admin-link{border-color:rgba(255,255,255,.2);color:var(--ink-faint)}
 footer .admin-link:hover{color:#fff;border-color:#fff}
 body.admin footer .admin-link{color:#fff;background:var(--accent);border-color:var(--accent)}
 @media (max-width:920px){
@@ -375,28 +378,28 @@ details.panel:hover{box-shadow:0 2px 4px rgba(18,52,74,.06),0 10px 26px rgba(18,
 body.editing [data-path]{outline:1px dashed rgba(125,99,181,.55);outline-offset:2px;border-radius:3px;min-width:22px;display:inline-block}
 body.editing td[data-path],body.editing p[data-path],body.editing div[data-path]{display:block}
 body.editing [data-path]:hover{background:var(--accent-tint)}
-body.editing [data-path]:focus{outline:2px solid var(--accent);background:#fff;box-shadow:0 0 0 4px var(--accent-tint)}
+body.editing [data-path]:focus{outline:2px solid var(--accent);background:var(--card);box-shadow:0 0 0 4px var(--accent-tint)}
 body.editing .hero-frame [data-path]{outline-color:rgba(255,255,255,.6)}
 body.editing .hero-frame [data-path]:focus{background:rgba(255,255,255,.14);box-shadow:none}
-body.editing .cyc{display:inline-block;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border:1px solid var(--line);background:#fff;color:var(--ink-soft);border-radius:5px;padding:1px 7px;margin-left:6px;cursor:pointer}
+body.editing .cyc{display:inline-block;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border:1px solid var(--line);background:var(--card);color:var(--ink-soft);border-radius:5px;padding:1px 7px;margin-left:6px;cursor:pointer}
 body.editing .cyc:hover{border-color:var(--accent);color:var(--accent)}
-body.editing .delbtn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1px solid #e6c3bd;background:#fdf1ef;color:#b3452f;font-size:13px;line-height:1;cursor:pointer;margin-left:8px;vertical-align:middle}
-body.editing .delbtn:hover{background:#b3452f;color:#fff;border-color:#b3452f}
-body.editing .rowbtn{display:inline-flex;align-items:center;gap:6px;margin:10px 0 2px;border:1px dashed var(--line);background:#fff;color:var(--accent);font-size:12px;font-weight:650;padding:6px 12px;border-radius:7px;cursor:pointer}
+body.editing .delbtn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1px solid rgba(240,138,114,.34);background:#2a1a16;color:#f08a72;font-size:13px;line-height:1;cursor:pointer;margin-left:8px;vertical-align:middle}
+body.editing .delbtn:hover{background:#f08a72;color:#fff;border-color:#f08a72}
+body.editing .rowbtn{display:inline-flex;align-items:center;gap:6px;margin:10px 0 2px;border:1px dashed var(--line);background:var(--card);color:var(--accent);font-size:12px;font-weight:650;padding:6px 12px;border-radius:7px;cursor:pointer}
 body.editing .rowbtn:hover{border-color:var(--accent);background:var(--accent-tint)}
 body.editing .practice-add{grid-column:1/-1}
 body.editing .pillar{pointer-events:none}
 body.editing .pillar [data-path]{pointer-events:auto}
 .edit-bar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(120%);background:var(--petrol-deep);color:#fff;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:12px;z-index:180;box-shadow:0 12px 34px rgba(18,52,74,.35);transition:transform .2s}
 body.editing .edit-bar{transform:translateX(-50%) translateY(0)}
-.edit-bar span{font-size:12.5px;color:#c3d2dd}
+.edit-bar span{font-size:12.5px;color:var(--line)}
 .edit-bar b{color:#fff}
 .edit-bar button{border:1px solid rgba(255,255,255,.28);background:transparent;color:#fff;font-size:12.5px;font-weight:650;padding:6px 13px;border-radius:8px;cursor:pointer}
-.edit-bar button.pri{background:#fff;color:var(--petrol-deep);border-color:#fff}
+.edit-bar button.pri{background:var(--card);color:var(--petrol-deep);border-color:#fff}
 .edit-bar button:hover{filter:brightness(1.1)}
-.empty-note{margin-top:18px;border:1px dashed var(--line);border-radius:11px;padding:18px 20px;font-size:13.5px;color:var(--ink-soft);background:#fff}
+.empty-note{margin-top:18px;border:1px dashed var(--line);border-radius:11px;padding:18px 20px;font-size:13.5px;color:var(--ink-soft);background:var(--card)}
 .sev{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;font-weight:700;padding:2px 8px;border-radius:5px;background:var(--plan-tint);color:var(--plan)}
-.sev.s-critical,.sev.s-high{background:#fdeeec;color:#b3452f}
+.sev.s-critical,.sev.s-high{background:#2a1a16;color:#f08a72}
 .sev.s-medium{background:var(--progress-tint);color:var(--progress)}
 .sev.s-low{background:var(--align-tint);color:var(--align)}
 /* ---- Assistant ---- */
@@ -404,7 +407,7 @@ body.editing .edit-bar{transform:translateX(-50%) translateY(0)}
 .chat-fab:hover{filter:brightness(1.08)}
 .chat-fab svg{flex:none}
 body.editing .chat-fab{display:none}
-.chat-panel{position:fixed;right:22px;bottom:22px;width:min(400px,calc(100vw - 32px));height:min(600px,calc(100vh - 44px));background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 60px rgba(18,52,74,.28);z-index:175;display:none;flex-direction:column;overflow:hidden}
+.chat-panel{position:fixed;right:22px;bottom:22px;width:min(400px,calc(100vw - 32px));height:min(600px,calc(100vh - 44px));background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 60px rgba(18,52,74,.28);z-index:175;display:none;flex-direction:column;overflow:hidden}
 .chat-panel.open{display:flex}
 .chat-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));color:#fff}
 .chat-head h3{font-size:14px;font-weight:750}
@@ -413,27 +416,49 @@ body.editing .chat-fab{display:none}
 .chat-head button:hover{background:rgba(255,255,255,.28)}
 .chat-log{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--paper)}
 .msg{max-width:88%;font-size:13.5px;line-height:1.6;padding:10px 13px;border-radius:12px;white-space:pre-wrap;word-wrap:break-word}
-.msg.bot{background:#fff;border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.bot{background:var(--card);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
 .msg.me{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
 .msg .src{display:block;margin-top:8px;padding-top:8px;border-top:1px solid var(--line-soft);font-size:11px;color:var(--ink-faint);font-family:var(--mono)}
 .msg .src a{color:var(--accent)}
 .msg.think{color:var(--ink-faint);font-style:italic;background:transparent;border:0}
 .chat-sugg{padding:0 16px 12px;display:flex;flex-wrap:wrap;gap:7px;background:var(--paper)}
-.chat-sugg button{border:1px solid var(--line);background:#fff;color:var(--ink-soft);font-size:11.5px;padding:6px 11px;border-radius:999px;cursor:pointer;text-align:left}
+.chat-sugg button{border:1px solid var(--line);background:var(--card);color:var(--ink-soft);font-size:11.5px;padding:6px 11px;border-radius:999px;cursor:pointer;text-align:left}
 .chat-sugg button:hover{border-color:var(--accent);color:var(--accent)}
-.chat-in{border-top:1px solid var(--line);padding:11px;display:flex;gap:9px;align-items:flex-end;background:#fff}
+.chat-in{border-top:1px solid var(--line);padding:11px;display:flex;gap:9px;align-items:flex-end;background:var(--card)}
 .chat-in textarea{flex:1;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:13.5px;resize:none;min-height:38px;max-height:110px}
 .chat-in textarea:focus{outline:2px solid var(--accent);border-color:var(--accent)}
 .chat-in button{border:0;background:var(--accent);color:#fff;width:38px;height:38px;border-radius:9px;cursor:pointer;flex:none;font-size:15px}
 .chat-in button:disabled{opacity:.5;cursor:default}
-.chat-foot{padding:8px 14px 11px;font-size:10.5px;color:var(--ink-faint);text-align:center;background:#fff;border-top:1px solid var(--line-soft)}
+.chat-foot{padding:8px 14px 11px;font-size:10.5px;color:var(--ink-faint);text-align:center;background:var(--card);border-top:1px solid var(--line-soft)}
 @media (max-width:920px){
   .chat-panel{right:8px;left:8px;bottom:8px;width:auto;height:min(560px,calc(100vh - 20px))}
   .chat-fab{right:14px;bottom:14px;padding:11px 15px;font-size:12.5px}
 }
 
-/* ---- compliance ledger: wider cell dividers ---- */
-.seal-cell{border-right:2px solid var(--line);border-bottom:2px solid var(--line)}
+/* ---- dark theme: compliance ledger, original grid with visible dividers ---- */
+.seal-cell{border-right:2px solid var(--line);border-bottom:2px solid var(--line);background:var(--card)}
+.seal-cell:hover{background:#22304d}
+.seal-name{color:var(--ink)}
+.ledger{background:var(--card)}
+
+/* ---- banners: purple set carried over from index.html ---- */
+.hero-frame{background:linear-gradient(135deg,#7e63a8 0%,#4a3470 100%)}
+.hero-frame .bbtn{color:#4a3470}
+.hero-frame .bbtn.o{color:#fff}
+.ledger-head{background:linear-gradient(to right,#251c3a,transparent 60%)}
+.p-head .kicker{color:#a894d0}
+
+/* ---- dark theme: hero banner text contrast ---- */
+.hero-frame .bbtn{background:#fff;color:#4a3470;border:0}
+.hero-frame .bbtn:hover{background:#f2eef8}
+.hero-frame .bbtn.o{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.7)}
+.hero-frame .hero-eyebrow{color:rgba(255,255,255,.95)}
+.hero-frame .hero-eyebrow::after{background:rgba(255,255,255,.4)}
+.hero-frame h1{color:#fff}
+.hero-frame p.lede{color:rgba(255,255,255,.95)}
+.hero-frame .hero-meta{color:rgba(255,255,255,.85)}
+.hero-frame .hero-meta strong{color:#fff}
+.hero-frame .hero-note{color:rgba(255,255,255,.85)}
 </style>
 </head>
 <body>
@@ -446,8 +471,8 @@ body.editing .chat-fab{display:none}
         <button aria-haspopup="true" aria-expanded="false">Sections <span class="car">▾</span></button>
         <div class="menu-list" role="menu" id="sectionsMenu"></div>
       </div>
-      <a class="navlink" href="policies/security-overview.html">Security overview</a>
-      <a class="navlink" href="policies/security-overview.html#documents">Documents</a>
+      <a class="navlink" href="policies/security-overview-dark.html">Security overview</a>
+      <a class="navlink" href="policies/security-overview-dark.html#documents">Documents</a>
       <a class="navlink" href="#faq">FAQ</a>
       <a class="cta" href="#disclosure" id="ctaReport">Report a vulnerability</a>
     </nav>
@@ -464,7 +489,7 @@ body.editing .chat-fab{display:none}
       <p class="lede" id="heroLede"></p>
       <div class="hero-meta" id="heroMeta"></div>
       <div class="hero-ctas">
-        <a class="bbtn" href="policies/security-overview.html">Read the security overview</a>
+        <a class="bbtn" href="policies/security-overview-dark.html">Read the security overview</a>
         <a class="bbtn o" href="#documents">Request documents</a>
         <a class="bbtn o" href="#disclosure">Report a vulnerability</a>
       </div>
@@ -572,7 +597,7 @@ body.editing .chat-fab{display:none}
         <span class="chev" aria-hidden="true">▾</span>
       </summary>
       <div class="panel-body">
-        <p class="intro">Good-faith security research is welcome. Reports are acknowledged within 2 business days, triaged and severity-scored, remediated on severity-based timelines (critical 7 days, high 30, medium 60, low 90), and disclosed in coordination with the reporter within 90 days by default. The full terms &mdash; scope, safe harbour, and what we commit to at each stage &mdash; are in the <a href="policies/vulnerability-disclosure.html"><strong>Coordinated Vulnerability Disclosure Policy</strong></a>.</p>
+        <p class="intro">Good-faith security research is welcome. Reports are acknowledged within 2 business days, triaged and severity-scored, remediated on severity-based timelines (critical 7 days, high 30, medium 60, low 90), and disclosed in coordination with the reporter within 90 days by default. The full terms &mdash; scope, safe harbour, and what we commit to at each stage &mdash; are in the <a href="policies/vulnerability-disclosure-dark.html"><strong>Coordinated Vulnerability Disclosure Policy</strong></a>.</p>
         <div class="cvd-grid">
           <div class="codebox" aria-label="security.txt">
             <button class="cbtn" id="copySecTxt">Copy</button>
@@ -614,7 +639,7 @@ body.editing .chat-fab{display:none}
         <span class="chev" aria-hidden="true">▾</span>
       </summary>
       <div class="panel-body">
-        <p class="intro">Six documents are published in full and open directly; everything else is released under NDA on request. The same list, with a line on what each document covers, is in the <a href="policies/security-overview.html#documents">Document Availability table</a> of the Security Overview. Requests generate a pre-filled email and are logged locally in your browser only.</p>
+        <p class="intro">Six documents are published in full and open directly; everything else is released under NDA on request. The same list, with a line on what each document covers, is in the <a href="policies/security-overview-dark.html#documents">Document Availability table</a> of the Security Overview. Requests generate a pre-filled email and are logged locally in your browser only.</p>
         <details class="doc-group" id="docGroupPolicy"><summary><span class="dg-title">Policies</span><span class="dg-count" id="docCountPolicy"></span><span class="dg-chev" aria-hidden="true">&#9662;</span></summary><div class="doc-list" id="docListPolicy"></div></details><details class="doc-group" id="docGroupAssurance"><summary><span class="dg-title">Assurance</span><span class="dg-count" id="docCountAssurance"></span><span class="dg-chev" aria-hidden="true">&#9662;</span></summary><div class="doc-list" id="docListAssurance"></div></details>
         <div class="form-card">
           <div class="req-form">
@@ -673,8 +698,8 @@ body.editing .chat-fab{display:none}
       <a href="https://www.prompthalo.ai/compliance/" target="_blank" rel="noopener">Compliance</a>
       <a href="#security">Security practices</a>
       <a href="#privacy">Data &amp; privacy</a>
-      <a href="policies/privacy-notice.html">Privacy Notice</a>
-      <a href="policies/cookie-policy.html">Cookie Policy</a>
+      <a href="policies/privacy-notice-dark.html">Privacy Notice</a>
+      <a href="policies/cookie-policy-dark.html">Cookie Policy</a>
       <a href="#reliability">Reliability</a>
     </div>
     <div class="fc fc-links">
@@ -684,7 +709,7 @@ body.editing .chat-fab{display:none}
       <a href="#advisories">Advisories &amp; CVEs</a>
       <a href="#cvd-record">Disclosure record</a>
       <a href="#disclosure">Responsible disclosure</a>
-      <a href="policies/vulnerability-disclosure.html">CVD policy</a>
+      <a href="policies/vulnerability-disclosure-dark.html">CVD policy</a>
       <a href="#faq">FAQ</a>
     </div>
     <div class="fc fc-links">
@@ -781,7 +806,7 @@ const PILLAR_ICONS = {
 const DEFAULTS = {
   ph: {
     cfgVersion:3,
-    accent:"#7e63a8", accentTint:"#f4f0fa", accentDeep:"#4a3470",
+    accent:"#7c74ff", accentTint:"#1e2140", accentDeep:"#3c30f0",
     name:"PromptHalo", sub:"Trust Center",
     heroTitle:"Rapid. Continuous. Answerable to auditors.",
     heroLede:"PromptHalo Litmus provides automated penetration testing – continuously probing your applications and cloud environment the way an attacker would, and turning findings into evidence your auditors and customers accept. Companies point Litmus at their real attack surface, so we hold ourselves to the standard our customers are measured against: documented controls, minimal data, independent examination.",
@@ -803,7 +828,7 @@ const DEFAULTS = {
     ],
     practicesIntro:"Summaries of the control areas that are not published in full. Each is drawn from a policy in our library; those source documents are Internal and available under NDA on request. Where a policy is published in full, it is linked from Document requests rather than summarised here.",
     practices:[
-      {t:"Governance & policy", d:"The security overview at policies/security-overview.html summarises every control on one page. Behind it sits a complete security policy library with matching implementation plans, owned by the security lead and approved by executive leadership. Every policy carries a document ID, version, effective date and annual review date. Five are published in full on this page, alongside a security overview; the rest are summarised below and released under NDA."},
+      {t:"Governance & policy", d:"The security overview at policies/security-overview-dark.html summarises every control on one page. Behind it sits a complete security policy library with matching implementation plans, owned by the security lead and approved by executive leadership. Every policy carries a document ID, version, effective date and annual review date. Five are published in full on this page, alongside a security overview; the rest are summarised below and released under NDA."},
       {t:"Access control", d:"Access is denied by default and granted on least privilege to a named individual identity; shared logins are not used. Approval precedes the grant and the record shows who asked, who approved, and what was granted. New joiners get a defined baseline for their role rather than a copy of a colleague\u2019s access, which is how privilege accumulates unnoticed. Authentication runs through Google Workspace SSO. Privileged access is approved separately and held apart from day-to-day accounts; break-glass credentials sit behind hardware MFA, raise an alert on use, and are recorded with a reason. Non-human identities \u2014 service accounts, automations, agents \u2014 are inventoried with a named human owner and reviewed alongside people. Production and non-production are separated at the cloud account boundary. Access is revoked within one business day of departure and immediately where the departure is involuntary."},
       {t:"Access to client environments", d:"Any access we hold inside a client environment exists only under the engagement agreement, is limited to the authorised scope, and is surrendered when the engagement ends. We treat standing access to a client estate as our single largest insider risk, so it is reviewed monthly rather than waiting for the quarterly cycle."},
       {t:"Access reviews", d:"Access within the audit boundary is reviewed on a fixed quarterly cadence, with removals actioned and the action recorded. Non-human identities and client-environment access are included in the same review rather than handled separately. A review that identifies removals and does not complete them is worse evidence than no review at all, because it shows we knew."},
@@ -811,7 +836,7 @@ const DEFAULTS = {
       {t:"Secure development", d:"Security requirements are considered at design rather than retrofitted; for anything handling client information or granting access that means a recorded conversation about how it could be misused. Static analysis and dependency scanning run on every change, and secrets are scanned on commit. Test and development environments hold no real client information \u2014 realistic data is synthetic or masked. Prompts, tool definitions and retrieval configuration are treated as code: held in the repository, reviewed, and changed through the same path. Internet-facing surfaces are tested before first exposure and again when the attack surface changes materially. Independent penetration tests are commissioned when a client agreement requires one or the service has changed enough to warrant it, not on a calendar to produce a certificate."},
       {t:"Cryptography", d:"TLS 1.2 minimum and 1.3 preferred, restricted to forward-secret authenticated cipher suites, with plain HTTP redirected. Confidential and Restricted information is encrypted at rest with AES-256 or equivalent, and cloud storage, databases, backups and snapshots have encryption enabled by default at account level so a resource created without thought is still encrypted. Secrets live in a managed secrets service or the password manager and are retrieved at runtime \u2014 never in source, committed environment files, tickets, chat or logs. Keys are managed by the platform key service with rotation enabled; we do not run our own key infrastructure and do not implement our own cryptography. A deprecated or broken algorithm is treated as a significant change and remediated on a timescale set by exposure rather than convenience."},
       {t:"Logging & monitoring", d:"Four platforms carry almost everything that matters: AWS CloudTrail management events across every account and region plus data events for buckets holding client information, Google Workspace admin, login and OAuth grant logs, GitHub organisation and repository audit logs, and application activity from our own code. Logs are retained at least thirteen months with the most recent ninety days available for immediate query \u2014 thirteen so a twelve-month observation period is covered with margin. Log storage is separated from the accounts that generate it, with object lock or equivalent, so compromising a workload does not erase the record of it. Alert dispositions for production are reviewed monthly, and a month with no alerts is recorded as such."},
-      {t:"AI and agent activity", d:"Each agent runs under its own identity rather than a person\u2019s credentials, so its actions are attributable in the same logs as anyone else\u2019s. Agent activity is logged with enough context to reconstruct what happened: the triggering input, the tools invoked, the parameters used, the actions taken and the outcome. Prompts, tool definitions, retrieval configuration, guardrails and model versions move through the same approval path as code, and those changes are logged \u2014 what the model was and what it was told are part of reconstructing what it did. The full AI Governance Policy is published; see Document requests.", href:"policies/ai-governance.html"},
+      {t:"AI and agent activity", d:"Each agent runs under its own identity rather than a person\u2019s credentials, so its actions are attributable in the same logs as anyone else\u2019s. Agent activity is logged with enough context to reconstruct what happened: the triggering input, the tools invoked, the parameters used, the actions taken and the outcome. Prompts, tool definitions, retrieval configuration, guardrails and model versions move through the same approval path as code, and those changes are logged \u2014 what the model was and what it was told are part of reconstructing what it did. The full AI Governance Policy is published; see Document requests.", href:"policies/ai-governance-dark.html"},
       {t:"Vendor management", d:"Subprocessors are risk-tiered, reviewed before onboarding against SOC 2 or equivalent, and re-reviewed annually. The subprocessor list below is versioned on this page. The full policy is published; see Document requests."},
       {t:"Incident response & continuity", d:"A documented incident response plan with customer-notification commitments, annual exercises, and encrypted versioned backups with periodic restore tests. Both the Incident Response and Business Continuity policies are published in full; see Document requests."}
     ],
@@ -846,11 +871,11 @@ const DEFAULTS = {
     trustEmail:"security@prompthalo.ai",
     securityEmail:"security@prompthalo.ai",
     docs:[
-      {n:"Privacy Notice", s:"External notice \u00b7 collection, use, rights", gate:"Public", href:"policies/privacy-notice.html", grp:"policy"},
-      {n:"Privacy Policy", s:"Privacy position, protection and disclosure", gate:"Public", href:"policies/privacy-policy.html", grp:"policy"},
-      {n:"Cookie Policy", s:"Strictly necessary cookies only", gate:"Public", href:"policies/cookie-policy.html", grp:"policy"},
-      {n:"Coordinated Vulnerability Disclosure Policy", s:"Scope, safe harbour, timelines", gate:"Public", href:"policies/vulnerability-disclosure.html", grp:"policy"},
-      {n:"AI Governance Policy", s:"Tool register, model providers, agents, pre-ship checks", gate:"Public", href:"policies/ai-governance.html", grp:"policy"},
+      {n:"Privacy Notice", s:"External notice \u00b7 collection, use, rights", gate:"Public", href:"policies/privacy-notice-dark.html", grp:"policy"},
+      {n:"Privacy Policy", s:"Privacy position, protection and disclosure", gate:"Public", href:"policies/privacy-policy-dark.html", grp:"policy"},
+      {n:"Cookie Policy", s:"Strictly necessary cookies only", gate:"Public", href:"policies/cookie-policy-dark.html", grp:"policy"},
+      {n:"Coordinated Vulnerability Disclosure Policy", s:"Scope, safe harbour, timelines", gate:"Public", href:"policies/vulnerability-disclosure-dark.html", grp:"policy"},
+      {n:"AI Governance Policy", s:"Tool register, model providers, agents, pre-ship checks", gate:"Public", href:"policies/ai-governance-dark.html", grp:"policy"},
       {n:"Information Security Policy", s:"The governing policy for the programme", gate:"NDA", grp:"policy"},
       {n:"Access Control Policy", s:"Least privilege, MFA, access reviews, joiners and leavers", gate:"NDA", grp:"policy"},
       {n:"Encryption Policy", s:"Algorithms, key handling, transit and rest", gate:"NDA", grp:"policy"},
@@ -864,7 +889,7 @@ const DEFAULTS = {
       {n:"Data Retention and Disposal Policy", s:"Retention periods, legal hold and destruction", gate:"NDA", grp:"policy"},
       {n:"Data Classification Policy", s:"How data is labelled, handled and distributed", gate:"NDA", grp:"policy"},
       {n:"Acceptable Use Policy", s:"Permitted use of Company systems by personnel", gate:"NDA", grp:"policy"},
-      {n:"Security overview", s:"Control summary and document availability", gate:"Public", href:"policies/security-overview.html", grp:"assurance"},
+      {n:"Security overview", s:"Control summary and document availability", gate:"Public", href:"policies/security-overview-dark.html", grp:"assurance"},
       {n:"Subprocessor list", s:"Current subprocessors, purpose and region", gate:"Public", href:"", grp:"assurance"},
       {n:"Data Processing Addendum", s:"Processor terms for customers who require them", gate:"NDA", grp:"assurance"},
       {n:"SOC 2 report", s:"Available under NDA on request", gate:"NDA", grp:"assurance"},
@@ -952,7 +977,7 @@ function sha256(ascii){
 }
 
 const SEAL = (status) => {
-  const colors = {ok:"#2e7d5b", progress:"#b07d2a", align:"#3d6b8f", plan:"#6d8092"};
+  const colors = {ok:"#2e7d5b", progress:"#b07d2a", align:"#3d6b8f", plan:"var(--ink-faint)"};
   const c = colors[status] || "#1b4965";
   const glyph = status === "progress"
     ? `<circle cx="19" cy="19" r="6.2" fill="none" stroke="${c}" stroke-width="2"/><line x1="19" y1="19" x2="19" y2="14.6" stroke="${c}" stroke-width="2" stroke-linecap="round"/><line x1="19" y1="19" x2="22" y2="20.8" stroke="${c}" stroke-width="2" stroke-linecap="round"/>`
@@ -1040,7 +1065,7 @@ function renderBrand(){
     `Contact: mailto:${esc(b.securityEmail || "security@prompthalo.ai")}<br>` +
     `Expires: 2027-07-25T00:00:00Z<br>` +
     `Preferred-Languages: en<br>` +
-    `Policy: https://${esc(b.secTxtDomain)}/trustcenter/policies/vulnerability-disclosure.html<br>` +
+    `Policy: https://${esc(b.secTxtDomain)}/trustcenter/policies/vulnerability-disclosure-dark.html<br>` +
     `Canonical: https://${esc(b.secTxtDomain)}/.well-known/security.txt`;
   const docRow = (d,i) =>
     `<div class="doc-row" data-item="docs.${i}"><div class="doc-name"><span data-path="docs.${i}.n">${esc(d.n)}</span><span class="sub" data-path="docs.${i}.s">${esc(d.s)}</span></div>
@@ -1073,7 +1098,7 @@ function renderBrand(){
          <td><span class="sev s-${(c.severity||"").toLowerCase()}" data-path="cvdRecord.${i}.severity">${esc(c.severity||"")}</span></td>
          <td><span data-path="cvdRecord.${i}.resolved">${esc(c.resolved||"")}</span>${delBtn("cvdRecord",i)}</td></tr>`).join("")
       + `</tbody></table></div>`
-    : `<div class="empty-note">No coordinated disclosures have been published yet. This table will be updated as reports are received, remediated and released &mdash; an empty record here means no report has completed the process, not that reports are unwelcome. See the <a href="policies/vulnerability-disclosure.html">Coordinated Vulnerability Disclosure Policy</a> for scope, safe harbour and our response commitments.</div>`)
+    : `<div class="empty-note">No coordinated disclosures have been published yet. This table will be updated as reports are received, remediated and released &mdash; an empty record here means no report has completed the process, not that reports are unwelcome. See the <a href="policies/vulnerability-disclosure-dark.html">Coordinated Vulnerability Disclosure Policy</a> for scope, safe harbour and our response commitments.</div>`)
     + addBtn("cvdRecord","disclosure");
   $("advList").innerHTML = ((b.advisories||[]).length
     ? `<div class="tbl"><table aria-label="Security advisories"><thead><tr><th style="width:150px">Identifier</th><th>Summary</th><th style="width:110px">Severity</th><th style="width:150px">Status</th></tr></thead><tbody>`

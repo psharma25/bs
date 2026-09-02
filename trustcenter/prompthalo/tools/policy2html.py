@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-policy2html.py — render a PromptHalo policy .docx as a Trust Center HTML page.
+policy2html.py – render a PromptHalo policy .docx as a Trust Center HTML page.
 
 Usage:  python3 policy2html.py <policy.docx> <output.html> [--logo logo.txt]
 
@@ -176,8 +176,8 @@ def render(docx, out, logo_html, back="../index.html", back_label="Trust Center"
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{html.escape(title)} — PromptHalo Trust Center</title>
-<meta name="description" content="{html.escape(title)} — published policy, PromptHalo Trust Center.">
+<title>{html.escape(title)} – PromptHalo Trust Center</title>
+<meta name="description" content="{html.escape(title)} – published policy, PromptHalo Trust Center.">
 <style>{CSS}</style>
 </head>
 <body>
@@ -202,7 +202,7 @@ def render(docx, out, logo_html, back="../index.html", back_label="Trust Center"
       <div class="callout"><b>About this copy.</b> This is the published version of {html.escape(title)}
       ({html.escape(meta.get("Document ID",""))}, version {html.escape(meta.get("Current Version",""))}).
       Owner: {html.escape(owner)}. Prepared by: {html.escape(prepared)}.
-      Printed or locally saved copies are uncontrolled — verify against this page before use.</div>
+      Printed or locally saved copies are uncontrolled – verify against this page before use.</div>
       {soup.decode()}
     </article>
   </div>
@@ -210,7 +210,7 @@ def render(docx, out, logo_html, back="../index.html", back_label="Trust Center"
 
 <footer><div class="fi">
   <span>PromptHalo Technologies · 6475 Preston Rd, Unit 140, Frisco, TX 75034</span>
-  <span>security@prompthalo.com</span>
+  <span>security@prompthalo.ai</span>
 </div></footer>
 </body>
 </html>"""
@@ -223,4 +223,4 @@ if __name__ == "__main__":
     if "--logo" in sys.argv:
         logo = pathlib.Path(sys.argv[sys.argv.index("--logo")+1]).read_text().strip()
     t, n, m = render(docx, out, logo)
-    print(f"{out}: {t} — {n} sections, classification={m.get('Classification','?')}")
+    print(f"{out}: {t} – {n} sections, classification={m.get('Classification','?')}")
