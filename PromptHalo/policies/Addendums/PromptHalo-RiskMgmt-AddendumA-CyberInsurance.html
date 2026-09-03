@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Risk Management Policy — Addendum A: Cyber Insurance Evaluation</title>
+<style>
+  :root { --petrol:#1b4965; --amber:#B45309; --grey:#444; --line:#BFC9D1; --base:15px; }
+  * { box-sizing:border-box; }
+  body {
+    font-family:Calibri,Inter,"Segoe UI",system-ui,sans-serif;
+    font-size:var(--base); line-height:1.55; color:#111;
+    margin:0; padding:44px 28px 72px; background:#f6f7f8;
+  }
+  .page { max-width:880px; margin:0 auto; background:#fff; padding:48px 56px 56px;
+          border:1px solid var(--line); }
+  .org { color:var(--amber); font-weight:700; font-size:0.82em; letter-spacing:.04em;
+         text-transform:uppercase; margin:0 0 6px; }
+  h1 { color:var(--petrol); font-size:1.85em; margin:0 0 4px; }
+  .sub { color:var(--grey); font-size:1.2em; margin:0 0 18px;
+         padding-bottom:14px; border-bottom:3px solid var(--amber); }
+  h2 { color:var(--petrol); font-size:1.12em; margin:28px 0 8px; padding-bottom:5px;
+       border-bottom:1px solid var(--amber); }
+  h3 { color:var(--petrol); font-size:1em; margin:18px 0 6px; }
+  p { margin:0 0 10px; }
+  ul { margin:0 0 12px; padding-left:20px; }
+  li { margin-bottom:5px; }
+  table { border-collapse:collapse; width:100%; margin:10px 0 14px; font-size:0.94em; }
+  th, td { border:1px solid var(--line); padding:7px 10px; text-align:left; vertical-align:top; }
+  th { background:var(--petrol); color:#fff; font-weight:600; }
+  table.meta td:first-child { font-weight:600; width:34%; background:#f2f5f7; }
+  .sizer { position:fixed; top:12px; right:14px; display:flex; gap:4px; }
+  .sizer button { font:inherit; font-size:13px; width:30px; height:28px; cursor:pointer;
+    background:#fff; border:1px solid var(--line); color:var(--petrol); border-radius:3px; }
+  .sizer button:hover { background:var(--petrol); color:#fff; }
+  @media print {
+    body { background:#fff; padding:0; font-size:10.5pt; }
+    .page { border:0; padding:0; max-width:none; }
+    .sizer { display:none; }
+    h2 { page-break-after:avoid; }
+    table { page-break-inside:avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sizer">
+  <button onclick="bump(-1)" title="Smaller text">A&minus;</button>
+  <button onclick="bump(1)" title="Larger text">A+</button>
+</div>
+
+<div class="page">
+  <p class="org">PromptHalo Technologies</p>
+  <h1>Risk Management Policy</h1>
+  <p class="sub">Addendum A — Cyber Insurance Evaluation</p>
+
+  <table class="meta">
+    <tr><td>Document owner</td><td>Security Officer</td></tr>
+    <tr><td>Approving authority</td><td>Chief Executive Officer</td></tr>
+    <tr><td>Parent document</td><td>PromptHalo Risk Management Policy</td></tr>
+    <tr><td>Version</td><td>1.0</td></tr>
+    <tr><td>Effective date</td><td>September 2, 2026</td></tr>
+    <tr><td>Review cadence</td><td>Annually, or upon a triggering event</td></tr>
+    <tr><td>Classification</td><td>Internal</td></tr>
+  </table>
+
+  <h2>1. Purpose</h2>
+  <p>This addendum sets out how PromptHalo Technologies (&ldquo;PromptHalo&rdquo; or &ldquo;the Company&rdquo;)
+  evaluates cyber liability insurance as a method of transferring information-security and business risk, and how the
+  resulting treatment decision is approved, documented, and revisited. It supplements &mdash; and does not replace
+  &mdash; the Risk Management Policy.</p>
+
+  <h2>2. Scope</h2>
+  <p>This addendum applies to all information-security and business risks that carry a financial loss component,
+  including risks arising from security incidents, unauthorized disclosure of customer or personal data, business
+  interruption, and third-party liability. It applies to the Company as a whole and to all systems, services, and data
+  within the scope of the Risk Management Policy.</p>
+
+  <h2>3. Policy Statement</h2>
+  <p>PromptHalo evaluates cyber liability insurance as one potential method of transferring information-security and
+  business risks. Insurance is treated as a risk-transfer option alongside &mdash; not as a substitute for &mdash; the
+  Company&rsquo;s preventive and detective controls.</p>
+
+  <h2>4. Evaluation</h2>
+  <h3>4.1 Cadence</h3>
+  <p>At least annually, and following material changes to the Company&rsquo;s operations, customer obligations, data
+  processing activities, or risk exposure, management will assess the need, availability, scope, and cost-effectiveness
+  of cyber insurance.</p>
+  <h3>4.2 Factors considered</h3>
+  <p>The evaluation takes into account, at minimum:</p>
+  <ul>
+    <li>Organizational size and financial resources, including the Company&rsquo;s capacity to absorb a loss.</li>
+    <li>Contractual obligations, including any customer or partner commitments that specify coverage or minimum limits.</li>
+    <li>Data exposure &mdash; the volume, sensitivity, and regulatory character of the data PromptHalo processes.</li>
+    <li>Existing preventive and detective controls and their effect on the likelihood and impact of a loss event.</li>
+    <li>Availability, scope, exclusions, and cost-effectiveness of coverage in the current market.</li>
+    <li>Applicable legal and regulatory requirements.</li>
+  </ul>
+
+  <h2>5. Risk Acceptance</h2>
+  <p>Based on PromptHalo&rsquo;s current organizational size, financial resources, contractual obligations, data
+  exposure, and existing preventive and detective controls, management may elect to accept the residual financial risk
+  rather than purchase cyber insurance.</p>
+  <p>Where management so elects, the decision, rationale, approving authority, and next review date will be documented
+  in the Company&rsquo;s risk register. The risk register entry will record the following:</p>
+  <table>
+    <tr><th>Field</th><th>Recorded value</th></tr>
+    <tr><td>Risk ID</td><td>Reference to the parent risk entry (e.g., RSK-###)</td></tr>
+    <tr><td>Risk description</td><td>Financial loss arising from a security incident, data breach, or business interruption not offset by insurance</td></tr>
+    <tr><td>Treatment decision</td><td>Accept / Transfer / Mitigate / Avoid</td></tr>
+    <tr><td>Rationale</td><td>Basis for the decision, including the factors listed in Section 4.2</td></tr>
+    <tr><td>Approving authority</td><td>Name and title of the approver</td></tr>
+    <tr><td>Approval date</td><td>Date the decision was approved</td></tr>
+    <tr><td>Next review date</td><td>No later than twelve months from the approval date</td></tr>
+  </table>
+  <p>An election to accept residual financial risk does not reduce any obligation under the Risk Management Policy to
+  identify, assess, and treat the underlying risk through other means.</p>
+
+  <h2>6. Reconsideration Triggers</h2>
+  <p>Cyber insurance will be reconsidered when required by contract, law, customer commitment, or when management
+  determines that the Company&rsquo;s risk exposure justifies transferring the risk. Events that trigger reconsideration
+  ahead of the annual review include:</p>
+  <ul>
+    <li>Execution of, or a proposed amendment to, a customer or partner agreement that requires cyber liability coverage.</li>
+    <li>A new legal or regulatory requirement for coverage in a market PromptHalo serves.</li>
+    <li>A material change in the volume, sensitivity, or regulatory character of data processed.</li>
+    <li>A material change in the Company&rsquo;s size, funding, revenue, or service offering.</li>
+    <li>A security incident, near-miss, or audit finding that materially changes the assessed exposure.</li>
+  </ul>
+
+  <h2>7. Roles and Responsibilities</h2>
+  <table>
+    <tr><th>Role</th><th>Responsibility</th></tr>
+    <tr><td>Security Officer</td><td>Performs the evaluation, assembles the supporting analysis (exposure, quotes, coverage terms), and records the outcome in the risk register.</td></tr>
+    <tr><td>Chief Executive Officer</td><td>Serves as the approving authority for the treatment decision, including any election to accept residual financial risk.</td></tr>
+    <tr><td>Finance / Business Operations</td><td>Provides financial context &mdash; available resources, budget impact, and cost-effectiveness inputs.</td></tr>
+    <tr><td>Legal / Contracts</td><td>Flags contractual, regulatory, or customer commitments that require insurance coverage or specific limits.</td></tr>
+  </table>
+
+  <h2>8. Trust Services Criteria Mapping</h2>
+  <table>
+    <tr><th>Criterion</th><th>Relevance</th></tr>
+    <tr><td>CC3.1 &ndash; CC3.4</td><td>Risk identification, analysis, and assessment of changes that affect the risk profile.</td></tr>
+    <tr><td>CC5.1</td><td>Selection and development of control activities that mitigate risks to acceptable levels.</td></tr>
+    <tr><td>CC9.1</td><td>Identification, selection, and development of risk mitigation activities, including the use of insurance to mitigate financial impact risks.</td></tr>
+  </table>
+
+  <h2>9. Exceptions</h2>
+  <p>Exceptions to this addendum require written approval from the approving authority identified above and must be
+  recorded in the risk register with a defined expiration or review date.</p>
+
+  <h2>10. Review</h2>
+  <p>This addendum is reviewed at least annually, or upon a triggering event described in Section 6, by the Security
+  Officer and approved by the approving authority.</p>
+
+  <h2>11. Revision History</h2>
+  <table>
+    <tr><th>Version</th><th>Date</th><th>Author</th><th>Description</th></tr>
+    <tr><td>1.0</td><td>September 2, 2026</td><td>Security Officer</td><td>Initial issue of Addendum A to the Risk Management Policy.</td></tr>
+  </table>
+</div>
+
+<script>
+  var size = 15;
+  function bump(d) {
+    size = Math.min(21, Math.max(11, size + d));
+    document.documentElement.style.setProperty('--base', size + 'px');
+  }
+</script>
+</body>
+</html>

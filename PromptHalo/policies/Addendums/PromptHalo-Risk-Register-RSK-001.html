@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Risk Register Entry — RSK-001 Cyber Insurance</title>
+<style>
+  :root { --petrol:#1b4965; --amber:#B45309; --grey:#444; --line:#BFC9D1; --base:15px; }
+  * { box-sizing:border-box; }
+  body {
+    font-family:Calibri,Inter,"Segoe UI",system-ui,sans-serif;
+    font-size:var(--base); line-height:1.55; color:#111;
+    margin:0; padding:44px 28px 72px; background:#f6f7f8;
+  }
+  .page { max-width:880px; margin:0 auto; background:#fff; padding:48px 56px 56px;
+          border:1px solid var(--line); }
+  .org { color:var(--amber); font-weight:700; font-size:0.82em; letter-spacing:.04em;
+         text-transform:uppercase; margin:0 0 6px; }
+  h1 { color:var(--petrol); font-size:1.85em; margin:0 0 4px; }
+  .sub { color:var(--grey); font-size:1.2em; margin:0 0 18px;
+         padding-bottom:14px; border-bottom:3px solid var(--amber); }
+  h2 { color:var(--petrol); font-size:1.12em; margin:28px 0 8px; padding-bottom:5px;
+       border-bottom:1px solid var(--amber); }
+  p { margin:0 0 10px; }
+  table { border-collapse:collapse; width:100%; margin:10px 0 14px; }
+  th, td { border:1px solid var(--line); padding:9px 11px; text-align:left; vertical-align:top; }
+  th { background:var(--petrol); color:#fff; font-weight:600; }
+  td.f { font-weight:600; width:30%; background:#f2f5f7; color:var(--petrol); }
+  .tag { display:inline-block; background:var(--amber); color:#fff; font-weight:600;
+         font-size:0.88em; padding:2px 9px; border-radius:3px; }
+  .note { font-size:0.9em; color:var(--grey); border-left:3px solid var(--amber);
+          padding:8px 12px; background:#faf6f1; margin:14px 0 0; }
+  .sizer { position:fixed; top:12px; right:14px; display:flex; gap:4px; }
+  .sizer button { font:inherit; font-size:13px; width:30px; height:28px; cursor:pointer;
+    background:#fff; border:1px solid var(--line); color:var(--petrol); border-radius:3px; }
+  .sizer button:hover { background:var(--petrol); color:#fff; }
+  @media print {
+    body { background:#fff; padding:0; font-size:10.5pt; }
+    .page { border:0; padding:0; max-width:none; }
+    .sizer { display:none; }
+    table { page-break-inside:avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sizer">
+  <button onclick="bump(-1)" title="Smaller text">A&minus;</button>
+  <button onclick="bump(1)" title="Larger text">A+</button>
+</div>
+
+<div class="page">
+  <p class="org">PromptHalo Technologies</p>
+  <h1>Risk Register Entry</h1>
+  <p class="sub">RSK-001 — Cyber Insurance</p>
+
+  <table>
+    <tr><th>Field</th><th>Entry</th></tr>
+    <tr><td class="f">Risk ID</td><td>RSK-001</td></tr>
+    <tr><td class="f">Risk</td><td>Financial exposure arising from a cybersecurity incident</td></tr>
+    <tr><td class="f">Existing controls</td><td>MFA, least privilege, encryption, backups, secure development,
+      vulnerability management, incident response, vendor management</td></tr>
+    <tr><td class="f">Response</td><td><span class="tag">Accept and monitor</span></td></tr>
+    <tr><td class="f">Rationale</td><td>Current premiums and coverage are not proportionate to PromptHalo&rsquo;s size,
+      revenue, risk exposure, and financial capacity</td></tr>
+    <tr><td class="f">Owner</td><td>CEO, CTO, or Security Officer</td></tr>
+    <tr><td class="f">Approval</td><td>Executive management</td></tr>
+    <tr><td class="f">Approval date</td><td>September 2, 2026</td></tr>
+    <tr><td class="f">Review</td><td>Annually and after material business, contractual, or risk changes</td></tr>
+    <tr><td class="f">Next review date</td><td>September 2, 2027</td></tr>
+    <tr><td class="f">Trigger</td><td>Major enterprise customer, sensitive-data expansion, contractual requirement,
+      significant revenue growth, or materially increased exposure</td></tr>
+    <tr><td class="f">Linked policy</td><td>Risk Management Policy &mdash; Addendum A: Cyber Insurance Evaluation</td></tr>
+    <tr><td class="f">Status</td><td>Open &mdash; monitoring</td></tr>
+  </table>
+
+  <p class="note">This entry records a risk-acceptance decision under Addendum A, Section 5. It is reviewed at the
+  next review date above, or earlier on any trigger listed.</p>
+</div>
+
+<script>
+  var size = 15;
+  function bump(d) {
+    size = Math.min(21, Math.max(11, size + d));
+    document.documentElement.style.setProperty('--base', size + 'px');
+  }
+</script>
+</body>
+</html>
