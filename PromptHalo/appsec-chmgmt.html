@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PromptHalo — AppSec &amp; Change Management</title>
+<style>
+:root{
+  --petrol:#1b4965;
+  --petrol-dk:#123449;
+  --petrol-lt:#5b8ba8;
+  --amber:#B45309;
+  --amber-soft:#c98a4b;
+  --amber-lt:#fdf2e0;
+  --ink:#2b3a45;
+  --muted:#63768a;
+  --line:#a9c6dd;
+  --line-soft:#dfeaf3;
+  --paper:#e8f0f8;
+  --field:#dceaf6;
+  --field-dp:#c9dff0;
+  --edge:#7ea9cb;
+  --white:#ffffff;
+  --lift:0 1px 2px rgba(27,73,101,.07), 0 5px 14px rgba(27,73,101,.07);
+  --lift-sm:0 1px 2px rgba(27,73,101,.06), 0 2px 6px rgba(27,73,101,.06);
+  --ok:#356b56;
+  --ok-bg:#dcecf8;
+  --warn:#8f5c26;
+  --warn-bg:#e9f0f7;
+  --bad:#94504f;
+  --bad-bg:#e4edf5;
+  --purple:#6b5b95;
+  --purple-bg:#d3e3f2;
+  --blue-bg:#dceaf6;
+  --teal-bg:#d6e8f5;
+  --peach-bg:#e6f0fa;
+  --mint-bg:#dceaf6;
+  --lilac-bg:#d3e3f2;
+  --sky-bg:#e6f1fa;
+  --fs:15px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  font-family:Calibri,Inter,"Segoe UI",system-ui,-apple-system,sans-serif;
+  font-size:var(--fs);
+  line-height:1.5;
+  color:var(--ink);
+  background:var(--paper);
+}
+h1,h2,h3,h4{margin:0;font-weight:600;line-height:1.25}
+
+/* ---------- masthead ---------- */
+.masthead{
+  background:#ffffff;box-shadow:var(--lift-sm);
+  color:var(--petrol);
+  padding:14px 22px;
+  display:flex;
+  align-items:center;
+  gap:22px;
+  flex-wrap:wrap;
+  position:sticky;
+  top:0;
+  z-index:50;
+  border-bottom:1px solid var(--edge);
+}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.brand .mark{
+  width:32px;height:32px;border-radius:9px;flex:0 0 auto;
+  background:linear-gradient(135deg,#cfe3f3,#a9c6dd);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;color:#4a6b80;font-size:15px;
+}
+.brand .name{font-size:1.18em;font-weight:600;letter-spacing:.2px}
+.brand .tag{font-size:.76em;opacity:.75;display:block;font-weight:400;letter-spacing:.1px}
+.masthead .spacer{flex:1}
+.fontctl{display:flex;align-items:center;gap:7px;font-size:.82em;color:var(--petrol);opacity:.95}
+.fontctl button{
+  width:27px;height:27px;border-radius:7px;cursor:pointer;
+  border:1px solid #c9dcea;
+  background:rgba(255,255,255,.75);color:var(--petrol);
+  font-size:14px;line-height:1;font-family:inherit;
+}
+.fontctl button:hover{background:#fff}
+.fontctl button:focus-visible{outline:2px solid var(--amber-soft);outline-offset:2px}
+#fsLabel{min-width:38px;text-align:center;font-variant-numeric:tabular-nums}
+
+/* ---------- tabs ---------- */
+.tabbar{
+  background:var(--field);
+  display:flex;gap:2px;padding:0 16px;
+  border-bottom:1px solid var(--edge);
+  overflow-x:auto;position:sticky;top:60px;z-index:49;
+}
+.tabbar button{
+  border:0;background:transparent;color:#4a6478;
+  font-family:inherit;font-size:.93em;font-weight:600;
+  padding:11px 17px;cursor:pointer;white-space:nowrap;
+  border-bottom:3px solid transparent;
+}
+.tabbar button:hover{color:var(--petrol);background:rgba(255,255,255,.6)}
+.tabbar button[aria-selected="true"]{color:var(--petrol);border-bottom-color:var(--edge);background:#fff;box-shadow:var(--lift-sm)}
+.tabbar button:focus-visible{outline:2px solid var(--amber-soft);outline-offset:-3px}
+
+.panel{display:none;padding:20px 22px 60px}
+.panel.active{display:block}
+.wrap{max-width:1560px;margin:0 auto}
+
+/* ---------- generic pieces ---------- */
+.card{background:var(--white);border:1px solid var(--line);border-radius:10px;box-shadow:var(--lift)}
+.sect{margin:0 0 18px}
+.sect > h2{
+  font-size:1.1em;color:var(--petrol);background:var(--field);border-radius:9px 9px 0 0;
+  padding:11px 15px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.sect > h2 .note{margin-left:auto;font-size:.78em;font-weight:400;color:var(--muted)}
+.pill{
+  display:inline-block;padding:1px 8px;border-radius:20px;border:1px solid #bfd6e8;
+  font-size:.78em;font-weight:600;white-space:nowrap;
+}
+.p-green{background:var(--ok-bg);color:var(--ok)}
+.p-amber{background:var(--warn-bg);color:var(--warn)}
+.p-red{background:var(--bad-bg);color:var(--bad)}
+.p-blue{background:var(--blue-bg);color:#1e40af}
+.p-purple{background:var(--purple-bg);color:var(--purple)}
+.yes{color:var(--ok);font-weight:700}
+.no{color:var(--bad);font-weight:700}
+.partial{color:var(--warn);font-weight:700}
+.dash{color:#9aa9b4}
+
+table{border-collapse:collapse;width:100%;font-size:.88em}
+th{
+  background:var(--field);color:var(--petrol);text-align:left;
+  font-weight:600;padding:7px 9px;border-bottom:2px solid var(--edge);
+  position:sticky;top:0;
+}
+td{padding:6px 9px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+tbody tr:nth-child(even){background:#f6fafd}
+.tscroll{overflow:auto;max-height:none}
+
+/* ---------- ORIGINAL TAB ---------- */
+.o-head{text-align:center;padding:4px 0 16px}
+.o-head h1{font-size:1.85em;color:var(--petrol);letter-spacing:-.2px}
+.o-head p{margin:4px 0 0;color:var(--muted);font-size:1.02em}
+.o-badges{display:flex;gap:8px 20px;flex-wrap:wrap;justify-content:center;margin-top:11px}
+.o-badges span{font-size:.85em;color:#5d7080;display:flex;align-items:center;gap:6px}
+.o-badges span::before{content:"✔";color:var(--ok);font-weight:700}
+.o-callout{
+  background:#fff;border:1px solid var(--line);border-top:3px solid var(--edge);
+  box-shadow:var(--lift);border-radius:9px;
+  padding:9px 15px;text-align:center;font-size:.87em;color:var(--petrol);
+  line-height:1.45;max-width:210px;margin:0 auto 14px;
+}
+
+.stages{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:8px;margin-bottom:16px}
+.stage{border:1px solid var(--line);border-radius:9px;background:#fff;box-shadow:var(--lift);display:flex;flex-direction:column;overflow:hidden}
+.stage h3{font-size:.82em;padding:8px 9px;text-align:center;line-height:1.3;color:var(--petrol);border-bottom:1px solid var(--line)}
+.stage h3 small{display:block;font-weight:400;opacity:.75;font-size:.92em}
+.stage .body{padding:9px;flex:1;display:flex;flex-direction:column;gap:7px}
+.stage .tool{display:flex;align-items:center;gap:7px;font-weight:600;font-size:.88em}
+.stage .glyph{
+  border:1px solid rgba(255,255,255,.5);
+  width:26px;height:26px;border-radius:6px;flex:0 0 auto;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;
+}
+.stage ul{margin:0;padding-left:15px;font-size:.8em;color:#5a6b78}
+.stage li{margin-bottom:2px}
+.stage .src{
+  border-top:1px solid var(--line-soft);background:#fbfdff;padding:7px 9px;
+  font-size:.75em;color:var(--muted);line-height:1.4;
+}
+.stage .src b{display:block;font-weight:600;color:#5a6b78}
+.st-blue h3{background:var(--blue-bg)}
+.st-green h3{background:var(--ok-bg)}
+.st-teal h3{background:var(--teal-bg)}
+.st-peach h3{background:var(--peach-bg)}
+.st-purple h3{background:var(--lilac-bg)}
+.st-mint h3{background:var(--mint-bg)}
+.st-sky h3{background:var(--sky-bg)}
+
+.flowband{display:flex;gap:3px;margin-bottom:18px;flex-wrap:wrap}
+.chev{
+  flex:1 1 130px;padding:9px 12px;font-size:.8em;font-weight:600;
+  color:var(--petrol);border-radius:7px;text-align:center;line-height:1.3;
+  background:#fff !important;border:1px solid var(--line);
+  border-top:3px solid var(--edge);box-shadow:var(--lift-sm);
+}
+
+.grid2{display:grid;grid-template-columns:1.35fr 1fr;gap:14px;align-items:start}
+.grid-side{display:grid;gap:14px}
+.mini h4{font-size:.95em;color:var(--petrol);background:var(--field);border-radius:9px 9px 0 0;padding:9px 13px;border-bottom:1px solid var(--line)}
+.mini ul{margin:0;padding:10px 13px 12px;list-style:none;font-size:.85em}
+.mini li{display:flex;justify-content:space-between;gap:12px;padding:3px 0;border-bottom:1px dotted var(--line-soft)}
+.mini li:last-child{border-bottom:0}
+.mini li span:last-child{color:var(--muted);white-space:nowrap}
+.result{
+  margin-top:16px;padding:11px 15px;border-radius:9px;
+  background:#fff;border:1px solid var(--line);border-left:4px solid var(--edge);
+  box-shadow:var(--lift);font-size:.9em;color:#3d6553;
+}
+.result b{color:#356b56}
+.foot{margin-top:10px;text-align:right;font-size:.8em;color:var(--muted)}
+
+/* ---------- detail tabs ---------- */
+.intro{
+  background:#fff;box-shadow:var(--lift);border:1px solid var(--line);border-left:4px solid var(--edge);
+  border-radius:9px;padding:13px 17px;margin-bottom:18px;
+  font-size:.95em;color:#3c4c58;max-width:78ch;
+}
+.intro strong{color:var(--petrol)}
+.intro em{color:#5b7284;font-style:normal;background:var(--field);padding:0 5px;border-radius:4px}
+.row{border:1px solid var(--line);border-radius:9px;background:#fff;box-shadow:var(--lift-sm);margin-bottom:9px;overflow:hidden}
+.row > summary{
+  padding:10px 14px;cursor:pointer;display:flex;align-items:center;
+  gap:11px;font-weight:600;color:var(--petrol);list-style:none;
+}
+.row > summary::-webkit-details-marker{display:none}
+.row > summary::before{content:"▸";color:var(--edge);font-size:1.05em;transition:transform .15s}
+.row[open] > summary::before{transform:rotate(90deg)}
+.row > summary:hover{background:var(--field)}
+.row > summary:focus-visible{outline:2px solid var(--edge);outline-offset:-2px}
+.row .rmeta{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.row .rbody{padding:2px 16px 15px 30px;border-top:1px solid var(--line-soft);background:#fbfdff}
+.rblock{margin-top:12px}
+.rblock h5{
+  font-size:.83em;color:var(--petrol);font-weight:700;
+  margin:0 0 4px;letter-spacing:.2px;
+}
+.rblock p{margin:0;font-size:.92em;color:#55666f;max-width:76ch}
+.rblock ol,.rblock ul{margin:0;padding-left:19px;font-size:.92em;color:#55666f;max-width:76ch}
+.rblock li{margin-bottom:3px}
+code{
+  background:var(--field);border:1px solid var(--line);border-radius:4px;
+  padding:.5px 5px;font-family:Consolas,"SF Mono",Menlo,monospace;
+  font-size:.86em;color:var(--petrol-dk);
+}
+pre{
+  background:#f4f9fd;color:#41586a;border:1px solid var(--line);border-radius:8px;
+  padding:11px 14px;overflow:auto;font-size:.83em;line-height:1.5;
+  font-family:Consolas,"SF Mono",Menlo,monospace;margin:7px 0 0;
+}
+pre .c{color:#5a7284}
+
+.phase{border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:var(--lift);margin-bottom:16px;overflow:hidden}
+.phase > header{
+  background:var(--field);color:var(--petrol);
+  border-bottom:2px solid var(--edge);padding:11px 16px;
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+}
+.phase > header h3{font-size:1.02em}
+.phase > header .when{margin-left:auto;font-size:.8em;opacity:.75;font-weight:400}
+.phase .pbody{padding:14px 17px}
+.step{display:flex;gap:13px;padding:9px 0;border-bottom:1px solid var(--line-soft)}
+.step:last-child{border-bottom:0}
+.stepn{
+  flex:0 0 26px;height:26px;border-radius:50%;
+  background:var(--field);color:var(--petrol);border:1px solid var(--edge);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:.85em;
+}
+.stepc{flex:1;min-width:0}
+.stepc h5{font-size:.95em;color:var(--petrol);margin:0 0 3px}
+.stepc p{margin:0;font-size:.9em;color:#55666f;max-width:80ch}
+.stepc .out{
+  margin-top:5px;font-size:.82em;color:var(--muted);
+  padding-left:9px;border-left:2px solid var(--field-dp);
+}
+.stepc .out b{color:var(--petrol);font-weight:600}
+.buybox,.skipbox{margin-top:14px;border-radius:9px;padding:11px 14px}
+.buybox{background:#f4f9fd;border:1px solid var(--line);border-left:4px solid var(--edge)}
+.skipbox{background:var(--field);border:1px solid var(--line)}
+.buybox h5,.skipbox h5{font-size:.85em;font-weight:700;margin:0 0 7px;color:var(--petrol)}
+.buytbl{width:100%;font-size:.86em}
+.buytbl td{border:0;padding:3px 0}
+.buytbl td.cost{width:150px;color:var(--petrol);font-weight:600;white-space:nowrap}
+.buytbl td.whenc{color:#55666f}
+.skipbox ul{margin:0;padding-left:18px;font-size:.88em;color:#55666f}
+.skipbox li{margin-bottom:5px}
+.skipbox b{color:var(--petrol)}
+
+@media print{
+  .masthead,.tabbar,.fontctl{display:none}
+  .panel{display:block !important;page-break-before:always;padding:0}
+  .row .rbody{display:block !important}
+  body{background:#fff;font-size:9.5pt}
+}
+@media (max-width:1200px){
+  .stages{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .grid2{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .stages{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .panel{padding:14px 12px 50px}
+  .masthead{padding:11px 14px;gap:12px}
+  .tabbar{top:auto;position:static}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="brand">
+    <div class="mark">PH</div>
+    <div>
+      <span class="name">PromptHalo</span>
+      <span class="tag">Secure by Design. Built for What's Next.</span>
+    </div>
+  </div>
+  <div class="spacer"></div>
+  <div class="fontctl">
+    <span>Text size</span>
+    <button type="button" id="fsDown" aria-label="Decrease text size">−</button>
+    <span id="fsLabel">15px</span>
+    <button type="button" id="fsUp" aria-label="Increase text size">+</button>
+    <button type="button" id="fsReset" aria-label="Reset text size" style="width:auto;padding:0 9px">Reset</button>
+  </div>
+</div>
+
+<nav class="tabbar" role="tablist">
+  <button role="tab" aria-selected="true" aria-controls="t-original" id="tab-original">Original architecture</button>
+  <button role="tab" aria-selected="false" aria-controls="t-github" id="tab-github">GitHub baseline detail</button>
+  <button role="tab" aria-selected="false" aria-controls="t-aws" id="tab-aws">AWS &amp; components detail</button>
+  <button role="tab" aria-selected="false" aria-controls="t-appsec" id="tab-appsec">Implementation sequence</button>
+  <button role="tab" aria-selected="false" aria-controls="t-chmgmt" id="tab-chmgmt">Implement change management</button>
+</nav>
+
+<!-- ================= TAB 1: ORIGINAL ================= -->
+<section class="panel active" id="t-original" role="tabpanel" aria-labelledby="tab-original">
+<div class="wrap">
+
+  <div class="o-head">
+    <h1>End-to-End AppSec &amp; Cloud Security Architecture</h1>
+    <p>From requirements to production and continuous improvement</p>
+    <div class="o-badges">
+      <span>Stronger Security</span><span>Open Source First</span>
+      <span>SOC 2 Aligned</span><span>Cost Conscious</span>
+    </div>
+  </div>
+
+  <div class="o-callout">Small team. Big security. Real impact.</div>
+
+  <div class="stages">
+    <div class="stage st-blue">
+      <h3>1. Plan &amp; Design<small>(Requirements)</small></h3>
+      <div class="body">
+        <div class="tool"><span class="glyph" style="background:#6f9dc2">J</span>Jira</div>
+        <ul><li>Security requirements</li><li>Acceptance criteria</li><li>Traceability</li></ul>
+      </div>
+      <div class="src"><b>Source: Jira (Free)</b>Cost: $0</div>
+    </div>
+    <div class="stage st-green">
+      <h3>2. Threat Modeling<small>(Design)</small></h3>
+      <div class="body">
+        <div class="tool"><span class="glyph" style="background:#6f9dc2">TD</span>Threat Dragon</div>
+        <ul><li>DFD, assets, threats</li><li>STRIDE, mitigations</li></ul>
+      </div>
+      <div class="src"><b>Source: Open Source</b>Cost: $0</div>
+    </div>
+    <div class="stage st-teal">
+      <h3>3. Develop<small>(Prevent Early)</small></h3>
+      <div class="body">
+        <div class="tool"><span class="glyph" style="background:#6f9dc2">VS</span>VS Code</div>
+        <ul><li>Semgrep (SAST)</li><li>Trivy (SCA/IaC)</li><li>Gitleaks (Secrets)</li></ul>
+      </div>
+      <div class="src"><b>Source: VS Code Extensions (Open Source)</b>Cost: $0</div>
+    </div>
+    <div class="stage st-blue">
+      <h3>4. Commit &amp; PR<small>(Enforce)</small></h3>
+      <div class="body">
+        <div class="tool"><span class="glyph" style="background:#6f9dc2">GH</span>GitHub</div>
+        <ul><li>Pre-commit hooks</li><li>Pull Requests</li><li>CODEOWNERS</li></ul>
+      </div>
+      <div class="src"><b>Source: GitHub Team</b>Cost: ~$4/user/month</div>
+    </div>
+    <div class="stage st-green">
+      <h3>5. CI/CD &amp; Build<small>(Enforce)</small></h3>
+      <div class="body">
+        <div class="tool"><span class="glyph" style="background:#6f9dc2">GA</span>GitHub Actions</div>
+        <ul><li>Security scans</li><li>Tests, SBOM</li><li>Signing (Cosign)</li><li>Supply-chain checks</li></ul>
+      </div>
+      <div class="src"><b>Source: GitHub (Free)</b>Cost: Included/usage</div>
+    </div>
+    <div class="stage st-peach">
+      <h3>6. Test &amp; Deploy</h3>
+      <div class="body">
+        <div class="tool"><span class="glyph" style="background:#6f9dc2">ECR</span>ECR</div>
+        <div class="tool"><span class="glyph" style="background:#6f9dc2">ZAP</span>OWASP ZAP</div>
+        <ul><li>Store signed images</li><li>DAST (web/API testing)</li></ul>
+      </div>
+      <div class="src"><b>Source: AWS / Open Source</b><span style="color:var(--bad)">Cost: Usage based</span></div>
+    </div>
+    <div class="stage st-blue">
+      <h3>7. Run (Protect Production)</h3>
+      <div class="body">
+        <div class="tool"><span class="glyph" style="background:#6f9dc2">AWS</span>aws</div>
+        <ul><li>IAM Analyzer</li><li>Inspector</li><li>GuardDuty</li><li>CloudTrail, Config</li><li>WAF, KMS, Secrets Manager</li></ul>
+      </div>
+      <div class="src"><b>Source: AWS</b><span style="color:var(--bad)">Cost: Usage based</span></div>
+    </div>
+    <div class="stage st-purple">
+      <h3>8. Monitor &amp; Correlate</h3>
+      <div class="body">
+        <div class="tool"><span class="glyph" style="background:#6f9dc2">SH</span>Security Hub</div>
+        <div class="tool"><span class="glyph" style="background:#6f9dc2">DD</span>DefectDojo</div>
+        <div class="tool"><span class="glyph" style="background:#6f9dc2">WZ</span>Wazuh</div>
+        <ul><li>AWS findings</li><li>AppSec vulnerabilities</li><li>Security events (SIEM)</li></ul>
+      </div>
+      <div class="src"><b>Source: AWS / Open Source</b>Cost: $0–$150/mo (hosting)</div>
+    </div>
+    <div class="stage st-blue">
+      <h3>9. Remediate</h3>
+      <div class="body">
+        <div class="tool"><span class="glyph" style="background:#6f9dc2">J</span>Jira</div>
+        <ul><li>Create tickets</li><li>Owner, SLA</li><li>Track to closure</li><li>Link to PRs</li></ul>
+      </div>
+      <div class="src"><b>Source: Jira (Free)</b>Cost: $0</div>
+    </div>
+    <div class="stage st-blue">
+      <h3>10. Evidence &amp; Compliance</h3>
+      <div class="body">
+        <div class="tool"><span class="glyph" style="background:#6f9dc2">GW</span>Google Workspace</div>
+        <ul><li>Policies, reports</li><li>Audit evidence</li><li>Approvals</li><li>SOC 2 alignment</li></ul>
+      </div>
+      <div class="src"><b>Source: Google Workspace</b>Cost: $0</div>
+    </div>
+  </div>
+
+  <div class="flowband">
+    <div class="chev" style="background:#e6f1fa">VS Code = prevent early</div>
+    <div class="chev" style="background:#e4f4ec">GitHub = enforce</div>
+    <div class="chev" style="background:#fbf0dc">AWS = protect production</div>
+    <div class="chev" style="background:#f9e9e9">Security Hub = AWS findings</div>
+    <div class="chev" style="background:#eae8f7">DefectDojo = AppSec vulnerabilities</div>
+    <div class="chev" style="background:#e8ecf9">Wazuh = security events</div>
+    <div class="chev" style="background:#e6f1fa">Jira = remediation</div>
+    <div class="chev" style="background:#e0f2ef">Google Workspace = controlled audit evidence</div>
+  </div>
+
+  <div class="grid2">
+    <div class="card sect">
+      <h2>A. GitHub Baseline (Free + Private Repos)
+        <span class="note">Use GitHub Free today. Upgrade to GitHub Team for stronger governance.</span></h2>
+      <div class="tscroll">
+      <table>
+        <thead><tr>
+          <th>Capability</th><th>GitHub Free + Private Repo</th><th>Turn on?</th>
+          <th>Selected configuration / free substitute</th><th>What it provides</th>
+          <th>Shift-left point</th><th>Buy?</th>
+        </tr></thead>
+        <tbody id="tblA"></tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="grid-side">
+      <div class="card mini">
+        <h4>Recommended Purchases (Planning Estimates)</h4>
+        <ul>
+          <li><span>GitHub Team (10 users)</span><span>~$480/yr</span></li>
+          <li><span>External Pentest</span><span>~$7K–20K/yr</span></li>
+          <li><span>GuardDuty</span><span>Usage-based</span></li>
+          <li><span>Inspector</span><span>Usage-based</span></li>
+          <li><span>CloudTrail (storage)</span><span>~$100–600/yr</span></li>
+          <li><span>Secrets Manager / KMS</span><span>~$50–300/yr</span></li>
+          <li><span>AWS WAF</span><span>~$20–100+/mo</span></li>
+          <li><span>MDM / Endpoint Mgmt</span><span>~$600–1,200/yr</span></li>
+          <li><span>DefectDojo hosting</span><span>~$240–900/yr</span></li>
+          <li><span>Wazuh hosting</span><span>~$360–1,800/yr</span></li>
+          <li><span>Security training</span><span>$0–500/yr</span></li>
+        </ul>
+      </div>
+      <div class="card mini">
+        <h4>Good ASPM Options (when needed)</h4>
+        <ul>
+          <li><span>PlexTrac</span><span>paid, ~$60–150/user/mo</span></li>
+          <li><span>Socket</span><span>paid, ~$20–50/dev/mo</span></li>
+          <li><span>Aikido</span><span>freemium</span></li>
+          <li><span>DefectDojo</span><span>free, self-hosted</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card sect" style="margin-top:14px">
+    <h2>B. Key AWS Security Services (Costs &amp; Purpose)
+      <span class="note">Usage-based pricing. Cost varies by region and workload.</span></h2>
+    <div class="tscroll">
+    <table>
+      <thead><tr>
+        <th>Service</th><th>What it provides</th><th>Shift-left point</th>
+        <th>Estimated cost (USD)</th><th>Free alternative</th>
+      </tr></thead>
+      <tbody id="tblB"></tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="card sect">
+    <h2>C. Other Key Components</h2>
+    <div class="tscroll">
+    <table>
+      <thead><tr>
+        <th>Component</th><th>What it provides</th>
+        <th>Estimated cost (USD)</th><th>Free alternative(s)</th>
+      </tr></thead>
+      <tbody id="tblC"></tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="result">
+    <b>Result:</b> A complete, cost-conscious AppSec and cloud security baseline for PromptHalo —
+    shift left, reduce risk, align with SOC 2, and scale as you grow.
+  </div>
+  <div class="foot">PromptHalo | People. AI. Security. What's Next.</div>
+
+</div>
+</section>
+
+<!-- ================= TAB 2: GITHUB DETAIL ================= -->
+<section class="panel" id="t-github" role="tabpanel" aria-labelledby="tab-github">
+<div class="wrap">
+  <div class="intro">
+    Every row of <strong>Table A</strong>, expanded. Each entry says what the control actually does,
+    then how to automate it so no one has to remember to run it. Open a row to read it, or use
+    <em>Expand all</em> before printing.
+    <div style="margin-top:9px">
+      <button type="button" class="exp" data-target="rowsA">Expand all</button>
+      <button type="button" class="col" data-target="rowsA">Collapse all</button>
+    </div>
+  </div>
+  <div id="rowsA"></div>
+</div>
+</section>
+
+<!-- ================= TAB 3: AWS DETAIL ================= -->
+<section class="panel" id="t-aws" role="tabpanel" aria-labelledby="tab-aws">
+<div class="wrap">
+  <div class="intro">
+    <strong>Tables B and C</strong>, expanded the same way. AWS services first, then the
+    open-source components that sit alongside them.
+    <div style="margin-top:9px">
+      <button type="button" class="exp" data-target="rowsBC">Expand all</button>
+      <button type="button" class="col" data-target="rowsBC">Collapse all</button>
+    </div>
+  </div>
+  <div id="rowsBC"></div>
+</div>
+</section>
+
+<!-- ================= TAB 4: APPSEC ================= -->
+<section class="panel" id="t-appsec" role="tabpanel" aria-labelledby="tab-appsec">
+<div class="wrap">
+  <div class="intro">
+    A twelve-week path from nothing to the architecture on the first tab. Phases are ordered so each
+    one produces something the next depends on. Timings assume a small team doing this alongside
+    product work, not a dedicated crew.
+  </div>
+  <div id="appsecPhases"></div>
+</div>
+</section>
+
+<!-- ================= TAB 5: CHANGE MANAGEMENT ================= -->
+<section class="panel" id="t-chmgmt" role="tabpanel" aria-labelledby="tab-chmgmt">
+<div class="wrap">
+  <div class="intro">
+    Change management built on the same GitHub primitives, so the pull request <em>is</em> the change
+    record rather than something you transcribe into a separate ticket afterwards. Mapped to
+    <strong>SOC 2 CC8.1</strong> throughout.
+  </div>
+  <div id="chmgmtPhases"></div>
+</div>
+</section>
+
+<script>
+/* ================= DETAIL CONTENT ================= */
+
+const DETAIL_A = {
+"Private repositories":{
+ does:"Keeps source code, commit history and issue discussion out of public view, and gives you an immutable record of who changed what and when. It is the foundation every other control on this list assumes.",
+ auto:["Set the organisation default repository visibility to private and disable member creation of public repos in org settings.",
+ "Manage repo settings as code with the Terraform <code>github</code> provider so a new repo is created private by default, never clicked into existence.",
+ "Run a weekly scheduled Action that calls <code>gh api /orgs/{org}/repos --paginate</code>, filters for <code>visibility=public</code>, and opens an issue if anything unexpected appears."]},
+
+"Dependency Graph":{
+ does:"Parses your manifest and lock files to build the full direct and transitive dependency inventory for each repo. Nothing else in the dependency chain works without it, and it is the raw material for your SBOM.",
+ auto:["Enable at organisation level so it applies to every current and future repo, rather than per-repo.",
+ "Commit lock files (<code>poetry.lock</code>, <code>package-lock.json</code>) so the graph reflects resolved versions instead of ranges.",
+ "Export periodically via the GraphQL <code>dependencyGraphManifests</code> field if you want the inventory outside GitHub."]},
+
+"Dependabot Alerts":{
+ does:"Matches your dependency graph against the GitHub Advisory Database and raises an alert when a component you use has a known CVE. This is your continuous signal that something you already shipped has become vulnerable.",
+ auto:["Enable org-wide with the <em>Automatically enable for new repositories</em> option set.",
+ "Pull alerts nightly into your vulnerability manager: <code>gh api /repos/{owner}/{repo}/dependabot/alerts --paginate</code> and import the JSON into DefectDojo so all findings live in one place.",
+ "Route critical and high alerts to a Slack channel with a webhook, and auto-create a Jira ticket with an SLA due date so the clock starts without human intervention."]},
+
+"Dependabot Security Updates":{
+ does:"Goes past alerting and opens a pull request that bumps the vulnerable component to the first fixed version. It turns a finding into a reviewable change automatically.",
+ auto:["Enable in repo security settings; no config file needed for the security-only behaviour.",
+ "Auto-merge patch-level security bumps once required checks pass: <code>gh pr merge --auto --squash</code> triggered by a workflow that checks the update is <code>version-update:semver-patch</code>.",
+ "Hold minor and major bumps for human review — auto-merging those is how you break production at 2am."]},
+
+"Dependabot Version Updates":{
+ does:"Keeps dependencies current on a schedule rather than only when a CVE lands. The security value is indirect but real: staying close to upstream means the eventual security bump is a small hop, not a major-version migration under time pressure.",
+ auto:["Add <code>.github/dependabot.yml</code> with a weekly schedule per ecosystem.",
+ "Use <code>groups:</code> to batch related packages into one PR so you get three PRs a week, not thirty.",
+ "Set <code>open-pull-requests-limit</code> so the queue stays reviewable."],
+ code:"<span class=\"c\"># .github/dependabot.yml</span>\nversion: 2\nupdates:\n  - package-ecosystem: pip\n    directory: \"/\"\n    schedule: { interval: weekly, day: monday }\n    open-pull-requests-limit: 5\n    groups:\n      dev-dependencies:\n        dependency-type: development"},
+
+"GitHub Advisory Database":{
+ does:"The curated vulnerability intelligence feed that Dependabot matches against. You do not operate it; you consume it. Worth understanding because its coverage determines what you find and what you miss.",
+ auto:["Nothing to enable — it is automatic wherever Dependabot is on.",
+ "Layer a second source so you are not single-sourced: Trivy pulls from its own database, which catches OS-package issues GitHub does not cover.",
+ "Query it directly via the GraphQL <code>securityAdvisories</code> field if you need to report on advisory age or backlog."]},
+
+"Pull Requests":{
+ does:"Forces every change through a review checkpoint and creates a durable record of what changed, who approved it, and why. For SOC 2 this single artefact carries most of your change management evidence.",
+ auto:["Enforce with a repository ruleset requiring a PR for the default branch. Direct pushes then fail at the server, not at someone's conscience.",
+ "Add <code>.github/pull_request_template.md</code> with the fields you need on every change: what, why, risk, rollback, linked issue.",
+ "Run a check that fails the PR if the description has no linked ticket reference, so traceability is enforced rather than requested."]},
+
+"CODEOWNERS":{
+ does:"Maps paths in the repo to the people or teams who must review changes to them. It is how you make security review automatic for the parts of the codebase that warrant it, without gating everything.",
+ auto:["Commit <code>.github/CODEOWNERS</code> and enable <em>Require review from Code Owners</em> in the ruleset.",
+ "Assign security ownership narrowly and deliberately: auth, crypto, IAM policy, CI workflows, dependency manifests. Owning everything means reviewing nothing carefully.",
+ "Validate the file in CI so a typo does not silently disable ownership."],
+ code:"<span class=\"c\"># .github/CODEOWNERS</span>\n*                      @promptohalo/engineering\n/infra/               @promptohalo/security @promptohalo/platform\n/.github/workflows/   @promptohalo/security\n/src/auth/            @promptohalo/security\npoetry.lock           @promptohalo/security"},
+
+"GitHub Actions":{
+ does:"The execution engine for everything else. Every scanner, test, gate and evidence step on this diagram runs as an Actions job triggered by a push, a PR, a tag or a schedule.",
+ auto:["Write the security workflow once in a central <code>.github</code> repo and call it from every other repo as a reusable workflow. One place to update when a scanner changes.",
+ "Pin third-party actions to a commit SHA, not a tag — a mutable tag is a supply-chain hole in your own pipeline.",
+ "Set <code>permissions:</code> explicitly at workflow level, defaulting to <code>contents: read</code>, and grant more only in the jobs that need it."],
+ code:"<span class=\"c\"># calling the shared workflow from any repo</span>\njobs:\n  security:\n    uses: promptohalo/.github/.github/workflows/security.yml@v1\n    permissions:\n      contents: read\n      security-events: write"},
+
+"SAST":{
+ does:"Reads your source without running it and flags insecure patterns: injection sinks, unsafe deserialisation, hardcoded crypto choices, missing authorisation checks. Semgrep CE gives you this free where GitHub's native CodeQL would require Advanced Security.",
+ auto:["Install the Semgrep VS Code extension so findings appear while the developer types. This is the highest-leverage placement — a finding fixed in the editor never becomes a ticket.",
+ "Run <code>semgrep ci</code> in the PR workflow with <code>--sarif</code>, and upload results with <code>github/codeql-action/upload-sarif</code> so they render in the PR's Security tab.",
+ "Scan only the diff on PRs and the full tree nightly. Full scans on every PR make the pipeline slow enough that people route around it.",
+ "Write custom rules for your own recurring mistakes; a five-line Semgrep rule beats a paragraph in a coding standard nobody reads."],
+ code:"<span class=\"c\"># PR job — diff-only, fails on error severity</span>\n- run: semgrep ci --config auto --sarif --output semgrep.sarif\n  env:\n    SEMGREP_BASELINE_REF: ${{ github.event.pull_request.base.sha }}\n- uses: github/codeql-action/upload-sarif@v3\n  with: { sarif_file: semgrep.sarif }"},
+
+"Secret scanning":{
+ does:"Finds credentials committed into code — API keys, tokens, private keys, connection strings. The critical property is that it scans history, not just the current tree, because a secret deleted in a later commit is still in the clone.",
+ auto:["Install Gitleaks as a pre-commit hook so the secret never reaches the remote. Once pushed, it must be treated as compromised and rotated regardless of what you do next.",
+ "Add a CI job that fails the build on any finding, and a weekly scheduled job running <code>gitleaks detect --log-opts=\"--all\"</code> across full history.",
+ "Maintain <code>.gitleaks.toml</code> allowlists for test fixtures, and review that allowlist quarterly — it drifts into a place where real secrets hide.",
+ "Pair detection with a rotation runbook. Finding the secret is the easy half."],
+ code:"<span class=\"c\"># .pre-commit-config.yaml</span>\nrepos:\n  - repo: https://github.com/gitleaks/gitleaks\n    rev: v8.18.0\n    hooks: [ { id: gitleaks } ]"},
+
+"SCA":{
+ does:"Software composition analysis: identifies third-party components and their known vulnerabilities. Dependabot covers your declared dependencies; Trivy additionally catches OS packages inside container images and things not in a manifest.",
+ auto:["Run <code>trivy fs --scanners vuln,license .</code> in CI and fail on HIGH or CRITICAL <em>where a fix is available</em>, using <code>--ignore-unfixed</code>. Failing on unfixable findings just teaches people to bypass the gate.",
+ "Cache the Trivy database between runs to keep the job under a minute.",
+ "Feed results to DefectDojo so you have one backlog rather than findings scattered across tools."]},
+
+"Dependency change review":{
+ does:"Catches the case where a pull request introduces a new vulnerable component. Without it you find out at the next scheduled scan, after the change is already merged.",
+ auto:["Add a PR job that runs Trivy against the changed lock file and posts findings as a PR comment.",
+ "Make it a required check so a PR adding a critical vulnerability cannot merge.",
+ "Include license checking in the same pass — a copyleft dependency arriving quietly is a commercial problem that surfaces during diligence."]},
+
+"IaC scanning":{
+ does:"Checks Terraform and CloudFormation for misconfiguration before anything is provisioned: public S3 buckets, unencrypted volumes, over-permissive security groups, IAM policies with wildcards. This is where most cloud incidents are actually prevented.",
+ auto:["Run <code>trivy config ./infra</code> in the PR workflow as a required check.",
+ "Also run it as a pre-plan step in the Terraform pipeline so a manual apply cannot skip it.",
+ "Add Checkov or a second ruleset if you need CIS or specific benchmark mapping for audit purposes.",
+ "Encode your own guardrails as custom policies — for example, deny any security group with <code>0.0.0.0/0</code> on a port other than 443."]},
+
+"Container scanning":{
+ does:"Finds CVEs in the base image OS packages and in language dependencies baked into the image. Most container findings come from the base image rather than your code, which makes base-image currency the highest-value fix.",
+ auto:["Scan after build and before push to ECR, failing the build on fixable HIGH or CRITICAL.",
+ "Rescan images already in the registry nightly — an image that was clean at build time will not stay clean.",
+ "Pin base images by digest and update them on a schedule with Dependabot's Docker ecosystem support.",
+ "Prefer distroless or minimal base images; the fastest way to cut container findings is to ship fewer packages."]},
+
+"SBOM":{
+ does:"A machine-readable inventory of every component in a build. It answers the question you get asked the morning a major CVE drops: are we affected, and where. Increasingly a customer and regulatory expectation rather than a nice-to-have.",
+ auto:["Generate on every release: <code>trivy image --format cyclonedx --output sbom.json</code>, plus GitHub's native SPDX export for a second format.",
+ "Attach the SBOM to the GitHub release and sign it with Cosign so its provenance is verifiable.",
+ "Store SBOMs in versioned object storage keyed by release tag, so you can answer the exposure question for any version still running.",
+ "Wire an alert that diffs the new SBOM against the previous release and flags newly introduced components."]},
+
+"Security unit tests":{
+ does:"Tests that assert security behaviour directly: that an unauthenticated request is rejected, that a user cannot read another tenant's record, that malformed input is refused. Scanners find known bad patterns; these tests protect the logic specific to your application, which no scanner understands.",
+ auto:["Mark them with a pytest marker and run <code>pytest -m security</code> as its own required CI job, so a security regression is visibly distinct from a functional failure.",
+ "Write one authorisation test per role boundary and treat any new endpoint without one as an incomplete PR.",
+ "Add a regression test for every security bug you fix — this is how the suite grows to match your actual risk rather than a generic template."]},
+
+"Build security gate":{
+ does:"The enforcement point. It converts scan results from advice into a merge blocker, which is the difference between a security programme and a security dashboard.",
+ auto:["Define required status checks in the repository ruleset so the gate cannot be disabled from a PR.",
+ "Centralise the pass/fail decision in one workflow rather than scattering thresholds across scanners, so you can tune policy in a single place.",
+ "Publish an explicit exception path with an expiry date and a named approver. A gate with no legitimate override becomes a gate people learn to route around.",
+ "Report gate bypass rate monthly — a rising number means your thresholds are wrong, not that your engineers are careless."]},
+
+"Security artifacts":{
+ does:"Retained scan reports, test results and SBOMs. During a SOC 2 audit these are what demonstrate the controls actually ran, on which commits, with what results. Without retention you are asserting rather than evidencing.",
+ auto:["Use <code>actions/upload-artifact</code> with an explicit <code>retention-days</code> matching your evidence policy.",
+ "Copy artefacts nightly to an S3 bucket with Object Lock and versioning, so evidence cannot be altered after the fact — auditors care about immutability.",
+ "Name artefacts with the commit SHA and timestamp so an auditor can trace evidence back to a specific change without your help."]},
+
+"Release management":{
+ does:"Ties a deployed version back to the exact code, build, and component inventory it came from. When a vulnerability is disclosed, this mapping is what turns a two-day investigation into a two-minute query.",
+ auto:["Trigger a release workflow on tag push; generate release notes from merged PR titles automatically.",
+ "Attach the SBOM, scan reports and Cosign signature to the release as assets.",
+ "Stamp the version and commit SHA into the running artefact and expose it on a health endpoint, so you can confirm what is actually deployed rather than what you believe is deployed."]},
+
+"SECURITY.md":{
+ does:"Tells outside researchers how to report a vulnerability to you. Without it, a finder's options are a public tweet or nothing. It is the cheapest control on this entire diagram and the one most often missing.",
+ auto:["Put it in the org-level <code>.github</code> repo — GitHub inherits it into every repo that lacks its own.",
+ "Include a monitored intake address, expected acknowledgement time, and a plain statement of safe harbour for good-faith research.",
+ "Route intake to a shared mailbox, never an individual, and auto-acknowledge on arrival.",
+ "This is the front door to your CVD process; the intake commitment you publish is one you have to staff."]},
+
+"GitHub Issues":{
+ does:"Where the remediation work actually lives for engineers. Jira tracks the security obligation and its SLA; the issue tracks the code change. Keeping both linked is what makes closure verifiable.",
+ auto:["Auto-create an issue from a scan finding with a severity label and a due date derived from your SLA table.",
+ "Use closing keywords so merging the fix PR closes the issue without anyone remembering to.",
+ "Sync issue state back to Jira with a webhook so the compliance view stays accurate without manual updates.",
+ "Report on open findings by age and severity monthly; the ageing curve is the honest measure of the programme."]},
+
+"Protected branches (stronger)":{
+ does:"Server-side enforcement that the default branch can only change through a reviewed, passing pull request. On private repos the stronger controls require GitHub Team, which is the one paid line item in the GitHub column.",
+ auto:["Define rulesets as JSON and apply via <code>gh api</code> or Terraform, so branch protection is version-controlled and reviewable like everything else.",
+ "Require: pull request before merge, at least one approving review, code owner review, all status checks passing, conversation resolution, and linear history.",
+ "Disable force push and branch deletion on protected branches.",
+ "Export ruleset configuration quarterly as change management evidence."],
+ code:"<span class=\"c\"># apply a ruleset as code</span>\ngh api --method POST /repos/:owner/:repo/rulesets \\\n  --input ruleset.json"},
+
+"GitHub Enterprise":{
+ does:"Adds org-level governance: SAML enforcement, the audit log API, IP allow lists, and enterprise-wide policy. Real capability, aimed at a scale you are not at.",
+ auto:["Nothing to implement — this is a deliberate not-buying decision, and worth recording as one.",
+ "Revisit when you cross roughly 50 engineers, when a customer contract requires SAML enforcement, or when you need programmatic audit log export for compliance.",
+ "In the meantime, Google Workspace SSO in front of GitHub covers most of the identity requirement."]},
+
+"GitHub Advanced Security":{
+ does:"GitHub's native SAST (CodeQL), secret scanning with push protection, and dependency review. Genuinely good, and per-committer pricing makes it expensive relative to what the open-source stack already covers here.",
+ auto:["Nothing to implement now — Semgrep, Gitleaks and Trivy cover the same ground at zero licence cost.",
+ "The one capability with no free equivalent is secret scanning push protection, which blocks the push rather than detecting after the fact. Pre-commit hooks approximate it but are bypassable.",
+ "Revisit if a customer explicitly requires CodeQL, or if maintaining three scanners costs more engineering time than the licence would."]}
+};
+
+const DETAIL_B = {
+"GuardDuty":{
+ does:"Continuously analyses CloudTrail, VPC flow logs and DNS logs for malicious or anomalous activity — credential exfiltration, cryptomining, reconnaissance, communication with known bad infrastructure. It is your detection layer for the case where prevention already failed.",
+ auto:["Enable across all regions, including ones you do not use — unused regions are exactly where an attacker provisions resources.",
+ "Enable at the organisation level with auto-enrolment so new accounts are covered on creation.",
+ "Route findings to Security Hub, then to Jira via EventBridge, with severity-based SLA on the ticket.",
+ "Suppress known-benign finding types with suppression rules rather than ignoring them by habit."]},
+
+"Inspector":{
+ does:"Scans running EC2 instances, Lambda functions and ECR images for CVEs and unintended network exposure. Where Trivy tells you what you built, Inspector tells you what is actually running now, which drifts apart faster than teams expect.",
+ auto:["Enable at organisation level for EC2, ECR and Lambda; scanning is continuous once on.",
+ "Enable ECR enhanced scanning so images are rescanned as new CVEs are published, not only at push.",
+ "Push findings into DefectDojo alongside build-time findings so runtime and build views reconcile.",
+ "Alert specifically on the delta between what Trivy passed at build and what Inspector reports at runtime — that gap is your image staleness measure."]},
+
+"CloudTrail (retention)":{
+ does:"Records every API call made in the account: who did what, from where, when, and whether it succeeded. It is simultaneously your incident response source of truth and a large share of your SOC 2 evidence.",
+ auto:["Create an organisation trail covering all regions, delivering to a dedicated log archive account.",
+ "Enable log file validation, and apply S3 Object Lock in compliance mode so logs cannot be deleted, including by you.",
+ "Set a lifecycle policy: 90 days in Standard for query, then Glacier for the remainder of your retention commitment. Cost control here is mostly a lifecycle policy question.",
+ "Query with Athena rather than the console — write and save the five queries you will want during an incident before you need them."]},
+
+"Secrets Manager":{
+ does:"Stores credentials outside code and configuration, with automatic rotation and IAM-controlled access. Every secret in an environment variable or a config file is a secret that will eventually appear in a log, an error page, or a git history.",
+ auto:["Retrieve at runtime via the SDK; never bake secrets into images or task definitions.",
+ "Enable automatic rotation with a Lambda rotation function — a secret that never rotates is a permanent credential.",
+ "Grant access with resource policies scoped to a specific role and secret, not wildcards.",
+ "Use SSM Parameter Store for non-rotating configuration to keep the Secrets Manager bill proportionate; the cost difference at volume is meaningful."]},
+
+"KMS":{
+ does:"Manages encryption keys and enforces who may use them. The audit value is as high as the cryptographic value: KMS logs every key use to CloudTrail, which gives you a record of data access at the key level.",
+ auto:["Use customer-managed keys for anything sensitive so you control the key policy and rotation, rather than relying on AWS-managed defaults.",
+ "Enable automatic annual key rotation.",
+ "Write key policies that name specific roles; a key policy granting the whole account is a key policy that grants everyone.",
+ "Alert on <code>Decrypt</code> calls from unexpected principals or regions — that signal has caught real incidents."]},
+
+"WAF":{
+ does:"Filters HTTP traffic before it reaches your application: common injection and scripting patterns, bad bots, and per-IP rate limits. It buys time rather than fixing anything — useful time, when a vulnerability is disclosed and the patch is not yet out.",
+ auto:["Start with AWS Managed Rules core rule set plus the known-bad-inputs set, deployed in count mode first.",
+ "Run in count mode for two weeks and review what would have been blocked before switching to block. Going straight to block is how you take down your own product.",
+ "Add rate-based rules on authentication and other expensive endpoints.",
+ "Deploy WAF rules as IaC so changes flow through the same review path as everything else, and send logs to the SIEM."]},
+
+"Security Hub":{
+ does:"Aggregates findings from GuardDuty, Inspector, IAM Access Analyzer, Config and third parties into one normalised view, and scores you against standards like CIS and AWS Foundational Security Best Practices.",
+ auto:["Enable org-wide with a delegated administrator account; turn on the FSBP standard first and CIS second.",
+ "Estimate cost before enabling everything — the finding-ingestion charge is the line item that surprises small teams.",
+ "Automate response for a narrow set of high-confidence findings with EventBridge and Lambda: revoke a public security group rule, quarantine an exposed key.",
+ "Export the standards score monthly as a trend line; the absolute number matters less than the direction."]},
+
+"AWS Config":{
+ does:"Records the configuration of every resource over time and evaluates it against rules. It answers what changed, when, and by whom at the infrastructure level — the exact question that follows every unexplained outage or incident.",
+ auto:["Enable with a recorder covering all resource types, delivering to the log archive account.",
+ "Deploy conformance packs for your control set rather than authoring individual rules.",
+ "Add remediation actions for a small set of unambiguous violations, such as re-enabling S3 public access block.",
+ "Restrict the recorder scope if cost climbs; recording every resource type in every region is the usual cause of a surprising Config bill."]},
+
+"ECR":{
+ does:"Private container registry with image scanning, immutable tags, and IAM-controlled pull access. The immutability property is what makes a deployment reproducible — a mutable tag means the image you tested is not necessarily the image you shipped.",
+ auto:["Enable tag immutability and enhanced scanning at repository creation, defined in Terraform.",
+ "Set a lifecycle policy expiring untagged images after a short window and capping stored versions.",
+ "Require a Cosign signature before deployment, verified in the deploy job — this is what stops an unsigned image from reaching production.",
+ "Scope pull permissions to the specific task execution role rather than the account."]},
+
+"IAM Access Analyzer":{
+ does:"Identifies resources shared outside your account or organisation, and validates policies against best practice. It is free, and it catches the single most common serious cloud misconfiguration: something exposed publicly that was never meant to be.",
+ auto:["Enable an organisation-level analyzer in every region.",
+ "Run policy validation in CI against Terraform IAM changes, failing on findings — this is the shift-left placement that makes it worth more than a detection tool.",
+ "Use unused-access findings quarterly to strip permissions nobody exercises.",
+ "Alert immediately on any new external-access finding; the false positive rate is low enough that this is a workable page."]},
+
+"Route 53 + ACM":{
+ does:"DNS and TLS certificates. The security-relevant parts are certificate automation, which eliminates expiry outages, and DNS hygiene, which prevents subdomain takeover.",
+ auto:["Use ACM public certificates with DNS validation — they renew automatically and cost nothing.",
+ "Scan for dangling DNS records pointing at deprovisioned resources on a schedule; this is the subdomain takeover path and it is easy to leave open.",
+ "Manage zones in Terraform so DNS changes are reviewed like code.",
+ "Alert on any certificate not auto-renewing at least 30 days out."]},
+
+"AWS Backup":{
+ does:"Centralised, policy-driven backup with retention rules and cross-account copies. Its security function is ransomware and destructive-incident recovery, which is why the copy has to live somewhere the production account cannot reach.",
+ auto:["Define backup plans as IaC with tag-based resource selection, so a new resource with the right tag is protected automatically.",
+ "Copy to a separate account with a vault lock policy — a backup deletable with production credentials is not a backup.",
+ "Schedule an automated quarterly restore test. An untested backup is a hypothesis.",
+ "Alert on backup job failures; silent failure is the normal way backup programmes die."]}
+};
+
+const DETAIL_C = {
+"DefectDojo":{
+ does:"The vulnerability management hub. It ingests findings from every scanner, deduplicates them across tools and runs, tracks state and SLA, and gives you one backlog instead of eight dashboards.",
+ auto:["Push findings from CI with the import-scan API endpoint on every run, keyed by product and engagement.",
+ "Let it deduplicate — the same CVE reported by Trivy, Dependabot and Inspector should be one finding with three sources, not three tickets.",
+ "Configure SLA by severity and let overdue findings escalate automatically.",
+ "Use its reporting for the monthly metrics: mean time to remediate, open findings by age, scanner coverage."]},
+
+"Wazuh":{
+ does:"Open-source SIEM and host monitoring: log collection and correlation, file integrity monitoring, and host intrusion detection. It covers the on-host and cross-source detection that AWS-native services do not.",
+ auto:["Deploy the manager from IaC; install agents via user data or the container image so enrolment is automatic.",
+ "Ingest CloudTrail, VPC flow logs, application logs and GuardDuty findings into one correlation point.",
+ "Enable file integrity monitoring on binaries and configuration paths.",
+ "Tune aggressively in the first month. An untuned SIEM produces noise, and noise trains people to ignore alerts — which is worse than having no SIEM."]},
+
+"OWASP ZAP":{
+ does:"Dynamic application security testing: exercises the running application the way an attacker would, finding issues only visible at runtime such as authentication flaws, session handling problems and misconfigured headers.",
+ auto:["Run the baseline scan against every deploy to staging as a CI job — passive, fast, catches header and configuration regressions.",
+ "Run the full active scan weekly against staging only. Never point an active scan at production.",
+ "Use the automation framework YAML with an authentication context so it tests behind login, which is where the interesting findings are.",
+ "Feed results into DefectDojo and fail the pipeline only on high-confidence high-severity findings; DAST false positive rates make a strict gate unworkable."]},
+
+"Threat Dragon":{
+ does:"OWASP's threat modelling tool. You draw the data flow diagram, mark trust boundaries, and work STRIDE against each element to produce threats and mitigations. It is the only control on this diagram that finds design flaws, which scanners structurally cannot.",
+ auto:["Store models as JSON in the repo next to the code, so the model is versioned and diffable rather than living in someone's drive.",
+ "Trigger a model review from the PR template whenever a change touches a trust boundary, a new external integration, or authentication.",
+ "Convert accepted threats into tracked issues with owners; a threat model that ends as a diagram has not done its job.",
+ "Review models quarterly and after any architecture change."]},
+
+"Semgrep":{
+ does:"The SAST engine behind the Develop and Commit stages. Pattern-based, fast enough for the editor, and its rules are readable enough that engineers can write their own.",
+ auto:["Same automation as the SAST row on the GitHub tab: IDE extension, PR job, nightly full scan.",
+ "Keep custom rules in a shared repo and version them.",
+ "Review the rule set quarterly against the findings you actually fix — rules that only ever produce ignored findings should be removed."]},
+
+"Trivy":{
+ does:"The workhorse scanner covering SCA, IaC misconfiguration, container images, filesystems and secrets. One binary replaces four commercial tools for the coverage a small team needs.",
+ auto:["Invoke it from one shared workflow with separate jobs for <code>fs</code>, <code>config</code>, and <code>image</code>.",
+ "Cache the vulnerability database between runs; database download dominates runtime otherwise.",
+ "Standardise on <code>--ignore-unfixed</code> for gating and full output for reporting, so the gate stays actionable while the record stays complete.",
+ "Use <code>.trivyignore</code> with expiry dates and review it monthly."]},
+
+"Gitleaks":{
+ does:"Secret detection across the working tree and full git history. Covered in the secret scanning row; listed here as the component itself.",
+ auto:["Pre-commit hook, CI job, and weekly full-history scan.",
+ "Custom rules for your own credential formats — internal token prefixes are exactly what generic rules miss.",
+ "Pair with a documented rotation runbook, because detection without rotation changes nothing."]},
+
+"Cosign (Sigstore)":{
+ does:"Signs container images and artefacts, and verifies those signatures at deploy time. It establishes that what you are about to run came from your pipeline and not from somewhere else.",
+ auto:["Sign in CI with keyless signing using the GitHub OIDC token — no key material to store or rotate.",
+ "Verify in the deployment job and fail closed on an unsigned or unverifiable image.",
+ "Attach SBOM and provenance attestations to the signature so the whole supply chain record travels with the image.",
+ "Verifying is the half that matters; signing without verification is theatre."],
+ code:"<span class=\"c\"># keyless sign in CI, verify at deploy</span>\ncosign sign --yes $IMAGE_URI\ncosign verify $IMAGE_URI \\\n  --certificate-identity-regexp='^https://github.com/promptohalo/' \\\n  --certificate-oidc-issuer=https://token.actions.githubusercontent.com"},
+
+"OpenSSF Scorecard":{
+ does:"Scores a repository's supply-chain security practices — branch protection, pinned dependencies, review coverage, workflow permissions, signed releases. Useful both to assess your own repos and to evaluate dependencies before adopting them.",
+ auto:["Run the Scorecard Action weekly on your own repos and upload results as SARIF.",
+ "Track the score as a trend; the checks it fails are a ready-made backlog of supply-chain hardening work.",
+ "Check the score of significant new dependencies during review — a low score on a package you are about to depend on is worth a conversation."]},
+
+"Nuclei":{
+ does:"Template-based scanning of your external attack surface: exposed panels, known CVEs on public endpoints, misconfigurations, information disclosure. It tests what the internet can actually reach, which is frequently more than the architecture diagram claims.",
+ auto:["Run weekly against your public domains from a scheduled workflow.",
+ "Keep templates updated automatically and pin to the official repo.",
+ "Combine with certificate transparency log monitoring to discover subdomains you forgot existed — those are usually where the findings are.",
+ "Scope carefully to assets you own, and record authorisation for the scan."]}
+};
+
+const APPSEC_PHASES = [
+{n:"Stage 1", t:"GitHub — the foundation", when:"Week 1–2", steps:[
+ ["Turn on every free GitHub security setting","Dependency graph, Dependabot alerts, Dependabot security updates, and weekly version updates. Set these at organisation level with auto-enable for new repositories, so you never have to remember to configure a new repo.","Deliverable: org security settings enabled; <code>.github/dependabot.yml</code> committed with weekly grouped updates."],
+ ["Scan full git history for secrets, then rotate","Run <code>gitleaks detect --log-opts=\"--all\"</code> across every repo before anything else. Treat every hit as compromised and rotate it — a secret deleted in a later commit is still in every clone.","This is the highest-value hour in the whole programme. Deliverable: scan output plus a dated rotation record."],
+ ["Write CODEOWNERS","Assign security ownership to auth, infrastructure, CI workflows and dependency manifests only. Owning every path means reviewing none of them properly.","Deliverable: <code>.github/CODEOWNERS</code> committed."],
+ ["Buy GitHub Team and apply rulesets as code","About $480/yr for ten users, and the only GitHub spend you need. Require pull request, one approving review, code owner review, passing checks, linear history. Disable force push. Enable dismissal of stale approvals on new commits.","Deliverable: ruleset JSON in the repo, applied via <code>gh api</code>."],
+ ["Add the PR template","What changed, why, risk, rollback, linked issue. Every field exists because something downstream consumes it — this template becomes your change record on the next tab.","Deliverable: <code>pull_request_template.md</code>."]],
+ buy:[["GitHub Team, 10 users","~$480/yr","Buy now — everything else in this stage depends on it"]]},
+
+{n:"Stage 2", t:"SAST and the scanning pipeline", when:"Week 2–4", steps:[
+ ["Put the scanners in the editor first","Ship <code>.vscode/extensions.json</code> with Semgrep and Trivy so they arrive with a clone. A finding fixed while the code is being written never becomes a ticket, a scan result or a meeting.","Deliverable: committed workspace config."],
+ ["Add Gitleaks as a pre-commit hook","<code>.pre-commit-config.yaml</code>, one <code>pre-commit install</code> per developer. This stops the secret before it reaches the remote, which is the only point at which rotation is avoidable.","Deliverable: hook config committed."],
+ ["Write one shared workflow, called by every repo","Semgrep, Trivy filesystem, Trivy config, Trivy image, Gitleaks, security tests — authored once in the org <code>.github</code> repo as a reusable workflow. One place to change when a scanner changes. Pin third-party actions to commit SHAs.","Deliverable: <code>security.yml</code> reusable workflow, called from each repo."],
+ ["Run report-only for two weeks","Collect findings without failing builds. Tune rules, build the ignore list with expiry dates, and see the real volume before you gate. Turning on a hard gate cold is how a security programme earns lasting resentment.","Deliverable: two weeks of baseline findings."],
+ ["Switch on the gate","Make the checks required. Fail on fixable HIGH and CRITICAL only, using <code>--ignore-unfixed</code>. Publish an exception path with a named approver and an expiry date.","Failing on unfixable findings teaches people to route around the gate. Deliverable: required status checks configured."],
+ ["Sign what you ship","Cosign keyless signing in CI using the GitHub OIDC token, verified at deploy, failing closed on unverified images. Generate a CycloneDX SBOM per release and attach it.","Verifying is the half that matters. Signing without verification is theatre."]],
+ buy:[["Semgrep CE, Trivy, Gitleaks, Cosign","$0","Open source covers this stage entirely"]]},
+
+{n:"Stage 3", t:"AWS — what to buy, in order", when:"Week 4–6", steps:[
+ ["Start with the free controls","Enable IAM Access Analyzer at organisation level in every region, and switch on S3 public access block account-wide. Access Analyzer is free and catches the most common serious cloud misconfiguration: something exposed publicly that was never meant to be.","Deliverable: org analyzer enabled; external-access findings alerting to your security channel."],
+ ["Get CloudTrail right before anything else paid","Organisation trail, all regions, delivered to a separate log archive account with Object Lock and log file validation, plus a lifecycle policy moving objects to Glacier after 90 days. This single service serves incident response and SOC 2 evidence at once.","Storage is the cost driver, and the lifecycle policy is what controls it. Deliverable: org trail with immutable retention."],
+ ["Buy GuardDuty next","Continuous detection across CloudTrail, VPC flow and DNS logs. Enable in all regions including unused ones, because unused regions are exactly where an attacker provisions. At your scale this is genuinely a few dollars a month.","Best value per dollar on this list. Deliverable: org-wide GuardDuty with findings routed to Jira."],
+ ["Move secrets into Secrets Manager, encrypt with KMS","Migrate anything currently in environment variables or task definitions, enable rotation, scope IAM to specific roles and secrets. Use SSM Parameter Store for non-rotating configuration to keep the bill proportionate.","Anything found in the Stage 1 history scan gets rotated here, not merely relocated."],
+ ["Add Inspector once images are in ECR","Tells you what is actually running now, which drifts from what you built faster than teams expect. Enable enhanced ECR scanning so images are rescanned as new CVEs are published.","Deliverable: runtime findings reconciled against build-time Trivy results."],
+ ["Deploy WAF in count mode, then block","Managed core rules plus known-bad-inputs, counting only. Review two weeks of would-have-blocked traffic before switching to block, and add rate limits on your authentication endpoints.","Going straight to block takes down your own product. Budget the two weeks."]],
+ buy:[
+  ["IAM Access Analyzer","$0","Turn on first"],
+  ["CloudTrail retention","~$100–600/yr","Week 4 — before anything else paid"],
+  ["GuardDuty","~$1–10/mo","Week 4 — best value on the list"],
+  ["Secrets Manager + KMS","~$50–300/yr","Week 5"],
+  ["Inspector","Usage-based","Week 5 — once images land in ECR"],
+  ["AWS WAF","~$20–100+/mo","Week 6 — count mode first"],
+  ["AWS Backup","Usage-based","Week 6 — cross-account copy, vault lock"]],
+ skip:["<b>Security Hub</b> — the finding-ingestion charge is the line item that surprises small teams, and with only GuardDuty, Inspector and Access Analyzer running you can read those three consoles directly. Revisit when you have more than three finding sources.",
+  "<b>AWS Config</b> — recording every resource type in every region is the usual cause of a surprising bill. Run Prowler on a monthly schedule instead until you need continuous drift evidence for an audit.",
+  "<b>Wazuh</b> — a self-hosted SIEM costs $360–1,800/yr in hosting plus roughly a month of tuning, and an untuned SIEM trains people to ignore alerts. GuardDuty plus CloudTrail in Athena covers a ten-person org. Revisit when you have someone whose job includes reading it."]},
+
+{n:"Stage 4", t:"Jira — remediation and SLA", when:"Week 6–7", steps:[
+ ["One project, three fields","Severity, owner, due date. Resist the urge to model the whole vulnerability lifecycle in Jira — the detail lives in the finding, and Jira exists to make sure someone owns it and the clock is running.","Deliverable: single security project with three required fields."],
+ ["Publish the SLA table you agreed in Stage 1","Critical, high, medium, low, each with a fix window. Due date is calculated from severity at ticket creation, not negotiated afterwards.","Deliverable: SLA table in the engineering handbook."],
+ ["Automate ticket creation","GuardDuty and Inspector findings via EventBridge; Dependabot and scanner findings from the CI workflow. No human transcribes a finding into a ticket.","Deliverable: finding to ticket with no manual step."],
+ ["Close the loop through the PR","Link the Jira key in the pull request, use closing keywords on the GitHub issue, sync state back with a webhook. Closure is evidenced by a merged fix, not by someone marking it done.","Deliverable: ticket closure traceable to a specific commit."],
+ ["Report four numbers monthly","Mean time to remediate by severity, open findings by age, gate bypass count, and overdue count. The ageing curve is the honest measure of the programme.","Deliverable: one-page monthly report."]],
+ buy:[["Jira free tier","$0","Free to 10 users — no purchase needed at your size"]]},
+
+{n:"Stage 5", t:"ASPM — only once the backlog earns it", when:"Week 8 onward", steps:[
+ ["Wait for a real trigger","Adopt an ASPM when one of these is true: you are running more than three scanners, the same CVE is arriving as separate tickets from different tools, or you cannot answer 'how many open highs do we have' in under a minute. Before that it is a dashboard for a backlog you can still read.","Deliverable: written trigger criteria, so the decision is made on evidence rather than appetite."],
+ ["Start with DefectDojo, self-hosted","Free software, $20–75/mo in hosting. Push findings from CI with the import-scan API, let it deduplicate the same CVE across Trivy, Dependabot and Inspector into one finding with three sources, and configure SLA by severity.","Deliverable: one backlog instead of five consoles."],
+ ["Only consider paid tools for a specific gap","Socket for dependency behaviour analysis, Aikido for a managed all-in-one, PlexTrac if you start delivering formal reports to customers. Each solves a problem DefectDojo does not — buy against that problem, not against a category.","Deliverable: named gap before any purchase."],
+ ["Book the external pentest once the gates are live","Roughly $7K–20K a year, and worth scheduling after Stages 1 to 3 rather than before. Testing early buys you a report full of findings a free scanner would have caught.","Deliverable: annual pentest scheduled, findings imported to the same backlog."]],
+ buy:[
+  ["DefectDojo hosting","~$240–900/yr","Only once a trigger fires"],
+  ["External pentest","~$7K–20K/yr","After Stage 3 gates are live"],
+  ["Paid ASPM","$0 for now","Skip until a named gap exists"]]}
+];
+
+const CHMGMT_PHASES = [
+{n:"Step 1", t:"Define change types before you define process", when:"Week 1", steps:[
+ ["Write three change categories, not seven","Standard: pre-approved, low risk, follows a known path — a dependency bump, a copy change. Normal: everything else, requires review and approval before merge. Emergency: production is broken or actively exploited, fix first and document within 24 hours.","Over-categorising is the classic failure. Three types people can actually distinguish beats seven nobody applies consistently."],
+ ["Define the approver for each type","Standard needs one peer review. Normal needs peer review plus code owner where CODEOWNERS applies. Emergency needs one named on-call approver, with retrospective review at the next working day.","Deliverable: one-page change policy naming roles, not individuals."],
+ ["State explicitly that the pull request is the change record","This is the decision that makes everything else cheap. You are not maintaining a change log alongside GitHub; the merged PR, with its approvals, checks and linked ticket, is the record.","Write this into the policy in one sentence so an auditor reads it there rather than inferring it."],
+ ["Map to SOC 2 CC8.1 now","CC8.1 asks that changes are authorised, designed, developed, configured, documented, tested, approved and implemented in line with objectives. Note against each clause which artefact evidences it.","Deliverable: CC8.1 clause-to-artefact mapping table."]]},
+
+{n:"Step 2", t:"Encode authorisation in the repository", when:"Week 1–2", steps:[
+ ["Apply the ruleset as code","Require pull request, at least one approving review, code owner review where applicable, all status checks passing, conversation resolution, linear history. Disable force push and branch deletion. Store the ruleset JSON in the repo.","Server-side enforcement is what turns a policy statement into a control an auditor can test."],
+ ["Dismiss stale approvals on new commits","Enable it. An approval given before the last three commits is not an approval of what merged, and an auditor who checks will find that.","One checkbox. Frequently missed."],
+ ["Make CODEOWNERS the authorisation matrix","Security-sensitive paths route to the security owner automatically. This is your segregation of duties control and it needs no separate system.","Deliverable: CODEOWNERS mapped against the change policy."],
+ ["Prevent self-approval on sensitive paths","On a small team this is the hardest requirement to meet honestly. Where a genuine second reviewer is not available, document the compensating control rather than pretending the review happened.","Auditors accept a documented compensating control. They do not accept a fictional one."]]},
+
+{n:"Step 3", t:"Make the standard change path frictionless", when:"Week 2–3", steps:[
+ ["Build the PR template around the evidence you need","What changed, why, risk assessment, test evidence, rollback plan, linked issue. Every field should exist because something downstream consumes it, not because a template needed filling.","Deliverable: <code>pull_request_template.md</code> whose fields map to CC8.1 clauses."],
+ ["Enforce traceability automatically","A CI check that fails the PR when no issue or ticket reference is present. Traceability requested is traceability missing; traceability enforced is traceability evidenced.","Deliverable: required check on ticket linkage."],
+ ["Auto-label by risk","A workflow that labels the PR based on changed paths — anything touching auth, IaC or workflows gets a higher-risk label and pulls in the security owner. Risk assessment stops depending on the author's self-report.","Deliverable: labelling workflow keyed to path patterns."],
+ ["Let standard changes auto-merge","Dependabot patch-level security updates with all checks green merge without waiting for a human. Reserving human attention for changes that need it is what keeps reviewers attentive.","Deliverable: auto-merge workflow scoped narrowly to semver-patch security updates."]]},
+
+{n:"Step 4", t:"Build the emergency path before you need it", when:"Week 3", steps:[
+ ["Define the trigger precisely","Production down, active exploitation, or data at risk. Not 'the customer is unhappy' and not 'we promised a demo'. A loose trigger turns the emergency path into the default path.","Deliverable: written trigger criteria in the change policy."],
+ ["Keep the gates, shorten the queue","Emergency changes still run the pipeline and still require a PR. What changes is that a single named on-call approver can approve alone, and retrospective review happens the next working day.","Bypassing checks entirely during an incident is how the fix causes the second outage."],
+ ["Make the break-glass path auditable","If someone must bypass branch protection, use a temporary elevated role that logs to CloudTrail and expires automatically. Alert the security channel on use.","Deliverable: break-glass role with automatic expiry and alerting."],
+ ["Require a retrospective PR within 24 hours","Documentation, tests, and the review that was deferred. Track the count of emergency changes monthly.","A rising emergency rate means your normal path is too slow, which is a process finding rather than a discipline problem."]]},
+
+{n:"Step 5", t:"Bring infrastructure under the same regime", when:"Week 4–5", steps:[
+ ["Terraform for everything, no console changes","Console changes create drift that no change record explains, and drift is what turns an audit into an archaeology exercise.","Deliverable: infrastructure repo covering all managed resources."],
+ ["Restrict production apply to CI","Remove human write credentials for production. The pipeline applies; people propose. This is a stronger segregation of duties control than any approval workflow.","Deliverable: OIDC-federated deploy role usable only from the workflow."],
+ ["Post the plan into the PR","<code>terraform plan</code> output as a comment means the reviewer approves the actual diff rather than the intent. For infrastructure this is the difference between review and rubber-stamping.","Deliverable: plan-comment workflow."],
+ ["Detect drift on a schedule","AWS Config plus a nightly plan run that alerts on unexpected diffs. Drift is an unrecorded change, and unrecorded changes are the finding.","Deliverable: nightly drift alert."]]},
+
+{n:"Step 6", t:"Evidence, review and close the loop", when:"Week 5–6, then continuous", steps:[
+ ["Automate the change evidence export","Monthly job pulling merged PRs with approver, timestamp, linked ticket, check results and reviewer. Written to the immutable evidence store.","Deliverable: a monthly change register generated with no manual step."],
+ ["Export ruleset configuration quarterly","Auditors ask not only whether controls exist now but whether they were in place throughout the period. A dated quarterly export answers that.","Deliverable: timestamped ruleset exports in the evidence store."],
+ ["Run a quarterly sample review","Pull ten merged PRs at random and check each against the policy: approved by the right person, checks passed, ticket linked, rollback stated. Record the result including failures.","A review that never finds anything is a review an auditor will not believe."],
+ ["Track the honest metrics","Change failure rate, emergency change count, mean time from PR open to merge, and bypass count. These tell you whether the process is working or being worked around.","Deliverable: one-page monthly change metrics."],
+ ["Review the policy annually or on change","Aligned with the annual-or-event-triggered cadence used across the rest of the policy library, so this does not become a separate review calendar.","Deliverable: dated policy review record."]]}
+];
+
+/* ---------- render detail rows ---------- */
+function renderRows(map, meta){
+  return Object.keys(map).map(k=>{
+    const d = map[k];
+    const m = meta[k] || [];
+    const chips = m.map(x=>'<span class="pill p-'+x[1]+'">'+x[0]+'</span>').join("");
+    return '<details class="row"><summary>'+k+'<span class="rmeta">'+chips+'</span></summary>'+
+      '<div class="rbody">'+
+        '<div class="rblock"><h5>What it does</h5><p>'+d.does+'</p></div>'+
+        '<div class="rblock"><h5>How to automate it</h5><ul>'+
+          d.auto.map(a=>'<li>'+a+'</li>').join("")+'</ul>'+
+          (d.code?'<pre>'+d.code+'</pre>':'')+
+        '</div>'+
+      '</div></details>';
+  }).join("");
+}
+
+/* ---------- render phases ---------- */
+function renderPhases(list){
+  return list.map(p=>{
+    const steps = p.steps.map((s,i)=>
+      '<div class="step"><div class="stepn">'+(i+1)+'</div><div class="stepc">'+
+      '<h5>'+s[0]+'</h5><p>'+s[1]+'</p>'+
+      (s[2]?'<div class="out">'+s[2].replace(/(Deliverable:)/,'<b>$1</b>')+'</div>':'')+
+      '</div></div>').join("");
+    const buy = p.buy ? '<div class="buybox"><h5>Spend at this stage</h5><table class="buytbl"><tbody>'+
+      p.buy.map(b=>'<tr><td>'+b[0]+'</td><td class="cost">'+b[1]+'</td><td class="whenc">'+b[2]+'</td></tr>').join("")+
+      '</tbody></table></div>' : '';
+    const skip = p.skip ? '<div class="skipbox"><h5>Deliberately not buying yet</h5><ul>'+
+      p.skip.map(x=>'<li>'+x+'</li>').join("")+'</ul></div>' : '';
+    return '<div class="phase"><header><h3>'+p.n+' — '+p.t+'</h3><span class="when">'+p.when+'</span></header>'+
+      '<div class="pbody">'+steps+buy+skip+'</div></div>';
+  }).join("");
+}
+document.getElementById("appsecPhases").innerHTML = renderPhases(APPSEC_PHASES);
+document.getElementById("chmgmtPhases").innerHTML = renderPhases(CHMGMT_PHASES);
+
+/* ---------- expand / collapse ---------- */
+document.querySelectorAll(".exp,.col").forEach(b=>{
+  b.style.cssText="border:1px solid var(--line);background:#fff;color:var(--petrol);font-family:inherit;font-size:.86em;font-weight:600;padding:4px 11px;border-radius:6px;cursor:pointer;margin-right:6px";
+  b.onclick=()=>{
+    const open = b.classList.contains("exp");
+    document.querySelectorAll("#"+b.dataset.target+" details").forEach(d=>d.open=open);
+  };
+});
+</script>
+
+<script>
+/* ---------- shared data: the three source tables ---------- */
+const TABLE_A = [
+ ["Private repositories","yes","YES","GitHub private repos","Source protection, version history","Code","green","NO",""],
+ ["Dependency Graph","yes","YES","Enable","Direct/transitive dependency inventory","Repository","amber","NO",""],
+ ["Dependabot Alerts","yes","YES","Enable","Known CVE alerts","Continuous","red","NO",""],
+ ["Dependabot Security Updates","yes","YES","Enable","Auto remediation PRs","PR","amber","NO",""],
+ ["Dependabot Version Updates","yes","YES","Configure weekly","Keeps dependencies current","PR","amber","NO",""],
+ ["GitHub Advisory Database","yes","YES","Automatic (via Dependabot)","Vulnerability intelligence","Continuous","red","NO",""],
+ ["Pull Requests","yes","YES","Require PR workflow","Peer review, discussion, traceability","PR","amber","NO",""],
+ ["CODEOWNERS","yes","YES","Define owners","Code/security ownership","PR","amber","NO",""],
+ ["GitHub Actions","yes","YES",".github/workflows/security.yml","CI/CD security automation","PR","amber","NO (included)",""],
+ ["SAST","no","YES","Semgrep CE (VS Code + Actions)","Static analysis, insecure patterns","IDE → PR","green","NO",""],
+ ["Secret scanning","no","YES","Gitleaks","Keys, tokens, passwords","Pre-commit → PR","amber","NO",""],
+ ["SCA","partial","YES","Dependabot + Trivy","Vulnerable dependency detection","Local → Continuous","green","NO",""],
+ ["Dependency change review","no","YES","Trivy + Dependabot","Detects vulnerable components","PR","amber","NO",""],
+ ["IaC scanning","no","YES","Trivy Config","Terraform/CloudFormation issues","IDE → PR","green","NO",""],
+ ["Container scanning","no","YES","Trivy","Container/package CVEs","Build → PR","amber","NO",""],
+ ["SBOM","partial","YES","Trivy CycloneDX + GitHub SPDX","Component inventory","Build / Release","amber","NO",""],
+ ["Security unit tests","yes","YES","pytest, integration tests","AuthN/AuthZ, input validation","IDE → PR","green","NO",""],
+ ["Build security gate","yes","YES","Require workflow success","Prevent vulnerable build","PR / CI","green","NO",""],
+ ["Security artifacts","yes","YES","Retain reports/SBOM","Audit / SOC 2 evidence","CI","green","NO",""],
+ ["Release management","yes","YES","Tagged/versioned releases","Maps version → code/build/SBOM","Release","amber","NO",""],
+ ["SECURITY.md","yes","YES","Provide disclosure instructions","Tells how to report vulnerabilities","External","red","NO",""],
+ ["GitHub Issues","yes","YES","Engineering remediation work","Finding → fix → PR → closure","Lifecycle","amber","NO",""],
+ ["Protected branches (stronger)","no","YES","Upgrade to GitHub Team","Required PRs/checks/reviews","PR","amber","YES (~$4/user/mo)","buy"],
+ ["GitHub Enterprise","dash","Don't buy","","Additional governance","—","dash","NO",""],
+ ["GitHub Advanced Security","dash","Not needed yet","","Use OSS substitutes features (SAST/Secrets)","—","dash","NO for now",""]
+];
+
+const TABLE_B = [
+ ["GuardDuty","AWS threat detection (malicious activity)","Runtime","red","Usage-based (~$1–10/mo small)","None (AWS native)"],
+ ["Inspector","Production workload/container CVEs","Runtime","red","Usage-based","Trivy (pre-deploy)"],
+ ["CloudTrail (retention)","Audit/IR/SOC 2 evidence","Runtime","red","Storage/event cost (~$5–50/mo)","None (AWS native)"],
+ ["Secrets Manager","Secure secret storage &amp; rotation","Deployment","green","Usage-based (~$0–10/mo)","SSM Parameter Store"],
+ ["KMS","Encryption &amp; key management","Deployment","green","Usage-based (~$1–20/mo)","None (AWS native)"],
+ ["WAF","Web application protection","Runtime","red","~$20–100+/mo","AWS Shield (basic)"],
+ ["Security Hub","Aggregate AWS findings/posture","Runtime","red","Usage-based (estimate first)","None (AWS native)"],
+ ["AWS Config","Configuration history &amp; drift","Runtime","red","Usage-based","Prowler (periodic)"],
+ ["ECR","Container image registry","Build/Deploy","amber","Usage-based","GHCR (free), Docker Hub"],
+ ["IAM Access Analyzer","External access &amp; policy analysis","Design/Runtime","green","Often $0 (free)","None (AWS native)"],
+ ["Route 53 + ACM","DNS + TLS certificates","Runtime","red","Low cost (ACM public certs are free)","Cloudflare (free tier)"],
+ ["AWS Backup","Backup &amp; recovery","Runtime","red","Usage-based","None (AWS native)"]
+];
+
+const TABLE_C = [
+ ["DefectDojo","AppSec vulnerability management","$0 + $20–75/mo hosting","None (self-host)"],
+ ["Wazuh","SIEM / security event monitoring","$0 + $30–150/mo hosting","None (self-host)"],
+ ["OWASP ZAP","DAST (web/API testing)","$0","None"],
+ ["Threat Dragon","Threat modeling","$0","None"],
+ ["Semgrep","SAST","$0","None"],
+ ["Trivy","SCA/IaC/container","$0","None"],
+ ["Gitleaks","Secrets scanning","$0","None"],
+ ["Cosign (Sigstore)","Artifact signing/provenance","$0","None"],
+ ["OpenSSF Scorecard","Supply-chain security","$0","None"],
+ ["Nuclei","External attack surface scanning","$0","None"]
+];
+
+function availGlyph(v){
+  if(v==="yes")   return '<span class="yes">&#10004;</span>';
+  if(v==="no")    return '<span class="no">&#10006;</span>';
+  if(v==="partial")return '<span class="partial">~</span>';
+  return '<span class="dash">&mdash;</span>';
+}
+function slp(text,tone){
+  if(tone==="dash") return '<span class="dash">&mdash;</span>';
+  return '<span class="pill p-'+tone+'">'+text+'</span>';
+}
+
+document.getElementById("tblA").innerHTML = TABLE_A.map(r=>
+  '<tr><td><b>'+r[0]+'</b></td><td style="text-align:center">'+availGlyph(r[1])+'</td>'+
+  '<td>'+r[2]+'</td><td>'+r[3]+'</td><td>'+r[4]+'</td><td>'+slp(r[5],r[6])+'</td>'+
+  '<td'+(r[8]==="buy"?' style="color:var(--amber);font-weight:600"':'')+'>'+r[7]+'</td></tr>').join("");
+
+document.getElementById("tblB").innerHTML = TABLE_B.map(r=>
+  '<tr><td><b>'+r[0]+'</b></td><td>'+r[1]+'</td><td>'+slp(r[2],r[3])+'</td>'+
+  '<td>'+r[4]+'</td><td>'+r[5]+'</td></tr>').join("");
+
+document.getElementById("tblC").innerHTML = TABLE_C.map(r=>
+  '<tr><td><b>'+r[0]+'</b></td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td></tr>').join("");
+
+/* ---------- detail rows (needs the tables above) ---------- */
+const METAA = {}; TABLE_A.forEach(r=>{ METAA[r[0]] = r[6]==="dash" ? [["not now","blue"]] : [[r[5],r[6]]]; });
+const METAB = {}; TABLE_B.forEach(r=>{ METAB[r[0]] = [[r[2],r[3]]]; });
+const METAC = {}; TABLE_C.forEach(r=>{ METAC[r[0]] = [[r[2],"blue"]]; });
+
+document.getElementById("rowsA").innerHTML = renderRows(DETAIL_A, METAA);
+document.getElementById("rowsBC").innerHTML =
+  '<h3 style="color:var(--petrol);margin:4px 0 9px">AWS security services</h3>' +
+  renderRows(DETAIL_B, METAB) +
+  '<h3 style="color:var(--petrol);margin:22px 0 9px">Other key components</h3>' +
+  renderRows(DETAIL_C, METAC);
+
+/* ---------- tabs ---------- */
+const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+tabs.forEach(t=>t.addEventListener("click",()=>{
+  tabs.forEach(x=>{
+    const on = x===t;
+    x.setAttribute("aria-selected", on?"true":"false");
+    document.getElementById(x.getAttribute("aria-controls")).classList.toggle("active", on);
+  });
+  if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+}));
+
+/* ---------- text size ---------- */
+/* storage is best-effort: blocked localStorage must not break the control */
+const store = {
+  get(k,d){ try { return localStorage.getItem(k) ?? d; } catch(e){ return d; } },
+  set(k,v){ try { localStorage.setItem(k,v); } catch(e){ /* session-only */ } }
+};
+let fs = parseInt(store.get("ph_fs","15"),10) || 15;
+function applyFs(){
+  fs = Math.min(21, Math.max(11, fs));
+  document.documentElement.style.setProperty("--fs", fs+"px");
+  document.getElementById("fsLabel").textContent = fs+"px";
+  store.set("ph_fs", fs);
+}
+document.getElementById("fsUp").onclick   = ()=>{fs++; applyFs();};
+document.getElementById("fsDown").onclick = ()=>{fs--; applyFs();};
+document.getElementById("fsReset").onclick= ()=>{fs=15; applyFs();};
+applyFs();
+</script>
+</body>
+</html>
