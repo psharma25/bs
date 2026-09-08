@@ -97,6 +97,12 @@
  summary.sect .sect-n{margin-left:auto;font-weight:600;letter-spacing:0;text-transform:none;
   color:var(--soft);background:#fff;border:1px solid var(--line);border-radius:999px;padding:1px 8px;font-size:11px}
  details.sect-box[open]>summary.sect .sect-n{color:var(--petrol)}
+ .pin{position:absolute;top:11px;right:auto;left:auto;font-size:15px;line-height:1;cursor:pointer;
+  color:#c2ccd4;padding:2px 4px;border-radius:4px;user-select:none;right:calc(14px + 62px)}
+ .pin:hover{color:var(--ctrl);background:#fff6e6}
+ .pin.on{color:var(--ctrl)}
+ .pin:focus-visible{outline:2px solid var(--petrol-lt);outline-offset:1px}
+ .card h3{padding-right:96px}
  .path .dir{color:var(--petrol);background:#eaf2f7;border-radius:3px;padding:0 3px;margin-right:1px}
  .path .dir.root{color:#9aa8b1;background:transparent;padding:0}
  .mini{font-family:var(--sans);font-size:11.5px;padding:5px 9px;border:1px solid var(--line);
@@ -125,6 +131,7 @@
 <div class="bar">
   <input type="search" id="q" placeholder="Filter by name, description or tag…" aria-label="Filter tools">
   <div class="chips" id="chips" role="group" aria-label="Filter by category"></div>
+  <button type="button" class="mini" id="pinReset" title="Forget my pins and go back to the default">Reset pins</button>
   <button type="button" class="mini" id="allOpen">Expand all</button>
   <button type="button" class="mini" id="allShut">Collapse all</button>
   <span class="count" id="count"></span>
@@ -388,6 +395,17 @@ function card(it){
     try { localStorage.setItem(KEY, JSON.stringify(seen)); } catch (e) {}
   });
 
+  const pin = document.createElement("span");
+  pin.className = "pin" + (isPinned(it) ? " on" : "");
+  pin.setAttribute("role", "button");
+  pin.setAttribute("tabindex", "0");
+  pin.setAttribute("aria-pressed", isPinned(it) ? "true" : "false");
+  pin.title = isPinned(it) ? "Unpin from the top" : "Pin to the top";
+  pin.textContent = isPinned(it) ? "\u2605" : "\u2606";
+  const hit = e => { e.preventDefault(); e.stopPropagation(); togglePin(it); };
+  pin.addEventListener("click", hit);
+  pin.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") hit(e); });
+
   const badge = it.access === "restricted"
     ? '<span class="acc res" title="Behind Cloudflare Access">Sign-in</span>'
     : '<span class="acc pub" title="Publicly readable">Open</span>';
@@ -400,7 +418,20 @@ function card(it){
     '<div class="path">' + pathBits(it) + "</div>" +
     (seen[it.file] ? '<div class="seen">' + ago(seen[it.file]) + "</div>" : "");
 
+  a.appendChild(pin);
   return a;
+}
+
+/* pins are a per-browser preference: the index file stays the same for everyone */
+const PINKEY = "regmap.index.pins.v1";
+let pins = {};
+try { pins = JSON.parse(localStorage.getItem(PINKEY) || "{}"); } catch (e) { pins = {}; }
+function isPinned(it){ return (it.file in pins) ? !!pins[it.file] : !!it.pin; }
+function togglePin(it){
+  const now = !isPinned(it);
+  if (now === !!it.pin) delete pins[it.file]; else pins[it.file] = now;
+  try { localStorage.setItem(PINKEY, JSON.stringify(pins)); } catch (e) {}
+  render();
 }
 
 /* which sections are open is a per-browser preference, not part of the index */
@@ -444,12 +475,12 @@ function render(){
     d.textContent = "Nothing matches that filter.";
     out.appendChild(d);
   } else {
-    const pinned = match.filter(it => it.pin);
+    const pinned = match.filter(isPinned);
     if (pinned.length){
-      out.appendChild(section("Start here", pinned, q ? true : openState("pin", true), "pin"));
+      out.appendChild(section("Pinned", pinned, q ? true : openState("pin", true), "pin"));
     }
     GROUPS.forEach(g => {
-      const inGroup = match.filter(it => it.group === g && !it.pin);
+      const inGroup = match.filter(it => it.group === g && !isPinned(it));
       if (!inGroup.length) return;
       out.appendChild(section(g, inGroup, q ? true : openState(g, true), g));
     });
@@ -463,6 +494,11 @@ document.getElementById("sTools").textContent = ITEMS.filter(i => !i.folder).len
 document.getElementById("sPub").textContent   = ITEMS.filter(i => i.access === "public").length;
 document.getElementById("sRes").textContent   = ITEMS.filter(i => i.access === "restricted").length;
 
+document.getElementById("pinReset").addEventListener("click", () => {
+  pins = {};
+  try { localStorage.removeItem(PINKEY); } catch (e) {}
+  render();
+});
 document.getElementById("allOpen").addEventListener("click", () => setAll(true));
 document.getElementById("allShut").addEventListener("click", () => setAll(false));
 function setAll(open){
