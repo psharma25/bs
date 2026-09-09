@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trust Center , Jiffy</title>
+<meta name="description" content="Security, compliance, privacy, and reliability for Jiffy.">
+<style>
+:root{
+  --paper:#fdfafa; --card:#ffffff;
+  --ink:#2b2124; --ink-soft:#67555a; --ink-faint:#9d8d92;
+  --petrol:#b05a63; --petrol-deep:#8a3f47;
+  --ok:#5e8f78; --ok-tint:#eef5f1;
+  --progress:#b0803f; --progress-tint:#faf3e6;
+  --align:#7d8cae; --align-tint:#f1f3f8;
+  --plan:#9d8d92; --plan-tint:#faf6f6;
+  --line:#f0e6e6; --line-soft:#f9f3f3;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Menlo,Consolas,monospace;
+  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --accent:var(--petrol); --accent-tint:#fdf4f5;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(138,63,71,.05),0 6px 18px rgba(138,63,71,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:86px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);font-size:15px;line-height:1.62;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+button{font-family:inherit}
+
+/* ---------- Header ---------- */
+.topbar{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar-inner{max-width:1080px;margin:0 auto;padding:0 24px;height:66px;display:flex;align-items:center;gap:26px}
+.brand-lockup{display:flex;align-items:center;gap:10px;min-width:0}
+.brand-lockup svg{flex:none}
+.brand-name{font-weight:800;font-size:16px;letter-spacing:-.01em;white-space:nowrap}
+.brand-sub{font-size:11px;color:var(--ink-faint);font-family:var(--mono);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.brand-text{display:flex;flex-direction:column;line-height:1.25}
+.nav{display:flex;align-items:center;gap:6px;margin-left:auto}
+.menu{position:relative}
+.menu>button{border:0;background:transparent;cursor:pointer;padding:9px 13px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--ink-soft);display:flex;align-items:center;gap:6px}
+.menu>button:hover,.menu>button[aria-expanded="true"]{background:var(--line-soft);color:var(--ink)}
+.menu>button .car{font-size:9px;transition:transform .15s}
+.menu>button[aria-expanded="true"] .car{transform:rotate(180deg)}
+.menu-list{position:absolute;top:calc(100% + 8px);right:0;min-width:230px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 40px rgba(138,63,71,.16);padding:7px;display:none;z-index:70}
+.menu-list.open{display:block}
+.menu-list a,.menu-list button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:transparent;cursor:pointer;padding:9px 11px;border-radius:8px;font-size:13.5px;color:var(--ink);font-weight:550}
+.menu-list a:hover,.menu-list button:hover{background:var(--accent-tint);text-decoration:none}
+.menu-list .m-note{font-size:11px;color:var(--ink-faint);font-weight:400;display:block}
+.menu-list .m-sep{height:1px;background:var(--line-soft);margin:6px 4px}
+.menu-list .m-label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);padding:6px 11px 3px}
+.menu-list .checked{color:var(--accent);font-weight:700}
+.cta{border:1px solid var(--accent);background:var(--accent);color:#fff;font-size:13px;font-weight:650;padding:9px 16px;border-radius:9px;cursor:pointer;white-space:nowrap}
+.cta:hover{filter:brightness(1.1);text-decoration:none;color:#fff}
+
+/* ---------- Layout ---------- */
+main{max-width:1080px;margin:0 auto;padding:34px 24px 90px}
+
+/* ---------- Hero frame ---------- */
+.hero-frame{background:linear-gradient(180deg,#fff, #fffdfd);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:38px 40px 34px;position:relative;overflow:hidden}
+.hero-frame::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:linear-gradient(90deg,var(--accent),transparent 70%)}
+.hero-eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.hero-eyebrow::after{content:"";height:1px;flex:1;background:var(--line)}
+h1{font-size:33px;line-height:1.16;letter-spacing:-.022em;font-weight:800;max-width:680px}
+.hero p.lede{margin-top:14px;font-size:16.5px;color:var(--ink-soft);max-width:680px}
+.hero-meta{margin-top:16px;font-family:var(--mono);font-size:12px;color:var(--ink-faint)}
+.hero-meta:empty{display:none}
+.hero-meta strong{color:var(--ink-soft);font-weight:600}
+.pillars{margin-top:28px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.pillar{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 16px;display:block;color:inherit;box-shadow:var(--shadow)}
+.pillar:hover{text-decoration:none;border-color:var(--accent);background:#fff}
+.pillar .p-ico{width:32px;height:32px;border-radius:8px;background:var(--accent-tint);display:flex;align-items:center;justify-content:center;margin-bottom:10px;color:var(--accent)}
+.pillar h3{font-size:14px;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+.pillar p{font-size:12.5px;color:var(--ink-soft);margin-top:3px}
+.ledger{margin-top:26px;border:1px solid var(--line);border-radius:13px;background:#fff;overflow:hidden}
+.ledger-head{display:flex;align-items:baseline;gap:12px;padding:13px 20px;border-bottom:1px solid var(--line-soft);background:linear-gradient(to right,var(--accent-tint),transparent 60%)}
+.ledger-head h2{font-size:12.5px;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.ledger-head span{font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);margin-left:auto}
+.ledger-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.seal-cell{padding:17px 20px;border-right:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);display:flex;gap:14px;align-items:flex-start}
+.seal-cell svg{flex:none;margin-top:2px}
+.seal-name{font-weight:700;font-size:13.5px}
+.seal-scope{font-size:12px;color:var(--ink-faint);margin-top:1px}
+.seal-status{display:inline-block;margin-top:7px;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:2.5px 8px;border-radius:5px;font-weight:600}
+.seal-req{background:none;border:0;border-bottom:1px solid #ecd9dc;padding:0;cursor:pointer;font-family:var(--mono);font-size:11px;color:var(--petrol)}.seal-link+.seal-link{margin-left:12px}
+.seal-link{display:inline-block;margin-top:7px;font-family:var(--mono);font-size:11px;color:var(--petrol);text-decoration:none;border-bottom:1px solid #ecd9dc}.seal-link:hover{border-color:var(--petrol)}
+.seal-date{font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:6px}
+.st-ok{color:var(--ok);background:var(--ok-tint)}
+.st-progress{color:var(--progress);background:var(--progress-tint)}
+.st-align{color:var(--align);background:var(--align-tint)}
+.st-plan{color:var(--plan);background:var(--plan-tint)}
+.hero-note{margin-top:14px;font-size:12px;color:var(--ink-faint);font-family:var(--mono)}
+
+/* ---------- Divider between frames ---------- */
+.sep{display:flex;align-items:center;gap:14px;margin:30px 6px 0;color:var(--ink-faint)}
+.sep::before,.sep::after{content:"";height:1px;flex:1;background:var(--line)}
+.sep span{font-family:var(--mono);font-size:10px;letter-spacing:.28em}
+
+/* ---------- Collapsible section panels ---------- */
+details.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-top:30px;overflow:hidden}
+details.panel>summary{cursor:pointer;list-style:none;padding:20px 26px;display:flex;align-items:center;gap:16px}
+details.panel>summary::-webkit-details-marker{display:none}
+.p-head{flex:1;min-width:0}
+.p-head .kicker{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:3px}
+.p-head h2{font-size:19px;letter-spacing:-.015em;font-weight:800}
+.chev{flex:none;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--ink-soft);transition:transform .18s;background:#fff}
+details.panel[open]>summary .chev{transform:rotate(180deg)}
+details.panel>summary:hover .chev{border-color:var(--accent);color:var(--accent)}
+.adm-edit{flex:none;display:none;border:1px solid var(--line);background:#fff;color:var(--ink-soft);font-size:11.5px;font-weight:650;padding:5px 12px;border-radius:7px;cursor:pointer;font-family:var(--mono)}
+body.admin .adm-edit{display:inline-block}
+.adm-edit:hover{border-color:var(--accent);color:var(--accent)}
+.panel-body{padding:6px 26px 26px;border-top:1px solid var(--line-soft)}
+.panel-body>p.intro{margin:16px 0 4px;color:var(--ink-soft);max-width:680px}
+.panel-body>p.intro:empty{display:none}
+
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.practice{background:var(--paper);border:1px solid var(--line);border-radius:11px;overflow:hidden;align-self:start}
+.practice>summary{list-style:none;cursor:pointer;padding:15px 18px;display:flex;align-items:center;gap:10px}
+.practice>summary::-webkit-details-marker{display:none}
+.practice>summary:hover{background:#fbf5f6}
+.practice>summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.practice h3{font-size:14px;font-weight:700;display:flex;align-items:center;gap:9px}
+.practice h3 .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
+.practice .prac-chev{margin-left:auto;color:var(--ink-faint);font-size:12px;transition:transform .18s ease}
+.practice[open]>summary .prac-chev{transform:rotate(180deg)}
+.practice .prac-body{padding:0 18px 16px}
+.practice p{font-size:13.5px;color:var(--ink-soft)}
+.prac-link{display:inline-block;margin-top:11px;font-size:12.5px;font-weight:600;color:var(--accent-deep);text-decoration:none;border-bottom:1px solid rgba(180,86,93,.35);padding-bottom:1px}
+.prac-link:hover{border-bottom-color:var(--accent-deep)}
+@media (prefers-reduced-motion:reduce){.practice .prac-chev{transition:none}}
+.tbl{margin-top:18px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;text-align:left;padding:11px 18px;border-bottom:1px solid var(--line);background:var(--paper)}
+td{padding:12px 18px;border-bottom:1px solid var(--line-soft);vertical-align:top;color:var(--ink-soft)}
+td:first-child{color:var(--ink);font-weight:600}
+tr:last-child td{border-bottom:0}
+td .sub{display:block;font-size:12px;color:var(--ink-faint);font-weight:400;margin-top:2px}
+.reg-list{margin-top:18px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff}
+.reg-more{margin:10px 0 0}.reg-more a{font-family:var(--mono);font-size:12px;letter-spacing:.02em;color:var(--petrol);text-decoration:none;border-bottom:1px solid #ecd9dc}.reg-more a:hover{border-color:var(--petrol)}
+.reg-item{border-bottom:1px solid var(--line-soft)}
+.reg-item:last-child{border-bottom:0}
+.reg-item>summary{list-style:none;cursor:pointer;padding:15px 20px;display:flex;align-items:center;gap:14px}
+.reg-item>summary::-webkit-details-marker{display:none}
+.reg-item>summary:hover{background:var(--paper)}
+.reg-item>summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.reg-item .reg-chev{margin-left:auto;color:var(--ink-faint);font-size:12px;transition:transform .18s ease}
+.reg-item[open]>summary .reg-chev{transform:rotate(180deg)}
+.reg-item .reg-body{padding:0 20px 17px}
+@media (prefers-reduced-motion:reduce){.reg-item .reg-chev{transition:none}}
+.reg-name{font-weight:700;font-size:14px}
+.reg-name .sub{display:block;font-family:var(--mono);font-size:11px;color:var(--ink-faint);font-weight:500;margin-top:2px}
+.reg-item p{font-size:13.5px;color:var(--ink-soft)}
+
+.doc-group{border:1px solid var(--line);border-radius:11px;background:#fff;margin-top:18px;overflow:hidden}
+.doc-group>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:13px 20px;background:var(--paper);border-bottom:1px solid var(--line-soft)}
+.doc-group>summary::-webkit-details-marker{display:none}
+.doc-group:not([open])>summary{border-bottom:0}
+.dg-title{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:700}
+.dg-count{font-family:var(--mono);font-size:11px;color:var(--ink-faint);border:1px solid var(--line);border-radius:20px;padding:1px 8px}
+.dg-chev{margin-left:auto;color:var(--ink-faint);font-size:12px;transition:transform .18s}
+.doc-group[open]>summary .dg-chev{transform:rotate(180deg)}
+.doc-group .doc-list{margin-top:0;border:0;border-radius:0}
+.doc-list{margin-top:18px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff}
+.doc-row{display:grid;grid-template-columns:1fr auto auto;gap:16px;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line-soft)}
+.doc-row:last-child{border-bottom:0}
+.doc-name{font-weight:650;font-size:14px}
+.doc-name .sub{display:block;font-size:12px;color:var(--ink-faint);font-weight:400;margin-top:1px}
+.gate{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);border:1px solid var(--line);border-radius:5px;padding:2px 8px;white-space:nowrap}
+.gate.open{color:var(--ok);border-color:#d7e7de;background:var(--ok-tint)}
+.btn{border:1px solid var(--accent);background:var(--accent);color:#fff;font-size:12.5px;font-weight:600;padding:8px 15px;border-radius:8px;cursor:pointer;transition:filter .15s;white-space:nowrap}
+.btn:hover{filter:brightness(1.1)}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.ghost:hover{background:var(--accent-tint);filter:none}
+.btn.danger{border-color:#b8584a;background:#b8584a}
+.form-card{margin-top:16px;border:1px solid var(--line);border-radius:11px;background:#fff}
+.req-form{padding:20px;display:grid;gap:14px;grid-template-columns:1fr 1fr}
+.req-form .full{grid-column:1/-1}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:5px}
+.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-family:inherit;font-size:13.5px;background:#fff;color:var(--ink)}
+.field textarea{resize:vertical;min-height:80px}
+.field input:focus,.field textarea:focus,.field select:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
+.form-foot{grid-column:1/-1;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.form-note{font-size:12px;color:var(--ink-faint)}
+.outbox-item{font-family:var(--mono);font-size:12px;color:var(--ink-soft);padding:9px 20px;border-top:1px solid var(--line-soft);display:flex;gap:12px;align-items:baseline}
+.outbox-item .when{color:var(--ink-faint);flex:none}
+.outbox-empty{font-size:12.5px;color:var(--ink-faint);padding:10px 20px;border-top:1px solid var(--line-soft)}
+
+.cvd-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-top:18px}
+.codebox{background:var(--petrol-deep);color:#fbeced;border-radius:11px;padding:18px 20px;font-family:var(--mono);font-size:12.5px;line-height:1.7;position:relative;overflow:auto}
+.codebox .cbtn{position:absolute;top:10px;right:10px;border:1px solid rgba(255,255,255,.25);background:transparent;color:#fbeced;font-size:11px;font-family:var(--mono);padding:4px 10px;border-radius:6px;cursor:pointer}
+.codebox .cbtn:hover{background:rgba(255,255,255,.1)}
+.safeharbor{padding:16px 20px;font-size:13px;color:var(--ink-soft);border:1px solid var(--line);border-radius:11px;background:var(--paper)}
+.safeharbor strong{color:var(--ink)}
+.vdp-head{margin-top:26px;display:flex;align-items:center;gap:10px}
+.vdp-head h3{font-size:15.5px;font-weight:800}
+.vdp-head .pill{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ok);background:var(--ok-tint);border-radius:5px;padding:2px 8px;font-weight:700}
+
+details.faq{border-bottom:1px solid var(--line-soft)}
+details.faq:last-child{border-bottom:0}
+details.faq summary{cursor:pointer;padding:15px 20px;font-weight:650;font-size:14px;list-style:none;display:flex;align-items:center;gap:10px}
+details.faq summary::-webkit-details-marker{display:none}
+details.faq summary::before{content:"+";font-family:var(--mono);color:var(--accent);font-weight:600;width:14px;flex:none}
+details.faq[open] summary::before{content:","}
+details.faq .a{padding:0 20px 16px 44px;font-size:13.5px;color:var(--ink-soft)}
+.faq-wrap{margin-top:18px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff}
+
+/* Blueprint */
+.bp-grid{display:grid;grid-template-columns:320px 1fr;gap:26px;align-items:start;margin-top:30px}
+.wireframe{position:sticky;top:96px;border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--shadow);padding:18px}
+.wf-title{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.wf-zone{border:1.5px dashed var(--line);border-radius:9px;padding:10px;margin-bottom:10px}
+.wf-zone:last-child{margin-bottom:0}
+.wf-zone-label{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
+.wf-zone-label .z{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:var(--accent);border-radius:5px;padding:1px 7px}
+.wf-zone-label span:last-child{font-size:11.5px;font-weight:700;color:var(--ink-soft)}
+.wf-el{display:flex;align-items:center;gap:8px;background:var(--accent-tint);border:1px solid var(--line);border-radius:6px;padding:6px 9px;margin-top:6px;font-size:12px;color:var(--ink-soft);font-weight:600}
+.wf-el:first-of-type{margin-top:0}
+.wf-el .n{font-family:var(--mono);font-size:10.5px;font-weight:700;color:var(--accent);flex:none;width:18px}
+.wf-el.t2{background:#fff}
+.wf-el.t3{background:#fff;border-style:dashed;color:var(--ink-faint)}
+.bp-cat{border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff}
+.bp-cat .cat-item{padding:17px 20px;border-bottom:1px solid var(--line-soft);display:grid;grid-template-columns:44px 1fr;gap:14px}
+.bp-cat .cat-item:last-child{border-bottom:0}
+.cat-num{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent);padding-top:2px}
+.cat-item h3{font-size:14.5px;font-weight:700;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tier{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:5px;font-weight:700}
+.tier.t1{color:var(--ok);background:var(--ok-tint)}
+.tier.t2{color:var(--progress);background:var(--progress-tint)}
+.tier.t3{color:var(--plan);background:var(--plan-tint)}
+.cat-item .where{font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:2px}
+.cat-item p{font-size:13.5px;color:var(--ink-soft);margin-top:6px}
+.rs-list{border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff;margin-top:18px}
+.rs-item{padding:16px 20px;border-bottom:1px solid var(--line-soft)}
+.rs-item:last-child{border-bottom:0}
+.rs-item h3{font-size:14px;font-weight:700}
+.rs-item p{font-size:13.5px;color:var(--ink-soft);margin-top:4px}
+
+/* Admin */
+.gate-overlay{position:fixed;inset:0;background:rgba(43,33,36,.55);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.gate-overlay.show{display:flex}
+.gate-modal{background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.3);padding:26px;width:min(380px,100%)}
+.gate-modal h2{font-size:17px;font-weight:800}
+.gate-modal p{font-size:13px;color:var(--ink-soft);margin-top:6px}
+.gate-modal input{width:100%;margin-top:14px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px;font-family:var(--mono)}
+.gate-modal .row{display:flex;gap:10px;margin-top:14px;justify-content:flex-end}
+.gate-err{font-size:12.5px;color:#b8584a;margin-top:8px;display:none}
+.admin-drawer{position:fixed;top:0;right:0;bottom:0;width:min(470px,100vw);background:#fff;border-left:1px solid var(--line);box-shadow:-12px 0 40px rgba(138,63,71,.14);z-index:150;transform:translateX(102%);transition:transform .22s ease;display:flex;flex-direction:column}
+.admin-drawer.open{transform:translateX(0)}
+.admin-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;flex:none}
+.admin-head h2{font-size:15px;font-weight:800}
+.admin-head .site-tag{font-family:var(--mono);font-size:11px;color:var(--accent);background:var(--accent-tint);border-radius:5px;padding:2px 8px;font-weight:700}
+.admin-head button{margin-left:auto}
+.admin-body{overflow-y:auto;padding:14px 20px 30px;flex:1}
+.admin-note{font-size:12px;color:var(--ink-soft);background:var(--progress-tint);border:1px solid #ecdcb8;border-radius:8px;padding:10px 12px;margin-bottom:14px}
+details.adm{border:1px solid var(--line);border-radius:9px;margin-bottom:10px;background:#fff}
+details.adm summary{cursor:pointer;padding:11px 14px;font-weight:700;font-size:13.5px;list-style:none;display:flex;align-items:center;gap:9px}
+details.adm summary::-webkit-details-marker{display:none}
+details.adm summary::before{content:"▸";font-size:11px;color:var(--accent)}
+details.adm[open] summary::before{content:"▾"}
+details.adm .adm-body{padding:4px 14px 14px;border-top:1px solid var(--line-soft)}
+.adm-field{margin-top:10px}
+.adm-field label{display:block;font-size:11.5px;font-weight:600;color:var(--ink-soft);margin-bottom:4px}
+.adm-field input,.adm-field textarea{width:100%;border:1px solid var(--line);border-radius:7px;padding:8px 10px;font-size:12.5px;font-family:var(--mono);background:#fff}
+.adm-field textarea{min-height:150px;resize:vertical;line-height:1.5}
+.adm-apply{margin-top:10px;display:flex;gap:10px;align-items:center}
+.adm-msg{font-size:11.5px;font-family:var(--mono)}
+.adm-msg.ok{color:var(--ok)} .adm-msg.err{color:#b8584a}
+.admin-global{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.adm-hint{font-size:11px;color:var(--ink-faint);margin-top:6px;line-height:1.5}
+
+footer{border-top:1px solid var(--line);margin-top:70px;background:#fff}
+.foot-inner{max-width:1080px;margin:0 auto;padding:26px 24px;display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.foot-inner .sp{margin-left:auto}
+.admin-link{border:1px solid var(--line);background:transparent;color:var(--ink-faint);font-size:11px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:6px;cursor:pointer}
+.admin-link:hover{color:var(--accent);border-color:var(--accent)}
+body.admin .admin-link{color:#fff;background:var(--accent);border-color:var(--accent)}
+.adm-sites{display:flex;gap:6px;margin-left:6px}
+.adm-sites button{border:1px solid var(--line);background:#fff;color:var(--ink-soft);font-size:11.5px;font-weight:650;padding:4px 11px;border-radius:999px;cursor:pointer}
+.adm-sites button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+footer p{font-size:12.5px;color:var(--ink-faint)}
+footer a{color:var(--ink-soft)}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--petrol-deep);color:#fff;font-size:13px;padding:10px 18px;border-radius:9px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:300;box-shadow:0 8px 24px rgba(138,63,71,.3)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (max-width:920px){
+  .topbar-inner{padding:0 14px;gap:10px}
+  .brand-sub{display:none}
+  .nav{gap:2px}
+  .menu>button{padding:8px 9px;font-size:12.5px}
+  .cta{padding:8px 11px;font-size:12px}
+  main{padding:22px 14px 70px}
+  .hero-frame{padding:26px 20px}
+  h1{font-size:26px}
+  .pillars{grid-template-columns:1fr 1fr}
+  .card-grid,.cvd-grid{grid-template-columns:1fr}
+  .wireframe{position:static}
+  .reg-item{grid-template-columns:1fr;gap:8px}
+  .doc-row{grid-template-columns:1fr;gap:8px}
+  .req-form{grid-template-columns:1fr}
+  details.panel>summary{padding:16px 18px}
+  .panel-body{padding:4px 18px 20px}
+  .menu-list{right:auto;left:0}
+}
+/* ---- Banner (full-bleed hero) ---- */
+body{overflow-x:hidden}
+.hero-frame{width:100vw;margin-left:calc(50% - 50vw);border:0;border-radius:0;box-shadow:none;background:linear-gradient(135deg,#fdf1f2 0%,#f6dde0 100%);border-bottom:1px solid #f0e0e2;padding:32px 0 48px;color:var(--ink)}
+.hero-frame{position:relative}
+.hero-frame::before{display:block;content:"";position:absolute;inset:0;background:radial-gradient(900px 420px at 88% -12%, rgba(255,255,255,.55), transparent 62%);pointer-events:none}
+.hero-inner{position:relative}
+.hero-inner{max-width:1080px;margin:0 auto;padding:0 24px}
+.hero-frame .hero-eyebrow{color:var(--accent-deep)}
+.hero-frame .hero-eyebrow::after{background:#e8ced1}
+.hero-frame h1{color:var(--ink)}
+.hero-frame p.lede{color:var(--ink-soft)}
+.hero-frame .hero-meta{color:#8d7378}
+.hero-frame .hero-meta strong{color:var(--accent-deep)}
+.hero-frame .hero-note{color:#8d7378}
+.hero-ctas{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}
+.bbtn{display:inline-block;background:var(--accent);color:#fff;font-size:13.5px;font-weight:700;padding:11px 20px;border-radius:9px}
+.bbtn:hover{text-decoration:none;filter:brightness(.96)}
+.bbtn.o{background:#fff;color:var(--accent-deep);border:1px solid #eed6d9}
+.bbtn.o:hover{background:var(--accent-tint);filter:none}
+.hero-below{margin-top:-26px;position:relative;z-index:2}
+.hero-below .pillars{margin-top:0}
+.hero-below .ledger{box-shadow:var(--shadow)}
+.hero-below .hero-note{color:var(--ink-faint)}
+/* ---- Header quick links ---- */
+.navlink{padding:9px 12px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--ink-soft)}
+.navlink:hover{background:var(--line-soft);color:var(--ink);text-decoration:none}
+/* ---- Footer ---- */
+footer{background:#2e2326;border-top:0;color:#eddfe1}
+.foot-cols{max-width:1080px;margin:0 auto;padding:44px 24px 30px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:34px}
+.fc h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#9d8d92;margin-bottom:12px;font-weight:600}
+.fc-links a{display:block;color:#eddfe1;font-size:13.5px;padding:4px 0}
+.fc-links a:hover{color:#fff;text-decoration:none}
+.fc-logo{width:40px;height:40px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.fc-logo img,.fc-logo svg{width:26px;height:26px}
+#footTag{font-size:13px;color:#cbb9bc;max-width:280px}
+footer footer .foot-bottom{border-top:1px solid rgba(255,255,255,.1);max-width:1080px;margin:0 auto;padding:16px 24px 22px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.foot-bottom p{font-size:12px;color:#9d8d92}
+.fb-sp{margin-left:auto}
+.foot-bottom a{color:#cbb9bc;font-size:12.5px}
+.foot-bottom a:hover{color:#fff}
+footer .admin-link{border-color:rgba(255,255,255,.2);color:#9d8d92}
+footer .admin-link:hover{color:#fff;border-color:#fff}
+body.admin footer .admin-link{color:#fff;background:var(--accent);border-color:var(--accent)}
+@media (max-width:920px){
+  .hero-frame{padding:34px 0 30px}
+  .hero-inner{padding:0 16px}
+  .navlink{display:none}
+  .foot-cols{grid-template-columns:1fr 1fr;gap:24px;padding:32px 16px 22px}
+  .fc-brand{grid-column:1/-1}
+}
+/* ---- Professional polish ---- */
+.hero-frame h1{font-size:29px;line-height:1.15;letter-spacing:-.022em;max-width:730px}
+.hero-frame p.lede{font-size:14.5px;line-height:1.6;max-width:720px;margin-top:10px}
+.hero-frame .hero-eyebrow{font-size:11px}
+.bbtn{letter-spacing:.01em;padding:10px 19px;font-size:13px}
+.topbar{box-shadow:0 1px 0 rgba(138,63,71,.03)}
+.brand-name{letter-spacing:-.015em}
+.p-head h2{font-size:18px}
+.p-head .kicker{letter-spacing:.14em}
+.pillar h3{font-size:13.5px}
+.pillar p{line-height:1.55}
+.seal-name{letter-spacing:-.005em}
+.menu>button,.navlink{letter-spacing:-.005em}
+details.panel{transition:box-shadow .15s}
+details.panel:hover{box-shadow:0 2px 4px rgba(138,63,71,.06),0 10px 26px rgba(138,63,71,.09)}
+.fc h4{letter-spacing:.16em}
+@media (max-width:920px){.hero-frame h1{font-size:23px}.hero-frame{padding:24px 0 38px}}
+/* ---- Inline edit mode ---- */
+.cyc,.rowbtn,.delbtn{display:none}
+body.editing [data-path]{outline:1px dashed rgba(180,86,93,.55);outline-offset:2px;border-radius:3px;min-width:22px;display:inline-block}
+body.editing td[data-path],body.editing p[data-path],body.editing div[data-path]{display:block}
+body.editing [data-path]:hover{background:var(--accent-tint)}
+body.editing [data-path]:focus{outline:2px solid var(--accent);background:#fff;box-shadow:0 0 0 4px var(--accent-tint)}
+body.editing .hero-frame [data-path]{outline-color:rgba(150,67,75,.5)}
+body.editing .hero-frame [data-path]:focus{background:#fff;box-shadow:none}
+body.editing .cyc{display:inline-block;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border:1px solid var(--line);background:#fff;color:var(--ink-soft);border-radius:5px;padding:1px 7px;margin-left:6px;cursor:pointer}
+body.editing .cyc:hover{border-color:var(--accent);color:var(--accent)}
+body.editing .delbtn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1px solid #eed4cf;background:#fdf4f2;color:#b8584a;font-size:13px;line-height:1;cursor:pointer;margin-left:8px;vertical-align:middle}
+body.editing .delbtn:hover{background:#b8584a;color:#fff;border-color:#b8584a}
+body.editing .rowbtn{display:inline-flex;align-items:center;gap:6px;margin:10px 0 2px;border:1px dashed var(--line);background:#fff;color:var(--accent);font-size:12px;font-weight:650;padding:6px 12px;border-radius:7px;cursor:pointer}
+body.editing .rowbtn:hover{border-color:var(--accent);background:var(--accent-tint)}
+body.editing .practice-add{grid-column:1/-1}
+body.editing .pillar{pointer-events:none}
+body.editing .pillar [data-path]{pointer-events:auto}
+.edit-bar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(120%);background:var(--petrol-deep);color:#fff;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:12px;z-index:180;box-shadow:0 12px 34px rgba(138,63,71,.35);transition:transform .2s}
+body.editing .edit-bar{transform:translateX(-50%) translateY(0)}
+.edit-bar span{font-size:12.5px;color:#eddfe1}
+.edit-bar b{color:#fff}
+.edit-bar button{border:1px solid rgba(255,255,255,.28);background:transparent;color:#fff;font-size:12.5px;font-weight:650;padding:6px 13px;border-radius:8px;cursor:pointer}
+.edit-bar button.pri{background:#fff;color:var(--petrol-deep);border-color:#fff}
+.edit-bar button:hover{filter:brightness(1.1)}
+.empty-note{margin-top:18px;border:1px dashed var(--line);border-radius:11px;padding:18px 20px;font-size:13.5px;color:var(--ink-soft);background:#fff}
+.sev{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;font-weight:700;padding:2px 8px;border-radius:5px;background:var(--plan-tint);color:var(--plan)}
+.sev.s-critical,.sev.s-high{background:#fdf3f1;color:#b8584a}
+.sev.s-medium{background:var(--progress-tint);color:var(--progress)}
+.sev.s-low{background:var(--align-tint);color:var(--align)}
+/* ---- compliance ledger: wider cell dividers ---- */
+.seal-cell{border-right:2px solid var(--line);border-bottom:2px solid var(--line)}
+.maturity-note{margin:0 0 18px;background:var(--ok-tint,#eef5f1);border:1px solid #d7e7de;border-left:3px solid var(--ok,#5e8f78);border-radius:0 12px 12px 0;padding:16px 20px;font-size:13.5px;line-height:1.6;color:var(--ink)}.maturity-note b{color:var(--ok,#5e8f78);display:block;margin-bottom:4px;font-size:14px}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand-lockup" id="brandLockup" aria-live="polite"></div>
+    <nav class="nav" aria-label="Main">
+      <div class="menu" id="menuSections">
+        <button aria-haspopup="true" aria-expanded="false">Sections <span class="car">▾</span></button>
+        <div class="menu-list" role="menu" id="sectionsMenu"></div>
+      </div>
+      <a class="navlink" href="policies/security-overview.html">Security overview</a>
+      <a class="navlink" href="policies/security-overview.html#documents">Documents</a>
+      <a class="navlink" href="#faq">FAQ</a>
+      <a class="cta" href="#disclosure" id="ctaReport">Report a vulnerability</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- ============ STANDARD SITE VIEW ============ -->
+  <div id="stdView">
+    <section class="hero hero-frame" id="overview">
+      <div class="hero-inner">
+      <div class="hero-eyebrow">Trust Center</div>
+      <h1 id="heroTitle"></h1>
+      <p class="lede" id="heroLede"></p>
+      <div class="hero-meta" id="heroMeta"></div>
+      <div class="hero-ctas">
+        <a class="bbtn" href="policies/security-overview.html">Read the security overview</a>
+        <a class="bbtn o" href="#documents">Request documents</a>
+        <a class="bbtn o" href="#disclosure">Report a vulnerability</a>
+      </div>
+      </div>
+    </section>
+
+    <div class="hero-below">
+      <div class="pillars" id="pillars"></div>
+      <div class="maturity-note">
+      <b>Our program is expanding as the field does.</b> Generative AI and agentic systems are moving quickly, and parts of the threat surface are still being mapped across the industry. Vendor review and vulnerability management run continuously rather than on an annual cycle, agent behaviour is monitored against what each agent is scoped to do, and this Trust Center is updated as the picture changes. Where something is still being worked out, it is stated here rather than implied to be settled.
+      </div>
+      <div class="ledger" aria-label="Compliance ledger">
+        <div class="ledger-head"><h2>Compliance ledger</h2><span id="ledgerStamp"></span></div>
+        <div class="ledger-grid" id="ledgerGrid"></div>
+      </div>
+      <p class="hero-note">Statuses reflect the current program state. Alignment to a framework is not certification. Evidence is available under NDA , see Document requests.</p>
+    </div>
+
+    <div class="sep"><span>TRUST DETAIL</span></div>
+
+    <details class="panel" id="security" open>
+      <summary>
+        <div class="p-head"><div class="kicker">Security</div><h2>Security practices</h2></div>
+        <button class="adm-edit" data-edit="practices">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro" id="practicesIntro"></p>
+        <div class="card-grid" id="practiceGrid"></div>
+      </div>
+    </details>
+
+    <details class="panel" id="privacy">
+      <summary>
+        <div class="p-head"><div class="kicker">Privacy</div><h2>Data &amp; privacy</h2></div>
+        <button class="adm-edit" data-edit="data">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro" id="dataIntro"></p>
+        <div class="tbl"><table aria-label="Data handling summary">
+          <thead><tr><th style="width:220px">Category</th><th>Handling</th></tr></thead>
+          <tbody id="dataTable"></tbody>
+        </table></div>
+      </div>
+    </details>
+
+    <details class="panel" id="reliability">
+      <summary>
+        <div class="p-head"><div class="kicker">Reliability</div><h2>Availability &amp; resilience</h2></div>
+        <button class="adm-edit" data-edit="reliability">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro" id="reliabilityIntro"></p>
+        <div class="tbl"><table aria-label="Reliability summary">
+          <thead><tr><th style="width:220px">Area</th><th>Commitment</th></tr></thead>
+          <tbody id="reliabilityTable"></tbody>
+        </table></div>
+      </div>
+    </details>
+
+    <div class="sep"><span>OPERATIONS</span></div>
+
+    <details class="panel" id="subprocessors">
+      <summary>
+        <div class="p-head"><div class="kicker">Third parties</div><h2>Subprocessors</h2></div>
+        <button class="adm-edit" data-edit="subs">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro">Vendors that may process data in delivering the service. Each is reviewed before onboarding and annually.</p>
+        <p class="intro">The current list, with purpose, region and safeguards, is released under a non-disclosure agreement. Customers are given notice before a new subprocessor begins processing their data, as their agreement requires.</p>
+        <p class="intro"><a class="status-link" href="mailto:security@jiffy.ai?subject=Document%20request%3A%20Subprocessor%20list">Request the subprocessor list &rarr;</a></p>
+      </div>
+    </details>
+
+    <details class="panel" id="cvd-record">
+      <summary>
+        <div class="p-head"><div class="kicker">Disclosure record</div><h2>Coordinated disclosure record</h2></div>
+        <button class="adm-edit" data-edit="cvdRecord">Edit</button>
+        <span class="chev" aria-hidden="true">&#9662;</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro" id="cvdRecordIntro"></p>
+        <div id="cvdList"></div>
+      </div>
+    </details>
+
+    <details class="panel" id="advisories">
+      <summary>
+        <div class="p-head"><div class="kicker">Advisories</div><h2>Security advisories &amp; CVEs</h2></div>
+        <button class="adm-edit" data-edit="advisories">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro">Published advisories affecting this product, including our assessment of relevant third-party CVEs. Ask the assistant about a specific CVE to have it check both this list and current public sources.</p>
+        <div id="advList"></div>
+      </div>
+    </details>
+
+    <details class="panel" id="disclosure">
+      <summary>
+        <div class="p-head"><div class="kicker">Coordinated vulnerability disclosure</div><h2>Responsible disclosure</h2></div>
+        <button class="adm-edit" data-edit="__fields">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro">Good-faith security research is welcome. Reports are acknowledged within 2 business days, triaged and severity-scored, remediated on severity-based timelines (critical 7 days, high 30, medium 60, low 90), and disclosed in coordination with the reporter within 90 days by default. The full terms , scope, safe harbour, and what we commit to at each stage , are in the <a href="policies/vulnerability-disclosure.html"><strong>Coordinated Vulnerability Disclosure Policy</strong></a>.</p>
+        <div class="cvd-grid">
+          <div class="codebox" aria-label="security.txt">
+            <button class="cbtn" id="copySecTxt">Copy</button>
+            <div id="secTxt"></div>
+          </div>
+          <div class="safeharbor">
+            <strong>Safe harbor.</strong> Research conducted in good faith and within this policy will not be met with legal action. Do not access, modify, or exfiltrate data beyond what is required to demonstrate the issue; stop and report immediately if personal data is encountered.
+          </div>
+        </div>
+
+        <div class="vdp-head" id="vdpForm"><h3>Report a vulnerability</h3><span class="pill">Safe harbor applies</span></div>
+        <p class="intro" style="margin-top:6px">Submit a report below , it composes a structured email to the security team with a tracking reference, and nothing is transmitted from this page itself. Encrypted reports via the PGP key in security.txt are welcome.</p>
+        <div class="form-card">
+          <div class="req-form">
+            <div class="field"><label for="vName">Your name <span style="font-weight:400;color:var(--ink-faint)">(optional , anonymous reports accepted)</span></label><input id="vName" autocomplete="name"></div>
+            <div class="field"><label for="vEmail">Contact email <span style="font-weight:400;color:var(--ink-faint)">(for coordination)</span></label><input id="vEmail" type="email" autocomplete="email"></div>
+            <div class="field"><label for="vAsset">Affected asset / URL</label><input id="vAsset" placeholder="e.g., app.example.com/login"></div>
+            <div class="field"><label for="vSev">Your severity estimate</label>
+              <select id="vSev"><option>Critical</option><option>High</option><option selected>Medium</option><option>Low</option><option>Informational</option></select>
+            </div>
+            <div class="field full"><label for="vDesc">What you found &amp; how to reproduce it</label><textarea id="vDesc" placeholder="Steps to reproduce, impact, and any proof-of-concept detail. Please do not include others' personal data."></textarea></div>
+            <div class="form-foot">
+              <button class="btn" id="vSend">Compose vulnerability report</button>
+              <span class="form-note">Opens your mail client with a tracking reference. Response within 2 business days.</span>
+            </div>
+          </div>
+          <div>
+            <div class="outbox-empty" id="vboxEmpty">No reports logged on this device yet.</div>
+            <div id="vboxList"></div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="panel" id="documents">
+      <summary>
+        <div class="p-head"><div class="kicker">Evidence</div><h2>Document requests</h2></div>
+        <button class="adm-edit" data-edit="docs">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro">Six documents are published in full and open directly; everything else is released under NDA on request. The same list, with a line on what each document covers, is in the <a href="policies/security-overview.html#documents">Document Availability table</a> of the Security Overview. Requests generate a pre-filled email and are logged locally in your browser only.</p>
+        <details class="doc-group" id="docGroupPolicy"><summary><span class="dg-title">Policies</span><span class="dg-count" id="docCountPolicy"></span><span class="dg-chev" aria-hidden="true">&#9662;</span></summary><div class="doc-list" id="docListPolicy"></div></details><details class="doc-group" id="docGroupAssurance"><summary><span class="dg-title">Assurance</span><span class="dg-count" id="docCountAssurance"></span><span class="dg-chev" aria-hidden="true">&#9662;</span></summary><div class="doc-list" id="docListAssurance"></div></details>
+        <div class="form-card">
+          <div class="req-form">
+            <div class="field"><label for="reqName">Your name</label><input id="reqName" autocomplete="name"></div>
+            <div class="field"><label for="reqCompany">Company</label><input id="reqCompany" autocomplete="organization"></div>
+            <div class="field"><label for="reqEmail">Work email</label><input id="reqEmail" type="email" autocomplete="email"></div>
+            <div class="field"><label for="reqDoc">Document</label><select id="reqDoc"></select></div>
+            <div class="field full"><label for="reqNote">Context (optional)</label><textarea id="reqNote" placeholder="e.g., vendor security review"></textarea></div>
+            <div class="form-foot">
+              <button class="btn" id="reqSend">Compose request email</button>
+              <span class="form-note">Opens your mail client. Nothing is transmitted from this page.</span>
+            </div>
+          </div>
+          <div>
+            <div class="outbox-empty" id="outboxEmpty">No requests logged on this device yet.</div>
+            <div id="outboxList"></div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <div class="sep"><span>REFERENCE</span></div>
+
+    <details class="panel" id="faq">
+      <summary>
+        <div class="p-head"><div class="kicker">Common questions</div><h2>FAQ</h2></div>
+        <button class="adm-edit" data-edit="faq">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body"><div class="faq-wrap" id="faqList"></div></div>
+    </details>
+
+    <details class="panel" id="contact">
+      <summary>
+        <div class="p-head"><div class="kicker">Reach the trust desk</div><h2>Contact</h2></div>
+        <button class="adm-edit" data-edit="contacts">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <div class="tbl"><table aria-label="Contact channels"><tbody id="contactTable"></tbody></table></div>
+        <p class="intro" style="font-size:12px;color:var(--ink-faint);font-family:var(--mono)">For active incidents affecting your data, use the security contact and include "INCIDENT" in the subject line.</p>
+      </div>
+    </details>
+  </div>
+
+</main>
+
+<footer>
+  <div class="foot-cols">
+    <div class="fc fc-brand">
+      <div class="fc-logo" id="footLogo"></div>
+      <p id="footTag"></p>
+    </div>
+    <div class="fc fc-links">
+      <h4>Trust</h4>
+      <a href="https://www.jiffy.ai/compliance/" target="_blank" rel="noopener">Compliance</a>
+      <a href="#security">Security practices</a>
+      <a href="#privacy">Data &amp; privacy</a>
+      <a href="policies/privacy-notice.html">Privacy Notice</a>
+      <a href="policies/cookie-policy.html">Cookie Policy</a>
+      <a href="#reliability">Reliability</a>
+    </div>
+    <div class="fc fc-links">
+      <h4>Resources</h4>
+      <a href="#documents">Document requests</a>
+      <a href="#subprocessors">Subprocessors</a>
+      <a href="#advisories">Advisories &amp; CVEs</a>
+      <a href="#cvd-record">Disclosure record</a>
+      <a href="#disclosure">Responsible disclosure</a>
+      <a href="policies/vulnerability-disclosure.html">CVD policy</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="fc fc-links">
+      <h4>Contact</h4>
+      <div id="footContacts"></div>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <p id="footBrand"></p>
+    <p id="footStamp"></p>
+    <span class="fb-sp"></span>
+    <a href="#overview" id="footTop">Back to top</a>
+    <button class="admin-link" id="adminLink" title="Admin sign in">Admin</button>
+  </div>
+</footer>
+
+<!-- Admin gate -->
+<div class="gate-overlay" id="gateOverlay" role="dialog" aria-modal="true" aria-label="Admin sign in">
+  <div class="gate-modal">
+    <h2>Admin access</h2>
+    <p>Enter the admin passphrase to edit this site's content.</p>
+    <input type="password" id="gatePass" placeholder="Passphrase" autocomplete="off">
+    <div class="gate-err" id="gateErr">Incorrect passphrase.</div>
+    <div class="row">
+      <button class="btn ghost" id="gateCancel">Cancel</button>
+      <button class="btn" id="gateGo">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin drawer -->
+<aside class="admin-drawer" id="adminDrawer" aria-label="Admin editor">
+  <div class="admin-head">
+    <h2>Admin</h2><span class="site-tag" id="adminSiteTag"></span>
+    <button class="btn ghost" id="adminClose">Close</button>
+  </div>
+  <div class="admin-body">
+    <div class="admin-note"><b>Edit page inline</b> lets you click any text on the page and retype it , the fastest way to correct content. The JSON editors below are for bulk changes. Edits save to this browser only (localStorage) and take effect immediately here. To publish for everyone, use <b>Export config</b> and replace the CONFIG block in the deployed file (or commit the JSON alongside it). This gate is a convenience lock, not a security boundary , for a hosted admin route, front it with Cloudflare Access.</div>
+    <div id="adminSections"></div>
+    <div class="admin-global">
+      <button class="btn" id="admInline">Edit page inline</button>
+      <button class="btn" id="admExport">Export config</button>
+      <button class="btn ghost" id="admImport">Import config</button>
+      <button class="btn ghost" id="admPass">Change passphrase</button>
+      <button class="btn danger" id="admReset">Reset this site</button>
+    </div>
+    <div class="adm-hint">Import expects the JSON produced by Export. Reset restores this site's shipped defaults on this browser. Passphrase changes apply to this browser; to change the shipped default, update ADMIN_HASH in the file.</div>
+  </div>
+</aside>
+
+<div class="edit-bar" id="editBar">
+  <span>Inline editing <b id="editSite"></b> , click any text to change it</span>
+  <button id="editDone" class="pri">Done</button>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+
+const LAST_UPDATED = "2026-07-25";
+const ADMIN_HASH = "244065b2cfc6c1643c2d2b218ffbe5eb620b5407632e4e0a3ba6fd6975d09cb8";
+
+const LOGOS = {
+  ph: '<img src="data:image/png;base64,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" width="34" height="34" alt="Jiffy logo" style="display:block">'
+};
+
+const PILLAR_ICONS = {
+  security:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 2 L17 5 V10 C17 14 14 17 10 18.5 C6 17 3 14 3 10 V5 Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7.2 10.2 L9.2 12.2 L13 8.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  compliance:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="2.5" width="12" height="15" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 7 H13 M7 10 H13 M7 13 H10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+  privacy:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4.5" y="8.5" width="11" height="8.5" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 8.5 V6.5 A3 3 0 0 1 13 6.5 V8.5" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="12.7" r="1.4" fill="currentColor"/></svg>',
+  reliability:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 12 L6.5 12 L8.5 6.5 L11.5 15 L13.5 10 L17.5 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+};
+
+const DEFAULTS = {
+  ph: {
+    cfgVersion:3,
+    accent:"#b4565d", accentTint:"#fdf4f5", accentDeep:"#96434b",
+    name:"Jiffy", sub:"Trust Center",
+    heroTitle:"Rapid. Continuous. Answerable to auditors.",
+    heroLede:"Jiffy Litmus provides automated penetration testing , continuously probing your applications and cloud environment the way an attacker would, and turning findings into evidence your auditors and customers accept. Companies point Litmus at their real attack surface, so we hold ourselves to the standard our customers are measured against: documented controls, minimal data, independent examination.",
+    heroMeta:"Products in scope: <strong>Jiffy Litmus</strong> \u00b7 <strong>Jiffy Septa</strong>",
+    pillars:[
+      {icon:"security", t:"Security", d:"Layered controls protecting the service and your data.", href:"#security"},
+      {icon:"compliance", t:"Compliance", d:"Frameworks and regulations we work to.", href:"https://www.jiffy.ai/compliance/"},
+      {icon:"privacy", t:"Privacy", d:"Minimal collection, clear retention, published notice.", href:"#privacy"},
+      {icon:"reliability", t:"Reliability", d:"Resilient delivery with tested backups and rollback.", href:"#reliability"}
+    ],
+    ledger:[
+      {name:"SOC 2", scope:"Security (Common Criteria) only", status:"align", label:"Report under NDA", date:"Reviewed annually", doc:"SOC 2 report"},
+      {name:"GDPR / UK GDPR", scope:"Territorial scope assessed annually; GDPR-grade rights extended to everyone", status:"align", label:"Standards applied by policy", date:"Assessed September 2026"},
+      {name:"ISO/IEC 27001", scope:"Information security controls", status:"align", label:"Control set aligned", date:"Reviewed annually", doc:"ISO/IEC 27001 control mapping"},
+      {name:"HIPAA", scope:"Engagements involving protected health information", status:"align", label:"Business associate where engaged", date:"BAA on request", doc:"Business associate agreement"},
+      {name:"Security program", scope:"Policies & controls", status:"ok", label:"Operating", date:"Reviewed annually"},
+      {name:"NIST AI RMF 1.0", scope:"AI governance", status:"align", label:"Aligned", date:"Reviewed annually"},
+      {name:"ISO/IEC 42001", scope:"AI management system", status:"align", label:"Aligned", date:"Reviewed annually"}
+    ],
+    practicesIntro:"Summaries of the control areas that are not published in full. Each is drawn from a policy in our library; those source documents are Internal and available under NDA on request. Where a policy is published in full, it is linked from Document requests rather than summarised here.",
+    practices:[
+      {t:"Governance & policy", d:"The security overview at policies/security-overview.html summarises every control on one page. Behind it sits a complete security policy library with matching implementation plans, owned by the security lead and approved by executive leadership. Every policy carries a document ID, version, effective date and annual review date. Five are published in full on this page, alongside a security overview; the rest are summarised below and released under NDA."},
+      {t:"Access control", d:"Access is denied by default and granted on least privilege to a named individual identity; shared logins are not used. Approval precedes the grant and the record shows who asked, who approved, and what was granted. New joiners get a defined baseline for their role rather than a copy of a colleague\u2019s access, which is how privilege accumulates unnoticed. Authentication runs through Google Workspace SSO. Privileged access is approved separately and held apart from day-to-day accounts; break-glass credentials sit behind hardware MFA, raise an alert on use, and are recorded with a reason. Non-human identities \u2014 service accounts, automations, agents \u2014 are inventoried with a named human owner and reviewed alongside people. Production and non-production are separated at the cloud account boundary. Access is revoked within one business day of departure and immediately where the departure is involuntary."},
+      {t:"Access to client environments", d:"Any access we hold inside a client environment exists only under the engagement agreement, is limited to the authorised scope, and is surrendered when the engagement ends. We treat standing access to a client estate as our single largest insider risk, so it is reviewed monthly rather than waiting for the quarterly cycle."},
+      {t:"Access reviews", d:"Access within the audit boundary is reviewed on a fixed quarterly cadence, with removals actioned and the action recorded. Non-human identities and client-environment access are included in the same review rather than handled separately. A review that identifies removals and does not complete them is worse evidence than no review at all, because it shows we knew."},
+      {t:"Change management", d:"Every in-scope change goes through a pull request that records what is changing and why; the pull request is the change record and no separate register is kept. Approval precedes implementation and comes from someone other than the author, enforced by branch protection so it cannot be skipped by accident. Production is reachable only through the pipeline \u2014 a manual console change is an emergency change by definition, recorded the same day and approved after the fact by a second person. Security impact is assessed inside the review rather than at a separate gate. The full deployment population is exportable and reviewed every six months for changes with no approver, self-approved changes, and deployments with no matching record."},
+      {t:"Secure development", d:"Security requirements are considered at design rather than retrofitted; for anything handling client information or granting access that means a recorded conversation about how it could be misused. Static analysis and dependency scanning run on every change, and secrets are scanned on commit. Test and development environments hold no real client information \u2014 realistic data is synthetic or masked. Prompts, tool definitions and retrieval configuration are treated as code: held in the repository, reviewed, and changed through the same path. Internet-facing surfaces are tested before first exposure and again when the attack surface changes materially. Independent penetration tests are commissioned when a client agreement requires one or the service has changed enough to warrant it, not on a calendar to produce a certificate."},
+      {t:"Cryptography", d:"TLS 1.2 minimum and 1.3 preferred, restricted to forward-secret authenticated cipher suites, with plain HTTP redirected. Confidential and Restricted information is encrypted at rest with AES-256 or equivalent, and cloud storage, databases, backups and snapshots have encryption enabled by default at account level so a resource created without thought is still encrypted. Secrets live in a managed secrets service or the password manager and are retrieved at runtime \u2014 never in source, committed environment files, tickets, chat or logs. Keys are managed by the platform key service with rotation enabled; we do not run our own key infrastructure and do not implement our own cryptography. A deprecated or broken algorithm is treated as a significant change and remediated on a timescale set by exposure rather than convenience."},
+      {t:"Logging & monitoring", d:"Four platforms carry almost everything that matters: AWS CloudTrail management events across every account and region plus data events for buckets holding client information, Google Workspace admin, login and OAuth grant logs, GitHub organisation and repository audit logs, and application activity from our own code. Logs are retained at least thirteen months with the most recent ninety days available for immediate query \u2014 thirteen so a twelve-month observation period is covered with margin. Log storage is separated from the accounts that generate it, with object lock or equivalent, so compromising a workload does not erase the record of it. Alert dispositions for production are reviewed monthly, and a month with no alerts is recorded as such."},
+      {t:"AI and agent activity", d:"Each agent runs under its own identity rather than a person\u2019s credentials, so its actions are attributable in the same logs as anyone else\u2019s. Agent activity is logged with enough context to reconstruct what happened: the triggering input, the tools invoked, the parameters used, the actions taken and the outcome. Prompts, tool definitions, retrieval configuration, guardrails and model versions move through the same approval path as code, and those changes are logged \u2014 what the model was and what it was told are part of reconstructing what it did. The AI Statement covers this in full; the AI Governance Policy behind it is available under NDA.", href:"policies/ai-statement.html"},
+      {t:"Vendor management", d:"Subprocessors are risk-tiered, reviewed before onboarding against SOC 2 or equivalent, and re-reviewed annually. The subprocessor list is released under NDA, and customers are notified before a new one begins processing. The full policy is published; see Document requests."},
+      {t:"Incident response & continuity", d:"A documented incident response plan with customer-notification commitments, annual exercises, and encrypted versioned backups with periodic restore tests. Both the Incident Response and Business Continuity policies are published in full; see Document requests."}
+    ],
+    dataIntro:"What the service holds, where it lives, and how long it is kept.",
+    data:[
+      ["Customer program data","Content customers place in the service, stored in access-controlled, encrypted infrastructure. Customers control what they upload and can export or delete it."],
+      ["Account & contact data","Names, work emails, and authentication data needed to operate accounts. Never sold or shared for advertising."],
+      ["Retention & deletion","Customer data is retained while the account is active and deleted within 30 days of a verified deletion request or contract end, backups included on their cycle."],
+      ["Data subject requests","Access, correction, and deletion requests are honored within 30 days via the privacy contact below."]
+    ],
+    reliabilityIntro:"Availability commitments and how the service recovers when things fail.",
+    reliability:[
+      ["Availability","The service is designed for high availability on redundant cloud infrastructure; material incidents are communicated to affected customers."],
+      ["Backups","Encrypted, versioned backups held separately from the workloads they protect, with annual restore tests. Recovery objectives are set in the Business Continuity and Disaster Recovery Policy; how long data is kept is set in the Data Retention and Disposal Policy."],
+      ["Change safety","Releases are staged, reviewed, and reversible; a rollback path exists for every production change."],
+      ["Incident communication","Customers are notified of incidents affecting their data without undue delay, with a post-incident summary on request."]
+    ],
+    subs:[
+      ["Amazon Web Services, Inc.","Platform hosting, compute and storage","US","SOC 2 / ISO 27001; DPA in place"],
+      ["Google LLC (Google Workspace)","Email, documents, storage, identity provider","US","SOC 2 / ISO 27001; DPA in place"],
+      ["GitHub, Inc.","Source control and build","US","SOC 2; private repos, MFA enforced"],
+      ["Cloudflare, Inc.","DNS, delivery, access gateway","Global edge","SOC 2 / ISO 27001; TLS enforced"],
+      ["Anthropic, PBC","AI-assisted features","US","SOC 2; enterprise terms exclude customer inputs from training"],
+      ["Amazon SES","Transactional email delivery","US","Covered by the AWS DPA \u2014 confirm before publishing"],
+      ["Wix.com Ltd.","Marketing site and authoritative DNS","US / Global","No customer personal data \u2014 confirm whether in scope"]
+    ],
+    advisories:[],
+    cvdRecordIntro:"Every report accepted through our Coordinated Vulnerability Disclosure Policy is recorded here once it is remediated and the coordination window has closed \u2014 what was reported, how it was scored, when it was fixed, and who reported it. We publish the record whether or not a finding was ours to be proud of, because a disclosure page that only ever shows good news tells a reviewer nothing.",
+    cvdRecord:[],
+    secTxtDomain:"jiffy.ai",
+    trustEmail:"security@jiffy.ai",
+    securityEmail:"security@jiffy.ai",
+    docs:[
+      {n:"Privacy Notice", s:"External notice \u00b7 collection, use, rights", gate:"Public", href:"policies/privacy-notice.html", grp:"policy"},
+      {n:"Privacy Policy", s:"Privacy position, protection and disclosure", gate:"Public", href:"policies/privacy-policy.html", grp:"policy"},
+      {n:"Cookie Policy", s:"Strictly necessary cookies only", gate:"Public", href:"policies/cookie-policy.html", grp:"policy"},
+      {n:"Coordinated Vulnerability Disclosure Policy", s:"Scope, safe harbour, timelines", gate:"Public", href:"policies/vulnerability-disclosure.html", grp:"policy"},
+      {n:"AI Statement", s:"How Generative AI is used, governed and monitored", gate:"Public", href:"policies/ai-statement.html", grp:"policy"},
+      {n:"AI Governance Policy", s:"Tool approval, model providers, agents, pre-ship checks", gate:"NDA", grp:"policy"},
+      {n:"Information Security Policy", s:"The governing policy for the programme", gate:"NDA", grp:"policy"},
+      {n:"Access Control Policy", s:"Least privilege, MFA, access reviews, joiners and leavers", gate:"NDA", grp:"policy"},
+      {n:"Encryption Policy", s:"Algorithms, key handling, transit and rest", gate:"NDA", grp:"policy"},
+      {n:"Logging and Monitoring Policy", s:"What is logged, retained and alerted on", gate:"NDA", grp:"policy"},
+      {n:"Change Management Policy", s:"Review, approval and release of change", gate:"NDA", grp:"policy"},
+      {n:"Secure SDLC Policy", s:"Design, review, testing and release", gate:"NDA", grp:"policy"},
+      {n:"Vulnerability and Patch Management Policy", s:"Scanning, severity, patch windows", gate:"NDA", grp:"policy"},
+      {n:"Incident Response Policy", s:"Detection, escalation, customer notification", gate:"NDA", grp:"policy"},
+      {n:"Business Continuity and Disaster Recovery Policy", s:"Backup, recovery objectives, restore testing", gate:"NDA", grp:"policy"},
+      {n:"Vendor Management Policy", s:"Subprocessor review and re-review", gate:"NDA", grp:"policy"},
+      {n:"Data Retention and Disposal Policy", s:"Retention periods, legal hold and destruction", gate:"NDA", grp:"policy"},
+      {n:"Data Classification Policy", s:"How data is labelled, handled and distributed", gate:"NDA", grp:"policy"},
+      {n:"Acceptable Use Policy", s:"Permitted use of Company systems by personnel", gate:"NDA", grp:"policy"},
+      {n:"Security overview", s:"Control summary and document availability", gate:"Public", href:"policies/security-overview.html", grp:"assurance"},
+      {n:"Subprocessor list", s:"Current subprocessors, purpose and region", gate:"NDA", grp:"assurance"},
+      {n:"Data Processing Addendum", s:"Processor terms for customers who require them", gate:"NDA", grp:"assurance"},
+      {n:"SOC 2 report", s:"Available under NDA on request", gate:"NDA", grp:"assurance"},
+      {n:"ISO/IEC 27001 control mapping", s:"Controls mapped to the Annex A set", gate:"NDA", grp:"assurance"},
+      {n:"Business associate agreement", s:"For engagements involving protected health information", gate:"NDA", grp:"assurance"},
+      {n:"Penetration test summary", s:"Most recent executive summary", gate:"NDA", grp:"assurance"},
+    ],
+    faq:[
+      {q:"Where is customer data stored?", a:"In access-controlled, encrypted cloud infrastructure on AWS. Data is encrypted in transit using TLS 1.2 or better and at rest using AES-256. The security overview, published on this Trust Center, describes the control set; region detail for a specific engagement is confirmed in the engagement agreement."},
+      {q:"Do you use customer data to train AI models?", a:"No. Customer data is never used to train or fine-tune any model, our own or a provider's. Where a commercial AI service is used in delivery, it runs under business or enterprise terms that exclude submissions from provider training. This is stated in the AI Statement, published here, and in the AI Governance Policy, available under NDA."},
+      {q:"Which AI providers do you use, and are they subprocessors?", a:"Any model provider that processes customer content in delivery is a subprocessor and appears on the subprocessor list, which is released under NDA on request. Customers are notified before a new subprocessor begins processing their data, on the terms of the engagement agreement."},
+      {q:"Do your agents take actions autonomously?", a:"No decision producing legal or similarly significant effects is made about an individual by automated means alone. A named person is accountable for any output acted upon. Agent behaviour, tool access and pre-ship checks are governed by the AI Governance Policy, available under NDA, and summarised in the published AI Statement."},
+      {q:"How do we delete our data?", a:"Request deletion through your account contact or the security desk. Deletion completes within 30 days. Backups are overwritten on their own cycle, so a deleted record may persist in a backup for a short period afterwards; it is not restored to active use."},
+      {q:"Do you use cookies or track visitors?", a:"We set strictly necessary cookies only , session, CSRF and load balancing. No analytics, no advertising or retargeting pixels, no session replay, no cross-site tracking and no fingerprinting. Because nothing we set requires consent, there is no cookie banner. Every cookie we set is named in the Cookie Policy."},
+      {q:"Do you sell or share personal data?", a:"No. We do not sell personal data and do not share it for cross-context behavioral advertising as US state privacy law defines those terms. Personal data is disclosed only to service providers acting on our documented instructions under written contract."},
+      {q:"Are you a controller or a processor?", a:"Both, in different contexts. For our own personnel and for visitors to this site we are the controller. For data we handle while delivering services to a customer, the customer is the controller and we are the processor , we act only on documented instructions and use the data for no purpose of our own."},
+      {q:"Does GDPR apply to you? Do you have an EU representative?", a:"Two separate things. Whether the Regulation applies to us is a legal question: we have assessed that the Article 3 tests are not currently met , no EU or UK establishment, no targeting of either market, no behavioural tracking , so no Article 27 representative is appointed today. Separately, and as a matter of policy, we extend GDPR-grade rights to everyone regardless of where they are, and we use Standard Contractual Clauses where data moves. The assessment is documented, reviewed annually, and reopened before any EU or UK expansion rather than after it. If your engagement changes the analysis, tell us and we will reassess and appoint a representative before processing begins."},
+      {q:"Do you sign a DPA?", a:"Processor terms are available for customers who require them. Request the Data Processing Addendum through the document request form on this page."},
+      {q:"How would we be told about a breach?", a:"Personal data breaches are handled as incidents under the Incident Response Policy, which sets a notification matrix governing who is told and by when. Where we act as a processor, we notify the controller without undue delay. Where a breach is likely to result in a high risk to an individual's rights, affected people are told directly."},
+      {q:"How is access to systems controlled?", a:"Access is denied by default and granted on least privilege to a named individual identity; shared logins are not used. Authentication runs through Google Workspace SSO with multi-factor authentication enforced. Privileged access is approved separately, break-glass credentials sit behind hardware MFA and alert on use, and access is revoked within one business day of departure."},
+      {q:"How often is access reviewed?", a:"Quarterly on a fixed cadence, with removals actioned and recorded. Non-human identities , service accounts, automations, agents , are inventoried with a named human owner and reviewed alongside people. Standing access inside a client environment is reviewed monthly rather than quarterly."},
+      {q:"What encryption do you use?", a:"TLS 1.2 or better in transit and AES-256 at rest. Restricted information is not transmitted over unencrypted channels. The Encryption Policy sets the standard and is available under NDA."},
+      {q:"Do you run penetration tests?", a:"The most recent executive summary is available under NDA. Request it through the document request form."},
+      {q:"How do you handle vulnerabilities?", a:"Internally found issues are tracked and remediated under the Vulnerability and Patch Management Policy. Externally reported issues follow our published Coordinated Vulnerability Disclosure Policy, which sets safe harbour for good-faith research and remediation timelines by severity."},
+      {q:"How do I report a vulnerability?", a:"Email the security desk. A person responds within two business days, and safe harbour applies from the moment good-faith research begins. Machine-readable contact details are published at /.well-known/security.txt. The full policy is published on this Trust Center."},
+      {q:"Are you SOC 2 certified?", a:"The security program is aligned to the SOC 2 Trust Services Criteria for Security. Alignment to a framework is not certification, and we state the current status plainly in the compliance ledger on this page rather than implying more. The report will be available under NDA once issued."},
+      {q:"Are you ISO 27001 or ISO 42001 certified?", a:"No. Controls are mapped to the ISO/IEC 27001 Annex A set and that mapping is available under NDA, but Jiffy is not certified to either standard and does not claim to be."},
+      {q:"Is the Privacy category in scope for your SOC 2?", a:"No. That is a recorded scoping decision, not an oversight , it sits in the risk register with a review date and is revisited when a customer agreement requires the category, or when we begin acting as a controller for material volumes of personal data."},
+      {q:"Which documents can I read without an NDA?", a:"Six are published in full: the Privacy Notice, Privacy Policy, Cookie Policy, Coordinated Vulnerability Disclosure Policy, AI Statement and the Security Overview. Everything else is listed by title in Document requests and released under a non-disclosure agreement."},
+      {q:"Why are some policies only available under NDA?", a:"Classification and distribution are recorded as two separate fields. Documents that describe operational specifics , patch windows, logging retention, recovery objectives , are classified Internal and released under NDA rather than published, so the detail reaches customers who need it without becoming a public map. The scheme is defined in the Data Classification Policy."},
+      {q:"How current are these documents?", a:"Every document carries an owner, a version, an effective date and an annual review date in its header, plus a change history. Policies are reviewed annually or on material change."},
+      {q:"Who do we contact?", a:"One address handles everything: security questions, document requests, vulnerability reports and privacy requests. A person replies within two business days."},
+    ],
+    contacts:[
+      ["Security, trust desk and privacy","security@jiffy.ai","PGP key in security.txt \u00b7 responses within 2 business days \u00b7 privacy requests honored within 30 days"]
+    ]
+  },
+};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const viewKey = "ph";
+const CFG_VERSION = 3;
+/* Keys whose shape changed in v2. A config saved before then would silently
+   override the shipped copy , that is how documents lost their group and the
+   ledger lost its rows. Stale copies are backed up, not merged. */
+const CFG_STALE_KEYS = ["docs","ledger","pillars","regs","frameworksIntro","subs"];
+
+function getConfig(k){
+  try {
+    const raw = localStorage.getItem("tc.cfg." + k);
+    if (raw) {
+      const saved = JSON.parse(raw);
+      if (saved.cfgVersion !== CFG_VERSION) {
+        try { localStorage.setItem("tc.cfg." + k + ".v1bak", raw); } catch(e){}
+        CFG_STALE_KEYS.forEach(key => { delete saved[key]; });
+        saved.cfgVersion = CFG_VERSION;
+        try { localStorage.setItem("tc.cfg." + k, JSON.stringify(saved)); } catch(e){}
+      }
+      return Object.assign({}, DEFAULTS[k], saved);
+    }
+  } catch(e){}
+  return DEFAULTS[k];
+}
+function saveConfig(k, cfg){ try { cfg.cfgVersion = CFG_VERSION; localStorage.setItem("tc.cfg." + k, JSON.stringify(cfg)); } catch(e){} }
+
+/* Compact synchronous SHA-256 */
+function sha256(ascii){
+  function rr(v,a){return (v>>>a)|(v<<(32-a));}
+  var mF=Math.pow,mC=mF(2,32),j,r='',words=[],aLen=ascii.length*8;
+  var h=sha256.h=sha256.h||[],k=sha256.k=sha256.k||[],pC=k.length,iH={};
+  for(var c=2;pC<64;c++){if(!iH[c]){for(j=0;j<313;j+=c)iH[j]=c;h[pC]=(mF(c,.5)*mC)|0;k[pC++]=(mF(c,1/3)*mC)|0;}}
+  ascii+='\x80';while(ascii.length%64-56)ascii+='\x00';
+  for(j=0;j<ascii.length;j++){var cc=ascii.charCodeAt(j);if(cc>>8)return'';words[j>>2]|=cc<<((3-j)%4)*8;}
+  words[words.length]=(aLen/mC)|0;words[words.length]=aLen;
+  for(j=0;j<words.length;){var w=words.slice(j,j+=16),oH=h.slice(0,8);
+    for(var i=0;i<64;i++){var w15=w[i-15],w2=w[i-2];
+      var a=h[0],e=h[4];
+      var t1=h[7]+(rr(e,6)^rr(e,11)^rr(e,25))+((e&h[5])^(~e&h[6]))+k[i]+(w[i]=(i<16)?w[i]:(w[i-16]+(rr(w15,7)^rr(w15,18)^(w15>>>3))+w[i-7]+(rr(w2,17)^rr(w2,19)^(w2>>>10)))|0);
+      var t2=(rr(a,2)^rr(a,13)^rr(a,22))+((a&h[1])^(a&h[2])^(h[1]&h[2]));
+      h=[(t1+t2)|0].concat(h);h[4]=(h[4]+t1)|0;}
+    for(i=0;i<8;i++)h[i]=(h[i]+oH[i])|0;}
+  for(i=0;i<8;i++)for(j=3;j+1;j--){var b=(h[i]>>(j*8))&255;r+=((b<16)?0:'')+b.toString(16);}
+  return r;
+}
+
+const SEAL = (status) => {
+  const colors = {ok:"#5e8f78", progress:"#b0803f", align:"#7d8cae", plan:"#9d8d92"};
+  const c = colors[status] || "#b05a63";
+  const glyph = status === "progress"
+    ? `<circle cx="19" cy="19" r="6.2" fill="none" stroke="${c}" stroke-width="2"/><line x1="19" y1="19" x2="19" y2="14.6" stroke="${c}" stroke-width="2" stroke-linecap="round"/><line x1="19" y1="19" x2="22" y2="20.8" stroke="${c}" stroke-width="2" stroke-linecap="round"/>`
+    : (status === "align" || status === "plan")
+    ? `<line x1="13.5" y1="19" x2="24.5" y2="19" stroke="${c}" stroke-width="2.4" stroke-linecap="round"/><line x1="13.5" y1="14.5" x2="24.5" y2="14.5" stroke="${c}" stroke-width="2.4" stroke-linecap="round" opacity=".45"/><line x1="13.5" y1="23.5" x2="24.5" y2="23.5" stroke="${c}" stroke-width="2.4" stroke-linecap="round" opacity=".45"/>`
+    : `<path d="M13 19.5 L17.2 23.5 L25 14.5" fill="none" stroke="${c}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;
+  return `<svg width="38" height="38" viewBox="0 0 38 38" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><circle cx="19" cy="19" r="17" fill="none" stroke="${c}" stroke-width="1.4" stroke-dasharray="2.6 3.1"/><circle cx="19" cy="19" r="12.5" fill="none" stroke="${c}" stroke-width="1.6"/>${glyph}</svg>`;
+};
+
+/* ---------- Header menus ---------- */
+function closeMenus(except){
+  document.querySelectorAll(".menu").forEach(m => {
+    if (m !== except){
+      m.querySelector(":scope > button").setAttribute("aria-expanded","false");
+      m.querySelector(".menu-list").classList.remove("open");
+    }
+  });
+}
+document.querySelectorAll(".menu > button").forEach(btn => {
+  btn.addEventListener("click", e => {
+    e.stopPropagation();
+    const menu = btn.parentElement, list = menu.querySelector(".menu-list");
+    const willOpen = !list.classList.contains("open");
+    closeMenus(menu);
+    list.classList.toggle("open", willOpen);
+    btn.setAttribute("aria-expanded", String(willOpen));
+  });
+});
+document.addEventListener("click", () => closeMenus());
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeMenus(); });
+document.querySelectorAll("[data-setview]").forEach(b =>
+  b.addEventListener("click", () => { closeMenus(); setView(b.dataset.setview); }));
+
+function buildSectionsMenu(){
+  const std = [
+    ["#overview","Overview"],["https://www.jiffy.ai/compliance/","Compliance"],["#security","Security"],["#privacy","Privacy"],
+    ["#reliability","Reliability"],["#subprocessors","Subprocessors"],["#advisories","Advisories & CVEs"],["#cvd-record","Disclosure record"],["#disclosure","Responsible disclosure"],
+    ["#documents","Document requests"],["#faq","FAQ"],["#contact","Contact"]
+  ];
+  const items = std;
+  $("sectionsMenu").innerHTML = items.map(i => `<a role="menuitem" href="${i[0]}">${esc(i[1])}</a>`).join("");
+  $("sectionsMenu").querySelectorAll("a").forEach(a => a.addEventListener("click", () => {
+    closeMenus();
+    const href = a.getAttribute("href") || "";
+    if (!href.startsWith("#")) return;
+    const target = document.querySelector(href);
+    if (target && target.tagName === "DETAILS") target.open = true;
+  }));
+}
+
+/* ---------- Render ---------- */
+function renderBrand(){
+  const b = getConfig(viewKey);
+  $("brandLockup").innerHTML = LOGOS[viewKey] +
+    `<div class="brand-text"><span class="brand-name">${esc(b.name)}</span><span class="brand-sub">${esc(b.sub)}</span></div>`;
+  bindText("heroTitle", b.heroTitle, "heroTitle");
+  bindText("heroLede", b.heroLede, "heroLede");
+  $("heroMeta").innerHTML = b.heroMeta || "";
+  $("ledgerStamp").textContent = "Updated " + LAST_UPDATED;
+  $("pillars").innerHTML = (b.pillars||[]).map((p,i) =>
+    `<a class="pillar" href="${esc(p.href)}"><div class="p-ico">${PILLAR_ICONS[p.icon]||""}</div><h3 data-path="pillars.${i}.t">${esc(p.t)}</h3><p data-path="pillars.${i}.d">${esc(p.d)}</p></a>`).join("");
+  $("ledgerGrid").innerHTML = b.ledger.map((l,i) =>
+    `<div class="seal-cell" data-item="ledger.${i}">${SEAL(l.status)}<div style="min-width:0">
+      <div class="seal-name" data-path="ledger.${i}.name">${esc(l.name)}</div>
+      <div class="seal-scope" data-path="ledger.${i}.scope">${esc(l.scope)}</div>
+      <span class="seal-status st-${l.status}" data-path="ledger.${i}.label">${esc(l.label)}</span>
+      <button class="cyc" data-cycle="ledger.${i}.status" title="Cycle status">${esc(l.status)}</button>
+      <div class="seal-date" data-path="ledger.${i}.date">${esc(l.date)}</div>${l.doc?`<button class="seal-link seal-req" data-doc="${esc(l.doc)}">Request under NDA &rarr;</button>`:""}</div>${delBtn("ledger",i)}</div>`).join("")
+    + addBtn("ledger","compliance item");
+  bindText("practicesIntro", b.practicesIntro, "practicesIntro");
+  $("practiceGrid").innerHTML = b.practices.map((p,i) =>
+    `<details class="practice" data-item="practices.${i}"><summary><h3><span class="dot"></span><span data-path="practices.${i}.t">${esc(p.t)}</span></h3><span class="prac-chev" aria-hidden="true">&#9662;</span></summary><div class="prac-body"><p data-path="practices.${i}.d">${esc(p.d)}</p>${p.href?`<a class="prac-link" href="${esc(p.href)}">Read the full policy &rarr;</a>`:""}${delBtn("practices",i)}</div></details>`).join("")
+    + addBtn("practices","practice","practice-add");
+  bindText("dataIntro", b.dataIntro, "dataIntro");
+  $("dataTable").innerHTML = b.data.map((r,i) => `<tr data-item="data.${i}"><td data-path="data.${i}.0">${esc(r[0])}</td><td data-path="data.${i}.1">${esc(r[1])}${delBtn("data",i)}</td></tr>`).join("")
+    + rowAdd("data", 2);
+  bindText("reliabilityIntro", b.reliabilityIntro || "", "reliabilityIntro");
+  $("reliabilityTable").innerHTML = (b.reliability||[]).map((r,i) => `<tr data-item="reliability.${i}"><td data-path="reliability.${i}.0">${esc(r[0])}</td><td data-path="reliability.${i}.1">${esc(r[1])}${delBtn("reliability",i)}</td></tr>`).join("")
+    + rowAdd("reliability", 2);
+  /* security.txt
+     - Policy URL derived from where this page sits and from the CVD link this
+       page itself uses, so the two cannot disagree.
+     - Expires computed 12 months ahead rather than hard-coded. */
+  const secHost = esc(b.secTxtDomain);
+  const cvdLink = document.querySelector('a[href*="vulnerability-disclosure"]');
+  const cvdRel = cvdLink ? cvdLink.getAttribute("href") : "policies/vulnerability-disclosure.html";
+  let cvdAbs;
+  try {
+    cvdAbs = (location.protocol === "http:" || location.protocol === "https:")
+      ? new URL(cvdRel, location.href).href
+      : "https://" + secHost + "/trustcenter/" + cvdRel;
+  } catch (e) { cvdAbs = "https://" + secHost + "/trustcenter/" + cvdRel; }
+  const secExp = new Date(Date.now() + 365 * 864e5).toISOString().replace(/\.\d+Z$/, "Z");
+  $("secTxt").innerHTML =
+    `# https://${secHost}/.well-known/security.txt<br>` +
+    `Contact: mailto:${esc(b.securityEmail || "security@jiffy.ai")}<br>` +
+    `Expires: ${secExp}<br>` +
+    `Preferred-Languages: en<br>` +
+    `Policy: ${esc(cvdAbs)}<br>` +
+    `Canonical: https://${secHost}/.well-known/security.txt`;
+  const docRow = (d,i) =>
+    `<div class="doc-row" data-item="docs.${i}"><div class="doc-name"><span data-path="docs.${i}.n">${esc(d.n)}</span><span class="sub" data-path="docs.${i}.s">${esc(d.s)}</span></div>
+     <span class="gate ${d.gate==="Public"?"open":""}">${d.gate==="Public"?(d.href?"Read online":"Available on request"):"Under NDA"}</span>
+     <button class="cyc" data-cycle="docs.${i}.gate" title="Toggle access">${esc(d.gate)}</button>
+     ${d.href?`<a class="btn ghost" href="${esc(d.href)}">Read</a>`:`<button class="btn ghost" data-doc="${esc(d.n)}">Request</button>`}${delBtn("docs",i)}</div>`;
+  const ASSURANCE_DOCS = new Set(["Security overview","Data Processing Addendum",
+    "SOC 2 report","ISO/IEC 27001 control mapping","Business associate agreement",
+    "Penetration test summary"]);
+  const groupOf = (d) => d.grp || (ASSURANCE_DOCS.has(d.n) ? "assurance" : "policy");
+  const docsByGroup = (g) => b.docs.map((d,i) => [d,i]).filter(([d]) => groupOf(d) === g);
+  const pol = docsByGroup("policy"), asr = docsByGroup("assurance");
+  $("docListPolicy").innerHTML = pol.map(([d,i]) => docRow(d,i)).join("") + addBtn("docs","document");
+  $("docListAssurance").innerHTML = asr.map(([d,i]) => docRow(d,i)).join("");
+  $("docCountPolicy").textContent = pol.length;
+  $("docCountAssurance").textContent = asr.length;
+  $("reqDoc").innerHTML = b.docs.map(d => `<option>${esc(d.n)}</option>`).join("");
+  $("faqList").innerHTML = b.faq.map((f,i) =>
+    `<details class="faq" data-item="faq.${i}"><summary><span data-path="faq.${i}.q">${esc(f.q)}</span>${delBtn("faq",i)}</summary><div class="a" data-path="faq.${i}.a">${esc(f.a)}</div></details>`).join("")
+    + addBtn("faq","question");
+  $("contactTable").innerHTML = b.contacts.map((c,i) =>
+    `<tr data-item="contacts.${i}"><td style="width:260px" data-path="contacts.${i}.0">${esc(c[0])}</td><td><a href="mailto:${esc(c[1])}" data-path="contacts.${i}.1">${esc(c[1])}</a><span class="sub" data-path="contacts.${i}.2">${esc(c[2])}</span>${delBtn("contacts",i)}</td></tr>`).join("")
+    + rowAdd("contacts", 3);
+  bindText("cvdRecordIntro", b.cvdRecordIntro, "cvdRecordIntro");
+  $("cvdList").innerHTML = (((b.cvdRecord)||[]).length
+    ? `<div class="tbl"><table aria-label="Coordinated disclosure record"><thead><tr><th style="width:130px">Reference</th><th>Finding</th><th style="width:110px">Severity</th><th style="width:150px">Resolved</th></tr></thead><tbody>`
+      + b.cvdRecord.map((c,i) =>
+        `<tr data-item="cvdRecord.${i}"><td><span data-path="cvdRecord.${i}.ref">${esc(c.ref||"")}</span><span class="sub" data-path="cvdRecord.${i}.reported">${esc(c.reported||"")}</span></td>
+         <td><span data-path="cvdRecord.${i}.title">${esc(c.title||"")}</span><span class="sub" data-path="cvdRecord.${i}.credit">${esc(c.credit||"")}</span></td>
+         <td><span class="sev s-${(c.severity||"").toLowerCase()}" data-path="cvdRecord.${i}.severity">${esc(c.severity||"")}</span></td>
+         <td><span data-path="cvdRecord.${i}.resolved">${esc(c.resolved||"")}</span>${delBtn("cvdRecord",i)}</td></tr>`).join("")
+      + `</tbody></table></div>`
+    : `<div class="empty-note">No coordinated disclosures have been published yet. This table will be updated as reports are received, remediated and released , an empty record here means no report has completed the process, not that reports are unwelcome. See the <a href="policies/vulnerability-disclosure.html">Coordinated Vulnerability Disclosure Policy</a> for scope, safe harbour and our response commitments.</div>`)
+    + addBtn("cvdRecord","disclosure");
+  $("advList").innerHTML = ((b.advisories||[]).length
+    ? `<div class="tbl"><table aria-label="Security advisories"><thead><tr><th style="width:150px">Identifier</th><th>Summary</th><th style="width:110px">Severity</th><th style="width:150px">Status</th></tr></thead><tbody>`
+      + b.advisories.map((a,i) =>
+        `<tr data-item="advisories.${i}"><td><span data-path="advisories.${i}.id">${esc(a.id)}</span><span class="sub" data-path="advisories.${i}.date">${esc(a.date||"")}</span></td>
+         <td><span data-path="advisories.${i}.title">${esc(a.title)}</span><span class="sub" data-path="advisories.${i}.detail">${esc(a.detail||"")}</span></td>
+         <td><span class="sev s-${(a.severity||"").toLowerCase()}" data-path="advisories.${i}.severity">${esc(a.severity||"")}</span></td>
+         <td><span data-path="advisories.${i}.status">${esc(a.status||"")}</span>${delBtn("advisories",i)}</td></tr>`).join("")
+      + `</tbody></table></div>`
+    : `<div class="empty-note">No advisories are currently published for this product. Vulnerabilities reported through the disclosure process are published here once remediated.</div>`)
+    + addBtn("advisories","advisory");
+  $("footBrand").textContent = `© ${new Date().getFullYear()} ${b.name} · Trust Center`;
+  $("footLogo").innerHTML = LOGOS[viewKey];
+  $("footTag").textContent = (b.heroLede.split(". ")[0] || b.name) + ".";
+  $("footContacts").innerHTML = b.contacts.map(c => `<a href="mailto:${esc(c[1])}">${esc(c[0])}</a>`).join("");
+  document.title = `Trust Center , ${b.name}`;
+  renderOutbox(); renderVbox();
+}
+
+function render(){
+  const theme = getConfig(viewKey);
+  document.documentElement.style.setProperty("--accent", theme.accent);
+  document.documentElement.style.setProperty("--accent-tint", theme.accentTint);
+  document.documentElement.style.setProperty("--accent-deep", theme.accentDeep || theme.accent);
+  $("footStamp").textContent = `Page version ${LAST_UPDATED} · Served statically; requests logged locally only`;
+  buildSectionsMenu();
+  renderBrand();
+  if (adminOpen) buildAdmin();
+  if (editing) document.querySelectorAll("[data-path]").forEach(el => {
+    el.setAttribute("contenteditable","true"); el.setAttribute("spellcheck","false");
+  });
+}
+$("footTop").addEventListener("click", e => { e.preventDefault(); window.scrollTo({top:0,behavior:"smooth"}); });
+$("ctaReport").addEventListener("click", () => {
+  const p = $("disclosure"); if (p) p.open = true;
+  setTimeout(() => { const f = $("vdpForm"); if (f) f.scrollIntoView({behavior:"smooth", block:"start"}); }, 60);
+});
+
+/* ===== Inline editing engine ===== */
+let editing = false;
+function pathParts(p){ return p.split(".").map(k => /^\d+$/.test(k) ? Number(k) : k); }
+function getByPath(o,p){ return pathParts(p).reduce((a,k) => (a==null?a:a[k]), o); }
+function setByPath(o,p,v){
+  const ks = pathParts(p), last = ks.pop();
+  let cur = o; ks.forEach(k => { cur = cur[k]; });
+  cur[last] = v;
+}
+function cloneCfg(){ return JSON.parse(JSON.stringify(getConfig(viewKey))); }
+function commit(cfg){ saveConfig(viewKey, cfg); render(); }
+function bindText(id, value, path){
+  const el = $(id);
+  el.textContent = value;
+  el.setAttribute("data-path", path);
+}
+const delBtn = (list,i) => `<button class="delbtn" data-del="${list}.${i}" title="Delete">×</button>`;
+const addBtn = (list,label,cls) => `<button class="rowbtn ${cls||""}" data-add="${list}">+ Add ${label}</button>`;
+const rowAdd = (list,cols) => `<tr class="addrow"><td colspan="${cols}"><button class="rowbtn" data-add="${list}">+ Add row</button></td></tr>`;
+
+const BLANKS = {
+  ledger:{name:"New item",scope:"Scope",status:"plan",label:"Planned",date:"Date",doc:""},
+  practices:{t:"Practice",d:"Describe the control."},
+  docs:{n:"Document",s:"Description",gate:"NDA",grp:"policy"},
+  faq:{q:"New question?",a:"Answer."},
+  pillars:{icon:"security",t:"Pillar",d:"Short blurb.",href:"#security"},
+  cvdRecord:{ref:"JF-CVD-0000",title:"Summary of the finding",severity:"Medium",resolved:"",reported:"",credit:"Reported by \u2014"},
+  advisories:{id:"CVE-0000-0000",title:"Summary",severity:"Medium",status:"Under investigation",date:"",detail:"Assessment and remediation status."},
+  data:["Category","Handling"],
+  reliability:["Area","Commitment"],
+  subs:["Vendor","Purpose","Region","Safeguards"],
+  contacts:["Channel","security@jiffy.ai","Note"]
+};
+const CYCLES = { status:["ok","progress","align","plan"], gate:["NDA","Public"] };
+
+function setEditing(on){
+  editing = on;
+  document.body.classList.toggle("editing", on);
+  $("editSite").textContent = getConfig(viewKey).name;
+  document.querySelectorAll("[data-path]").forEach(el => {
+    if (on){ el.setAttribute("contenteditable","true"); el.setAttribute("spellcheck","false"); }
+    else el.removeAttribute("contenteditable");
+  });
+  if (on) toast("Inline editing on , changes save as you click away");
+}
+document.addEventListener("focusout", e => {
+  const el = e.target.closest && e.target.closest("[data-path]");
+  if (!el || !editing) return;
+  const path = el.getAttribute("data-path");
+  const val = el.textContent.trim();
+  if (val === String(getByPath(getConfig(viewKey), path) ?? "")) return;
+  const cfg = cloneCfg();
+  setByPath(cfg, path, val);
+  saveConfig(viewKey, cfg);
+  render();
+  setEditing(true);
+  toast("Saved");
+});
+document.addEventListener("keydown", e => {
+  if (!editing) return;
+  const el = e.target.closest && e.target.closest("[data-path]");
+  if (el && e.key === "Enter" && !e.shiftKey && el.tagName !== "P" && el.tagName !== "TD"){ e.preventDefault(); el.blur(); }
+  if (e.key === "Escape" && editing) setEditing(false);
+});
+document.addEventListener("click", e => {
+  if (!editing) return;
+  const cyc = e.target.closest("[data-cycle]");
+  if (cyc){
+    e.preventDefault(); e.stopPropagation();
+    const p = cyc.getAttribute("data-cycle"), key = p.split(".").pop();
+    const opts = CYCLES[key] || [];
+    const cfg = cloneCfg();
+    const cur = getByPath(cfg, p);
+    setByPath(cfg, p, opts[(opts.indexOf(cur)+1) % opts.length]);
+    commit(cfg); setEditing(true); return;
+  }
+  const del = e.target.closest("[data-del]");
+  if (del){
+    e.preventDefault(); e.stopPropagation();
+    const [list, idx] = del.getAttribute("data-del").split(".");
+    const cfg = cloneCfg();
+    cfg[list].splice(Number(idx), 1);
+    commit(cfg); setEditing(true); toast("Removed"); return;
+  }
+  const add = e.target.closest("[data-add]");
+  if (add){
+    e.preventDefault(); e.stopPropagation();
+    const list = add.getAttribute("data-add");
+    const cfg = cloneCfg();
+    if (!Array.isArray(cfg[list])) cfg[list] = [];
+    cfg[list].push(JSON.parse(JSON.stringify(BLANKS[list])));
+    commit(cfg); setEditing(true); toast("Added , click the new text to edit"); return;
+  }
+}, true);
+$("editDone").addEventListener("click", () => { setEditing(false); toast("Inline editing off"); });
+
+/* Any in-page link expands its target panel before scrolling */
+document.addEventListener("click", e => {
+  const a = e.target.closest('a[href^="#"]');
+  if (!a) return;
+  const t = document.querySelector(a.getAttribute("href"));
+  if (t && t.tagName === "DETAILS") t.open = true;
+});
+
+/* Toast */
+let toastTimer;
+function toast(msg){
+  const t = $("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+/* Copy security.txt */
+$("copySecTxt").addEventListener("click", () => {
+  const text = $("secTxt").innerText;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => toast("security.txt copied"), () => toast("Copy failed , select the text manually"));
+  } else { toast("Copy not available , select the text manually"); }
+});
+
+/* Document requests */
+document.addEventListener("click", e => {
+  const btn = e.target.closest("[data-doc]");
+  if (!btn) return;
+  const grp = document.querySelector(`[data-doc="${CSS.escape(btn.dataset.doc)}"]`);
+  const owner = grp && grp.closest("details.doc-group");
+  if (owner) owner.open = true;
+  const form = document.querySelector(".req-form");
+  const panel = form && form.closest("details");
+  if (panel) panel.open = true;
+  $("reqDoc").value = btn.dataset.doc;
+  $("reqName").focus();
+  if (form) form.scrollIntoView({behavior:"smooth", block:"center"});
+});
+function loadBox(key){ try { return JSON.parse(localStorage.getItem(key) || "[]"); } catch(e){ return []; } }
+function renderOutbox(){
+  const items = loadBox("tc.outbox").filter(i => i.brand === viewKey);
+  $("outboxEmpty").style.display = items.length ? "none" : "block";
+  $("outboxList").innerHTML = items.slice(-8).reverse().map(i =>
+    `<div class="outbox-item"><span class="when">${esc(i.when)}</span><span>${esc(i.doc)} , ${esc(i.company || "no company given")}</span></div>`).join("");
+}
+$("reqSend").addEventListener("click", () => {
+  const b = getConfig(viewKey);
+  const name = $("reqName").value.trim(), company = $("reqCompany").value.trim(),
+        email = $("reqEmail").value.trim(), doc = $("reqDoc").value, note = $("reqNote").value.trim();
+  if (!name || !email) { toast("Name and work email are needed to compose the request"); return; }
+  const subject = encodeURIComponent(`[${b.name} Trust Center] Document request: ${doc}`);
+  const body = encodeURIComponent(`Document requested: ${doc}\nRequester: ${name}\nCompany: ${company || ","}\nWork email: ${email}\n\nContext:\n${note || ","}\n\n(Composed from the ${b.name} Trust Center, ${LAST_UPDATED})`);
+  const box = loadBox("tc.outbox");
+  box.push({brand: viewKey, when: new Date().toISOString().slice(0,16).replace("T"," "), doc, company});
+  try { localStorage.setItem("tc.outbox", JSON.stringify(box)); } catch(e){}
+  renderOutbox();
+  window.location.href = `mailto:${b.trustEmail || "security@jiffy.ai"}?subject=${subject}&body=${body}`;
+  toast("Request drafted in your mail client and logged locally");
+});
+
+/* Vulnerability reports */
+function vdpRef(){
+  const d = new Date();
+  const ymd = d.toISOString().slice(0,10).replace(/-/g,"");
+  const rand = Math.random().toString(36).slice(2,6).toUpperCase();
+  return `VDP-${ymd}-${rand}`;
+}
+function renderVbox(){
+  const items = loadBox("tc.vulnbox").filter(i => i.brand === viewKey);
+  $("vboxEmpty").style.display = items.length ? "none" : "block";
+  $("vboxList").innerHTML = items.slice(-8).reverse().map(i =>
+    `<div class="outbox-item"><span class="when">${esc(i.when)}</span><span>${esc(i.ref)} · ${esc(i.sev)} · ${esc(i.asset || "asset not given")}</span></div>`).join("");
+}
+$("vSend").addEventListener("click", () => {
+  const b = getConfig(viewKey);
+  const name = $("vName").value.trim(), email = $("vEmail").value.trim(),
+        asset = $("vAsset").value.trim(), sev = $("vSev").value, desc = $("vDesc").value.trim();
+  if (!desc) { toast("Please describe what you found so the team can triage it"); return; }
+  const ref = vdpRef();
+  const subject = encodeURIComponent(`[${b.name} VDP] ${ref} , ${sev}: ${asset || "vulnerability report"}`);
+  const body = encodeURIComponent(
+    `Tracking reference: ${ref}\nProduct: ${b.name}\nReporter: ${name || "Anonymous"}\nContact: ${email || ","}\nAffected asset: ${asset || ","}\nReporter severity estimate: ${sev}\n\nReport:\n${desc}\n\n, Submitted via the ${b.name} Trust Center (${LAST_UPDATED}). Good-faith research is covered by the safe harbor stated on that page.`);
+  const box = loadBox("tc.vulnbox");
+  box.push({brand: viewKey, when: new Date().toISOString().slice(0,16).replace("T"," "), ref, sev, asset});
+  try { localStorage.setItem("tc.vulnbox", JSON.stringify(box)); } catch(e){}
+  renderVbox();
+  window.location.href = `mailto:${b.securityEmail || "security@jiffy.ai"}?subject=${subject}&body=${body}`;
+  toast(`Report ${ref} drafted in your mail client`);
+});
+
+/* ---------- Admin (#admin) ---------- */
+let adminOpen = false;
+function adminHash(){ try { return localStorage.getItem("tc.adminhash") || ADMIN_HASH; } catch(e){ return ADMIN_HASH; } }
+function isAdmin(){ try { return sessionStorage.getItem("tc.admin") === "1"; } catch(e){ return false; } }
+function requestAdmin(){
+  if (viewKey === "bp") setView("ph");
+  if (isAdmin()) { openAdmin(); return; }
+  $("gateErr").style.display = "none";
+  $("gatePass").value = "";
+  $("gateOverlay").classList.add("show");
+  $("gatePass").focus();
+}
+function tryUnlock(){
+  if (sha256($("gatePass").value) === adminHash()){
+    try { sessionStorage.setItem("tc.admin","1"); } catch(e){}
+    $("gateOverlay").classList.remove("show");
+    openAdmin();
+  } else { $("gateErr").style.display = "block"; }
+}
+$("gateGo").addEventListener("click", tryUnlock);
+$("gatePass").addEventListener("keydown", e => { if (e.key === "Enter") tryUnlock(); });
+$("gateCancel").addEventListener("click", () => {
+  $("gateOverlay").classList.remove("show");
+  if (location.hash === "#admin") history.replaceState(null,"",location.pathname + location.search);
+});
+function openAdmin(){
+  adminOpen = true;
+  document.body.classList.add("admin");
+  buildAdmin();
+  $("adminDrawer").classList.add("open");
+}
+function closeAdmin(){
+  adminOpen = false;
+  document.body.classList.remove("admin");
+  $("adminDrawer").classList.remove("open");
+  if (location.hash === "#admin") history.replaceState(null,"",location.pathname + location.search);
+}
+$("adminClose").addEventListener("click", closeAdmin);
+$("admInline").addEventListener("click", () => { setEditing(!editing); if (editing) closeAdmin(); });
+$("adminLink").addEventListener("click", () => { if (adminOpen) closeAdmin(); else requestAdmin(); });
+document.querySelectorAll("[data-admsite]").forEach(btn => btn.addEventListener("click", () => {
+  if (viewKey !== btn.dataset.admsite) setView(btn.dataset.admsite);
+}));
+window.addEventListener("hashchange", () => { if (location.hash === "#admin") requestAdmin(); });
+if (location.hash === "#admin") setTimeout(requestAdmin, 50);
+
+/* Per-section Edit buttons (visible when admin) */
+document.addEventListener("click", e => {
+  const btn = e.target.closest(".adm-edit");
+  if (!btn) return;
+  e.preventDefault(); e.stopPropagation();
+  if (!isAdmin()){ requestAdmin(); return; }
+  if (!editing) setEditing(true);
+  const panel = btn.closest("details.panel");
+  if (panel){ panel.open = true; panel.scrollIntoView({behavior:"smooth", block:"start"}); }
+  if (!adminOpen) openAdmin();
+  const key = btn.dataset.edit;
+  const target = key === "__fields" ? document.querySelector("details.adm[data-adm='__fields']")
+                                    : document.querySelector(`details.adm[data-adm='${key}']`);
+  document.querySelectorAll("details.adm").forEach(d => d.open = false);
+  if (target){ target.open = true; target.scrollIntoView({behavior:"smooth", block:"start"}); }
+});
+
+const ADMIN_FIELDS = [
+  {key:"name", label:"Site / product name", type:"input"},
+  {key:"heroTitle", label:"Hero title", type:"input"},
+  {key:"heroLede", label:"Hero paragraph", type:"textarea", rows:4},
+  {key:"heroMeta", label:"Hero meta line (optional, HTML allowed; leave blank to hide)", type:"textarea", rows:2},
+  {key:"accent", label:"Accent color (hex)", type:"input"},
+  {key:"accentTint", label:"Accent tint (hex)", type:"input"},
+  {key:"accentDeep", label:"Accent deep (banner gradient end, hex)", type:"input"},
+  {key:"secTxtDomain", label:"security.txt domain", type:"input"},
+  {key:"trustEmail", label:"Trust desk email (document requests)", type:"input"},
+  {key:"securityEmail", label:"Security email (vulnerability reports)", type:"input"}
+];
+const ADMIN_JSON = [
+  {key:"pillars", label:"Trust pillars", hint:'[{"icon":"security|compliance|privacy|reliability","t":"Title","d":"Blurb","href":"#security"}]'},
+  {key:"ledger", label:"Compliance ledger", hint:'[{"name":"SOC 2","scope":"...","status":"ok|progress|align|plan","label":"...","date":"..."}]'},
+  {key:"practices", label:"Security practices", hint:'[{"t":"Title","d":"Description"}]'},
+  {key:"data", label:"Data & privacy rows", hint:'[["Category","Handling"], ...]'},
+  {key:"reliability", label:"Reliability rows", hint:'[["Area","Commitment"], ...]'},
+  {key:"subs", label:"Subprocessors", hint:'[["Vendor","Purpose","Region","Safeguards"], ...]'},
+  {key:"docs", label:"Documents", hint:'[{"n":"Name","s":"Subtitle","gate":"NDA|Public"}]'},
+  {key:"faq", label:"FAQ", hint:'[{"q":"Question","a":"Answer"}]'},
+  {key:"contacts", label:"Contacts", hint:'[["Channel","email","Note"], ...]'},
+  {key:"cvdRecordIntro", label:"Disclosure record intro", type:"textarea"},
+  {key:"cvdRecord", label:"Coordinated disclosure record", hint:'[{"ref":"JF-CVD-0001","title":"...","severity":"High","resolved":"2026-09-01","reported":"2026-08-01","credit":"Reported by ..."}]'},
+  {key:"advisories", label:"Security advisories / CVEs", hint:'[{"id":"CVE-2026-0001","title":"...","severity":"Critical|High|Medium|Low","status":"Fixed in 2.1","date":"2026-07-01","detail":"..."}]'},
+  {key:"intros", label:"Section intros", multi:["practicesIntro","dataIntro","reliabilityIntro"], hint:'{"practicesIntro":"...","dataIntro":"...","reliabilityIntro":"..."}'}
+];
+function buildAdmin(){
+  const cfg = getConfig(viewKey);
+  $("adminSiteTag").textContent = cfg.name;
+  $("admSitePH")?.classList.toggle("on", viewKey === "ph");
+  $("admSiteJF")?.classList.toggle("on", viewKey === "jf");
+  let html = `<details class="adm" data-adm="__fields" open><summary>Site settings</summary><div class="adm-body">`;
+  ADMIN_FIELDS.forEach(f => {
+    const v = cfg[f.key] || "";
+    html += `<div class="adm-field"><label for="af_${f.key}">${esc(f.label)}</label>` +
+      (f.type === "textarea"
+        ? `<textarea id="af_${f.key}" style="min-height:${(f.rows||3)*24}px">${esc(v)}</textarea>`
+        : `<input id="af_${f.key}" value="${esc(v)}">`) + `</div>`;
+  });
+  html += `<div class="adm-apply"><button class="btn" id="applyFields">Apply site settings</button><span class="adm-msg" id="msg_fields"></span></div></div></details>`;
+  ADMIN_JSON.forEach(sec => {
+    let value;
+    if (sec.multi){ value = {}; sec.multi.forEach(k => value[k] = cfg[k] || ""); }
+    else value = cfg[sec.key];
+    html += `<details class="adm" data-adm="${sec.key}"><summary>${esc(sec.label)}</summary><div class="adm-body">
+      <div class="adm-field"><label for="aj_${sec.key}">JSON</label>
+      <textarea id="aj_${sec.key}">${esc(JSON.stringify(value, null, 2))}</textarea></div>
+      <div class="adm-hint">Shape: ${esc(sec.hint)}</div>
+      <div class="adm-apply"><button class="btn" data-applyjson="${sec.key}">Apply</button><span class="adm-msg" id="msg_${sec.key}"></span></div>
+    </div></details>`;
+  });
+  $("adminSections").innerHTML = html;
+  $("applyFields").addEventListener("click", () => {
+    const cfg2 = Object.assign({}, getConfig(viewKey));
+    ADMIN_FIELDS.forEach(f => { cfg2[f.key] = $("af_" + f.key).value; });
+    saveConfig(viewKey, cfg2);
+    render();
+    const m = $("msg_fields"); m.textContent = "Saved"; m.className = "adm-msg ok";
+  });
+  document.querySelectorAll("[data-applyjson]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const key = btn.dataset.applyjson;
+      const sec = ADMIN_JSON.find(s => s.key === key);
+      const m = $("msg_" + key);
+      try {
+        const parsed = JSON.parse($("aj_" + key).value);
+        const cfg2 = Object.assign({}, getConfig(viewKey));
+        if (sec.multi){ sec.multi.forEach(k => { if (parsed[k] !== undefined) cfg2[k] = parsed[k]; }); }
+        else cfg2[key] = parsed;
+        saveConfig(viewKey, cfg2);
+        render();
+        m.textContent = "Saved"; m.className = "adm-msg ok";
+      } catch(err){ m.textContent = "Invalid JSON: " + err.message; m.className = "adm-msg err"; }
+    });
+  });
+}
+$("admExport").addEventListener("click", () => {
+  const out = { ph: getConfig("ph"), exported: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(out, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "trust-center-config.json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast("Config exported");
+});
+$("admImport").addEventListener("click", () => {
+  const raw = prompt("Paste the exported config JSON:");
+  if (!raw) return;
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed.ph) saveConfig("ph", Object.assign({}, DEFAULTS.ph, parsed.ph));
+    if (parsed.jf) saveConfig("jf", Object.assign({}, DEFAULTS.jf, parsed.jf));
+    render(); buildAdmin();
+    toast("Config imported");
+  } catch(err){ toast("Import failed: invalid JSON"); }
+});
+$("admPass").addEventListener("click", () => {
+  const np = prompt("New admin passphrase (applies to this browser):");
+  if (!np) return;
+  try { localStorage.setItem("tc.adminhash", sha256(np)); toast("Passphrase updated on this browser"); } catch(e){}
+});
+$("admReset").addEventListener("click", () => {
+  if (!confirm(`Reset ${getConfig(viewKey).name} to shipped defaults on this browser?`)) return;
+  try { localStorage.removeItem("tc.cfg." + viewKey); } catch(e){}
+  render(); buildAdmin();
+  toast("Site reset to defaults");
+});
+
+render();
+</script>
+</body>
+</html>
