@@ -1,0 +1,33 @@
+{
+  "schema": 4,
+  "published": "2026-09-09",
+  "notes": "Third-party vulnerabilities and incidents elsewhere in the AI and agent supply chain, with PromptHalo's impact assessment. An entry here does not mean PromptHalo was breached. Edit this file in the repository and commit; the Trust Center reads it on the next page load. Plain text only, it is escaped on render. url must be http(s) or it is dropped, and it opens in a new tab. order must be First-order, Second-order, Third-order or Ecosystem; any other value renders no badge. impact renders green when it begins with 'No'. Every entry is a published claim, so state customer impact only where you can evidence it. Records may also carry affected, fixedIn, patched, cvss and remediation, plus a fields array of {label, value} pairs for anything else.",
+  "orderMeaning": {
+    "First-order": "The issue is in PromptHalo's own code, service or configuration.",
+    "Second-order": "The issue is in a component, library or vendor PromptHalo uses directly.",
+    "Third-order": "The issue reaches PromptHalo through one of our vendors' own suppliers.",
+    "Ecosystem": "No dependency path to PromptHalo. Listed because customers ask about it."
+  },
+  "incidentsIntro": "Vulnerabilities and incidents elsewhere in the AI and agent supply chain that a customer might reasonably ask us about, with our assessment of whether they affected this service. Each entry states why it is listed and how far it sits from us: first-order means the issue is in PromptHalo code or service, second-order means it is in a component or vendor we use directly, third-order means it reaches us through one of our vendors' own suppliers, and ecosystem means there is no dependency path to us at all. An entry here does not mean PromptHalo was breached. Incidents affecting PromptHalo itself are reported to affected customers directly under the Incident Response Policy, and are recorded here once resolved.",
+  "incidents": [
+    {
+      "id": "MCP SDK command injection",
+      "source": "Disclosed by OX Security",
+      "title": "Command injection in the STDIO transport of the official Model Context Protocol SDKs",
+      "date": "2026-04",
+      "order": "Second-order",
+      "why": "Listed because it is second-order: the defect is in the official Model Context Protocol SDKs, which PromptHalo uses directly as a dependency in Litmus and Septa. It is not a defect in PromptHalo code, but the component sits inside our build, so it is ours to inventory, patch and account for.",
+      "impact": "No customer impact",
+      "url": "https://www.ox.security/blog/the-mother-of-all-ai-supply-chains/",
+      "detail": "Researchers reported that the STDIO transport in the official MCP SDKs for Python, TypeScript, Java and Rust passed configuration parameters to the host shell without sanitisation, with a large number of exposed instances estimated across the wider ecosystem. PromptHalo inventoried every MCP integration in Litmus and Septa, pinned and updated the affected SDK versions, and confirmed that the STDIO transport is not reachable from untrusted input in our deployment. No customer environment, customer data or credential was affected and no customer action is required.",
+      "affected": "MCP SDKs for Python, TypeScript, Java and Rust (STDIO transport)",
+      "remediation": "No customer action required. SDK versions were pinned and updated in our build.",
+      "fields": [
+        {
+          "label": "Verified by",
+          "value": "Dependency inventory across Litmus and Septa"
+        }
+      ]
+    }
+  ]
+}

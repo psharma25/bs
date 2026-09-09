@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trust Center , PromptHalo</title>
+<meta name="description" content="Security, compliance, privacy, and reliability for PromptHalo.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; form-action 'none'; script-src 'self' 'sha256-bWzWWzZq2hU9VL2yVP03NMKAvulx2NRonIi6sXZTObE='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'none'; upgrade-insecure-requests">
+<script>
+/* Clickjacking guard. A CSP delivered in a meta tag cannot enforce
+   frame-ancestors, so this is the in-page backstop. The authoritative control
+   is the frame-ancestors and X-Frame-Options headers in _headers. */
+try {
+  if (window.top !== window.self){
+    document.documentElement.style.display = "none";
+    window.top.location = window.self.location.href;
+  }
+} catch(e){
+  document.documentElement.style.display = "none";
+}
+</script>
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="robots" content="index, follow">
+<link rel="stylesheet" href="assets/trustcenter.css?v=a7ac1595">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand-lockup" id="brandLockup" aria-live="polite"></div>
+    <nav class="nav" aria-label="Main">
+      <div class="search" id="siteSearch">
+        <svg class="search-ico" width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.7"/><path d="M13.2 13.2 L17 17" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <input type="search" id="searchInput" placeholder="Search advisories, incidents, policies&hellip;" aria-label="Search the Trust Center" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="searchResults">
+        <div class="search-results" id="searchResults" role="listbox" aria-label="Search results"></div>
+      </div>
+      <div class="menu" id="menuSections">
+        <button aria-haspopup="true" aria-expanded="false">Sections <span class="car">▾</span></button>
+        <div class="menu-list" role="menu" id="sectionsMenu"></div>
+      </div>
+      <a class="navlink" href="policies/security-overview.html">Security Overview</a>
+      <a class="navlink" href="#documents">Documents &amp; Policies</a>
+      <a class="navlink" href="#faq">FAQ</a>
+      <a class="cta" href="#disclosure" id="ctaReport">Report a vulnerability</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- ============ STANDARD SITE VIEW ============ -->
+  <div id="stdView">
+    <section class="hero hero-frame" id="overview">
+      <div class="hero-inner">
+      <div class="hero-eyebrow">Trust Center</div>
+      <h1 id="heroTitle"></h1>
+      <p class="lede" id="heroLede"></p>
+      <div class="hero-meta" id="heroMeta"></div>
+      <div class="hero-ctas">
+        <a class="bbtn o" href="#documents">Request documents</a>
+        <a class="bbtn o" href="#disclosure">Report a vulnerability</a>
+      </div>
+      </div>
+    </section>
+
+    <div class="hero-below">
+      <div class="pillars" id="pillars"></div>
+      <div class="maturity-note">
+      <b>AI and agentic threats continue to evolve.</b> PromptHalo continuously reviews <strong>vendors, vulnerabilities and emerging risks</strong>, and monitors <strong>agent behavior against defined permissions and intended use</strong>. This Trust Center is updated as our controls evolve.
+      </div>
+      <div class="ledger" aria-label="Compliance ledger">
+        <div class="ledger-head"><h2>Compliance ledger</h2><span id="ledgerStamp"></span></div>
+        <div class="ledger-grid" id="ledgerGrid"></div>
+      </div>
+      <p class="hero-note">Statuses reflect the current program state. Alignment to a framework is not certification. Evidence is available under NDA , see Document requests.</p>
+    </div>
+
+    <div class="sep"><span>TRUST DETAIL</span></div>
+
+    <details class="panel" id="security" open>
+      <summary>
+        <div class="p-head"><div class="kicker">Security</div><h2>Security practices</h2></div>
+        <button class="adm-edit" data-edit="practices">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro" id="practicesIntro"></p>
+        <div class="card-grid" id="practiceGrid"></div>
+      </div>
+    </details>
+
+    <div class="sep"><span>DISCLOSURE</span></div>
+
+    <details class="panel" id="advisories">
+      <summary>
+        <div class="p-head"><div class="kicker">Advisories</div><h2>Security advisories &amp; CVEs</h2></div>
+        <button class="adm-edit" data-edit="advisories">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro">Advisories affecting this product, plus our assessment of relevant third-party CVEs and external guidance. Ask the assistant about a specific CVE to have it check both this list and current public sources.</p>
+        <div id="advList"></div>
+      </div>
+    </details>
+
+    <details class="panel" id="incidents">
+      <summary>
+        <div class="p-head"><div class="kicker">Ecosystem</div><h2>Security incidents</h2></div>
+        <button class="adm-edit" data-edit="incidents">Edit</button>
+        <span class="chev" aria-hidden="true">&#9662;</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro" id="incidentsIntro"></p>
+        <div id="incList"></div>
+      </div>
+    </details>
+
+    <details class="panel" id="cvd-record">
+      <summary>
+        <div class="p-head"><div class="kicker">Disclosure record</div><h2>Coordinated disclosure record</h2></div>
+        <button class="adm-edit" data-edit="cvdRecord">Edit</button>
+        <span class="chev" aria-hidden="true">&#9662;</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro" id="cvdRecordIntro"></p>
+        <div id="cvdList"></div>
+      </div>
+    </details>
+
+    <details class="panel flagged" id="disclosure" open>
+      <summary>
+        <div class="p-head"><div class="kicker">Coordinated vulnerability disclosure</div><h2>Responsible disclosure<span class="panel-flag">Open to researchers</span></h2></div>
+        <button class="adm-edit" data-edit="__fields">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro">Good-faith security research is welcome. Reports are acknowledged within 2 business days, triaged and severity-scored, remediated on severity-based timelines (critical 7 days, high 30, medium 60, low 90), and disclosed in coordination with the reporter within 90 days by default. The full terms , scope, safe harbour, and what we commit to at each stage , are in the <a href="policies/vulnerability-disclosure.html"><strong>Coordinated Vulnerability Disclosure Policy</strong></a>.</p>
+        <div class="safeharbor">
+          <strong>Safe harbor.</strong> Research conducted in good faith and within this policy will not be met with legal action. Do not access, modify, or exfiltrate data beyond what is required to demonstrate the issue; stop and report immediately if personal data is encountered.
+        </div>
+
+        <div class="vdp-head" id="vdpForm"><h3>Report a vulnerability</h3><span class="pill">Safe harbor applies</span></div>
+        <p class="intro" style="margin-top:6px">Submit a report below , it composes a structured email to the security team with a tracking reference, and nothing is transmitted from this page itself.</p>
+        <div class="form-card">
+          <div class="req-form">
+            <div class="field"><label for="vName">Your name <span style="font-weight:400;color:var(--ink-faint)">(optional , anonymous reports accepted)</span></label><input id="vName" autocomplete="name"></div>
+            <div class="field"><label for="vEmail">Contact email <span style="font-weight:400;color:var(--ink-faint)">(for coordination)</span></label><input id="vEmail" type="email" autocomplete="email"></div>
+            <div class="field"><label for="vAsset">Affected asset / URL</label><input id="vAsset" placeholder="e.g., app.example.com/login"></div>
+            <div class="field"><label for="vSev">Your severity estimate</label>
+              <select id="vSev"><option>Critical</option><option>High</option><option selected>Medium</option><option>Low</option><option>Informational</option></select>
+            </div>
+            <div class="field full"><label for="vDesc">What you found &amp; how to reproduce it</label><textarea id="vDesc" placeholder="Steps to reproduce, impact, and any proof-of-concept detail. Please do not include others' personal data."></textarea></div>
+            <div class="form-foot">
+              <button class="btn" id="vSend">Compose vulnerability report</button>
+              <span class="form-note">Opens your mail client with a tracking reference. Response within 2 business days.</span>
+            </div>
+          </div>
+          <div>
+            <div class="outbox-empty" id="vboxEmpty">No reports logged on this device yet.</div>
+            <div id="vboxList"></div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <div class="sep"><span>DATA &amp; OPERATIONS</span></div>
+
+    <details class="panel" id="privacy">
+      <summary>
+        <div class="p-head"><div class="kicker">Privacy</div><h2>Data &amp; privacy</h2></div>
+        <button class="adm-edit" data-edit="data">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro" id="dataIntro"></p>
+        <div class="doc-refs" id="dataDocs"></div>
+        <div class="tbl"><table aria-label="Data handling summary">
+          <thead><tr><th style="width:220px">Category</th><th>Handling</th></tr></thead>
+          <tbody id="dataTable"></tbody>
+        </table></div>
+      </div>
+    </details>
+
+    <details class="panel" id="reliability">
+      <summary>
+        <div class="p-head"><div class="kicker">Reliability</div><h2>Availability &amp; resilience</h2></div>
+        <button class="adm-edit" data-edit="reliability">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro" id="reliabilityIntro"></p>
+        <div class="doc-refs" id="reliabilityDocs"></div>
+        <div class="tbl"><table aria-label="Reliability summary">
+          <thead><tr><th style="width:220px">Area</th><th>Commitment</th></tr></thead>
+          <tbody id="reliabilityTable"></tbody>
+        </table></div>
+      </div>
+    </details>
+
+    <details class="panel" id="subprocessors">
+      <summary>
+        <div class="p-head"><div class="kicker">Third parties</div><h2>Subprocessors</h2></div>
+        <button class="adm-edit" data-edit="subs">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro">Vendors that may process data in delivering the service. Each is reviewed before onboarding and annually.</p>
+        <p class="intro">The current list, with purpose, region and safeguards, is released under a non-disclosure agreement. Customers are given notice before a new subprocessor begins processing their data, as their agreement requires.</p>
+        <p class="intro"><a class="status-link" href="mailto:security@prompthalo.ai?subject=Document%20request%3A%20Subprocessor%20list">Request the subprocessor list &rarr;</a></p>
+      </div>
+    </details>
+
+    <details class="panel" id="documents">
+      <summary>
+        <div class="p-head"><div class="kicker">Evidence</div><h2>Documents &amp; Policies</h2></div>
+        <button class="adm-edit" data-edit="docs">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <p class="intro">Public documents open directly. Private policies and assurance materials are available under NDA on request. Requests generate a pre-filled email and are logged locally in your browser only.</p>
+        <details class="doc-group" id="docGroupPolicy" open><summary><span class="dg-title">Policies</span><span class="dg-count" id="docCountPolicy"></span><span class="dg-chev" aria-hidden="true">&#9662;</span></summary><div class="doc-list" id="docListPolicy"></div></details><details class="doc-group" id="docGroupAssurance" open><summary><span class="dg-title">Assurance</span><span class="dg-count" id="docCountAssurance"></span><span class="dg-chev" aria-hidden="true">&#9662;</span></summary><div class="doc-list" id="docListAssurance"></div></details>
+        <div class="form-card">
+          <div class="req-form">
+            <div class="field"><label for="reqName">Your name</label><input id="reqName" autocomplete="name"></div>
+            <div class="field"><label for="reqCompany">Company</label><input id="reqCompany" autocomplete="organization"></div>
+            <div class="field"><label for="reqEmail">Work email</label><input id="reqEmail" type="email" autocomplete="email"></div>
+            <div class="field"><label for="reqDoc">Document</label><select id="reqDoc"></select></div>
+            <div class="field full"><label for="reqNote">Context (optional)</label><textarea id="reqNote" placeholder="e.g., vendor security review"></textarea></div>
+            <div class="form-foot">
+              <button class="btn" id="reqSend">Compose request email</button>
+              <span class="form-note">Opens your mail client. Nothing is transmitted from this page.</span>
+            </div>
+          </div>
+          <div>
+            <div class="outbox-empty" id="outboxEmpty">No requests logged on this device yet.</div>
+            <div id="outboxList"></div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <div class="sep"><span>REFERENCE</span></div>
+
+    <details class="panel" id="faq">
+      <summary>
+        <div class="p-head"><div class="kicker">Common questions</div><h2>FAQ</h2></div>
+        <button class="adm-edit" data-edit="faq">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body"><div class="faq-wrap" id="faqList"></div></div>
+    </details>
+
+    <details class="panel" id="contact">
+      <summary>
+        <div class="p-head"><div class="kicker">Reach the trust desk</div><h2>Contact</h2></div>
+        <button class="adm-edit" data-edit="contacts">Edit</button>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel-body">
+        <div class="tbl"><table aria-label="Contact channels"><tbody id="contactTable"></tbody></table></div>
+        <p class="intro" style="font-size:12px;color:var(--ink-faint);font-family:var(--mono)">For active incidents affecting your data, use the security contact and include "INCIDENT" in the subject line.</p>
+      </div>
+    </details>
+  </div>
+
+</main>
+
+<footer>
+  <div class="foot-cols">
+    <div class="fc fc-brand">
+      <div class="fc-logo" id="footLogo"></div>
+      <p id="footTag"></p>
+    </div>
+    <div class="fc fc-links">
+      <h4>Trust</h4>
+      <a href="https://www.prompthalo.ai/compliance/" target="_blank" rel="noopener noreferrer">Compliance</a>
+      <a href="#security">Security practices</a>
+      <a href="#privacy">Data &amp; privacy</a>
+      <a href="policies/privacy-notice.html">Privacy Notice</a>
+      <a href="policies/cookie-policy.html">Cookie Policy</a>
+      <a href="#reliability">Reliability</a>
+    </div>
+    <div class="fc fc-links">
+      <h4>Resources</h4>
+      <a href="#documents">Documents &amp; Policies</a>
+      <a href="#subprocessors">Subprocessors</a>
+      <a href="#advisories">Advisories &amp; CVEs</a>
+      <a href="#incidents">Security incidents</a>
+      <a href="#cvd-record">Disclosure record</a>
+      <a href="#disclosure">Responsible disclosure</a>
+      <a href="policies/vulnerability-disclosure.html">CVD policy</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="fc fc-links">
+      <h4>Contact</h4>
+      <div id="footContacts"></div>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <p id="footBrand"></p>
+    <p id="footStamp"></p>
+    <span class="fb-sp"></span>
+    <a href="#overview" id="footTop">Back to top</a>
+    <button class="admin-link" id="adminLink" title="Admin sign in">Admin</button>
+  </div>
+</footer>
+
+<!-- Admin gate -->
+<div class="gate-overlay" id="gateOverlay" role="dialog" aria-modal="true" aria-label="Admin sign in">
+  <div class="gate-modal">
+    <h2>Admin access</h2>
+    <p>Enter the admin passphrase to edit this site's content.</p>
+    <input type="password" id="gatePass" placeholder="Passphrase" autocomplete="off">
+    <div class="gate-err" id="gateErr">Incorrect passphrase.</div>
+    <div class="row">
+      <button class="btn ghost" id="gateCancel">Cancel</button>
+      <button class="btn" id="gateGo">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin drawer -->
+<aside class="admin-drawer" id="adminDrawer" aria-label="Admin editor">
+  <div class="admin-head">
+    <h2>Admin</h2><span class="site-tag" id="adminSiteTag"></span>
+    <button class="btn ghost" id="adminClose">Close</button>
+  </div>
+  <div class="admin-body">
+    <div class="admin-note"><b>This gate is a convenience lock, not a security boundary.</b> It runs in your browser, so anyone reading the page source can bypass it. Everything edited here is saved to this browser only and is never published.
+
+<b>To publish advisories, CVEs and disclosure records</b>, edit the relevant file in <code>trustcenter/prompthalo/</code> (<code>advisories.json</code>, <code>incidents.json</code> or <code>disclosure-record.json</code>) and commit. The Trust Center reads that file on every page load, so a published CVE appears without redeploying this page. Use the <b>Export</b> buttons below to generate that file from what you see here.
+
+For everything else, use <b>Export config</b> and replace the DEFAULTS block in <code>assets/trustcenter.js</code>.</div>
+    <div id="adminSections"></div>
+    <div class="admin-global">
+      <button class="btn" id="admInline">Edit page inline</button>
+      <button class="btn" id="admFeedAdv">Export advisories.json</button>
+      <button class="btn" id="admFeedInc">Export incidents.json</button>
+      <button class="btn" id="admFeedCvd">Export disclosure-record.json</button>
+      <button class="btn" id="admExport">Export config</button>
+      <button class="btn ghost" id="admImport">Import config</button>
+      <button class="btn ghost" id="admPass">Change passphrase</button>
+      <button class="btn danger" id="admReset">Reset this site</button>
+    </div>
+    <div class="adm-hint">Import expects the JSON produced by Export. Reset restores this site's shipped defaults on this browser. Passphrase changes apply to this browser; to change the shipped default, update ADMIN_HASH in the file.</div>
+  </div>
+</aside>
+
+<div class="edit-bar" id="editBar">
+  <span>Inline editing <b id="editSite"></b> , click any text to change it</span>
+  <button id="editDone" class="pri">Done</button>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/trustcenter.js?v=93fe53f9" defer></script>
+</body>
+</html>

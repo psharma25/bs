@@ -1,0 +1,7 @@
+{
+  "schema": 4,
+  "published": "2026-09-09",
+  "notes": "Coordinated disclosure record: reports accepted under the Coordinated Vulnerability Disclosure Policy, published once remediated and the coordination window has closed. Edit this file in the repository and commit; the Trust Center reads it on the next page load. Plain text only, it is escaped on render. severity must be Critical, High, Medium, Low or Informational. Publish a researcher's name in credit only with their consent.",
+  "cvdRecordIntro": "Every report accepted through our Coordinated Vulnerability Disclosure Policy is recorded here once it is remediated and the coordination window has closed: what was reported, how it was scored, when it was fixed, and who reported it. We publish the record whether or not a finding was ours to be proud of, because a disclosure page that only ever shows good news tells a reviewer nothing.",
+  "cvdRecord": []
+}
