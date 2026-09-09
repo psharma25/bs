@@ -1,0 +1,13 @@
+#	Task	Instructions	SOC 2	SOC 2 source	Owner	Helper	Collaborators	Start	Days late	Due by	Status	Priority	Effort	Open issues	Notes	Last updated	Changes logged
+1					Prv						Not started	Medium	Medium	0		2026-09-09 19:53	1
+2	AWS hardening				Praveen Sharma						Not started	High	Medium	0		2026-09-08 14:35	3
+3	Complete activities for the Trust Center		CC2.3	suggested	Praveen Sharma						Not started	High	Medium	0		2026-09-08 14:41	9
+4	Complete Github hardening				Uddyan	Amisha					Not started	High	Medium	0		2026-09-08 14:35	7
+5	Asset Inventory				Teja					2026-09-22	Not started	High	Medium	0		2026-09-08 14:16	9
+6	Vendor Inventory and Assessment		CC9.2	suggested	Praveen Sharma	Teja					Not started	High	Medium	0		2026-09-08 14:35	5
+7	Complete testing of Security Email -				Praveen Sharma						Not started	High	Medium	0		2026-09-08 14:35	3
+8	Create - finalize OV-1, System-View of Architecture				Praveen	Amisha, Uddyan					Not started	High	Medium	0		2026-09-08 14:35	7
+9	Enable Github Security controls				Praveen						Not started	High	Medium	0		2026-09-08 14:35	7
+10	Provision secureframe account for auditors										Not started	Medium	Medium	0		2026-09-08 15:33	2
+11	FInalize										Not started	Medium	Medium	0		2026-09-08 15:33	2
+12	Assign tasks in SecureFrame										Not started	Medium	Medium	0		2026-09-08 15:34	2
