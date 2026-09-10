@@ -1,0 +1,75 @@
+When	Who	Task	Type	From	To	Detail	Resolved
+2026-09-09 20:12	Prv	1 untitled task	create			Task created	
+2026-09-09 19:53	Prv	2 untitled task	create			Task created	
+2026-09-08 15:34	Prv	13 Assign tasks in SecureFrame	Task		Assign tasks in SecureFrame		
+2026-09-08 15:34	Prv	13 Assign tasks in SecureFrame	create			Task created	
+2026-09-08 15:33	Prv	12 FInalize	Task		FInalize		
+2026-09-08 15:33	Prv	12 FInalize	create			Task created	
+2026-09-08 15:33	Prv	11 Provision secureframe account for auditors	Task		Provision secureframe account for auditors		
+2026-09-08 15:33	Prv	11 Provision secureframe account for auditors	create			Task created	
+2026-09-08 15:02	Prv	3.1 untitled task	create			Subtask created under task 1	
+2026-09-08 14:59	Prv	6.4 Endpoints / Servers/Desktops	Task		Endpoints / Servers/Desktops		
+2026-09-08 14:59	Prv	6.3 Github	Task		Github		
+2026-09-08 14:56	Prv	7.2 SOC2 reports	Task		SOC2 reports		
+2026-09-08 14:56	Prv	7.2 SOC2 reports	create			Subtask created under task 5	
+2026-09-08 14:56	Prv	7.1 List of all vendors including AI/ML vendors	Task		List of all vendors including AI/ML vendors		
+2026-09-08 14:56	Prv	7.1 List of all vendors including AI/ML vendors	create			Subtask created under task 5	
+2026-09-08 14:55	Prv	6.2 Google Workspace	Task	Infrastructure assets	Google Workspace		
+2026-09-08 14:55	Prv	6.5 untitled task	create			Subtask created under task 4	
+2026-09-08 14:41	Prv	4 Complete activities for the Trust Center	Number	1	2		
+2026-09-08 14:41	Prv	6.4 Endpoints / Servers/Desktops	create			Subtask created under task 4	
+2026-09-08 14:41	Prv	6.3 Github	create			Subtask created under task 4	
+2026-09-08 14:37	Prv	6.2 Google Workspace	Task		Infrastructure assets		
+2026-09-08 14:37	Prv	6.2 Google Workspace	create			Subtask created under task 4	
+2026-09-08 14:37	Praveen	4.1 untitled task	create			Subtask created under task 1	
+2026-09-08 14:37	Praveen	6.1 Cloud assets	Task		Cloud assets		
+2026-09-08 14:37	Praveen	6.1 Cloud assets	create			Subtask created under task 4	
+2026-09-08 14:36	Praveen	4 Complete activities for the Trust Center	Number	2	1		
+2026-09-08 14:35	Praveen	10 Enable Github Security controls	Priority	Medium	High		
+2026-09-08 14:35	Praveen	9 Create - finalize OV-1, System-View of Architecture	Priority	Medium	High		
+2026-09-08 14:35	Praveen	8 Complete testing of Security Email -	Priority	Medium	High		
+2026-09-08 14:35	Praveen	5 Complete Github hardening	Priority	Medium	High		
+2026-09-08 14:35	Praveen	3 AWS hardening	Priority	Medium	High		
+2026-09-08 14:35	Praveen	4 Complete activities for the Trust Center	Priority	Medium	High		
+2026-09-08 14:35	Praveen	7 Vendor Inventory and Assessment	Priority	Medium	High		
+2026-09-08 14:34	Praveen	10 Enable Github Security controls	Status	Completed	Not started		
+2026-09-08 14:33	Praveen	10 Enable Github Security controls	Status	Not started	Completed		
+2026-09-08 14:33	Praveen	10 Enable Github Security controls	Task	Enable Github 	Enable Github Security controls		
+2026-09-08 14:33	Praveen	9 Create - finalize OV-1, System-View of Architecture	Owner	Praven	Praveen		
+2026-09-08 14:33	Praveen	9 Create - finalize OV-1, System-View of Architecture	Helper	nobody	Amisha, Uddyan		
+2026-09-08 14:33	Praveen	9 Create - finalize OV-1, System-View of Architecture	Owner	Pravee	Praven		
+2026-09-08 14:29	Praveen	10 Enable Github Security controls	Task	Start 	Enable Github 		
+2026-09-08 14:28	Praveen	10 Enable Github Security controls	Task		Start 		
+2026-09-08 14:28	Praveen	10 Enable Github Security controls	create			Task created	
+2026-09-08 14:26	Teja	9 Create - finalize OV-1, System-View of Architecture	Owner	Teja	Pravee		
+2026-09-08 14:26	Teja	9 Create - finalize OV-1, System-View of Architecture	Task		Create - finalize OV-1, System-View of Architecture		
+2026-09-08 14:26	Teja	9 Create - finalize OV-1, System-View of Architecture	create			Task created	
+2026-09-08 14:25	Praveen Sharma	8 Complete testing of Security Email -	Task		Complete testing of Security Email -		
+2026-09-08 14:24	Praveen Sharma	8 Complete testing of Security Email -	create			Task created	
+2026-09-08 14:23	Praveen Sharma	7 Vendor Inventory and Assessment	Helper	nobody	Teja		
+2026-09-08 14:22	Praveen Sharma	7 Vendor Inventory and Assessment	SOC 2 mapping	none	CC9.2		
+2026-09-08 14:22	Praveen Sharma	7 Vendor Inventory and Assessment	Task		Vendor Inventory and Assessment		
+2026-09-08 14:22	Praveen Sharma	7 Vendor Inventory and Assessment	create			Task created	
+2026-09-08 14:18	Praveen Sharma	4 Complete activities for the Trust Center	Helper	Amisha	nobody		
+2026-09-08 14:18	Praveen Sharma	4 Complete activities for the Trust Center	Owner	nobody	Praveen Sharma		
+2026-09-08 14:17	Praveen Sharma	4 Complete activities for the Trust Center	SOC 2 mapping	none	CC2.3		
+2026-09-08 14:17	Praveen Sharma	4 Complete activities for the Trust Center	Task		Complete activities for the Trust Center		
+2026-09-08 14:16	Praveen Sharma	6 Asset Inventory	Status	Completed	Not started		
+2026-09-08 14:16	Praveen Sharma	6 Asset Inventory	Status	Blocked	Completed		
+2026-09-08 14:16	Praveen Sharma	6 Asset Inventory	Status	In progress	Blocked		
+2026-09-08 14:16	Praveen Sharma	6 Asset Inventory	Status	Started	In progress		
+2026-09-08 14:16	Praveen Sharma	6 Asset Inventory	Status	Not started	Started		
+2026-09-08 14:16	Praveen Sharma	6 Asset Inventory	Priority	Medium	High		
+2026-09-08 14:15	Praveen Sharma	3 AWS hardening	Task		AWS hardening		
+2026-09-08 14:13	Praveen Sharma	5 Complete Github hardening	Helper	Uddyan	Amisha		
+2026-09-08 14:12	Praveen Sharma	5 Complete Github hardening	Owner	Amisha	Uddyan		
+2026-09-08 14:12	Praveen Sharma	5 Complete Github hardening	Owner	nobody	Amisha		
+2026-09-08 14:12	Praveen Sharma	5 Complete Github hardening	Task		Complete Github hardening		
+2026-09-08 14:11	Praveen Sharma	3 AWS hardening	create			Task created	
+2026-09-08 14:10	Praveen Sharma	5 Complete Github hardening	Helper	nobody	Uddyan		
+2026-09-08 14:10	Praveen Sharma	4 Complete activities for the Trust Center	Helper	nobody	Amisha		
+2026-09-08 14:10	unnamed	4 Complete activities for the Trust Center	create			Task created	
+2026-09-08 14:10	unnamed	5 Complete Github hardening	create			Task created	
+2026-09-08 14:04	someone	6 Asset Inventory	note			Due date: none to 2026-09-22	
+2026-09-08 14:03	someone	6 Asset Inventory	note			Owner: unassigned to Teja	
+2026-09-08 14:03	someone	6 Asset Inventory	note			Task created	
