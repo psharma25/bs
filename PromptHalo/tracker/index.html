@@ -184,20 +184,20 @@ button.act:disabled{background:#EDF1F3;border-color:var(--line);color:var(--lgra
 
 table{width:100%;border-collapse:separate;border-spacing:0;background:var(--panel);
   border:1px solid var(--line);border-radius:10px;overflow:hidden}
-th{font-size:.78rem;letter-spacing:.04em;color:var(--lgray);font-weight:600;text-align:left;
-  padding:.5rem .6rem;background:var(--soft);border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:.72rem;letter-spacing:.04em;color:var(--lgray);font-weight:600;text-align:left;
+  padding:.35rem .5rem;background:var(--soft);border-bottom:1px solid var(--line);white-space:nowrap}
 th.sortable{cursor:pointer}
 th.sortable:hover{color:var(--blue-ink)}
 th .arw{font-size:.7rem;color:var(--blue-ink)}
-td{padding:.32rem .45rem;border-bottom:1px solid #EFF4F6;vertical-align:middle}
+td{padding:.2rem .4rem;border-bottom:1px solid #EFF4F6;vertical-align:middle}
 tr.row:last-child td{border-bottom:0}
 tr.row.done td,tr.detail.done td{background-color:#E9F4EC}
 tr.row.done:hover td{background-color:#DFEDE3}
 tr.row.done td:not(.keep) input,tr.row.done td:not(.keep) select{color:#5E7A68}
 tr.row.done .f-title{text-decoration:line-through;text-decoration-color:#9EBBA8}
 
-td input,td select,td textarea{width:100%;font:inherit;font-size:.92rem;border:1px solid transparent;
-  border-radius:5px;padding:.3rem .4rem;background:transparent;color:var(--ink)}
+td input,td select,td textarea{width:100%;font:inherit;font-size:.86rem;border:1px solid transparent;
+  border-radius:5px;padding:.2rem .35rem;background:transparent;color:var(--ink)}
 td input::placeholder{color:var(--lgray)}
 td input:hover,td select:hover{border-color:#D6E1E7;background:rgba(255,255,255,.75)}
 td input:focus,td select:focus,td textarea:focus{outline:none;border-color:var(--blue-d);background:#fff;
@@ -279,8 +279,8 @@ select.loe{font-weight:600}
 select.e-High{color:#6B5386}
 select.e-Medium{color:var(--gray)}
 select.e-Low{color:#4C7059;font-weight:500}
-td.t-act{width:17.6rem;white-space:nowrap;text-align:right}
-button.subbtn{font:inherit;font-size:.74rem;font-weight:700;padding:.24rem .55rem;margin-left:3px;
+td.t-act{width:16.4rem;white-space:nowrap;text-align:right}
+button.subbtn{font:inherit;font-size:.7rem;font-weight:700;padding:.16rem .4rem;margin-left:2px;
   border:1px solid var(--sage-d);background:var(--sage);color:var(--sage-ink);border-radius:5px;cursor:pointer}
 button.subbtn:hover{background:#C3DFCB}
 .grip{display:inline-block;cursor:grab;color:var(--lgray);font-size:.8rem;letter-spacing:-2px;
@@ -303,7 +303,7 @@ tr.wk.k0 td{background:#FBEAE7}
 tr.wk.k0 .wkl{color:var(--rose-ink)}
 tr.wk.k9 td{background:#F4F7F8}
 tr.wk.k9 .wkl{color:var(--gray)}
-button.icon.mv{padding:.2rem .34rem;font-size:.68rem;line-height:1}
+button.icon.mv{padding:.14rem .26rem;font-size:.62rem;line-height:1}
 button.icon.mv[disabled]{opacity:.3;cursor:default}
 button.icon.mv[disabled]:hover{border-color:var(--line);color:var(--gray);background:#fff}
 select.prio{font-weight:600}
@@ -433,8 +433,8 @@ th:hover .colmv{opacity:1}
 .colmv button:hover{border-color:var(--blue-d);color:var(--blue-ink)}
 .colmv button[disabled]{opacity:.25;cursor:default}
 
-button.icon{font:inherit;font-size:.78rem;border:1px solid var(--line);background:#fff;color:var(--gray);
-  border-radius:5px;padding:.22rem .45rem;cursor:pointer;margin-left:3px}
+button.icon{font:inherit;font-size:.72rem;border:1px solid var(--line);background:#fff;color:var(--gray);
+  border-radius:5px;padding:.14rem .35rem;cursor:pointer;margin-left:3px}
 button.icon:hover{border-color:var(--blue-d);color:var(--blue-ink);background:var(--soft)}
 button.icon.on{background:var(--blue);border-color:var(--blue-d);color:var(--blue-ink)}
 button.armed,button.icon.armed,.act.armed{background:var(--rose)!important;border-color:var(--rose-d)!important;
@@ -443,11 +443,11 @@ button.igx.armed{background:var(--rose)}
 button.icon.del:hover{border-color:var(--rose-d);color:var(--rose-ink);background:var(--rose)}
 button.icon.res{margin-left:0;margin-top:.2rem}
 
-tr.crow td{padding:.1rem .45rem .28rem;border-bottom:1px solid #F1F5F7}
+tr.crow td{padding:.05rem .4rem .2rem;border-bottom:1px solid #F1F5F7}
 tr.crow.draft{display:none}
-.cline{display:flex;align-items:center;gap:.45rem;padding-left:1.1rem;min-height:1.5rem}
+.cline{display:flex;align-items:center;gap:.4rem;padding-left:1.1rem;min-height:1.3rem}
 .cicon{font-size:.72rem;opacity:.5;flex:none}
-.clast{font-size:.8rem;color:var(--gray);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+.clast{font-size:.76rem;color:var(--gray);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   max-width:52%}
 .clast b{color:var(--blue-ink);font-weight:700}
 .cwhen{color:var(--lgray);font-size:.72rem;margin-left:.4rem}
@@ -455,20 +455,23 @@ tr.crow.draft{display:none}
 .cmore{font:inherit;font-size:.7rem;font-weight:700;padding:.08rem .4rem;border:1px solid var(--line);
   background:#fff;color:var(--blue-ink);border-radius:99px;cursor:pointer;flex:none}
 .cmore:hover{border-color:var(--blue-d);background:var(--soft)}
-.cinput{flex:1;min-width:6rem;font:inherit;font-size:.8rem;padding:.2rem .45rem;border:1px solid transparent;
+.cinput{flex:1;min-width:6rem;font:inherit;font-size:.76rem;padding:.14rem .4rem;border:1px solid transparent;
   border-radius:5px;background:transparent;color:var(--ink)}
 .cinput::placeholder{color:#BCC9D1}
 .cinput:hover{border-color:#D6E1E7;background:rgba(255,255,255,.8)}
 .cinput:focus{outline:none;border-color:var(--blue-d);background:#fff;box-shadow:0 0 0 3px rgba(166,198,217,.28)}
-.cadd{font:inherit;font-size:.74rem;font-weight:700;padding:.2rem .55rem;border:1px solid var(--blue-d);
+.cadd{font:inherit;font-size:.7rem;font-weight:700;padding:.14rem .45rem;border:1px solid var(--blue-d);
   background:var(--blue);color:var(--blue-ink);border-radius:5px;cursor:pointer;flex:none}
 .cadd:hover{background:var(--blue-d)}
 .cswitch{display:inline-flex;align-items:center;gap:3px;font-size:.8rem;color:var(--lgray)}
-.cswitch button{font:inherit;font-size:.78rem;padding:.24rem .55rem;border:1px solid var(--line);
+.cswitch button{font:inherit;font-size:.76rem;padding:.2rem .5rem;border:1px solid var(--line);
   background:#fff;color:var(--gray);border-radius:6px;cursor:pointer}
 .cswitch button[aria-pressed="true"]{background:var(--blue);border-color:var(--blue-d);color:var(--blue-ink);
   font-weight:600}
 .tag.tc{background:#E7E1F2;color:var(--lav-ink)}
+button.icon.cbtn{font-size:.68rem;letter-spacing:-.02em}
+button.icon.cbtn.has{border-color:#CFC6E2;background:var(--lav);color:var(--lav-ink);font-weight:700}
+button.icon.cbtn.on{background:var(--blue);border-color:var(--blue-d);color:var(--blue-ink)}
 tr.row.done + tr.crow td{background-color:#E9F4EC}
 tr.detail td{padding:.7rem .9rem .9rem}
 .dgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:1rem}
@@ -704,8 +707,8 @@ body.printing .tscroll{overflow:visible}
       <option value="completed">Completed</option>
     </select>
     <span class="cswitch">Comments
-      <button type="button" data-cs="1">Show</button>
-      <button type="button" data-cs="0">Hide</button>
+      <button type="button" data-cs="1" title="Open every comment line">All</button>
+      <button type="button" data-cs="0" title="Close them all">None</button>
     </span>
     <span class="folder">Outline
       <button type="button" id="foldall" title="Collapse every task that has subtasks">Collapse</button>
@@ -853,7 +856,7 @@ var COLS = {
 };
 var DEFAULT_COLS = ["title","instructions","soc2","owner","helper","collab","start","due","status","prio","loe"];
 var COLW = { num:126, title:250, instructions:230, soc2:150, owner:150, helper:150, collab:165,
-             start:150, due:150, status:145, prio:105, loe:105, act:268 };
+             start:150, due:150, status:145, prio:105, loe:105, act:250 };
 function widthOf(k){ return (state.widths && state.widths[k]) || COLW[k] || 140; }
 function setWidth(k, px){
   state.widths = state.widths || {};
@@ -902,7 +905,7 @@ var FIELDS = { title:"Task", num:"Number", instructions:"Instructions", soc2:"SO
 
 /* activity is the single record of who changed what. Per-task logs are a filtered view of it. */
 var state = { tasks: [], activity: [], sort: "num", dir: 1, open: {}, onlyIssues: false, onlyLate: false, view: "outline", openWho: {}, cols: DEFAULT_COLS.slice(), cur: null, people: [], collapsed: {}, widths: {}, openImg: {}, sel: {}, newTop: true,
-  dField: "due", dFrom: "", dTo: "", showComments: true };
+  dField: "due", dFrom: "", dTo: "", openC: {} };
 var me = "";
 
 function uid(p){ return (p||"t") + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
@@ -933,6 +936,7 @@ function addComment(id, input){
   if(t.draft){ t.draft = false; logEvent(t, "create", "", "", "", "Task created"); }
   logEvent(t, "comment", "", "", "", v);
   t.updated = nowISO(); save(); render();
+  state.openC[id] = 1;
   var again = document.querySelector('tr.crow[data-id="' + id + '"] [data-a="ctext"]');
   if(again){ again.focus(); }
 }
@@ -987,7 +991,6 @@ function load(){
   try { var wd = JSON.parse(store.get("tracker.widths") || "{}"); if(wd && typeof wd === "object") state.widths = wd; } catch(e){}
   try { var cl = JSON.parse(store.get("tracker.collapsed") || "{}"); if(cl && typeof cl === "object") state.collapsed = cl; } catch(e){}
   state.newTop = store.get("tracker.newtop") !== "0";
-  state.showComments = store.get("tracker.comments") !== "0";
   state.gz = parseFloat(store.get("tracker.gz") || "9") || 9;
   state.view = store.get("tracker.view") || "outline";
   document.querySelectorAll(".viewsw button").forEach(function(x){
@@ -2045,11 +2048,17 @@ function render(){
             ' title="Move up, renumbering as it goes">&#9650;</button>' +
           '<button class="icon mv" data-a="down"' + (canDown ? '' : ' disabled') +
             ' title="Move down, renumbering as it goes">&#9660;</button>') +
+        (function(){
+          var cn = commentsOf(t.id).length;
+          return '<button class="icon cbtn' + (cn ? " has" : "") + (state.openC[t.id] ? " on" : "") +
+                 '" data-a="ctoggle" title="' + (cn ? cn + " comment" + (cn > 1 ? "s" : "") : "Add a comment") +
+                 '">&#128172;' + (cn ? " " + cn : "") + '</button>';
+        })() +
         '<button class="icon toggle' + (state.open[t.id] ? " on":"") + '" data-a="toggle">' + n + ' &#9662;</button>' +
         '<button class="icon del" data-a="del" title="Delete">&#10005;</button>' +
       '</td></tr>';
 
-    if(state.showComments && !wk){
+    if(state.openC[t.id] && !wk){
       var cs = commentsOf(t.id), last = cs.length ? cs[cs.length - 1] : null;
       html += '<tr class="crow' + (isDraft(t) ? " draft" : "") + zebra + '" data-id="' + t.id + '">' +
         '<td colspan="' + (state.cols.length + 2) + '">' +
@@ -2307,6 +2316,13 @@ function wire(){
     if(a === "socadd") el.onchange = function(){ if(el.value) toggleSOC2(id, el.value); };
     if(a === "socauto") el.onclick = function(){ var t = find(id); if(!t) return;
       t.soc2auto = true; autoMap(t); save(); render(); };
+    if(a === "ctoggle") el.onclick = function(e){
+      e.stopPropagation();
+      if(state.openC[id]) delete state.openC[id]; else state.openC[id] = 1;
+      render();
+      var f = document.querySelector('tr.crow[data-id="' + id + '"] [data-a="ctext"]');
+      if(f && state.openC[id]) f.focus();
+    };
     if(a === "cadd")  el.onclick = function(){ addComment(id, tr.querySelector("[data-a='ctext']")); };
     if(a === "ctext") el.onkeydown = function(e){ if(e.key === "Enter"){ e.preventDefault(); addComment(id, el); } };
     if(a === "cmore") el.onclick = function(){ state.open[id] = true; render(); };
@@ -2500,16 +2516,17 @@ markNewPos();
 
 document.querySelectorAll(".cswitch button").forEach(function(b){
   b.onclick = function(){
-    state.showComments = b.dataset.cs === "1";
-    store.set("tracker.comments", state.showComments ? "1" : "0");
+    if(b.dataset.cs === "1"){
+      state.tasks.forEach(function(t){ if(!isDraft(t)) state.openC[t.id] = 1; });
+    } else state.openC = {};
     render();
   };
 });
 function markComments(){
+  var open = Object.keys(state.openC).length;
   document.querySelectorAll(".cswitch button").forEach(function(x){
-    x.setAttribute("aria-pressed", (x.dataset.cs === "1") === !!state.showComments ? "true" : "false"); });
+    x.setAttribute("aria-pressed", (x.dataset.cs === "1" ? open > 0 : open === 0) ? "true" : "false"); });
 }
-markComments();
 
 function setSaveMode(mode){
   saveMode = mode;
