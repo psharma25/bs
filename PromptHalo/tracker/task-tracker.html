@@ -915,8 +915,13 @@ button.act.warnbtn{background:var(--apricot);border-color:var(--apricot-d);color
   font-weight:700}
 button.act.warnbtn:hover{background:#EBCBA5}
 .smode{display:inline-flex;align-items:center;gap:.3rem;font-size:.8rem;color:var(--lgray)}
-.smode select{font:inherit;font-size:.8rem;padding:.2rem .35rem;border:1px solid var(--line);
-  border-radius:5px;background:#fff;color:var(--gray)}
+.smode button{font:inherit;font-size:.78rem;padding:.26rem .6rem;border:1px solid var(--line);
+  background:#fff;color:var(--gray);border-radius:6px;cursor:pointer}
+.smode button:hover{border-color:var(--blue-d);color:var(--blue-ink)}
+.smode button[aria-pressed="true"]{background:var(--blue-ink);border-color:var(--blue-ink);color:#fff;
+  font-weight:700}
+.smode button[disabled]{opacity:.45;cursor:not-allowed}
+.wheresaved{font-size:.78rem;color:var(--lgray);white-space:nowrap}
 .restore{display:none;margin-bottom:.8rem;border:1px solid var(--line);border-radius:10px;background:#fff;
   padding:.6rem .8rem;box-shadow:0 2px 8px rgba(55,72,79,.08)}
 .restore.on{display:block}
@@ -1000,16 +1005,15 @@ body.printing .tscroll{overflow:visible}
   <div class="syncbar" id="syncbar">
     <button class="act save" id="savebtn" type="button" title="Everything saves as you type. This forces a save and copies it everywhere you have set up.">Save</button>
     <span class="savedat" id="savedat">Saved</span>
+    <span class="wheresaved" id="wheresaved">in ./data, once you have shown the browser the folder</span>
     <span class="dot"></span>
     <span class="synctxt" id="syncstat">Working locally in this browser.</span>
     <span class="presence" id="presence"></span>
     <span class="dirstat" id="dirstat"></span>
     <span class="autoload" id="autoload"></span>
     <span class="smode">Save to
-      <select id="savemode">
-        <option value="folder">the data folder here</option>
-        <option value="browser">this browser</option>
-      </select>
+      <button type="button" id="smDevice" data-sm="browser" title="Keep the board in this browser, on this device only" aria-pressed="false">This device</button>
+      <button type="button" id="smFolder" data-sm="folder" title="Keep the board in the data folder beside this page, so anyone opening the page sees it" aria-pressed="true">./data folder</button>
     </span>
     <span class="spacer"></span>
     <button class="act ghost sm" id="linkfile" type="button">Share via a file</button>
@@ -1139,7 +1143,7 @@ body.printing .tscroll{overflow:visible}
         <i class="gk s-completed"></i>Completed<span class="gdi">◆</span>Milestone
       </span>
     </div>
-    <div class="gwrap" id="gwrap"><div class="ghead"><div class="glabel gcorner">Task</div><div class="gtrack" style="width:180px"><div class="gmon" style="left:0px;width:180px">Sep 26</div><div class="gtick" style="left:9px"></div><div class="gwl" style="left:12px">7</div><div class="gtick" style="left:72px"></div><div class="gwl" style="left:75px">14</div><div class="gtick" style="left:135px"></div><div class="gwl" style="left:138px">21</div><div class="gtoday" style="left:27px"><span>today</span></div></div></div><div class="gbody"><div class="grow" data-id="tmtszagxs2grot"><div class="glabel"><span class="gnum">1</span><span class="gname">Asset Inventory</span></div><div class="gtrack" style="width:180px"><div class="gms" style="left:138px" title="Milestone 2026-09-22">◆</div><div class="gtail" style="left:154px">2026-09-22 · Teja</div></div></div><div class="goverlay"><div class="gtodayline" style="left:calc(var(--glab) + 27px)"></div></div></div></div>
+    <div class="gwrap" id="gwrap"><div class="ghead"><div class="glabel gcorner">Task</div><div class="gtrack" style="width:171px"><div class="gmon" style="left:0px;width:171px">Sep 26</div><div class="gtick" style="left:0px"></div><div class="gwl" style="left:3px">7</div><div class="gtick" style="left:63px"></div><div class="gwl" style="left:66px">14</div><div class="gtick" style="left:126px"></div><div class="gwl" style="left:129px">21</div><div class="gtoday" style="left:27px"><span>today</span></div></div></div><div class="gbody"><div class="grow" data-id="tmtszagxs2grot"><div class="glabel"><span class="gnum">1</span><span class="gname">Asset Inventory</span></div><div class="gtrack" style="width:171px"><div class="gms" style="left:129px" title="Milestone 2026-09-22">◆</div><div class="gtail" style="left:145px">2026-09-22 · Teja</div></div></div><div class="goverlay"><div class="gtodayline" style="left:calc(var(--glab) + 27px)"></div></div></div></div>
     <div id="gnodate"></div>
   </section>
 
@@ -1376,7 +1380,14 @@ function updateStoreBanner(){
   var need = folderMode() && !dirHandle;
   var b = $("pickstore");
   if(b) b.classList.toggle("hidden", !need);
-  var sel = $("savemode"); if(sel) sel.value = saveMode;
+  document.querySelectorAll(".smode button").forEach(function(x){
+    x.setAttribute("aria-pressed", x.dataset.sm === saveMode ? "true" : "false"); });
+  var w = $("wheresaved");
+  if(w){
+    w.textContent = folderMode()
+      ? (dirHandle ? "in " + dataPath() : "in ./data, once you have shown the browser the folder")
+      : "on this device, in this browser only";
+  }
 }
 function markSaved(ok){
   saveOk = !!ok;
@@ -2765,20 +2776,24 @@ function markNewPos(){
 }
 markNewPos();
 
-$("savemode").onchange = function(){
-  saveMode = $("savemode").value;
+function setSaveMode(mode){
+  saveMode = mode;
   store.set("tracker.savemode", saveMode);
   if(folderMode()){
     try { localStorage.removeItem("tracker.data"); localStorage.removeItem("tracker.snaps"); } catch(e){}
-    if(dirHandle) backupToDir(true); else markSaved(false);
-    toast("The board will be kept in the data folder, not in this browser.");
+    if(dirHandle){ backupToDir(true); toast("Saving to " + dataPath()); }
+    else { markSaved(false); chooseDir(); }
   } else {
     save();
-    toast("The board will be kept in this browser.");
+    toast("Saving on this device, in this browser only");
   }
   updateStoreBanner();
-};
+}
+document.querySelectorAll(".smode button").forEach(function(b){
+  b.onclick = function(){ setSaveMode(b.dataset.sm); };
+});
 $("pickstore").onclick = function(){ chooseDir(); };
+updateStoreBanner();
 
 $("savebtn").onclick = function(){
   if(folderMode() && !dirHandle){ chooseDir(); return; }
@@ -3358,13 +3373,12 @@ async function autoLoad(){
   return false;
 }
 
-$("savemode").value = saveMode;
-updateStoreBanner();
 if(!dirSupported() && folderMode()){
   saveMode = "browser"; store.set("tracker.savemode", "browser");
-  $("savemode").value = "browser";
-  updateStoreBanner();
+  var fb = $("smFolder");
+  if(fb){ fb.disabled = true; fb.title = "Needs Chrome or Edge. Other browsers cannot write to a folder."; }
 }
+updateStoreBanner();
 resumeDir();
 resumeFile();
 autoLoad();
