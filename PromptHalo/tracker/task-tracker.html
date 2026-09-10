@@ -911,6 +911,12 @@ details.acts>summary span.c{font-size:.82rem;font-weight:400;color:var(--lgray)}
 .syncbar .dirstat{color:var(--sage-ink);font-weight:600}
 .syncbar .autoload{color:var(--blue-ink);font-weight:600}
 .syncbar .dirstat.bad{color:var(--rose-ink)}
+button.act.warnbtn{background:var(--apricot);border-color:var(--apricot-d);color:var(--apricot-ink);
+  font-weight:700}
+button.act.warnbtn:hover{background:#EBCBA5}
+.smode{display:inline-flex;align-items:center;gap:.3rem;font-size:.8rem;color:var(--lgray)}
+.smode select{font:inherit;font-size:.8rem;padding:.2rem .35rem;border:1px solid var(--line);
+  border-radius:5px;background:#fff;color:var(--gray)}
 .restore{display:none;margin-bottom:.8rem;border:1px solid var(--line);border-radius:10px;background:#fff;
   padding:.6rem .8rem;box-shadow:0 2px 8px rgba(55,72,79,.08)}
 .restore.on{display:block}
@@ -999,13 +1005,21 @@ body.printing .tscroll{overflow:visible}
     <span class="presence" id="presence"></span>
     <span class="dirstat" id="dirstat"></span>
     <span class="autoload" id="autoload"></span>
+    <span class="smode">Save to
+      <select id="savemode">
+        <option value="folder">the data folder here</option>
+        <option value="browser">this browser</option>
+      </select>
+    </span>
     <span class="spacer"></span>
     <button class="act ghost sm" id="linkfile" type="button">Share via a file</button>
     <button class="act ghost sm hidden" id="unlinkfile" type="button">Stop sharing</button>
+    <button class="act warnbtn sm" id="pickstore" type="button" title="Show the browser this page's folder once, then saving is automatic">Choose folder once</button>
     <button class="act ghost sm" id="linkdir" type="button" title="Pick a folder and the tracker keeps saving copies into it">Backup folder</button>
     <button class="act ghost sm hidden" id="unlinkdir" type="button">Stop backups</button>
     <button class="act ghost sm" id="backupnow" type="button" title="Download a dated copy right now">Backup now</button>
     <button class="act sub sm" id="zipall" type="button" title="The tracker, the data, the exports and the images in one archive" disabled="">Packing...</button>
+    <button class="act ghost sm" id="reloaddata" type="button" title="Read data/tracker.json again">Reload data</button>
     <button class="act ghost sm" id="restorebtn" type="button">Restore</button>
   </div>
 
@@ -1028,14 +1042,14 @@ body.printing .tscroll{overflow:visible}
     </div>
   <div class="bar">
     <button class="act" id="add" type="button">+ Task</button>
-    <button class="act sub" id="addsub" type="button" title="Adds a subtask under task 15">+ Subtask under 15</button>
+    <button class="act sub" id="addsub" type="button" title="Adds a subtask under task 3">+ Subtask under 3</button>
     <span class="newpos">New at
       <button type="button" data-np="top" aria-pressed="true">Top</button>
       <button type="button" data-np="bottom" aria-pressed="false">Bottom</button>
     </span>
     <input type="search" id="q" placeholder="Search any column: task, owner, SOC 2, status, dates">
     <span class="hits" id="hits"></span>
-    <select id="fowner"><option value="">All people</option><option>Amisha</option><option>Amisha, Uddyan</option><option>Praveen</option><option>Praveen Sharma</option><option>Prv</option><option>someone</option><option>Teja</option><option>Uddyan</option><option>unnamed</option></select>
+    <select id="fowner"><option value="">All people</option><option>Prv</option><option>someone</option><option>Teja</option></select>
     <span class="dfilter">
       <select id="dfield" title="Which date to filter on">
         <option value="due">Due by</option>
@@ -1083,6 +1097,8 @@ body.printing .tscroll{overflow:visible}
     <button class="act ghost sm" id="bulkclear" type="button">Clear selection</button>
   </div>
 
+
+
   <div class="restore" id="restore">
     <div class="rhead">Restore a copy <button class="icon" id="restoreclose" type="button">Close</button></div>
     <div id="restorelist"></div>
@@ -1098,7 +1114,7 @@ body.printing .tscroll{overflow:visible}
   <section class="panel hidden" id="p-activity">
     <p class="phead">Grouped by author and collapsed. Open a name to see what that person changed. <span id="actcount"></span></p>
   <div class="bar">
-      <select id="fwho"><option value="">All people</option><option>Praveen</option><option>Praveen Sharma</option><option>Prv</option><option>Teja</option><option>someone</option><option>unnamed</option></select>
+      <select id="fwho"><option value="">All people</option><option>someone</option></select>
       <input type="search" id="aq" placeholder="Search activity">
       <div class="spacer"></div>
       <button class="act ghost sm" id="aexpand" type="button">Expand all</button>
@@ -1110,7 +1126,7 @@ body.printing .tscroll{overflow:visible}
 
   <section class="panel hidden" id="p-gantt">
     <p class="phead">Drawn from the start and due dates on the Tasks tab, and it follows whatever filters you
-      have set there. <span id="gantthead">(1 on the chart, 12 with no dates)</span></p>
+      have set there. <span id="gantthead">(1 on the chart)</span></p>
     <div class="bar">
       <span class="gzoom">Scale
         <button type="button" data-gz="24">Day</button>
@@ -1123,8 +1139,8 @@ body.printing .tscroll{overflow:visible}
         <i class="gk s-completed"></i>Completed<span class="gdi">◆</span>Milestone
       </span>
     </div>
-    <div class="gwrap" id="gwrap"><div class="ghead"><div class="glabel gcorner">Task</div><div class="gtrack" style="width:180px"><div class="gmon" style="left:0px;width:180px">Sep 26</div><div class="gtick" style="left:9px"></div><div class="gwl" style="left:12px">7</div><div class="gtick" style="left:72px"></div><div class="gwl" style="left:75px">14</div><div class="gtick" style="left:135px"></div><div class="gwl" style="left:138px">21</div><div class="gtoday" style="left:27px"><span>today</span></div></div></div><div class="gbody"><div class="grow" data-id="tmtszagxs2grot"><div class="glabel"><span class="gnum">6</span><span class="gname parent">Asset Inventory</span></div><div class="gtrack" style="width:180px"><div class="gms" style="left:138px" title="Milestone 2026-09-22">◆</div><div class="gtail" style="left:154px">2026-09-22 · Teja</div></div></div><div class="goverlay"><div class="gtodayline" style="left:calc(var(--glab) + 27px)"></div></div></div></div>
-    <div id="gnodate"><div class="gnd"><b>12 without dates:</b> 1 untitled, 2 untitled, 3 AWS hardening, 4 Complete activities for the Trust Center, 5 Complete Github hardening, 7 Vendor Inventory and Assessment, 8 Complete testing of Security Email -, 9 Create - finalize OV-1, System-View of Architecture, 10 Enable Github Security controls, 11 Provision secureframe account for auditors, 12 FInalize, 13 Assign tasks in SecureFrame</div></div>
+    <div class="gwrap" id="gwrap"><div class="ghead"><div class="glabel gcorner">Task</div><div class="gtrack" style="width:180px"><div class="gmon" style="left:0px;width:180px">Sep 26</div><div class="gtick" style="left:9px"></div><div class="gwl" style="left:12px">7</div><div class="gtick" style="left:72px"></div><div class="gwl" style="left:75px">14</div><div class="gtick" style="left:135px"></div><div class="gwl" style="left:138px">21</div><div class="gtoday" style="left:27px"><span>today</span></div></div></div><div class="gbody"><div class="grow" data-id="tmtszagxs2grot"><div class="glabel"><span class="gnum">1</span><span class="gname">Asset Inventory</span></div><div class="gtrack" style="width:180px"><div class="gms" style="left:138px" title="Milestone 2026-09-22">◆</div><div class="gtail" style="left:154px">2026-09-22 · Teja</div></div></div><div class="goverlay"><div class="gtodayline" style="left:calc(var(--glab) + 27px)"></div></div></div></div>
+    <div id="gnodate"></div>
   </section>
 
   <section class="panel hidden" id="p-people">
@@ -1301,8 +1317,9 @@ function refocus(id, which){
 }
 
 function load(){
+  saveMode = store.get("tracker.savemode") || "folder";
   try {
-    var raw = store.get("tracker.data");
+    var raw = folderMode() ? null : store.get("tracker.data");
     if(raw){ var d = JSON.parse(raw) || {}; state.tasks = d.tasks || []; state.activity = d.activity || []; state.people = d.people || []; }
     else {
       var old = store.get("tracker.tasks");   /* migrate a v1 file */
@@ -1349,7 +1366,18 @@ function flattenDepth(){
   });
   return moved;
 }
+/* The board lives in a folder on disk. The browser only ever holds preferences:
+   your name, text size, column widths, which sections you folded. */
+var saveMode = "folder";
 var lastSaved = 0, saveOk = true;
+function folderMode(){ return saveMode === "folder"; }
+function storeReady(){ return folderMode() ? !!dirHandle : true; }
+function updateStoreBanner(){
+  var need = folderMode() && !dirHandle;
+  var b = $("pickstore");
+  if(b) b.classList.toggle("hidden", !need);
+  var sel = $("savemode"); if(sel) sel.value = saveMode;
+}
 function markSaved(ok){
   saveOk = !!ok;
   if(ok) lastSaved = Date.now();
@@ -1357,18 +1385,28 @@ function markSaved(ok){
   if(el){
     el.textContent = ok
       ? "Saved " + new Date(lastSaved).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-      : "Not saved: " + (store.lastError || "the browser refused the write");
+      : (folderMode() && !dirHandle
+          ? "Not saving yet"
+          : "Not saved: " + (store.lastError || "the write was refused"));
     el.classList.toggle("bad", !ok);
   }
   var b = $("savebtn");
   if(b) b.classList.toggle("unsaved", !ok);
 }
 function save(){
+  if(folderMode()){
+    if(dirHandle){ queueDirBackup(); }
+    else { markSaved(false); }
+    updateStoreBanner();
+    if(typeof announce === "function") announce();
+    return;
+  }
   markSaved(store.set("tracker.data", JSON.stringify({ version: 2, tasks: state.tasks, activity: state.activity, people: state.people || [] })));
   if(typeof announce === "function") announce();
   if(typeof queueWrite === "function") queueWrite();
   if(typeof queueSnap === "function") queueSnap();
   if(typeof queueDirBackup === "function") queueDirBackup();
+  updateStoreBanner();
 }
 
 /* nothing is editable until a name is set, so every log entry has an author */
@@ -2727,14 +2765,32 @@ function markNewPos(){
 }
 markNewPos();
 
+$("savemode").onchange = function(){
+  saveMode = $("savemode").value;
+  store.set("tracker.savemode", saveMode);
+  if(folderMode()){
+    try { localStorage.removeItem("tracker.data"); localStorage.removeItem("tracker.snaps"); } catch(e){}
+    if(dirHandle) backupToDir(true); else markSaved(false);
+    toast("The board will be kept in the data folder, not in this browser.");
+  } else {
+    save();
+    toast("The board will be kept in this browser.");
+  }
+  updateStoreBanner();
+};
+$("pickstore").onclick = function(){ chooseDir(); };
+
 $("savebtn").onclick = function(){
-  save();                                   /* the browser copy */
+  if(folderMode() && !dirHandle){ chooseDir(); return; }
+  save();
   if(typeof snapshot === "function"){ lastSnap = 0; snapshot(); }
+  if(folderMode() && dirHandle) backupToDir(true);
   var extra = [];
   if(typeof fileHandle !== "undefined" && fileHandle){ writeFile(); extra.push("the shared file"); }
-  if(typeof dirHandle !== "undefined" && dirHandle){ backupToDir(true); extra.push(dirHandle.name); }
-  toast(saveOk
-    ? "Saved" + (extra.length ? " here, plus " + extra.join(" and ") : " in this browser")
+  if(typeof dirHandle !== "undefined" && dirHandle && !folderMode()){ backupToDir(true); extra.push(dirHandle.name); }
+  toast(saveOk || (folderMode() && dirHandle)
+    ? (folderMode() ? "Saved into " + dirHandle.name + "/data" : "Saved in this browser") +
+      (extra.length ? ", plus " + extra.join(" and ") : "")
     : "Could not save: " + (store.lastError || "the browser refused the write"));
 };
 
@@ -2995,7 +3051,8 @@ async function linkFile(){
   } catch(e){ if(e && e.name !== "AbortError") toast("Could not open that file: " + e.message); }
 }
 function unlinkFile(){
-  clearInterval(pollTimer); pollTimer = null; fileHandle = null; dropHandle("file");
+  clearInterval(pollTimer); pollTimer = null; fileHandle = null;
+  try { dropHandle("file"); } catch(e){}
   $("linkfile").classList.remove("hidden");
   $("unlinkfile").classList.add("hidden");
   syncStatus("Working locally in this browser.", false);
@@ -3031,6 +3088,7 @@ function docNow(withImages){
 }
 
 function snapshot(){
+  if(folderMode()) return;          /* the folder keeps its own dated snapshots */
   if(Date.now() - lastSnap < 45000) return;         /* at most one a minute */
   lastSnap = Date.now();
   var list = [];
@@ -3049,15 +3107,21 @@ function queueSnap(){ clearTimeout(snapTimer); snapTimer = setTimeout(snapshot, 
 /* --- a folder the tracker writes into, remembered between sessions --- */
 var dirHandle = null, dirTimer = null, lastFullBackup = 0;
 
+/* never rejects: remembering a handle is a convenience, and a browser
+   without IndexedDB should not throw errors into the console for it */
 function idb(fn){
-  return new Promise(function(res, rej){
-    var rq = indexedDB.open("tracker-fs", 1);
+  return new Promise(function(res){
+    var rq;
+    try { rq = indexedDB.open("tracker-fs", 1); }
+    catch(e){ res(null); return; }
     rq.onupgradeneeded = function(){ rq.result.createObjectStore("h"); };
     rq.onsuccess = function(){
-      var db = rq.result, tx = db.transaction("h", "readwrite"), st = tx.objectStore("h");
-      fn(st, res, rej);
+      try {
+        var db = rq.result, tx = db.transaction("h", "readwrite"), st = tx.objectStore("h");
+        fn(st, res, res);
+      } catch(e){ res(null); }
     };
-    rq.onerror = function(){ rej(rq.error); };
+    rq.onerror = function(){ res(null); };
   });
 }
 function saveHandle(h, key){ return idb(function(st, res){ st.put(h, key || "dir"); res(); }); }
@@ -3065,7 +3129,14 @@ function loadHandle(key){ return idb(function(st, res){ var r = st.get(key || "d
 function dropHandle(key){ return idb(function(st, res){ st.delete(key || "dir"); res(); }); }
 
 function dirSupported(){ return typeof window.showDirectoryPicker === "function"; }
+var sameFolder = false;
+function pageFile(){
+  var n = decodeURIComponent(location.pathname.split("/").pop() || "");
+  return n || "index.html";
+}
+function dataPath(){ return sameFolder ? "./data/tracker.json" : (dirHandle ? dirHandle.name + "/data/tracker.json" : "./data/tracker.json"); }
 
+async function subdir(dir, name){ return await dir.getDirectoryHandle(name, { create: true }); }
 async function writeInto(dir, name, text){
   var fh = await dir.getFileHandle(name, { create: true });
   var wr = await fh.createWritable();
@@ -3083,17 +3154,19 @@ async function pruneSnaps(dir){
 async function readFromDir(){
   if(!dirHandle) return false;
   try {
-    var fh = await dirHandle.getFileHandle("tracker-latest.json");
+    var fh = null;
+    try { var dd = await dirHandle.getDirectoryHandle("data"); fh = await dd.getFileHandle("tracker.json"); }
+    catch(e){ fh = await dirHandle.getFileHandle("tracker-latest.json"); }
     var txt = await (await fh.getFile()).text();
     if(!txt.trim()) return false;
     applying = true;
     var res = mergeData(JSON.parse(txt));
     applying = false;
+    render();
     if(res.added || res.updated || res.acts){
-      save(); render();
-      toast("Picked up " + (res.added + res.updated) + " task" +
-            ((res.added + res.updated) === 1 ? "" : "s") + " from " + dirHandle.name);
+      toast("Loaded " + res.added + " task" + (res.added === 1 ? "" : "s") + " from " + dataPath());
     }
+    markSaved(true);
     return true;
   } catch(e){ applying = false; return false; }
 }
@@ -3102,34 +3175,49 @@ async function backupToDir(force){
   if(!dirHandle) return;
   try {
     var text = JSON.stringify(docNow(true), null, 1);
-    await writeInto(dirHandle, "tracker-latest.json", text);
+    var data = await subdir(dirHandle, "data");
+    await writeInto(data, "tracker.json", text);
+    await writeInto(dirHandle, "tracker-latest.json", text);   /* handy for older copies */
     var due = force || (Date.now() - lastFullBackup > 15 * 60000);
     if(due){
       lastFullBackup = Date.now();
       var d = new Date(), p = function(n){ return (n < 10 ? "0" : "") + n; };
       var stampName = "tracker-" + d.getFullYear() + p(d.getMonth()+1) + p(d.getDate()) +
                       "-" + p(d.getHours()) + p(d.getMinutes()) + ".json";
-      await writeInto(dirHandle, stampName, text);
-      await pruneSnaps(dirHandle);
+      var snaps = await subdir(data, "snapshots");
+      await writeInto(snaps, stampName, text);
+      await pruneSnaps(snaps);
     }
+    markSaved(true);
     dirStatus("saved " + new Date().toLocaleTimeString());
-  } catch(e){ dirStatus("could not write: " + e.message, true); }
+    if(folderMode()){                       /* nothing of the board stays in the browser */
+      try { localStorage.removeItem("tracker.data"); localStorage.removeItem("tracker.snaps"); } catch(e){}
+    }
+  } catch(e){ markSaved(false); dirStatus("could not write: " + e.message, true); }
 }
 function queueDirBackup(){ if(!dirHandle) return; clearTimeout(dirTimer); dirTimer = setTimeout(backupToDir, 1500); }
 
 function dirStatus(txt, bad){
   var el = $("dirstat"); if(!el) return;
-  el.textContent = dirHandle ? ("Backups: " + dirHandle.name + ", " + txt) : "";
+  el.textContent = dirHandle ? (dataPath() + " \u00b7 " + txt) : "";
   el.classList.toggle("bad", !!bad);
 }
 async function chooseDir(){
   if(!dirSupported()){ toast("This browser cannot write to a folder. Use Backup now instead."); return; }
   try {
     var h = await window.showDirectoryPicker({ mode: "readwrite" });
-    dirHandle = h; await saveHandle(h, "dir");
+    dirHandle = h;
+    sameFolder = false;
+    try { await h.getFileHandle(pageFile()); sameFolder = true; } catch(e){}
+    try { await saveHandle(h, "dir"); } catch(e){}   /* remembering it is a bonus, not a requirement */
     $("linkdir").classList.add("hidden"); $("unlinkdir").classList.remove("hidden");
+    await readFromDir();
     await backupToDir(true);
-    toast("Backing up into " + h.name);
+    updateStoreBanner();
+    toast(sameFolder
+      ? "Saving automatically to ./data/tracker.json"
+      : "Saving to " + h.name + "/data/tracker.json. That is not the folder this page sits in, so " +
+        "./data will still be what the page reads on start.");
   } catch(e){ if(e && e.name !== "AbortError") toast("Could not open that folder: " + e.message); }
 }
 async function resumeDir(){
@@ -3139,6 +3227,7 @@ async function resumeDir(){
     var p = await h.queryPermission({ mode: "readwrite" });
     if(p === "granted"){
       dirHandle = h;
+      try { await h.getFileHandle(pageFile()); sameFolder = true; } catch(e){ sameFolder = false; }
       $("linkdir").classList.add("hidden"); $("unlinkdir").classList.remove("hidden");
       dirStatus("connected");
       await readFromDir();
@@ -3149,6 +3238,7 @@ async function resumeDir(){
         var g = await h.requestPermission({ mode: "readwrite" });
         if(g === "granted"){
           dirHandle = h;
+          try { await h.getFileHandle(pageFile()); sameFolder = true; } catch(e){ sameFolder = false; }
           $("linkdir").classList.add("hidden"); $("unlinkdir").classList.remove("hidden");
           await readFromDir();
           backupToDir(true);
@@ -3158,7 +3248,7 @@ async function resumeDir(){
   } catch(e){}
 }
 function stopDir(){
-  dirHandle = null; dropHandle("dir");
+  dirHandle = null; sameFolder = false; try { dropHandle("dir"); } catch(e){}
   $("linkdir").classList.remove("hidden"); $("linkdir").textContent = "Backup folder";
   $("unlinkdir").classList.add("hidden"); dirStatus("");
   $("linkdir").onclick = chooseDir;
@@ -3175,8 +3265,8 @@ function openRestore(){
   }).join("") : '<div class="rmeta">No snapshots yet. One is taken as you work.</div>';
   html += '<div class="rrow"><div><b>From a file</b><div class="rmeta">A folder backup or an exported copy</div></div>' +
           '<button class="act ghost sm" id="restorefile">Choose file</button></div>';
-  if(dirHandle) html = '<div class="rrow"><div><b>Latest in ' + esc(dirHandle.name) + '</b>' +
-    '<div class="rmeta">tracker-latest.json, including images</div></div>' +
+  if(dirHandle) html = '<div class="rrow"><div><b>' + esc(dataPath()) + '</b>' +
+    '<div class="rmeta">the live copy, including images</div></div>' +
     '<button class="act sm" id="restoredir">Restore</button></div>' + html;
   box.innerHTML = html;
   box.querySelectorAll("[data-sn]").forEach(function(b){
@@ -3192,10 +3282,8 @@ function openRestore(){
   var rd = $("restoredir");
   if(rd) rd.onclick = async function(){
     try {
-      var fh = await dirHandle.getFileHandle("tracker-latest.json");
-      var txt = await (await fh.getFile()).text();
-      var res = mergeData(JSON.parse(txt)); save(); render();
-      toast("Restored from the folder: " + res.added + " added, " + res.updated + " updated");
+      var ok = await readFromDir();
+      if(!ok) throw new Error("nothing to read there yet");
       $("restore").classList.remove("on");
     } catch(e){ toast("Could not read that backup: " + e.message); }
   };
@@ -3207,6 +3295,11 @@ $("unlinkdir").onclick = stopDir;
 $("backupnow").onclick = function(){
   download("tracker-backup-" + stamp() + ".json", JSON.stringify(docNow(true), null, 1), "application/json");
   toast("Backup downloaded");
+};
+$("reloaddata").onclick = async function(){
+  var ok = dirHandle ? await readFromDir() : false;
+  if(!ok) ok = await autoLoad();
+  toast(ok ? "Read " + dataPath() : "Could not read data/tracker.json from here");
 };
 $("restorebtn").onclick = openRestore;
 $("restoreclose").onclick = function(){ $("restore").classList.remove("on"); };
@@ -3257,14 +3350,21 @@ async function autoLoad(){
       save(); render();
       var got = res.added + res.updated;
       $("autoload").textContent = got
-        ? "Loaded " + names[i] + ", " + got + " task" + (got === 1 ? "" : "s")
-        : "In step with " + names[i];
+        ? "Loaded ./" + names[i] + ", " + got + " task" + (got === 1 ? "" : "s")
+        : "In step with ./" + names[i];
       return true;
     } catch(e){ applying = false; }
   }
   return false;
 }
 
+$("savemode").value = saveMode;
+updateStoreBanner();
+if(!dirSupported() && folderMode()){
+  saveMode = "browser"; store.set("tracker.savemode", "browser");
+  $("savemode").value = "browser";
+  updateStoreBanner();
+}
 resumeDir();
 resumeFile();
 autoLoad();
@@ -3582,6 +3682,7 @@ document.querySelectorAll(".gzoom button").forEach(function(b){
     renderGantt();
   };
 });
+
 
 load();
 showTab(store.get("tracker.tab") || "tasks");
