@@ -279,7 +279,7 @@ select.loe{font-weight:600}
 select.e-High{color:#6B5386}
 select.e-Medium{color:var(--gray)}
 select.e-Low{color:#4C7059;font-weight:500}
-td.t-act{width:15rem;white-space:nowrap;text-align:right}
+td.t-act{width:17.6rem;white-space:nowrap;text-align:right}
 button.subbtn{font:inherit;font-size:.74rem;font-weight:700;padding:.24rem .55rem;margin-left:3px;
   border:1px solid var(--sage-d);background:var(--sage);color:var(--sage-ink);border-radius:5px;cursor:pointer}
 button.subbtn:hover{background:#C3DFCB}
@@ -853,7 +853,7 @@ var COLS = {
 };
 var DEFAULT_COLS = ["title","instructions","soc2","owner","helper","collab","start","due","status","prio","loe"];
 var COLW = { num:126, title:250, instructions:230, soc2:150, owner:150, helper:150, collab:165,
-             start:150, due:150, status:145, prio:105, loe:105, act:225 };
+             start:150, due:150, status:145, prio:105, loe:105, act:268 };
 function widthOf(k){ return (state.widths && state.widths[k]) || COLW[k] || 140; }
 function setWidth(k, px){
   state.widths = state.widths || {};
@@ -1355,6 +1355,38 @@ function siblingsOf(id){
   var t = find(id), p = t ? (t.parent || null) : null;
   return state.tasks.filter(function(x){ return (x.parent || null) === p; });
 }
+function topLevel(){ return state.tasks.filter(function(x){ return !x.parent; }); }
+
+/* tuck this task under the one above it */
+function indentTask(id){
+  if(!requireName()) return;
+  var t = find(id); if(!t) return;
+  if(childrenOf(id).length){ toast("This task has subtasks of its own, so it cannot become one."); return; }
+  if(depthOf(id) >= MAXDEPTH){ toast("A subtask cannot have subtasks."); return; }
+  var sibs = siblingsOf(id), i = sibs.indexOf(t);
+  if(i <= 0){ toast("There is no task above this one to sit under."); return; }
+  var parent = sibs[i - 1];
+  applyMove(id, parent.id, childrenOf(parent.id).length + 1);
+}
+/* lift a subtask back out, landing right after the task it belonged to */
+function outdentTask(id){
+  if(!requireName()) return;
+  var t = find(id); if(!t || !t.parent) return;
+  var p = find(t.parent);
+  var tops = topLevel();
+  applyMove(id, null, (p ? tops.indexOf(p) + 2 : tops.length + 1));
+}
+/* or pick the parent outright */
+function setParent(id, parentId){
+  if(!requireName()) return;
+  var t = find(id); if(!t) return;
+  if(!parentId){ outdentTask(id); return; }
+  if(parentId === id) return;
+  if(childrenOf(id).length){ toast("This task has subtasks of its own, so it cannot become one."); render(); return; }
+  var p = find(parentId); if(!p) return;
+  applyMove(id, parentId, childrenOf(parentId).length + 1);
+}
+
 function moveStep(id, delta){
   if(!requireName()) return;
   var t = find(id); if(!t) return;
@@ -2005,6 +2037,10 @@ function render(){
            numOf(dp < MAXDEPTH ? t.id : t.parent) + '">+ Subtask</button>' +
 
         (wk ? '' :
+          '<button class="icon mv" data-a="out"' + (t.parent ? '' : ' disabled') +
+            ' title="Lift this subtask back out to its own task">&#8676;</button>' +
+          '<button class="icon mv" data-a="in"' + ((!t.parent && !kids) ? '' : ' disabled') +
+            ' title="Tuck this task under the one above it">&#8677;</button>' +
           '<button class="icon mv" data-a="up"' + (canUp ? '' : ' disabled') +
             ' title="Move up, renumbering as it goes">&#9650;</button>' +
           '<button class="icon mv" data-a="down"' + (canDown ? '' : ' disabled') +
@@ -2049,6 +2085,17 @@ function render(){
            esc(t.prio || "Medium") + ' priority, ' + esc(t.loe || "Medium") + ' effort</div>' +
         '<div class="pair">Owner <b>' + esc(t.owner || "unassigned") +
         '</b> &middot; Helper <b>' + esc(t.helper || "none") + '</b></div>' +
+        '<h4 style="margin-top:.7rem">PARENT TASK</h4>' +
+        '<div class="socbox">' +
+          (childrenOf(t.id).length
+            ? '<span class="soc-none">This task has ' + childrenOf(t.id).length + ' subtask' +
+              (childrenOf(t.id).length > 1 ? "s" : "") + ' of its own, so it stays at the top level.</span>'
+            : '<select data-a="setparent"><option value="">None, a task in its own right</option>' +
+              topLevel().filter(function(x){ return x.id !== t.id && !isDraft(x); }).map(function(x){
+                return '<option value="' + x.id + '"' + (t.parent === x.id ? " selected" : "") + '>' +
+                       esc(numOf(x.id) + "  " + (x.title || "untitled")) + '</option>';
+              }).join("") + '</select>') +
+        '</div>' +
         '<h4 style="margin-top:.7rem">COLLABORATORS</h4>' +
         '<div class="socbox">' +
           (collabOf(t).length ? collabOf(t).map(function(nm){
@@ -2245,9 +2292,12 @@ function wire(){
       arm(el, "sure?", function(){ removeImage(id, el.dataset.i); });
     };
     if(a === "num")  el.onchange = function(){ renumber(id, el.value); };
+    if(a === "in")   el.onclick = function(e){ e.stopPropagation(); indentTask(id); };
+    if(a === "out")  el.onclick = function(e){ e.stopPropagation(); outdentTask(id); };
     if(a === "up")   el.onclick = function(){ moveStep(id, -1); };
     if(a === "down") el.onclick = function(){ moveStep(id, 1); };
     if(a === "soctog") el.onclick = function(){ toggleSOC2(id, el.dataset.c); };
+    if(a === "setparent") el.onchange = function(){ setParent(id, el.value); };
     if(a === "colltog") el.onclick = function(){ toggleCollab(id, el.dataset.c); };
     if(a === "colladd") el.onchange = function(){ if(el.value) toggleCollab(id, el.value); };
     if(a === "collnewbtn") el.onclick = function(){
