@@ -443,6 +443,33 @@ button.igx.armed{background:var(--rose)}
 button.icon.del:hover{border-color:var(--rose-d);color:var(--rose-ink);background:var(--rose)}
 button.icon.res{margin-left:0;margin-top:.2rem}
 
+tr.crow td{padding:.1rem .45rem .28rem;border-bottom:1px solid #F1F5F7}
+tr.crow.draft{display:none}
+.cline{display:flex;align-items:center;gap:.45rem;padding-left:1.1rem;min-height:1.5rem}
+.cicon{font-size:.72rem;opacity:.5;flex:none}
+.clast{font-size:.8rem;color:var(--gray);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:52%}
+.clast b{color:var(--blue-ink);font-weight:700}
+.cwhen{color:var(--lgray);font-size:.72rem;margin-left:.4rem}
+.cnone{font-size:.78rem;color:#B9C6CD;flex:none}
+.cmore{font:inherit;font-size:.7rem;font-weight:700;padding:.08rem .4rem;border:1px solid var(--line);
+  background:#fff;color:var(--blue-ink);border-radius:99px;cursor:pointer;flex:none}
+.cmore:hover{border-color:var(--blue-d);background:var(--soft)}
+.cinput{flex:1;min-width:6rem;font:inherit;font-size:.8rem;padding:.2rem .45rem;border:1px solid transparent;
+  border-radius:5px;background:transparent;color:var(--ink)}
+.cinput::placeholder{color:#BCC9D1}
+.cinput:hover{border-color:#D6E1E7;background:rgba(255,255,255,.8)}
+.cinput:focus{outline:none;border-color:var(--blue-d);background:#fff;box-shadow:0 0 0 3px rgba(166,198,217,.28)}
+.cadd{font:inherit;font-size:.74rem;font-weight:700;padding:.2rem .55rem;border:1px solid var(--blue-d);
+  background:var(--blue);color:var(--blue-ink);border-radius:5px;cursor:pointer;flex:none}
+.cadd:hover{background:var(--blue-d)}
+.cswitch{display:inline-flex;align-items:center;gap:3px;font-size:.8rem;color:var(--lgray)}
+.cswitch button{font:inherit;font-size:.78rem;padding:.24rem .55rem;border:1px solid var(--line);
+  background:#fff;color:var(--gray);border-radius:6px;cursor:pointer}
+.cswitch button[aria-pressed="true"]{background:var(--blue);border-color:var(--blue-d);color:var(--blue-ink);
+  font-weight:600}
+.tag.tc{background:#E7E1F2;color:var(--lav-ink)}
+tr.row.done + tr.crow td{background-color:#E9F4EC}
 tr.detail td{padding:.7rem .9rem .9rem}
 .dgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:1rem}
 @media (max-width:900px){.dgrid{grid-template-columns:1fr}}
@@ -676,6 +703,10 @@ body.printing .tscroll{overflow:visible}
       <option value="blocked">Blocked</option>
       <option value="completed">Completed</option>
     </select>
+    <span class="cswitch">Comments
+      <button type="button" data-cs="1">Show</button>
+      <button type="button" data-cs="0">Hide</button>
+    </span>
     <span class="folder">Outline
       <button type="button" id="foldall" title="Collapse every task that has subtasks">Collapse</button>
       <button type="button" id="unfoldall" title="Show every subtask">Expand</button>
@@ -871,7 +902,7 @@ var FIELDS = { title:"Task", num:"Number", instructions:"Instructions", soc2:"SO
 
 /* activity is the single record of who changed what. Per-task logs are a filtered view of it. */
 var state = { tasks: [], activity: [], sort: "num", dir: 1, open: {}, onlyIssues: false, onlyLate: false, view: "outline", openWho: {}, cols: DEFAULT_COLS.slice(), cur: null, people: [], collapsed: {}, widths: {}, openImg: {}, sel: {}, newTop: true,
-  dField: "due", dFrom: "", dTo: "" };
+  dField: "due", dFrom: "", dTo: "", showComments: true };
 var me = "";
 
 function uid(p){ return (p||"t") + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
@@ -894,6 +925,19 @@ function logEvent(task, kind, field, from, to, text){
 function taskLog(id){ return state.activity.filter(function(a){ return a.task === id; }); }
 function openIssues(id){
   return state.activity.filter(function(a){ return a.task === id && a.kind === "issue" && !a.resolved; });
+}
+function addComment(id, input){
+  if(!requireName()) return;
+  var t = find(id); if(!t || !input) return;
+  var v = input.value.trim(); if(!v) return;
+  if(t.draft){ t.draft = false; logEvent(t, "create", "", "", "", "Task created"); }
+  logEvent(t, "comment", "", "", "", v);
+  t.updated = nowISO(); save(); render();
+  var again = document.querySelector('tr.crow[data-id="' + id + '"] [data-a="ctext"]');
+  if(again){ again.focus(); }
+}
+function commentsOf(id){
+  return state.activity.filter(function(a){ return a.task === id && a.kind === "comment"; });
 }
 function addProgress(id, input){
   if(!requireName()) return;
@@ -943,6 +987,7 @@ function load(){
   try { var wd = JSON.parse(store.get("tracker.widths") || "{}"); if(wd && typeof wd === "object") state.widths = wd; } catch(e){}
   try { var cl = JSON.parse(store.get("tracker.collapsed") || "{}"); if(cl && typeof cl === "object") state.collapsed = cl; } catch(e){}
   state.newTop = store.get("tracker.newtop") !== "0";
+  state.showComments = store.get("tracker.comments") !== "0";
   state.gz = parseFloat(store.get("tracker.gz") || "9") || 9;
   state.view = store.get("tracker.view") || "outline";
   document.querySelectorAll(".viewsw button").forEach(function(x){
@@ -1641,6 +1686,9 @@ function entryHTML(a, withTask){
   if(a.kind === "field"){
     body = '<span class="who">' + esc(a.who) + '</span> changed <b>' + esc(FIELDS[a.field] || a.field) + '</b>' + on +
            '<div class="val">' + esc(a.from || "empty") + ' &#8594; ' + esc(a.to || "empty") + '</div>';
+  } else if(a.kind === "comment"){
+    body = '<span class="who">' + esc(a.who) + '</span><span class="tag tc">COMMENT</span>' + on +
+           '<div class="body">' + esc(a.text) + '</div>';
   } else if(a.kind === "progress" || a.kind === "note"){
     body = '<span class="who">' + esc(a.who) + '</span><span class="tag tp">PROGRESS</span>' + on +
            '<div class="body">' + esc(a.text) + '</div>';
@@ -1836,6 +1884,7 @@ function render(){
   NUM = numbering();
   applyLock();
   updateSubBtn();
+  if(typeof markComments === "function") markComments();
   var tt = $("tcTask"); if(tt) tt.textContent = realTasks().length;
   renderOwners();
   renderSOCRef();
@@ -1963,6 +2012,22 @@ function render(){
         '<button class="icon toggle' + (state.open[t.id] ? " on":"") + '" data-a="toggle">' + n + ' &#9662;</button>' +
         '<button class="icon del" data-a="del" title="Delete">&#10005;</button>' +
       '</td></tr>';
+
+    if(state.showComments && !wk){
+      var cs = commentsOf(t.id), last = cs.length ? cs[cs.length - 1] : null;
+      html += '<tr class="crow' + (isDraft(t) ? " draft" : "") + zebra + '" data-id="' + t.id + '">' +
+        '<td colspan="' + (state.cols.length + 2) + '">' +
+          '<div class="cline">' +
+            '<span class="cicon">&#128172;</span>' +
+            (last
+              ? '<span class="clast"><b>' + esc(last.who) + '</b> ' + esc(last.text) +
+                '<span class="cwhen">' + ago(last.ts) + '</span></span>' +
+                (cs.length > 1 ? '<button class="cmore" data-a="cmore">' + cs.length + ' comments</button>' : '')
+              : '<span class="cnone">No comments</span>') +
+            '<input class="cinput" data-a="ctext" placeholder="Comment on ' + esc(numOf(t.id)) + '">' +
+            '<button class="cadd" data-a="cadd">Add</button>' +
+          '</div></td></tr>';
+    }
 
     if(state.open[t.id]){
       var entries = taskLog(t.id).slice().reverse();
@@ -2192,6 +2257,9 @@ function wire(){
     if(a === "socadd") el.onchange = function(){ if(el.value) toggleSOC2(id, el.value); };
     if(a === "socauto") el.onclick = function(){ var t = find(id); if(!t) return;
       t.soc2auto = true; autoMap(t); save(); render(); };
+    if(a === "cadd")  el.onclick = function(){ addComment(id, tr.querySelector("[data-a='ctext']")); };
+    if(a === "ctext") el.onkeydown = function(e){ if(e.key === "Enter"){ e.preventDefault(); addComment(id, el); } };
+    if(a === "cmore") el.onclick = function(){ state.open[id] = true; render(); };
     if(a === "padd")  el.onclick = function(){ addProgress(id, tr.querySelector("[data-a='ptext']")); };
     if(a === "ptext") el.onkeydown = function(e){ if(e.key === "Enter"){ e.preventDefault(); addProgress(id, el); } };
     if(a === "iadd")  el.onclick = function(){ addIssue(id, tr.querySelector("[data-a='itext']")); };
@@ -2211,13 +2279,13 @@ function stamp(){ var d = new Date(), p = function(n){ return (n<10?"0":"")+n; }
   return d.getFullYear() + p(d.getMonth()+1) + p(d.getDate()); }
 
 function toTSV(){
-  var head = ["#","Task","Instructions","SOC 2","SOC 2 source","Owner","Helper","Collaborators","Start","Days late","Due by","Status","Priority","Effort","Open issues","Notes","Last updated","Changes logged"];
+  var head = ["#","Task","Instructions","SOC 2","SOC 2 source","Owner","Helper","Collaborators","Start","Days late","Due by","Status","Priority","Effort","Open issues","Comments","Notes","Last updated","Changes logged"];
   var lines = [head.join("\t")];
   sortRows(visible()).filter(function(t){ return !isDraft(t); }).forEach(function(t){
     lines.push([ numOf(t.id), t.title, (t.instructions || "").replace(/\s+/g," "),
       socList(t).join(" "), (socList(t).length ? (t.soc2auto === false ? "confirmed" : "suggested") : ""),
       t.owner, t.helper || "", collabOf(t).join(", "), t.start || "", daysLate(t) || "",
-      t.due, label(t.status), t.prio, t.loe || "Medium", openIssues(t.id).length,
+      t.due, label(t.status), t.prio, t.loe || "Medium", openIssues(t.id).length, commentsOf(t.id).length,
       (t.notes || "").replace(/\s+/g," "), fmt(t.updated), taskLog(t.id).length
     ].map(function(c){ return String(c == null ? "" : c).replace(/\t/g," "); }).join("\t"));
   });
@@ -2265,7 +2333,7 @@ function buildWorkbook(){
   var num = {};
   /* Tasks */
   var th = ["#","Task","Instructions","SOC 2","SOC 2 source","Owner","Helper","Collaborators",
-            "Start","Due by","Days late","Status","Priority","Effort","Open issues","Notes",
+            "Start","Due by","Days late","Status","Priority","Effort","Open issues","Comments","Notes",
             "Last updated","Changes logged","Images"];
   var trows = sortRows(state.tasks.filter(function(t){ return !isDraft(t); })).map(function(t){
     return [ numOf(t.id), t.title, t.instructions || "", socList(t).join(" "),
@@ -2379,6 +2447,19 @@ function markNewPos(){
     x.setAttribute("aria-pressed", (x.dataset.np === "top") === !!state.newTop ? "true" : "false"); });
 }
 markNewPos();
+
+document.querySelectorAll(".cswitch button").forEach(function(b){
+  b.onclick = function(){
+    state.showComments = b.dataset.cs === "1";
+    store.set("tracker.comments", state.showComments ? "1" : "0");
+    render();
+  };
+});
+function markComments(){
+  document.querySelectorAll(".cswitch button").forEach(function(x){
+    x.setAttribute("aria-pressed", (x.dataset.cs === "1") === !!state.showComments ? "true" : "false"); });
+}
+markComments();
 
 function setSaveMode(mode){
   saveMode = mode;
