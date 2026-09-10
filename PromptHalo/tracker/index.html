@@ -1,404 +1,6 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-    <script>
-      (function() {
-        // Capture host references before any artifact code runs: Window.parent
-        // is [Replaceable] (a top-level `var parent` in artifact code would
-        // replace the accessor with a data property), and a top-level
-        // `const crypto` would shadow the global — either would otherwise
-        // silently break the bridge for artifacts that worked before.
-        const realParent = window.parent;
-        const cryptoObj = window.crypto;
-        // html-to-image is only used by takeScreenshot: fetched on first use, not as a
-        // parser-blocking tag. Native fetch, captured before the proxy override below.
-        const realFetch = typeof window.fetch === 'function' ? window.fetch.bind(window) : null;
-        const HTML_TO_IMAGE_SRC = "https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.13/html-to-image.min.js";
-        const HTML_TO_IMAGE_INTEGRITY = "sha512-iZ2ORl595Wx6miw+GuadDet4WQbdSWS3JLMoNfY8cRGoEFy6oT3G9IbcrBeL6AfkgpA51ETt/faX6yLV+/gFJg==";
-        let htmlToImageLoad = null;
-        const loadHtmlToImage = () => {
-          if (!htmlToImageLoad) {
-            htmlToImageLoad = (realFetch
-              ? realFetch(HTML_TO_IMAGE_SRC, { integrity: HTML_TO_IMAGE_INTEGRITY, credentials: 'omit', referrerPolicy: 'no-referrer' })
-              : Promise.reject(new Error('fetch unavailable'))
-            )
-              .then((res) => {
-                if (!res.ok) throw new Error('html-to-image failed to load (' + res.status + ')');
-                return res.text();
-              })
-              .then((source) => {
-                // UMD bundle: hide the artifact's AMD/CommonJS globals so it takes the
-                // window-global branch; inline script text runs synchronously on insert.
-                const hidden = ['define', 'module', 'exports'].map((k) => {
-                  const entry = { k, own: Object.prototype.hasOwnProperty.call(window, k), v: window[k] };
-                  try { window[k] = undefined; } catch (e) {}
-                  return entry;
-                });
-                try {
-                  const el = document.createElement('script');
-                  el.text = source;
-                  (document.head || document.documentElement).appendChild(el);
-                } finally {
-                  hidden.forEach(({ k, own, v }) => {
-                    try { if (own) { window[k] = v; } else { delete window[k]; } } catch (e) {}
-                  });
-                }
-                if (!window.htmlToImage) throw new Error('html-to-image unavailable after load');
-                return window.htmlToImage;
-              });
-            // A failed load may be transient; let the next screenshot retry.
-            htmlToImageLoad.catch(() => { htmlToImageLoad = null; });
-          }
-          return htmlToImageLoad;
-        };
-        // crypto.randomUUID exists only in Secure Contexts; fall back to a
-        // unique non-crypto id elsewhere (http://LAN-IP dev flows) —
-        // uniqueness is what the bridge needs, unpredictability is
-        // defense-in-depth on top of the source guards.
-        const newRequestId =
-          cryptoObj && typeof cryptoObj.randomUUID === "function"
-            ? function () { return cryptoObj.randomUUID(); }
-            : function () { return Date.now() + "-" + Math.random(); };
-        const originalConsole = window.console;
-        window.console = {
-          log: (...args) => {
-            originalConsole.log(...args);
-            realParent.postMessage({ type: 'console', message: args.join(' ') }, '*');
-          },
-          error: (...args) => {
-            originalConsole.error(...args);
-            realParent.postMessage({ type: 'console', message: 'Error: ' + args.join(' ') }, '*');
-          },
-          warn: (...args) => {
-            originalConsole.warn(...args);
-            realParent.postMessage({ type: 'console', message: 'Warning: ' + args.join(' ') }, '*');
-          }
-        };
-
-        // Bridge request ids are crypto-random (not sequential) so they
-        // cannot be predicted by other frames in the tab.
-        let callbacksMap = new Map();
-        let streamControllers = new Map();
-        
-        window.claude = {
-          complete: (prompt) => {
-            return new Promise((resolve, reject) => {
-              const id = newRequestId();
-              callbacksMap.set(id, { resolve, reject });
-              realParent.postMessage({ type: 'claudeComplete', id, prompt }, '*');
-            });
-          }
-        };
-
-        window.storage = {
-          get: (key, shared = false) => {
-            return new Promise((resolve, reject) => {
-              const id = newRequestId();
-              callbacksMap.set(id, { resolve, reject });
-              realParent.postMessage({ type: 'storageGet', id, key, shared }, '*');
-            });
-          },
-          set: (key, value, shared = false) => {
-            return new Promise((resolve, reject) => {
-              const id = newRequestId();
-              callbacksMap.set(id, { resolve, reject });
-              realParent.postMessage({ type: 'storageSet', id, key, value, shared }, '*');
-            });
-          },
-          delete: (key, shared = false) => {
-            return new Promise((resolve, reject) => {
-              const id = newRequestId();
-              callbacksMap.set(id, { resolve, reject });
-              realParent.postMessage({ type: 'storageDelete', id, key, shared }, '*');
-            });
-          },
-          list: (prefix, shared = false) => {
-            return new Promise((resolve, reject) => {
-              const id = newRequestId();
-              callbacksMap.set(id, { resolve, reject });
-              realParent.postMessage({ type: 'storageList', id, prefix, shared }, '*');
-            });
-          }
-        };
-
-        let pendingBlobs = new Map();
-        URL.createObjectURL = (blob) => {
-          // Store the blob and create an ID and URL for it
-          const blobId = `blob-${Date.now()}-${Math.random()}`;
-          pendingBlobs.set(blobId, blob);
-          return `blob-request://${blobId}`;
-        };
-
-        URL.revokeObjectURL = (url) => {
-          // Remove the blob from our store
-          const blobId = url.replace("blob-request://", "");
-          pendingBlobs.delete(blobId);
-        };
-
-        const getBlobFromURL = (url) => {
-          const blobId = url.replace("blob-request://", "");
-          return pendingBlobs.get(blobId);
-        };
-
-        // Override global fetch with streaming support
-        window.fetch = (url, init = {}) => {
-          return new Promise((resolve, reject) => {
-            const id = newRequestId();
-            const channelId = `fetch-${id}-${Date.now()}`;
-            
-            callbacksMap.set(id, { 
-              resolve: (response) => {
-                // Null-body statuses: Response(stream, {status: 204}) throws
-                // per the Fetch spec, which would escape this resolver and
-                // hang the artifact's await forever.
-                if (response.status === 204 || response.status === 205 || response.status === 304) {
-                  try {
-                    resolve(new Response(null, {
-                      status: response.status,
-                      statusText: response.statusText,
-                      headers: response.headers
-                    }));
-                  } catch (err) {
-                    // Invalid statusText/header bytes can throw here too.
-                    reject(new TypeError(
-                      'Bridge fetch: unconstructable response (status ' + response.status + ')'
-                    ));
-                  }
-                  return;
-                }
-                // Create a ReadableStream for the response body
-                const stream = new ReadableStream({
-                  start(controller) {
-                    streamControllers.set(channelId, controller);
-                  },
-                  cancel() {
-                    streamControllers.delete(channelId);
-                  }
-                });
-                
-                // Create and return the Response with the stream. Response()
-                // requires status in [200, 599]; an opaque/no-cors fetch
-                // forwards status 0, which would throw here and escape the
-                // resolver, hanging the artifact's await. Surface it as a
-                // network-error-shaped rejection instead.
-                try {
-                  resolve(new Response(stream, {
-                    status: response.status,
-                    statusText: response.statusText,
-                    headers: response.headers
-                  }));
-                } catch (err) {
-                  streamControllers.delete(channelId);
-                  reject(new TypeError(
-                    'Bridge fetch: unconstructable response (status ' + response.status + ')'
-                  ));
-                }
-              },
-              reject,
-              channelId
-            });
-            
-            realParent.postMessage({
-              type: 'proxyFetch',
-              id,
-              url,
-              init,
-              channelId
-            }, '*');
-          });
-        };
-
-        window.addEventListener('message', async (event) => {
-          // Only the embedding parent may drive the bridge — sibling and
-          // nested frames can also postMessage into this window.
-          if (event.source !== realParent) return;
-          if (event.data.type === 'takeScreenshot') {
-            // Echo the request's nonce so the requester can correlate the
-            // reply to ITS request — a reply without the expected nonce
-            // (e.g. from a stale pre-remount artifact) is ignored upstream.
-            const screenshotNonce = event.data.nonce;
-            const rootElement = document.getElementById('artifacts-component-root-html');
-            if (!rootElement) {
-              realParent.postMessage({
-                type: 'screenshotError',
-                nonce: screenshotNonce,
-                error: new Error('Root element not found'),
-              }, '*');
-              return;
-            }
-            // Catch CDN load failures and toPng errors so the parent always
-            // gets a response instead of hanging forever.
-            try {
-              const htmlToImage = await loadHtmlToImage();
-              const screenshot = await htmlToImage.toPng(rootElement, {
-                imagePlaceholder:
-                  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjePDgwX8ACOQDoNsk0PMAAAAASUVORK5CYII=",
-              });
-              realParent.postMessage({
-                type: 'screenshotData',
-                nonce: screenshotNonce,
-                data: screenshot,
-              }, '*');
-            } catch (err) {
-              realParent.postMessage({
-                type: 'screenshotError',
-                nonce: screenshotNonce,
-                error: err instanceof Error ? err : new Error(String(err)),
-              }, '*');
-            }
-          } else if (event.data.type === 'claudeComplete') {
-            const callback = callbacksMap.get(event.data.id);
-            if (!callback) return;
-            if (event.data.error) {
-              callback.reject(new Error(event.data.error));
-            } else {
-              callback.resolve(event.data.completion);
-            }
-            callbacksMap.delete(event.data.id);
-          } else if (event.data.type === 'proxyFetchResponse') {
-            const callback = callbacksMap.get(event.data.id);
-            if (!callback) return;
-            if (event.data.error) {
-              callback.reject(new Error(event.data.error));
-              callbacksMap.delete(event.data.id);
-            } else {
-              // Initial response with headers, status, etc.
-              callback.resolve({
-                status: event.data.status,
-                statusText: event.data.statusText,
-                headers: event.data.headers
-              });
-              // Don't delete the callback yet if streaming
-              if (!event.data.body) {
-                callbacksMap.delete(event.data.id);
-              }
-            }
-          } else if (event.data.type === 'proxyFetchStream') {
-            // Handle streaming data chunks
-            const controller = streamControllers.get(event.data.channelId);
-            if (controller) {
-              if (event.data.error) {
-                controller.error(new Error(event.data.error));
-                streamControllers.delete(event.data.channelId);
-              } else if (event.data.done) {
-                controller.close();
-                streamControllers.delete(event.data.channelId);
-                // Clean up the callback
-                const callback = Array.from(callbacksMap.entries()).find(
-                  ([_, value]) => value.channelId === event.data.channelId
-                );
-                if (callback) {
-                  callbacksMap.delete(callback[0]);
-                }
-              } else if (event.data.chunk) {
-                controller.enqueue(new Uint8Array(event.data.chunk));
-              }
-            }
-          } else if (event.data.type === 'storageGet') {
-            const callback = callbacksMap.get(event.data.id);
-            if (!callback) return;
-            if (event.data.error) {
-              callback.reject(new Error(event.data.error));
-            } else {
-              callback.resolve(event.data.result);
-            }
-            callbacksMap.delete(event.data.id);
-          } else if (event.data.type === 'storageSet') {
-            const callback = callbacksMap.get(event.data.id);
-            if (!callback) return;
-            if (event.data.error) {
-              callback.reject(new Error(event.data.error));
-            } else {
-              callback.resolve(event.data.result);
-            }
-            callbacksMap.delete(event.data.id);
-          } else if (event.data.type === 'storageDelete') {
-            const callback = callbacksMap.get(event.data.id);
-            if (!callback) return;
-            if (event.data.error) {
-              callback.reject(new Error(event.data.error));
-            } else {
-              callback.resolve(event.data.result);
-            }
-            callbacksMap.delete(event.data.id);
-          } else if (event.data.type === 'storageList') {
-            const callback = callbacksMap.get(event.data.id);
-            if (!callback) return;
-            if (event.data.error) {
-              callback.reject(new Error(event.data.error));
-            } else {
-              callback.resolve(event.data.result);
-            }
-            callbacksMap.delete(event.data.id);
-          }
-        });
-
-        window.addEventListener('click', (event) => {
-          const isEl = event.target instanceof HTMLElement;
-          if (!isEl) return;
-    
-          // find ancestor links
-          const linkEl = event.target.closest("a");
-          if (!linkEl || !linkEl.href) return;
-    
-          event.preventDefault();
-          event.stopImmediatePropagation();
-    
-          if (linkEl.href.startsWith("blob-request:")) {
-            const blob = getBlobFromURL(linkEl.href);
-            if (!blob) return;
-            void blob.arrayBuffer().then((data) => {
-              realParent.postMessage({
-                type: "downloadFile",
-                filename: linkEl.download,
-                data,
-                mimeType: blob.type || "application/octet-stream",
-              });
-            });
-          } else if (linkEl.href.startsWith("data:")) {
-            const [header, base64Data] = linkEl.href.split(",");
-            const mimeMatch = header.match(/data:([^;]+)/);
-            const mimeType = mimeMatch ? mimeMatch[1] : "application/octet-stream";
-            const binaryString = atob(base64Data);
-            const data = Uint8Array.from(binaryString, (c) =>
-              c.charCodeAt(0),
-            ).buffer;
-            realParent.postMessage({
-              type: "downloadFile",
-              filename: linkEl.download,
-              data,
-              mimeType,
-            });
-          } else {
-            let linkUrl;
-            try {
-              linkUrl = new URL(linkEl.href);
-            } catch (error) {
-              return;
-            }
-    
-            if (linkUrl.hostname === window.location.hostname) return;
-      
-            realParent.postMessage({
-              type: 'openExternal',
-              href: linkEl.href,
-            }, '*');
-          }
-      });
-
-        const originalOpen = window.open;
-        window.open = function (url) {
-          realParent.postMessage({
-            type: "openExternal",
-            href: url,
-          }, "*");
-        };
-
-        window.addEventListener('error', (event) => {
-          realParent.postMessage({ type: 'console', message: 'Uncaught Error: ' + event.message }, '*');
-        });
-      })();
-    </script>
-  
+<html lang="en">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Task Tracker</title>
@@ -589,8 +191,10 @@ th.sortable:hover{color:var(--blue-ink)}
 th .arw{font-size:.7rem;color:var(--blue-ink)}
 td{padding:.32rem .45rem;border-bottom:1px solid #EFF4F6;vertical-align:middle}
 tr.row:last-child td{border-bottom:0}
-tr.row.done td:not(.keep) input,tr.row.done td:not(.keep) select{color:#93A5AD}
-tr.row.done .f-title{text-decoration:line-through;text-decoration-color:#BFCCD3}
+tr.row.done td,tr.detail.done td{background-color:#E9F4EC}
+tr.row.done:hover td{background-color:#DFEDE3}
+tr.row.done td:not(.keep) input,tr.row.done td:not(.keep) select{color:#5E7A68}
+tr.row.done .f-title{text-decoration:line-through;text-decoration-color:#9EBBA8}
 
 td input,td select,td textarea{width:100%;font:inherit;font-size:.92rem;border:1px solid transparent;
   border-radius:5px;padding:.3rem .4rem;background:transparent;color:var(--ink)}
@@ -977,7 +581,7 @@ details.who-grp>summary:hover{background:var(--soft)}
 body.printing .tscroll{overflow:visible}
 </style>
 </head>
-<body id="artifacts-component-root-html" class="">
+<body>
 
 <header>
   <div>
@@ -1005,24 +609,24 @@ body.printing .tscroll{overflow:visible}
   <div class="syncbar" id="syncbar">
     <button class="act save" id="savebtn" type="button" title="Everything saves as you type. This forces a save and copies it everywhere you have set up.">Save</button>
     <span class="savedat" id="savedat">Saved</span>
-    <span class="wheresaved" id="wheresaved">in ./data, once you have shown the browser the folder</span>
+    <span class="wheresaved" id="wheresaved"></span>
     <span class="dot"></span>
     <span class="synctxt" id="syncstat">Working locally in this browser.</span>
     <span class="presence" id="presence"></span>
     <span class="dirstat" id="dirstat"></span>
     <span class="autoload" id="autoload"></span>
     <span class="smode">Save to
-      <button type="button" id="smDevice" data-sm="browser" title="Keep the board in this browser, on this device only" aria-pressed="false">This device</button>
-      <button type="button" id="smFolder" data-sm="folder" title="Keep the board in the data folder beside this page, so anyone opening the page sees it" aria-pressed="true">./data folder</button>
+      <button type="button" id="smDevice" data-sm="browser" title="Keep the board in this browser, on this device only">This device</button>
+      <button type="button" id="smFolder" data-sm="folder" title="Keep the board in the data folder beside this page, so anyone opening the page sees it">./data folder</button>
     </span>
     <span class="spacer"></span>
     <button class="act ghost sm" id="linkfile" type="button">Share via a file</button>
     <button class="act ghost sm hidden" id="unlinkfile" type="button">Stop sharing</button>
-    <button class="act warnbtn sm" id="pickstore" type="button" title="Show the browser this page's folder once, then saving is automatic">Choose folder once</button>
+    <button class="act warnbtn sm hidden" id="pickstore" type="button" title="Show the browser this page's folder once, then saving is automatic">Choose folder once</button>
     <button class="act ghost sm" id="linkdir" type="button" title="Pick a folder and the tracker keeps saving copies into it">Backup folder</button>
     <button class="act ghost sm hidden" id="unlinkdir" type="button">Stop backups</button>
     <button class="act ghost sm" id="backupnow" type="button" title="Download a dated copy right now">Backup now</button>
-    <button class="act sub sm" id="zipall" type="button" title="The tracker, the data, the exports and the images in one archive" disabled="">Packing...</button>
+    <button class="act sub sm" id="zipall" type="button" title="The tracker, the data, the exports and the images in one archive">Download all (zip)</button>
     <button class="act ghost sm" id="reloaddata" type="button" title="Read data/tracker.json again">Reload data</button>
     <button class="act ghost sm" id="restorebtn" type="button">Restore</button>
   </div>
@@ -1030,7 +634,7 @@ body.printing .tscroll{overflow:visible}
   <div class="tabs" id="tabs" role="tablist">
     <button type="button" data-p="tasks" role="tab" aria-selected="true">Tasks <span class="tc" id="tcTask"></span></button>
     <button type="button" data-p="activity" role="tab" aria-selected="false">Activity log <span class="tc" id="tcAct"></span></button>
-    <button type="button" data-p="gantt" role="tab" aria-selected="false">Gantt <span class="tc" id="tcGantt">1</span></button>
+    <button type="button" data-p="gantt" role="tab" aria-selected="false">Gantt <span class="tc" id="tcGantt"></span></button>
     <button type="button" data-p="people" role="tab" aria-selected="false">People <span class="tc" id="tcPeople"></span></button>
     <button type="button" data-p="soc" role="tab" aria-selected="false">SOC 2 coverage <span class="tc" id="tcSoc"></span></button>
   </div>
@@ -1046,14 +650,14 @@ body.printing .tscroll{overflow:visible}
     </div>
   <div class="bar">
     <button class="act" id="add" type="button">+ Task</button>
-    <button class="act sub" id="addsub" type="button" title="Adds a subtask under task 3">+ Subtask under 3</button>
+    <button class="act sub" id="addsub" type="button" disabled>+ Subtask</button>
     <span class="newpos">New at
-      <button type="button" data-np="top" aria-pressed="true">Top</button>
-      <button type="button" data-np="bottom" aria-pressed="false">Bottom</button>
+      <button type="button" data-np="top">Top</button>
+      <button type="button" data-np="bottom">Bottom</button>
     </span>
     <input type="search" id="q" placeholder="Search any column: task, owner, SOC 2, status, dates">
     <span class="hits" id="hits"></span>
-    <select id="fowner"><option value="">All people</option><option>Prv</option><option>someone</option><option>Teja</option></select>
+    <select id="fowner"><option value="">All people</option></select>
     <span class="dfilter">
       <select id="dfield" title="Which date to filter on">
         <option value="due">Due by</option>
@@ -1062,7 +666,7 @@ body.printing .tscroll{overflow:visible}
       </select>
       <input type="date" id="dfrom" title="From this date">
       <input type="date" id="dto" title="To this date">
-      <button type="button" id="dclear" title="Clear the date filter">✕</button>
+      <button type="button" id="dclear" title="Clear the date filter">&#10005;</button>
     </span>
     <select id="fstatus">
       <option value="">All statuses</option>
@@ -1079,8 +683,8 @@ body.printing .tscroll{overflow:visible}
     <button class="act ghost sm" id="emptyclear" type="button" title="Delete rows nobody has filled in">Clear empty rows</button>
     <button class="act ghost sm" id="wreset" type="button" title="Put every column back to its default width">Reset widths</button>
     <span class="panner">Scroll
-      <button type="button" id="panl" title="Scroll the table left">◀</button>
-      <button type="button" id="panr" title="Scroll the table right">▶</button>
+      <button type="button" id="panl" title="Scroll the table left">&#9664;</button>
+      <button type="button" id="panr" title="Scroll the table right">&#9654;</button>
     </span>
     <span class="viewsw">View
       <button type="button" data-v="outline" aria-pressed="true">Outline</button>
@@ -1092,11 +696,11 @@ body.printing .tscroll{overflow:visible}
     <button class="act ghost sm" id="tsv" type="button">Copy</button>
     <button class="act ghost sm" id="exp" type="button">Export</button>
     <button class="act ghost sm" id="impBtn" type="button">Import</button>
-    <input type="file" id="imp" accept="application/json" hidden="">
+    <input type="file" id="imp" accept="application/json" hidden>
   </div>
   <p class="hint-line">Tasks are numbered <b>1, 2, 3</b>. Subtasks take their parent's number: <b>1.1, 1.2</b>. Use <b>+ Subtask</b> to add one. A task with subtasks shows a count you can click to fold it away. Reorder by <b>dragging the handle</b>, using the <b>arrows</b>, or typing a number in the # column. Switch to <b>By week</b> to see the same tasks grouped by due date.</p>
   <div class="bulk" id="bulk">
-    <span id="bulkn"></span>
+    <span id="bulkn">0 rows selected</span>
     <button class="act sm warn" id="bulkdel" type="button">Delete selected</button>
     <button class="act ghost sm" id="bulkclear" type="button">Clear selection</button>
   </div>
@@ -1118,7 +722,7 @@ body.printing .tscroll{overflow:visible}
   <section class="panel hidden" id="p-activity">
     <p class="phead">Grouped by author and collapsed. Open a name to see what that person changed. <span id="actcount"></span></p>
   <div class="bar">
-      <select id="fwho"><option value="">All people</option><option>someone</option></select>
+      <select id="fwho"><option value="">All people</option></select>
       <input type="search" id="aq" placeholder="Search activity">
       <div class="spacer"></div>
       <button class="act ghost sm" id="aexpand" type="button">Expand all</button>
@@ -1130,7 +734,7 @@ body.printing .tscroll{overflow:visible}
 
   <section class="panel hidden" id="p-gantt">
     <p class="phead">Drawn from the start and due dates on the Tasks tab, and it follows whatever filters you
-      have set there. <span id="gantthead">(1 on the chart)</span></p>
+      have set there. <span id="gantthead"></span></p>
     <div class="bar">
       <span class="gzoom">Scale
         <button type="button" data-gz="24">Day</button>
@@ -1140,10 +744,10 @@ body.printing .tscroll{overflow:visible}
       <span class="glegend">
         <i class="gk s-not-started"></i>Not started<i class="gk s-started"></i>Started
         <i class="gk s-in-progress"></i>In progress<i class="gk s-blocked"></i>Blocked
-        <i class="gk s-completed"></i>Completed<span class="gdi">◆</span>Milestone
+        <i class="gk s-completed"></i>Completed<span class="gdi">&#9670;</span>Milestone
       </span>
     </div>
-    <div class="gwrap" id="gwrap"><div class="ghead"><div class="glabel gcorner">Task</div><div class="gtrack" style="width:171px"><div class="gmon" style="left:0px;width:171px">Sep 26</div><div class="gtick" style="left:0px"></div><div class="gwl" style="left:3px">7</div><div class="gtick" style="left:63px"></div><div class="gwl" style="left:66px">14</div><div class="gtick" style="left:126px"></div><div class="gwl" style="left:129px">21</div><div class="gtoday" style="left:27px"><span>today</span></div></div></div><div class="gbody"><div class="grow" data-id="tmtszagxs2grot"><div class="glabel"><span class="gnum">1</span><span class="gname">Asset Inventory</span></div><div class="gtrack" style="width:171px"><div class="gms" style="left:129px" title="Milestone 2026-09-22">◆</div><div class="gtail" style="left:145px">2026-09-22 · Teja</div></div></div><div class="goverlay"><div class="gtodayline" style="left:calc(var(--glab) + 27px)"></div></div></div></div>
+    <div class="gwrap" id="gwrap"></div>
     <div id="gnodate"></div>
   </section>
 
@@ -2364,7 +1968,7 @@ function render(){
       var entries = taskLog(t.id).slice().reverse();
       var logs = entries.length ? entries.map(function(a){ return entryHTML(a, false); }).join("")
                                 : '<div class="empty">No entries yet.</div>';
-      html += '<tr class="detail' + zebra + '" data-id="' + t.id + '"><td colspan="' + (state.cols.length + 2) + '"><div class="dgrid">' +
+      html += '<tr class="detail' + (t.status === "completed" ? " done" : "") + zebra + '" data-id="' + t.id + '"><td colspan="' + (state.cols.length + 2) + '"><div class="dgrid">' +
         '<div><h4>ITEM ' + numOf(t.id) +
         (depthOf(t.id) < MAXDEPTH
           ? ' <button class="icon" data-a="addsub">+ Add a subtask under task ' + numOf(t.id) + '</button>'
@@ -3703,6 +3307,5 @@ showTab(store.get("tracker.tab") || "tasks");
 render();
 if(!named()) { var g = $("gname"); if(g) g.focus(); }
 </script>
-
-
-</body></html>
+</body>
+</html>
