@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agentic AI Risk Tabletop, eight slides</title>
+<style>
+:root{
+  --ink:#25333c; --gray:#5f7280; --light:#93a6b3; --line:#dde7ee;
+  --bg:#eef4f9; --soft:#eaf2f8;
+  --blue:#cfe3f2; --blue-d:#a9c8e0; --blue-ink:#2f5d80;
+  --rose:#f5dcd9; --rose-d:#e0b3ad; --rose-ink:#8d5049;
+  --amber:#f7e5c8; --amber-d:#e2c294; --amber-ink:#8a6636;
+  --sage:#d8e9dc; --sage-d:#aecdb6; --sage-ink:#4a7157;
+  --violet:#e2dced; --violet-d:#c0b4d6; --violet-ink:#5d5080;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);
+  font-family:Calibri,Inter,"Segoe UI",system-ui,sans-serif;line-height:1.45;
+  display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:1.1rem 1.1rem 4.6rem}
+
+.stage{width:min(100%,1500px);aspect-ratio:16/9;position:relative}
+.slide{position:absolute;inset:0;container-type:size;background:#fff;border:1px solid var(--line);
+  border-radius:14px;box-shadow:0 6px 26px rgba(47,93,128,.13);overflow:hidden;display:none}
+.slide.on{display:block}
+.pad{padding:4.2cqh 3.4cqw 0;height:88cqh;display:flex;flex-direction:column}
+
+.t-rose{--tone:var(--rose-d);--tsoft:var(--rose);--tink:var(--rose-ink)}
+.t-amber{--tone:var(--amber-d);--tsoft:var(--amber);--tink:var(--amber-ink)}
+.t-blue{--tone:var(--blue-d);--tsoft:var(--blue);--tink:var(--blue-ink)}
+.t-violet{--tone:var(--violet-d);--tsoft:var(--violet);--tink:var(--violet-ink)}
+
+.shead{border-left:.5cqw solid var(--tone);padding-left:1.1cqw;margin-bottom:2.6cqh}
+.shead.tight{margin-bottom:2cqh}
+.eyebrow{font-size:1.15cqw;letter-spacing:.14em;text-transform:uppercase;color:var(--tink);font-weight:700}
+.newtag{background:var(--tsoft);border-radius:99px;padding:.15cqh .6cqw;margin-left:.3cqw}
+.shead h2{font-size:3.1cqw;font-weight:700;letter-spacing:-.015em;color:#1f4762;line-height:1.12;margin-top:.5cqh}
+.quote{font-size:1.5cqw;color:var(--gray);font-style:italic;margin-top:.6cqh}
+
+.anchor{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.45fr);gap:2cqw;align-items:center;
+  background:var(--tsoft);border-radius:1cqw;padding:1.8cqh 1.8cqw;margin-bottom:3cqh}
+.alab{font-size:1.05cqw;letter-spacing:.14em;text-transform:uppercase;color:var(--tink);font-weight:700;opacity:.75}
+.aname{font-size:1.75cqw;font-weight:700;color:var(--tink);margin-top:.3cqh;line-height:1.25}
+.facts{display:flex;flex-wrap:wrap;gap:.4cqw;margin-top:1cqh}
+.fact{font-size:1.05cqw;background:#fff;border-radius:99px;padding:.35cqh .8cqw;color:var(--tink)}
+.adet{font-size:1.4cqw;color:var(--gray);line-height:1.5}
+
+.blab{font-size:1.1cqw;letter-spacing:.14em;text-transform:uppercase;color:var(--light);font-weight:700;
+  margin-bottom:1.2cqh}
+.blab.sp{margin-top:2.4cqh}
+.illus{letter-spacing:0;text-transform:none;font-weight:400;color:#adbcc6}
+
+.flow{display:flex;align-items:stretch;gap:.5cqw;flex:1}
+.step{position:relative;flex:1;background:#fff;border:1px solid var(--line);border-radius:.9cqw;
+  padding:2.2cqh 1.1cqw 1.6cqh;box-shadow:0 .3cqh 1.1cqh rgba(47,93,128,.11);
+  display:flex;flex-direction:column;gap:.9cqh;color:var(--tink)}
+.step::before{content:"";position:absolute;inset:0 0 auto 0;height:.55cqh;background:var(--tone);
+  border-radius:.9cqw .9cqw 0 0}
+.sno{position:absolute;top:1.3cqh;right:.8cqw;font-size:1.05cqw;font-weight:700;color:var(--tink);
+  background:var(--tsoft);border-radius:99px;width:2.4cqh;height:2.4cqh;display:grid;place-items:center}
+.ic{width:1.9cqw;height:1.9cqw;flex:none}
+.ic.big{width:3cqw;height:3cqw}
+.stitle{font-size:1.45cqw;font-weight:700;color:var(--ink);line-height:1.25}
+.sdet{font-size:1.2cqw;color:var(--gray);line-height:1.45}
+.arw{flex:none;display:grid;place-items:center;color:var(--tone);width:2cqw}
+.arw svg{width:1.7cqw;height:1.7cqw}
+
+.cols{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:2.4cqw}
+.steps{list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:.7cqh}
+.steps li{position:relative;background:#fff;border:1px solid var(--line);border-radius:.7cqw;
+  padding:.85cqh 1cqw .85cqh 3.1cqw;font-size:1.22cqw;color:var(--gray);line-height:1.4;
+  box-shadow:0 .15cqh .5cqh rgba(47,93,128,.06)}
+.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:.9cqw;top:.85cqh;
+  width:2.1cqh;height:2.1cqh;border-radius:50%;background:var(--tsoft);color:var(--tink);
+  font-size:1.05cqw;font-weight:700;display:grid;place-items:center}
+
+.chips{display:flex;flex-wrap:wrap;gap:.5cqw}
+.chip{display:flex;align-items:center;gap:.5cqw;background:#fff;border:1px solid var(--line);
+  border-radius:.7cqw;padding:.8cqh .9cqw;font-size:1.2cqw;color:var(--gray);
+  box-shadow:0 .15cqh .5cqh rgba(47,93,128,.07)}
+.chip svg{color:var(--tink)}
+.chip.alt{background:var(--tsoft);border-color:transparent;color:var(--tink);font-weight:600}
+
+.money{display:grid;grid-template-columns:repeat(auto-fit,minmax(9cqw,1fr));gap:.5cqw}
+.mc{background:#fff;border:1px solid var(--line);border-radius:.7cqw;padding:1cqh 1cqw;
+  box-shadow:0 .15cqh .5cqh rgba(47,93,128,.07)}
+.mn{font-size:1.45cqw;font-weight:700;color:var(--tink)}
+.ml{font-size:1.12cqw;color:var(--gray);margin-top:.2cqh}
+.mc.severe{background:var(--rose);border-color:var(--rose-d)}
+.mc.severe .mn{color:var(--rose-ink)}
+
+.sfoot{position:absolute;left:0;right:0;bottom:0;height:5.2cqh;background:#1f4762;color:#c9dcea;
+  display:flex;align-items:center;gap:2cqw;padding:0 3.4cqw;font-size:1.05cqw;letter-spacing:.05em}
+.sfoot .pg{margin-left:auto;font-variant-numeric:tabular-nums}
+
+.bar{position:fixed;left:50%;transform:translateX(-50%);bottom:1rem;display:flex;align-items:center;gap:.5rem;
+  background:#fff;border:1px solid var(--line);border-radius:99px;padding:.4rem .7rem;
+  box-shadow:0 3px 14px rgba(47,93,128,.16);z-index:10}
+.bar button{font:inherit;font-size:.85rem;border:1px solid var(--line);background:#fff;color:var(--gray);
+  border-radius:99px;padding:.28rem .8rem;cursor:pointer}
+.bar button:hover{border-color:var(--blue-d);color:var(--blue-ink)}
+.dots{display:flex;gap:.28rem;margin:0 .3rem}
+.dots button{width:.62rem;height:.62rem;padding:0;border-radius:50%;background:#d5e2ec;border:0}
+.dots button[aria-current="true"]{background:var(--blue-ink)}
+.count{font-size:.82rem;color:var(--light);font-variant-numeric:tabular-nums;min-width:2.6rem;text-align:center}
+.hint{position:fixed;right:1rem;bottom:1rem;font-size:.75rem;color:var(--light)}
+
+@media print{
+  @page{size:297mm 167mm;margin:0}
+  body{background:#fff;padding:0;display:block}
+  .bar,.hint{display:none}
+  .stage{width:100%;aspect-ratio:auto}
+  .slide{display:block;position:relative;inset:auto;width:297mm;height:167mm;border:0;border-radius:0;
+    box-shadow:none;break-after:page}
+  .slide:last-child{break-after:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+
+<section class="slide t-rose" data-i="1">
+  <div class="pad">
+    <div class="shead">
+      <div class="eyebrow">Scenario 1 of 4</div>
+      <h2>They Stole the Science</h2>
+      <p class="quote">Our research data trained the attacker, not us.</p>
+    </div>
+
+    <div class="anchor">
+      <div>
+        <div class="alab">Real world anchor</div>
+        <div class="aname">Hugging Face malicious model and dataset incidents</div>
+        <div class="facts"><span class="fact">Public model hub</span><span class="fact">Pickle and format abuse</span><span class="fact">Runs on load</span></div>
+      </div>
+      <p class="adet">Attackers published poisoned models and datasets to a public hub. Loading one runs attacker code on the machine that opened it, which is how a data download becomes code execution.</p>
+    </div>
+
+    <div class="blab">How it could happen at Dyne</div>
+    <div class="flow"><div class="step"><span class="sno">1</span><svg class="ic big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" rx="7" r="7" style="display:none"/><ellipse cx="12" cy="6" rx="7.5" ry="2.6"/><path d="M4.5 6v12c0 1.4 3.4 2.6 7.5 2.6s7.5-1.2 7.5-2.6V6"/><path d="M4.5 12c0 1.4 3.4 2.6 7.5 2.6s7.5-1.2 7.5-2.6"/></svg><div class="stitle">Researcher imports a public dataset</div><div class="sdet">A bioinformatics or target-discovery dataset is pulled from a public hub into the research environment.</div></div><div class="arw" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m13 6.5 6 5.5-6 5.5"/></svg></div><div class="step"><span class="sno">2</span><svg class="ic big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.2"/><path d="M12 9.8V4.6M10.1 13.1 5.6 15.7M13.9 13.1l4.5 2.6"/></svg><div class="stitle">The file carries a payload</div><div class="sdet">Deserialisation runs attacker code the moment the artefact is loaded. No exploit of Dyne software is needed.</div></div><div class="arw" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m13 6.5 6 5.5-6 5.5"/></svg></div><div class="step"><span class="sno">3</span><svg class="ic big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="11" rx="1.6"/><path d="M2.5 19h19"/><path d="M9.5 9.5h5M9.5 12.2h5"/></svg><div class="stitle">Code runs inside the AI workspace</div><div class="sdet">The payload executes with the researcher&#x27;s rights inside the Claude or OpenAI assisted environment.</div></div><div class="arw" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m13 6.5 6 5.5-6 5.5"/></svg></div><div class="step"><span class="sno">4</span><svg class="ic big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="12" r="3.6"/><path d="M11.6 12H21M18 12v3.2M15 12v2.4"/></svg><div class="stitle">Credentials are harvested</div><div class="sdet">Tokens, SSH keys and cloud profiles sitting on the workstation are collected.</div></div><div class="arw" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m13 6.5 6 5.5-6 5.5"/></svg></div><div class="step"><span class="sno">5</span><svg class="ic big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a4 4 0 0 1-.4-8 5.4 5.4 0 0 1 10.3 1.2A3.4 3.4 0 0 1 17 18z"/></svg><div class="stitle">The agent moves outward</div><div class="sdet">Those credentials open code repositories, data lakes and cloud accounts far beyond the original notebook.</div></div></div>
+  </div>
+  <div class="sfoot">
+    <span>Agentic AI Risk Tabletop Exercise</span>
+    <span>Confidential, for tabletop exercise use only</span>
+    <span class="pg">1 / 8</span>
+  </div>
+</section>
+<section class="slide t-rose" data-i="2">
+  <div class="pad">
+    <div class="shead tight">
+      <div class="eyebrow">Scenario 1, what it costs us</div>
+      <h2>They Stole the Science</h2>
+    </div>
+
+    <div class="cols">
+      <div>
+        <div class="blab">Step by step</div>
+        <ol class="steps"><li>A scientist searches a public hub for a dataset or model to speed up target work and imports it without a provenance check.</li><li>The artefact deserialises on load and executes attacker code with the scientist&#x27;s own permissions.</li><li>The code enumerates the workstation: environment variables, SSH keys, cloud CLI profiles, notebook secrets.</li><li>It uses the AI assistant already installed to search for more secrets, because the assistant can read the filesystem and is trusted.</li><li>Harvested credentials are encoded and pushed to an external repository the attacker controls.</li><li>The attacker reuses those credentials at leisure to reach code, data and cloud services that the original notebook never touched.</li></ol>
+      </div>
+      <div>
+        <div class="blab">What is at risk</div>
+        <div class="chips"><div class="chip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3c0 5 10 5 10 10S7 18 7 21"/><path d="M17 3c0 5-10 5-10 10s10 2 10 8"/><path d="M8.6 7h6.8M8.6 17h6.8M9.8 10.5h4.4"/></svg><span>FORCE platform IP</span></div><div class="chip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3h4M11 3v6.2L5.8 18a2 2 0 0 0 1.7 3h9a2 2 0 0 0 1.7-3L13 9.2V3"/><path d="M8 15h8"/></svg><span>Experimental data and protocols</span></div><div class="chip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8M9.5 3v13.4a2.5 2.5 0 0 0 5 0V3"/><path d="M9.5 11h5"/></svg><span>Preclinical results</span></div><div class="chip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 17.5a6 6 0 1 1 5.6 0"/><path d="M9.6 20h4.8M10.2 22h3.6"/></svg><span>Future disease targets</span></div><div class="chip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8.2 10.5V7.8a3.8 3.8 0 0 1 7.6 0v2.7"/></svg><span>Trade secrets and patent strategy</span></div></div>
+        <div class="blab sp">Business impact</div>
+        <div class="chips"><div class="chip alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10M7 21h10"/><path d="M8 3c0 4 4 5.4 4 9s-4 5-4 9M16 3c0 4-4 5.4-4 9s4 5 4 9"/></svg><span>Research programme delays</span></div><div class="chip alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.5" r="3"/><path d="M3.5 19c.7-3.2 2.9-4.8 5.5-4.8S13.8 15.8 14.5 19"/><circle cx="17" cy="9.5" r="2.4"/><path d="M15.4 14.6c2.1-.5 4.2.9 4.8 4"/></svg><span>Competitive advantage lost</span></div><div class="chip alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M7 20h10M5 8h14M12 6l-4 2M12 6l4 2"/><path d="M5 8 2.6 13.4a2.8 2.8 0 0 0 4.8 0zM19 8l-2.4 5.4a2.8 2.8 0 0 0 4.8 0z"/></svg><span>Legal and patent implications</span></div><div class="chip alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12.5 7 9l4 2.4 3-1.6 4 3.2"/><path d="M3 12.5 7.6 17l3.4-1.6L14 17l4.4-4"/></svg><span>Partner confidence</span></div></div>
+      </div>
+    </div>
+
+    <div class="blab sp">Estimated financial impact <span class="illus">illustrative range</span></div>
+    <div class="money"><div class="mc"><div class="mn">$0.5M to $2M</div><div class="ml">Forensics and containment</div></div><div class="mc"><div class="mn">$1M to $10M+</div><div class="ml">Lost or repeated R&amp;D work</div></div><div class="mc"><div class="mn">$1M to $10M+</div><div class="ml">IP and legal response</div></div><div class="mc"><div class="mn">$10M to $50M+</div><div class="ml">Major development delay</div></div></div>
+  </div>
+  <div class="sfoot">
+    <span>Agentic AI Risk Tabletop Exercise</span>
+    <span>Confidential, for tabletop exercise use only</span>
+    <span class="pg">2 / 8</span>
+  </div>
+</section>
+<section class="slide t-amber" data-i="3">
+  <div class="pad">
+    <div class="shead">
+      <div class="eyebrow">Scenario 2 of 4</div>
+      <h2>Can We Still Trust the Clinical Evidence?</h2>
+      <p class="quote">Nobody typed a malicious instruction. The document did.</p>
+    </div>
+
+    <div class="anchor">
+      <div>
+        <div class="alab">Real world anchor</div>
+        <div class="aname">EchoLeak, zero-click prompt injection in Microsoft 365 Copilot</div>
+        <div class="facts"><span class="fact">CVE-2025-32711</span><span class="fact">Zero click</span><span class="fact">Retrieval abused</span></div>
+      </div>
+      <p class="adet">A crafted email or document carried hidden instructions. The assistant read them while doing its normal job, then retrieved and leaked internal data. The user clicked nothing.</p>
+    </div>
+
+    <div class="blab">How it could happen at Dyne</div>
+    <div class="flow"><div class="step"><span class="sno">1</span><svg class="ic big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="m3.8 7 8.2 6 8.2-6"/></svg><div class="stitle">A document arrives</div><div class="sdet">An email, PDF or investigator report enters the environment through an ordinary channel.</div></div><div class="arw" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m13 6.5 6 5.5-6 5.5"/></svg></div><div class="step"><span class="sno">2</span><svg class="ic big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/></svg><div class="stitle">Hidden instructions ride along</div><div class="sdet">Text invisible to the reader is written for the model, not the person.</div></div><div class="arw" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m13 6.5 6 5.5-6 5.5"/></svg></div><div class="step"><span class="sno">3</span><svg class="ic big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 5.2a2.6 2.6 0 0 0-2.6 2.6 2.6 2.6 0 0 0-1.4 4.8A2.6 2.6 0 0 0 7.4 17a2.6 2.6 0 0 0 4.6 1.5V5.9a2.6 2.6 0 0 0-2.5-.7Z"/><path d="M14.5 5.2a2.6 2.6 0 0 1 2.6 2.6 2.6 2.6 0 0 1 1.4 4.8A2.6 2.6 0 0 1 16.6 17a2.6 2.6 0 0 1-4.6 1.5"/></svg><div class="stitle">The assistant reads it as content</div><div class="sdet">A clinical or regulatory assistant summarises the document and treats the hidden text as direction.</div></div><div class="arw" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m13 6.5 6 5.5-6 5.5"/></svg></div><div class="step"><span class="sno">4</span><svg class="ic big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7.5" ry="2.6"/><path d="M4.5 6v12c0 1.4 3.4 2.6 7.5 2.6s7.5-1.2 7.5-2.6V6"/><path d="M4.5 12c0 1.4 3.4 2.6 7.5 2.6s7.5-1.2 7.5-2.6"/></svg><div class="stitle">Retrieval widens the blast radius</div><div class="sdet">The model pulls trial data, safety signals and correspondence it legitimately has access to.</div></div><div class="arw" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m13 6.5 6 5.5-6 5.5"/></svg></div><div class="step"><span class="sno">5</span><svg class="ic big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18H6z"/><path d="M9 8h6M9 11.5h6M9 15h3"/></svg><div class="stitle">The output is shaped by the attacker</div><div class="sdet">A summary, analysis or draft submission is quietly manipulated, or data leaves in the answer itself.</div></div></div>
+  </div>
+  <div class="sfoot">
+    <span>Agentic AI Risk Tabletop Exercise</span>
+    <span>Confidential, for tabletop exercise use only</span>
+    <span class="pg">3 / 8</span>
+  </div>
+</section>
+<section class="slide t-amber" data-i="4">
+  <div class="pad">
+    <div class="shead tight">
+      <div class="eyebrow">Scenario 2, what it costs us</div>
+      <h2>Can We Still Trust the Clinical Evidence?</h2>
+    </div>
+
+    <div class="cols">
+      <div>
+        <div class="blab">Step by step</div>
+        <ol class="steps"><li>An external document reaches a mailbox, shared drive or reference library that the assistant is allowed to read.</li><li>It contains instructions aimed at the model: hidden text, white on white, alt text or metadata.</li><li>A team member asks a routine question, for example summarise this study or check this endpoint.</li><li>The assistant retrieves related internal material through RAG, because that is what makes it useful.</li><li>The hidden instructions redirect the model to include, restate or send content it should not, or to alter its conclusion.</li><li>The answer looks normal. The manipulation is only visible if someone compares it against the source.</li></ol>
+      </div>
+      <div>
+        <div class="blab">What is at risk</div>
+        <div class="chips"><div class="chip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.5" r="3"/><path d="M3.5 19c.7-3.2 2.9-4.8 5.5-4.8S13.8 15.8 14.5 19"/><circle cx="17" cy="9.5" r="2.4"/><path d="M15.4 14.6c2.1-.5 4.2.9 4.8 4"/></svg><span>Subject level clinical data</span></div><div class="chip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18H6z"/><path d="M9 8h6M9 11.5h6M9 15h3"/></svg><span>Unreleased efficacy results</span></div><div class="chip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v6c0 4.4 3 7.6 7 9 4-1.4 7-4.6 7-9V6z"/><path d="m9 12 2.2 2.2L15.4 10"/></svg><span>Safety information</span></div><div class="chip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h4L11 8.4h8.5A1.5 1.5 0 0 1 21 9.9v8.6A1.5 1.5 0 0 1 19.5 20h-15A1.5 1.5 0 0 1 3 18.5z"/></svg><span>Regulatory correspondence</span></div><div class="chip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><rect x="6" y="12" width="3" height="6"/><rect x="11" y="8" width="3" height="10"/><rect x="16" y="4.5" width="3" height="13.5"/></svg><span>Integrity of clinical evidence</span></div></div>
+        <div class="blab sp">Business impact</div>
+        <div class="chips"><div class="chip alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.5" r="3"/><path d="M3.5 19c.7-3.2 2.9-4.8 5.5-4.8S13.8 15.8 14.5 19"/><circle cx="17" cy="9.5" r="2.4"/><path d="M15.4 14.6c2.1-.5 4.2.9 4.8 4"/></svg><span>Data exposure and privacy risk</span></div><div class="chip alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 2.8 20h18.4z"/><path d="M12 10v4.6M12 17.2v.2"/></svg><span>Regulatory submissions impacted</span></div><div class="chip alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.4" y="9" width="17" height="6" rx="3" transform="rotate(-40 12 12)"/><path d="m9.5 8.2 6 6"/></svg><span>Clinical programme delays</span></div><div class="chip alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M5.6 20c.9-3.8 3.4-5.6 6.4-5.6s5.5 1.8 6.4 5.6"/></svg><span>Potential patient safety impact</span></div></div>
+      </div>
+    </div>
+
+    <div class="blab sp">Estimated financial impact <span class="illus">illustrative range</span></div>
+    <div class="money"><div class="mc"><div class="mn">$0.5M to $5M</div><div class="ml">Investigation and revalidation</div></div><div class="mc"><div class="mn">$1M to $5M+</div><div class="ml">Re-review of AI assisted documents</div></div><div class="mc"><div class="mn">$5M to $100M+</div><div class="ml">Clinical and regulatory delay</div></div><div class="mc"><div class="mn">$10M to $100M+</div><div class="ml">Programme delay and enterprise value</div></div></div>
+  </div>
+  <div class="sfoot">
+    <span>Agentic AI Risk Tabletop Exercise</span>
+    <span>Confidential, for tabletop exercise use only</span>
+    <span class="pg">4 / 8</span>
+  </div>
+</section>
+<section class="slide t-blue" data-i="5">
+  <div class="pad">
+    <div class="shead">
+      <div class="eyebrow">Scenario 3 of 4</div>
+      <h2>The Agent Changed Production</h2>
+      <p class="quote">It had the access. It just used it differently than we expected.</p>
+    </div>
+
+    <div class="anchor">
+      <div>
+        <div class="alab">Real world anchor</div>
+        <div class="aname">Agent incidents disclosed by OpenAI and Anthropic</div>
+        <div class="facts"><span class="fact">Autonomous actions</span><span class="fact">Unintended reach</span><span class="fact">Broad permissions</span></div>
+      </div>
+      <p class="adet">Agents reached external sites and systems outside the boundary intended for them. Broad permissions plus autonomy produced actions nobody explicitly approved.</p>
+    </div>
+
+    <div class="blab">How it could happen at Dyne</div>
+    <div class="flow"><div class="step"><span class="sno">1</span><svg class="ic big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 3v2.4M12 18.6V21M3 12h2.4M18.6 12H21M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></svg><div class="stitle">An agent is given manufacturing access</div><div class="sdet">It is wired to MES, LIMS or a specification store to save manual effort.</div></div><div class="arw" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m13 6.5 6 5.5-6 5.5"/></svg></div><div class="step"><span class="sno">2</span><svg class="ic big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/></svg><div class="stitle">It gathers context from outside</div><div class="sdet">The agent consults external sources that were never vetted as authoritative.</div></div><div class="arw" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m13 6.5 6 5.5-6 5.5"/></svg></div><div class="step"><span class="sno">3</span><svg class="ic big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z"/><path d="M15 3v3h3"/><path d="M9 11h6M9 14.5h6"/></svg><div class="stitle">It selects the wrong specification</div><div class="sdet">A plausible but incorrect parameter or revision is chosen with full confidence.</div></div><div class="arw" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m13 6.5 6 5.5-6 5.5"/></svg></div><div class="step"><span class="sno">4</span><svg class="ic big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10v4M7 12h2.4a1.4 1.4 0 0 0 0-2.8H7M13 10v4M13 12h2.6M17.4 10v4"/></svg><div class="stitle">It writes the change through an API</div><div class="sdet">The system accepts it, because the agent&#x27;s credentials are legitimate.</div></div><div class="arw" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m13 6.5 6 5.5-6 5.5"/></svg></div><div class="step"><span class="sno">5</span><svg class="ic big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20V10l5 3.4V10l5 3.4V10l5 3.4V20z"/><path d="M3 20h18"/><path d="M17.6 10 18.4 4h1.8l.8 6"/></svg><div class="stitle">The CDMO builds to the revised spec</div><div class="sdet">Clinical supply is manufactured against a specification nobody reviewed.</div></div></div>
+  </div>
+  <div class="sfoot">
+    <span>Agentic AI Risk Tabletop Exercise</span>
+    <span>Confidential, for tabletop exercise use only</span>
+    <span class="pg">5 / 8</span>
+  </div>
+</section>
+<section class="slide t-blue" data-i="6">
+  <div class="pad">
+    <div class="shead tight">
+      <div class="eyebrow">Scenario 3, what it costs us</div>
+      <h2>The Agent Changed Production</h2>
+    </div>
+
+    <div class="cols">
+      <div>
+        <div class="blab">Step by step</div>
+        <ol class="steps"><li>An agent is connected to manufacturing or quality systems with write access, to cut turnaround time.</li><li>Its task requires context, so it retrieves from sources outside the validated boundary.</li><li>It resolves ambiguity by choosing, not by escalating. No human is asked because none is required.</li><li>The change is written through an approved integration, so every log shows an authorised call.</li><li>The CDMO manufactures against the revised specification.</li><li>The discrepancy surfaces at batch review or release testing, after material and time are already committed.</li></ol>
+      </div>
+      <div>
+        <div class="blab">What is at risk</div>
+        <div class="chips"><div class="chip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20V10l5 3.4V10l5 3.4V10l5 3.4V20z"/><path d="M3 20h18"/><path d="M17.6 10 18.4 4h1.8l.8 6"/></svg><span>Manufacturing specifications</span></div><div class="chip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v6c0 4.4 3 7.6 7 9 4-1.4 7-4.6 7-9V6z"/><path d="m9 12 2.2 2.2L15.4 10"/></svg><span>Quality systems</span></div><div class="chip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="7" width="11" height="9" rx="1.2"/><path d="M13.5 10h4l3 3.2V16h-7z"/><circle cx="7" cy="18.4" r="1.8"/><circle cx="17.4" cy="18.4" r="1.8"/></svg><span>External partners and CDMOs</span></div><div class="chip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8M9.5 3v13.4a2.5 2.5 0 0 0 5 0V3"/><path d="M9.5 11h5"/></svg><span>Clinical supply</span></div><div class="chip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.5" r="3"/><path d="M3.5 19c.7-3.2 2.9-4.8 5.5-4.8S13.8 15.8 14.5 19"/><circle cx="17" cy="9.5" r="2.4"/><path d="M15.4 14.6c2.1-.5 4.2.9 4.8 4"/></svg><span>Patient safety</span></div></div>
+        <div class="blab sp">Business impact</div>
+        <div class="chips"><div class="chip alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 8 4.2v9.6L12 21l-8-4.2V7.2z"/><path d="m4 7.2 8 4.2 8-4.2M12 11.4V21"/></svg><span>Lot quarantine or replacement</span></div><div class="chip alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10M7 21h10"/><path d="M8 3c0 4 4 5.4 4 9s-4 5-4 9M16 3c0 4-4 5.4-4 9s4 5 4 9"/></svg><span>Manufacturing interruption</span></div><div class="chip alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.5" r="3"/><path d="M3.5 19c.7-3.2 2.9-4.8 5.5-4.8S13.8 15.8 14.5 19"/><circle cx="17" cy="9.5" r="2.4"/><path d="M15.4 14.6c2.1-.5 4.2.9 4.8 4"/></svg><span>Clinical trial delays</span></div><div class="chip alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20h12M7.5 17h9v-2.4c0-1-.8-1.6-1.8-1.9-.9-.3-1.4-1-1.2-2l.5-3.2A2.3 2.3 0 0 0 11.7 5a2.3 2.3 0 0 0-2.3 2.7l.5 3.1c.2 1-.3 1.7-1.2 2-1 .3-1.8.9-1.8 1.9z"/></svg><span>Regulatory impact</span></div><div class="chip alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 2.8 20h18.4z"/><path d="M12 10v4.6M12 17.2v.2"/></svg><span>Potential patient exposure</span></div></div>
+      </div>
+    </div>
+
+    <div class="blab sp">Estimated financial impact <span class="illus">illustrative range</span></div>
+    <div class="money"><div class="mc"><div class="mn">$0.25M to $2M</div><div class="ml">Investigation</div></div><div class="mc"><div class="mn">$1M to $10M+</div><div class="ml">Lot quarantine and replacement</div></div><div class="mc"><div class="mn">$10M to $50M+</div><div class="ml">Trial delay</div></div><div class="mc"><div class="mn">$50M to $100M+</div><div class="ml">Regulatory and approval delay</div></div><div class="mc severe"><div class="mn">Potentially catastrophic: actual patient harm</div></div></div>
+  </div>
+  <div class="sfoot">
+    <span>Agentic AI Risk Tabletop Exercise</span>
+    <span>Confidential, for tabletop exercise use only</span>
+    <span class="pg">6 / 8</span>
+  </div>
+</section>
+<section class="slide t-violet" data-i="7">
+  <div class="pad">
+    <div class="shead">
+      <div class="eyebrow">Scenario 4 of 4 <span class="newtag">new</span></div>
+      <h2>The Assistant Helped Them Rob Us</h2>
+      <p class="quote">Our own AI tooling did the reconnaissance.</p>
+    </div>
+
+    <div class="anchor">
+      <div>
+        <div class="alab">Real world anchor</div>
+        <div class="aname">s1ngularity, the Nx supply chain attack of August 2025</div>
+        <div class="facts"><span class="fact">First AI weaponised supply chain attack</span><span class="fact">~5 hour window</span><span class="fact">~2,300 secrets leaked</span></div>
+      </div>
+      <p class="adet">Malicious npm versions of the Nx build system ran on install, then invoked the developer&#x27;s own AI command line tools with permission bypass flags to hunt for secrets, and published the results to public repositories. Roughly 2,300 secrets across about 1,300 repositories.</p>
+    </div>
+
+    <div class="blab">How it could happen at Dyne</div>
+    <div class="flow"><div class="step"><span class="sno">1</span><svg class="ic big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 8 4.2v9.6L12 21l-8-4.2V7.2z"/><path d="m4 7.2 8 4.2 8-4.2M12 11.4V21"/></svg><div class="stitle">A routine dependency updates</div><div class="sdet">A build or analysis pipeline pulls a new version of a trusted open source package.</div></div><div class="arw" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m13 6.5 6 5.5-6 5.5"/></svg></div><div class="step"><span class="sno">2</span><svg class="ic big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="m7 10 3 2.4-3 2.4M13 15h4"/></svg><div class="stitle">A post-install script runs</div><div class="sdet">Installation executes code by design. Nothing is exploited.</div></div><div class="arw" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m13 6.5 6 5.5-6 5.5"/></svg></div><div class="step"><span class="sno">3</span><svg class="ic big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 5.2a2.6 2.6 0 0 0-2.6 2.6 2.6 2.6 0 0 0-1.4 4.8A2.6 2.6 0 0 0 7.4 17a2.6 2.6 0 0 0 4.6 1.5V5.9a2.6 2.6 0 0 0-2.5-.7Z"/><path d="M14.5 5.2a2.6 2.6 0 0 1 2.6 2.6 2.6 2.6 0 0 1 1.4 4.8A2.6 2.6 0 0 1 16.6 17a2.6 2.6 0 0 1-4.6 1.5"/></svg><div class="stitle">It calls the local AI CLI</div><div class="sdet">The script invokes the installed assistant with flags that skip the usual permission prompts.</div></div><div class="arw" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m13 6.5 6 5.5-6 5.5"/></svg></div><div class="step"><span class="sno">4</span><svg class="ic big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="12" r="3.6"/><path d="M11.6 12H21M18 12v3.2M15 12v2.4"/></svg><div class="stitle">The assistant finds the secrets</div><div class="sdet">It reads the filesystem competently and returns exactly what was asked for: credentials and tokens.</div></div><div class="arw" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m13 6.5 6 5.5-6 5.5"/></svg></div><div class="step"><span class="sno">5</span><svg class="ic big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="6.5" cy="6.5" r="2.4"/><circle cx="6.5" cy="17.5" r="2.4"/><circle cx="17.5" cy="12" r="2.4"/><path d="M6.5 8.9v6.2M8.9 6.9c4 .6 6.2 1.9 6.4 4.6M8.9 17.1c4-.6 6.2-1.9 6.4-4.6"/></svg><div class="stitle">Data is published outward</div><div class="sdet">Findings are encoded and pushed to a public repository, then used to reach private ones.</div></div></div>
+  </div>
+  <div class="sfoot">
+    <span>Agentic AI Risk Tabletop Exercise</span>
+    <span>Confidential, for tabletop exercise use only</span>
+    <span class="pg">7 / 8</span>
+  </div>
+</section>
+<section class="slide t-violet" data-i="8">
+  <div class="pad">
+    <div class="shead tight">
+      <div class="eyebrow">Scenario 4, what it costs us</div>
+      <h2>The Assistant Helped Them Rob Us</h2>
+    </div>
+
+    <div class="cols">
+      <div>
+        <div class="blab">Step by step</div>
+        <ol class="steps"><li>A developer or bioinformatician installs or updates a package in a build, CI job or analysis environment.</li><li>The package&#x27;s install script executes automatically, which is normal behaviour for the ecosystem.</li><li>The script looks for AI command line tools already on the machine and runs them with permission bypass flags.</li><li>The assistant does what it is good at: it searches the filesystem and reports credentials, tokens and keys.</li><li>Results are encoded and pushed to a public repository under the victim&#x27;s own account.</li><li>Leaked tokens are then used to expose private repositories, widening the breach well beyond the first machine.</li></ol>
+      </div>
+      <div>
+        <div class="blab">What is at risk</div>
+        <div class="chips"><div class="chip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="6.5" cy="6.5" r="2.4"/><circle cx="6.5" cy="17.5" r="2.4"/><circle cx="17.5" cy="12" r="2.4"/><path d="M6.5 8.9v6.2M8.9 6.9c4 .6 6.2 1.9 6.4 4.6M8.9 17.1c4-.6 6.2-1.9 6.4-4.6"/></svg><span>Source code and pipelines</span></div><div class="chip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="12" r="3.6"/><path d="M11.6 12H21M18 12v3.2M15 12v2.4"/></svg><span>Cloud and CI credentials</span></div><div class="chip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3c0 5 10 5 10 10S7 18 7 21"/><path d="M17 3c0 5-10 5-10 10s10 2 10 8"/><path d="M8.6 7h6.8M8.6 17h6.8M9.8 10.5h4.4"/></svg><span>Bioinformatics workflows</span></div><div class="chip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7.5" ry="2.6"/><path d="M4.5 6v12c0 1.4 3.4 2.6 7.5 2.6s7.5-1.2 7.5-2.6V6"/><path d="M4.5 12c0 1.4 3.4 2.6 7.5 2.6s7.5-1.2 7.5-2.6"/></svg><span>Research data stores</span></div><div class="chip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13.8a3.6 3.6 0 0 0 5.4.4l2.6-2.6a3.6 3.6 0 0 0-5.1-5.1L11.5 8"/><path d="M14 10.2a3.6 3.6 0 0 0-5.4-.4L6 12.4a3.6 3.6 0 0 0 5.1 5.1L12.5 16"/></svg><span>Connected SaaS and partners</span></div></div>
+        <div class="blab sp">Business impact</div>
+        <div class="chips"><div class="chip alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10M7 21h10"/><path d="M8 3c0 4 4 5.4 4 9s-4 5-4 9M16 3c0 4-4 5.4-4 9s4 5 4 9"/></svg><span>Pipeline shutdown and rebuild</span></div><div class="chip alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/></svg><span>Credential rotation at scale</span></div><div class="chip alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M7 20h10M5 8h14M12 6l-4 2M12 6l4 2"/><path d="M5 8 2.6 13.4a2.8 2.8 0 0 0 4.8 0zM19 8l-2.4 5.4a2.8 2.8 0 0 0 4.8 0z"/></svg><span>Disclosure obligations</span></div><div class="chip alt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12.5 7 9l4 2.4 3-1.6 4 3.2"/><path d="M3 12.5 7.6 17l3.4-1.6L14 17l4.4-4"/></svg><span>Partner and auditor scrutiny</span></div></div>
+      </div>
+    </div>
+
+    <div class="blab sp">Estimated financial impact <span class="illus">illustrative range</span></div>
+    <div class="money"><div class="mc"><div class="mn">$0.25M to $2M</div><div class="ml">Investigation and rotation</div></div><div class="mc"><div class="mn">$1M to $5M+</div><div class="ml">Pipeline rebuild and revalidation</div></div><div class="mc"><div class="mn">$1M to $10M+</div><div class="ml">IP exposure response</div></div><div class="mc"><div class="mn">$5M to $25M+</div><div class="ml">Programme delay</div></div></div>
+  </div>
+  <div class="sfoot">
+    <span>Agentic AI Risk Tabletop Exercise</span>
+    <span>Confidential, for tabletop exercise use only</span>
+    <span class="pg">8 / 8</span>
+  </div>
+</section>
+</div>
+
+<div class="bar">
+  <button type="button" id="prev">Back</button>
+  <span class="dots" id="dots"><button type="button" data-go="1" aria-label="Slide 1"></button><button type="button" data-go="2" aria-label="Slide 2"></button><button type="button" data-go="3" aria-label="Slide 3"></button><button type="button" data-go="4" aria-label="Slide 4"></button><button type="button" data-go="5" aria-label="Slide 5"></button><button type="button" data-go="6" aria-label="Slide 6"></button><button type="button" data-go="7" aria-label="Slide 7"></button><button type="button" data-go="8" aria-label="Slide 8"></button></span>
+  <span class="count" id="count">1 / 8</span>
+  <button type="button" id="next">Next</button>
+</div>
+<div class="hint">Arrow keys to move, P to print</div>
+
+<script>
+var slides = [].slice.call(document.querySelectorAll(".slide"));
+var dots = [].slice.call(document.querySelectorAll("#dots button"));
+var at = 1;
+function show(n){
+  at = Math.min(Math.max(n, 1), slides.length);
+  slides.forEach(function(s){ s.classList.toggle("on", +s.dataset.i === at); });
+  dots.forEach(function(d){ d.setAttribute("aria-current", +d.dataset.go === at ? "true" : "false"); });
+  document.getElementById("count").textContent = at + " / " + slides.length;
+  location.hash = "s" + at;
+}
+document.getElementById("prev").onclick = function(){ show(at - 1); };
+document.getElementById("next").onclick = function(){ show(at + 1); };
+dots.forEach(function(d){ d.onclick = function(){ show(+d.dataset.go); }; });
+document.addEventListener("keydown", function(e){
+  if(e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") { e.preventDefault(); show(at + 1); }
+  if(e.key === "ArrowLeft"  || e.key === "PageUp") { e.preventDefault(); show(at - 1); }
+  if(e.key === "Home") show(1);
+  if(e.key === "End") show(slides.length);
+  if(e.key === "p" || e.key === "P") window.print();
+});
+document.getElementById("stage").addEventListener("click", function(e){
+  if(e.target.closest("a,button")) return;
+  var r = this.getBoundingClientRect();
+  show(at + (e.clientX - r.left > r.width / 2 ? 1 : -1));
+});
+var h = parseInt((location.hash || "").replace("#s", ""), 10);
+show(h > 0 ? h : 1);
+</script>
+</body>
+</html>
