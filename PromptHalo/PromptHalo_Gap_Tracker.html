@@ -5319,9 +5319,6 @@ else boot();
 
 <style id="sc-css">
 /* ---------- By control: subcontrol detail layer ---------- */
-.sc-leg{border:1px solid var(--line);border-left:4px solid var(--amb);background:#fff;border-radius:8px;
-  padding:10px 13px;margin:0 0 14px;font-size:12.5px;color:var(--mut);line-height:1.6}
-.sc-leg b{color:var(--pet)}
 .sc-p{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.05em;border-radius:4px;
   padding:2px 6px;border:1px solid transparent;line-height:1.35;vertical-align:1px}
 .sc-p.p1{background:#f7e3e2;color:#8b1a16;border-color:#e3b7b4}
@@ -6526,10 +6523,10 @@ function scChips(list){
     return '<button type="button" class="sc-jump" data-ref="'+e2(i.ref)+'">'+
       "<b>"+e2(i.ref)+"</b>"+(m.t?"<span>"+e2(m.t)+"</span>":"")+"</button>"}).join("")+"</div>"
 }
-var SCOPEN={top:true,auto:true,p1:true};
-try{var _o=JSON.parse(localStorage.getItem("ph_sc_top_v1")||"null");
+var SCOPEN={top:false,auto:true,p1:true};
+try{var _o=JSON.parse(localStorage.getItem("ph_sc_top_v2")||"null");
     if(_o&&typeof _o==="object")SCOPEN=_o}catch(e){}
-function scSaveOpen(){try{localStorage.setItem("ph_sc_top_v1",JSON.stringify(SCOPEN))}catch(e){}}
+function scSaveOpen(){try{localStorage.setItem("ph_sc_top_v2",JSON.stringify(SCOPEN))}catch(e){}}
 
 function scTop(all){
   var byMode={Automatable:[],Hybrid:[],Manual:[]}, byP={1:[],2:[],3:[]};
@@ -6751,14 +6748,6 @@ function scCrit(key,list){
 }
 
 /* ---------- the panel ---------- */
-var LEGEND='<div class="sc-leg"><b>Priority.</b> '+
-  '<span class="sc-p p1">P1</span> do now, the control produces evidence that cannot be created after the period closes, or other controls wait on it. '+
-  '<span class="sc-p p2">P2</span> do next, needed for the period but recoverable. '+
-  '<span class="sc-p p3">P3</span> do later, low effort or event driven. '+
-  'Groups open on click. Each subcontrol carries what it is, the evidence an auditor requires, and how that evidence is tested. '+
-  'Each subcontrol also states what successful completion looks like, always banded green, since it is the accepted end state. The chip beside it shows where the subcontrol stands today. '+
-  'Every subcontrol says whether it is automatable, hybrid or manual, and where it is automatable, how. '+
-  'Search matches any of that text, plus the document name, criterion name and priority, and opens the groups that hold a hit.</div>';
 
 function renderControlSC(){
   var el=document.getElementById("l-control"); if(!el)return;
@@ -6768,10 +6757,10 @@ function renderControlSC(){
   I.forEach(function(i){var k=i.cc==="\u2014"?"Document-side findings":i.cc;(by[k]=by[k]||[]).push(i)});
   var keys=Object.keys(by).sort();
   if(!keys.length){
-    el.innerHTML=scTop(ALL)+LEGEND+
+    el.innerHTML=scTop(ALL)+
       '<p class="rs">No findings match these filters. Clear the search or choose another filter.</p>';
     scBind(el); return}
-  el.innerHTML=scTop(ALL)+LEGEND+keys.map(function(k){
+  el.innerHTML=scTop(ALL)+keys.map(function(k){
     var list=by[k], open=list.filter(function(x){return x.state==="open"}).length;
     var byc={};
     list.forEach(function(i){(byc[i.crit]=byc[i.crit]||[]).push(i)});
@@ -6866,7 +6855,301 @@ if(document.readyState==="loading"){
   window.addEventListener("load",scBoot);
 }else scBoot();
 
+/* subcontrol metadata, exposed for the Excel export */
+window.phSC={SCSUB:SCSUB,SCMODE:SCMODE,SCCRIT:SCCRIT,SCDONE:SCDONE,
+             pOf:pOf,pCrit:pCrit,doneState:doneState,PLAB:PLAB,PNAME:PNAME};
+
 })();
 
+</script>
+
+<script>
+/* ============================================================
+   Excel export. Self contained: a store-only ZIP writer and a
+   minimal SpreadsheetML workbook, no external library.
+   ============================================================ */
+(function(){
+
+  /* ---- CRC32 and a store-only ZIP ---- */
+  var CRC=(function(){var t=new Uint32Array(256);
+    for(var n=0;n<256;n++){var c=n;for(var k=0;k<8;k++)c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1);t[n]=c>>>0}
+    return t})();
+  function crc32(b){var c=0xFFFFFFFF;for(var i=0;i<b.length;i++)c=CRC[(c^b[i])&0xFF]^(c>>>8);return (c^0xFFFFFFFF)>>>0}
+  function dosT(d){return ((d.getHours()<<11)|(d.getMinutes()<<5)|(d.getSeconds()>>1))&0xFFFF}
+  function dosD(d){return (((d.getFullYear()-1980)<<9)|((d.getMonth()+1)<<5)|d.getDate())&0xFFFF}
+  function zip(entries){
+    var enc=new TextEncoder(), now=new Date(), parts=[], cd=[], off=0;
+    entries.forEach(function(e){
+      var nb=enc.encode(e.name), da=enc.encode(e.text), crc=crc32(da), t=dosT(now), dt=dosD(now);
+      var lh=new DataView(new ArrayBuffer(30));
+      lh.setUint32(0,0x04034b50,true);lh.setUint16(4,20,true);lh.setUint16(6,0x0800,true);
+      lh.setUint16(8,0,true);lh.setUint16(10,t,true);lh.setUint16(12,dt,true);
+      lh.setUint32(14,crc,true);lh.setUint32(18,da.length,true);lh.setUint32(22,da.length,true);
+      lh.setUint16(26,nb.length,true);lh.setUint16(28,0,true);
+      parts.push(new Uint8Array(lh.buffer),nb,da);
+      var ch=new DataView(new ArrayBuffer(46));
+      ch.setUint32(0,0x02014b50,true);ch.setUint16(4,20,true);ch.setUint16(6,20,true);
+      ch.setUint16(8,0x0800,true);ch.setUint16(10,0,true);ch.setUint16(12,t,true);ch.setUint16(14,dt,true);
+      ch.setUint32(16,crc,true);ch.setUint32(20,da.length,true);ch.setUint32(24,da.length,true);
+      ch.setUint16(28,nb.length,true);ch.setUint16(30,0,true);ch.setUint16(32,0,true);
+      ch.setUint16(34,0,true);ch.setUint16(36,0,true);ch.setUint32(38,0,true);ch.setUint32(42,off,true);
+      cd.push(new Uint8Array(ch.buffer),nb);
+      off+=30+nb.length+da.length;
+    });
+    var cs=cd.reduce(function(a,b){return a+b.length},0);
+    var eo=new DataView(new ArrayBuffer(22));
+    eo.setUint32(0,0x06054b50,true);eo.setUint16(8,entries.length,true);eo.setUint16(10,entries.length,true);
+    eo.setUint32(12,cs,true);eo.setUint32(16,off,true);
+    return new Blob(parts.concat(cd,[new Uint8Array(eo.buffer)]),{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  }
+
+  /* ---- XML helpers ---- */
+  function xe(s){
+    return String(s==null?'':s)
+      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,'')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+  }
+  function colName(n){var s='';while(n>0){var m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=(n-m-1)/26}return s}
+
+  /* ---- styles: 0 default, 1 header, 2 wrapped body, 3 mono-ish key ---- */
+  var STYLES='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+  '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'+
+  '<fonts count="4">'+
+    '<font><sz val="10"/><name val="Arial"/></font>'+
+    '<font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="Arial"/></font>'+
+    '<font><sz val="10"/><name val="Arial"/></font>'+
+    '<font><b/><sz val="10"/><color rgb="FF1F4A5A"/><name val="Consolas"/></font>'+
+  '</fonts>'+
+  '<fills count="3"><fill><patternFill patternType="none"/></fill>'+
+    '<fill><patternFill patternType="gray125"/></fill>'+
+    '<fill><patternFill patternType="solid"><fgColor rgb="FF1F4A5A"/><bgColor indexed="64"/></patternFill></fill>'+
+  '</fills>'+
+  '<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border>'+
+    '<border><left/><right/><top/><bottom style="thin"><color rgb="FFDDE3E7"/></bottom><diagonal/></border>'+
+  '</borders>'+
+  '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'+
+  '<cellXfs count="4">'+
+    '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'+
+    '<xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1">'+
+      '<alignment vertical="center" wrapText="1"/></xf>'+
+    '<xf numFmtId="0" fontId="2" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1">'+
+      '<alignment vertical="top" wrapText="1"/></xf>'+
+    '<xf numFmtId="0" fontId="3" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1">'+
+      '<alignment vertical="top"/></xf>'+
+  '</cellXfs>'+
+  '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>'+
+  '</styleSheet>';
+
+  function sheetXml(sh){
+    var cols=sh.cols, n=cols.length;
+    var out='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+      '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'+
+      '<sheetPr><outlinePr summaryBelow="1"/></sheetPr>'+
+      '<sheetViews><sheetView showGridLines="0" workbookViewId="0">'+
+      '<pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'+
+      '<sheetFormatPr defaultRowHeight="13"/><cols>';
+    cols.forEach(function(c,i){
+      out+='<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+(c.w||18)+'" customWidth="1"/>';
+    });
+    out+='</cols><sheetData><row r="1" ht="26" customHeight="1">';
+    cols.forEach(function(c,i){
+      out+='<c r="'+colName(i+1)+'1" s="1" t="inlineStr"><is><t xml:space="preserve">'+xe(c.h)+'</t></is></c>';
+    });
+    out+='</row>';
+    sh.rows.forEach(function(r,ri){
+      out+='<row r="'+(ri+2)+'">';
+      for(var i=0;i<n;i++){
+        var v=r[i];
+        if(v===''||v===null||v===undefined)continue;
+        var st=(cols[i].key?3:2);
+        if(typeof v==='number'&&isFinite(v)){
+          out+='<c r="'+colName(i+1)+(ri+2)+'" s="'+st+'"><v>'+v+'</v></c>';
+        }else{
+          out+='<c r="'+colName(i+1)+(ri+2)+'" s="'+st+'" t="inlineStr"><is><t xml:space="preserve">'+xe(v)+'</t></is></c>';
+        }
+      }
+      out+='</row>';
+    });
+    out+='</sheetData><autoFilter ref="A1:'+colName(n)+(sh.rows.length+1)+'"/></worksheet>';
+    return out;
+  }
+
+  function workbook(sheets){
+    var ct='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+      '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+      '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'+
+      '<Default Extension="xml" ContentType="application/xml"/>'+
+      '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'+
+      '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>';
+    sheets.forEach(function(s,i){
+      ct+='<Override PartName="/xl/worksheets/sheet'+(i+1)+'.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>';
+    });
+    ct+='</Types>';
+
+    var wb='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+      '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" '+
+      'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>';
+    sheets.forEach(function(s,i){
+      wb+='<sheet name="'+xe(s.name.slice(0,31))+'" sheetId="'+(i+1)+'" r:id="rId'+(i+1)+'"/>';
+    });
+    wb+='</sheets></workbook>';
+
+    var wbr='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+      '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">';
+    sheets.forEach(function(s,i){
+      wbr+='<Relationship Id="rId'+(i+1)+'" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet'+(i+1)+'.xml"/>';
+    });
+    wbr+='<Relationship Id="rId'+(sheets.length+1)+'" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
+
+    var rels='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+      '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+
+      '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
+
+    var files=[{name:'[Content_Types].xml',text:ct},
+               {name:'_rels/.rels',text:rels},
+               {name:'xl/workbook.xml',text:wb},
+               {name:'xl/_rels/workbook.xml.rels',text:wbr},
+               {name:'xl/styles.xml',text:STYLES}];
+    sheets.forEach(function(s,i){
+      files.push({name:'xl/worksheets/sheet'+(i+1)+'.xml',text:sheetXml(s)});
+    });
+    return zip(files);
+  }
+
+  function saveBlob(b,name){
+    try{
+      if(window.navigator&&navigator.msSaveOrOpenBlob){navigator.msSaveOrOpenBlob(b,name);return true}
+      var u=URL.createObjectURL(b), a=document.createElement('a');
+      a.href=u;a.download=name;a.rel='noopener';
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+      setTimeout(function(){try{URL.revokeObjectURL(u)}catch(e){}},2000);
+      return true;
+    }catch(e){return false}
+  }
+
+  /* ---- shared lookups ---- */
+  function scoreLabel(v){
+    var d=(typeof scDef==='function')?scDef(v):null;
+    return d?d[1]:String(v);
+  }
+  function stateLabel(s){
+    return s==='open'?'Open':(s==='policy-closed'?'Policy closed, artifact outstanding':'Closed');
+  }
+  function list(a){return (a&&a.length)?a.map(function(x,i){return (i+1)+'. '+x}).join('\n'):''}
+  function today(){
+    try{ return (D.snapshots[snap].label||'').replace(/[^0-9A-Za-z]+/g,'-'); }catch(e){ return 'export' }
+  }
+
+  /* ---- By policy ---- */
+  function policySheet(){
+    var cols=[
+      {h:'Document',w:16,key:1},{h:'Finding',w:13,key:1},{h:'Criterion',w:10},{h:'CC group',w:9},
+      {h:'Direction',w:13},{h:'Owner',w:16},{h:'Score',w:7},{h:'Score label',w:14},{h:'State',w:26},
+      {h:'Control activity',w:60},{h:'Cadence',w:12},{h:'Mode',w:12},
+      {h:'Evidence it must produce',w:34},{h:'System of record',w:22},{h:'Coverage now',w:12},
+      {h:'Why it is a finding',w:40},{h:'Fix',w:60},{h:'Tool',w:20},{h:'Cost',w:10},
+      {h:'Setup hours',w:11},{h:'POL-ISP relevant',w:14},{h:'Clause',w:14},{h:'Clause name',w:26}];
+    var rows=items().slice().sort(function(a,b){
+      return String(a.doc).localeCompare(String(b.doc))||String(a.ref).localeCompare(String(b.ref));
+    }).map(function(i){
+      var s=String(sc(i.ref));
+      return [i.doc,i.ref,i.crit,i.cc,i.dir,i.owner,s,scoreLabel(s),stateLabel(i.state),
+              i.act,i.cadence,i.mode,i.ev,i.sor,i.covnow,i.reason,i.fix,i.tool,i.cost,
+              (typeof i.hrs==='number'?i.hrs:''),i.isp?'Yes':'No',i.clause,i.clausename];
+    });
+    return {name:'By policy',cols:cols,rows:rows};
+  }
+
+  /* ---- By control ---- */
+  function controlSheet(){
+    var cols=[
+      {h:'CC group',w:9},{h:'Criterion',w:10,key:1},{h:'Criterion name',w:30},
+      {h:'Criterion priority',w:11},{h:'Subcontrol',w:13,key:1},{h:'Subcontrol title',w:40},
+      {h:'Priority',w:9},{h:'Priority meaning',w:18},{h:'Why this priority',w:44},
+      {h:'State',w:26},{h:'Score',w:7},{h:'Score label',w:14},
+      {h:'What this subcontrol is',w:62},
+      {h:'Evidence an auditor requires',w:62},{h:'How it is tested',w:62},
+      {h:'Automation mode',w:14},{h:'Why that mode',w:46},{h:'How to operate it',w:62},
+      {h:'Successful completion',w:62},{h:'Status now',w:16},
+      {h:'Document',w:16},{h:'Owner',w:16},{h:'Cadence',w:12},
+      {h:'Control activity',w:56}];
+    var PM={1:'Do now',2:'Do next',3:'Do later'};
+    var SC=window.phSC||{SCSUB:{},SCMODE:{},SCCRIT:{},SCDONE:{},pOf:function(){return 3}};
+    var rows=items().slice().sort(function(a,b){
+      var pa=SC.pOf(a.ref),pb=SC.pOf(b.ref);
+      return String(a.cc).localeCompare(String(b.cc))||String(a.crit).localeCompare(String(b.crit))||
+             pa-pb||String(a.ref).localeCompare(String(b.ref));
+    }).map(function(i){
+      var m=SC.SCSUB[i.ref]||{}, md=SC.SCMODE[i.ref]||{}, cm=SC.SCCRIT[i.crit]||{},
+          p=SC.pOf(i.ref), s=String(sc(i.ref)),
+          dn=SC.SCDONE[i.ref]||'',
+          ds=SC.doneState?SC.doneState(i.ref):['','',''];
+      return [i.cc,i.crit,cm.n||'',('P'+(cm.p||3)),i.ref,m.t||'',('P'+p),PM[p]||'',m.w||'',
+              stateLabel(i.state),s,scoreLabel(s),m.s||'',list(m.e),list(m.x),
+              md.m||'',md.y||'',list(md.h),dn,ds[1]||'',
+              i.doc,i.owner,i.cadence,i.act];
+    });
+    return {name:'By control',cols:cols,rows:rows};
+  }
+
+  /* ---- Artifacts ---- */
+  function artifactSheet(){
+    var cols=[
+      {h:'Artifact',w:12,key:1},{h:'Name',w:48},{h:'Policy section',w:13},{h:'Kind',w:14},
+      {h:'Owner',w:18},{h:'Cadence',w:14},{h:'Score',w:7},{h:'Score label',w:14},
+      {h:'What it is',w:64},{h:'How to stand it up',w:70},
+      {h:'Criteria',w:20},{h:'Findings that depend on it',w:30},{h:'Tool',w:22},{h:'Cost',w:10}];
+    var rows=(D.artifacts||[]).map(function(a){
+      var s=String(sc(a.ref));
+      return [a.ref,a.name,a.sec,a.kind,a.owner,a.cadence,s,scoreLabel(s),
+              a.what,list(a.do),
+              Array.isArray(a.crit)?a.crit.join(', '):(a.crit||''),
+              Array.isArray(a.refs)?a.refs.join(', '):(a.refs||''),
+              a.tool,a.cost];
+    });
+    return {name:'Artifacts',cols:cols,rows:rows};
+  }
+
+  function go(btn,sheets,file){
+    var ok=false;
+    try{ if(typeof TextEncoder==='function') ok=saveBlob(workbook(sheets),file); }catch(e){ ok=false }
+    if(!ok&&btn){var o=btn.textContent;btn.textContent='Not available here';
+      setTimeout(function(){btn.textContent=o},2400)}
+  }
+
+  /* ---- buttons ---- */
+  function addBtn(afterId,id,label){
+    var ref=document.getElementById(afterId); if(!ref||document.getElementById(id))return null;
+    var b=document.createElement('button');
+    b.className='ghost'; b.id=id; b.type='button'; b.textContent=label;
+    ref.parentNode.insertBefore(b,ref.nextSibling);
+    return b;
+  }
+
+  var bp=addBtn('exp-policy','xls-policy','Export Excel');
+  if(bp)bp.addEventListener('click',function(){
+    go(bp,[policySheet(),artifactSheet()],'PromptHalo-by-policy-'+today()+'.xlsx')});
+
+  var bc=addBtn('exp-control','xls-control','Export Excel');
+  if(bc)bc.addEventListener('click',function(){
+    go(bc,[controlSheet()],'PromptHalo-by-control-'+today()+'.xlsx')});
+
+  var fa=document.getElementById('f-art');
+  if(fa&&!document.getElementById('xls-art')){
+    var wrap=document.createElement('div');
+    wrap.className='filters';
+    var ba=document.createElement('button');
+    ba.className='ghost'; ba.id='xls-art'; ba.type='button'; ba.textContent='Export artifacts to Excel';
+    wrap.appendChild(ba);
+    fa.parentNode.insertBefore(wrap,fa);
+    ba.addEventListener('click',function(){
+      go(ba,[artifactSheet()],'PromptHalo-artifacts-'+today()+'.xlsx')});
+  }
+
+  /* exposed so the whole workbook can be pulled in one go if wanted */
+  window.phExportXlsx=function(){
+    go(null,[policySheet(),controlSheet(),artifactSheet()],'PromptHalo-gap-tracker-'+today()+'.xlsx')};
+})();
 </script>
 </body></html>
