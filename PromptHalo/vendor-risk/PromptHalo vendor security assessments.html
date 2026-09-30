@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PromptHalo vendor security assessments</title>
+<style>
+:root{
+  --banner-a:#35205f; --banner-b:#5a3d9a;
+  --p700:#3f2a73; --p600:#5a3d9a; --p500:#7556b8; --p300:#bcaee0; --p200:#ddd4f1; --p100:#eee9f8; --p50:#f7f5fc;
+  --ink:#1f1b2e; --ink2:#4a4560; --ink3:#77728c;
+  --line:#e3def0; --paper:#ffffff; --page:#f4f1fa;
+  --good:#1f6b4c; --goodbg:#e3f3ea; --goodfill:#8fd0ad;
+  --warn:#86590a; --warnbg:#fcf1db; --warnfill:#f1cf7e;
+  --bad:#9a2a2e;  --badbg:#fbe8e8; --badfill:#ee9d9b;
+  --mut:#5b5870; --mutbg:#eeecf3;
+  --shadow:0 1px 2px rgba(53,32,95,.06),0 6px 18px rgba(53,32,95,.07);
+  --shadow-lift:0 2px 4px rgba(53,32,95,.08),0 10px 26px rgba(53,32,95,.10);
+  --fs:15px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --p700:#cbbdf0; --p600:#b19ae6; --p500:#9a82d8; --p300:#5d4a8c; --p200:#3a2e58; --p100:#2a2242; --p50:#221c36;
+    --ink:#ece8f7; --ink2:#c3bdd8; --ink3:#948eab;
+    --line:#352c4f; --paper:#1b1629; --page:#130f1f;
+    --good:#8fd6b0; --goodbg:#17302a; --goodfill:#3f8f6a;
+    --warn:#f1cf7e; --warnbg:#332916; --warnfill:#a88636;
+    --bad:#f1a3a1;  --badbg:#3a1d23; --badfill:#a8514f;
+    --mut:#c3bdd8; --mutbg:#2a2440;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25);
+    --shadow-lift:0 2px 4px rgba(0,0,0,.35),0 10px 26px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+    --p700:#cbbdf0; --p600:#b19ae6; --p500:#9a82d8; --p300:#5d4a8c; --p200:#3a2e58; --p100:#2a2242; --p50:#221c36;
+    --ink:#ece8f7; --ink2:#c3bdd8; --ink3:#948eab;
+    --line:#352c4f; --paper:#1b1629; --page:#130f1f;
+    --good:#8fd6b0; --goodbg:#17302a; --goodfill:#3f8f6a;
+    --warn:#f1cf7e; --warnbg:#332916; --warnfill:#a88636;
+    --bad:#f1a3a1;  --badbg:#3a1d23; --badfill:#a8514f;
+    --mut:#c3bdd8; --mutbg:#2a2440;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25);
+    --shadow-lift:0 2px 4px rgba(0,0,0,.35),0 10px 26px rgba(0,0,0,.3);
+}
+html{font-size:var(--fs);height:100%}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;min-height:100%;background:var(--page);color:var(--ink);
+  font-family:Inter,Calibri,"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--p600)}
+button{font:inherit}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--p500);outline-offset:2px}
+
+.shell{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+aside{background:var(--paper);border-right:1px solid var(--line);position:sticky;top:0;height:100vh;overflow-y:auto;
+  padding:18px 12px 30px;padding-top:calc(18px + env(safe-area-inset-top,0px))}
+.brand{padding:4px 10px 14px;border-bottom:1px solid var(--line);margin-bottom:10px}
+.brand .t{font-weight:700;color:var(--p700);font-size:1rem}
+.brand .s{font-size:.78rem;color:var(--ink3)}
+.idx{list-style:none;margin:0;padding:0}
+.idx button{width:100%;display:flex;align-items:center;gap:10px;background:none;border:0;border-radius:8px;
+  padding:8px 10px;cursor:pointer;color:var(--ink2);text-align:left;font-size:.9rem;border-left:3px solid transparent}
+.idx button:hover{background:var(--p50)}
+.idx button.on{background:var(--p100);color:var(--p700);font-weight:600;border-left-color:var(--p600)}
+.idx .nm{flex:1}
+.chip{font-size:.72rem;font-weight:700;border-radius:999px;padding:1px 8px;font-variant-numeric:tabular-nums}
+.c-good{background:var(--goodbg);color:var(--good)}
+.c-warn{background:var(--warnbg);color:var(--warn)}
+.c-bad{background:var(--badbg);color:var(--bad)}
+.c-mut{background:var(--mutbg);color:var(--mut)}
+.c-pur{background:var(--p100);color:var(--p700)}
+.sizer{margin-top:18px;padding:12px 10px 0;border-top:1px solid var(--line)}
+.sizer .lab{font-size:.75rem;color:var(--ink3);margin-bottom:6px}
+.sizer .row{display:flex;gap:6px;flex-wrap:wrap}
+.sizer button{border:1px solid var(--line);background:var(--paper);color:var(--ink2);border-radius:6px;padding:3px 9px;cursor:pointer;font-size:.8rem}
+.sizer button.on{background:var(--p600);border-color:var(--p600);color:#fff}
+
+main{min-width:0;padding:0 0 70px}
+.banner{background:linear-gradient(120deg,var(--banner-a),var(--banner-b));color:#fff;padding:26px 30px 24px}
+.banner h1{margin:0;font-size:1.65rem;font-weight:700;letter-spacing:-.2px}
+.banner h1 .as{font-weight:400;opacity:.8;font-size:1.05rem;margin-left:6px}
+.banner .sub{opacity:.85;margin-top:4px;font-size:.92rem;max-width:90ch}
+.banner .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.banner .meta span{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:2px 10px;font-size:.78rem}
+.wrap{padding:22px 30px 0;max-width:1320px}
+
+.grid{display:grid;gap:16px}
+.g3{grid-template-columns:minmax(250px,.8fr) minmax(300px,1fr) minmax(360px,1.25fr)}
+.g3b{grid-template-columns:repeat(3,minmax(0,1fr))}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:18px 20px}
+.panel h2{margin:0 0 10px;font-size:1.08rem;color:var(--p700);font-weight:700}
+.panel h3{margin:14px 0 6px;font-size:.92rem;color:var(--ink)}
+.sectitle{margin:30px 0 4px;font-size:1.18rem;color:var(--p700);font-weight:700}
+.seclede{margin:0 0 12px;color:var(--ink2);font-size:.9rem;max-width:90ch}
+
+.gauge{display:flex;flex-direction:column;align-items:center}
+.gauge svg{width:190px;height:190px}
+.riskpill{display:inline-block;font-weight:700;letter-spacing:.3px;padding:6px 18px;border-radius:999px;margin:6px 0 12px;font-size:.95rem}
+.reason{font-size:.88rem;color:var(--ink2)}
+.reason strong{color:var(--ink)}
+
+.radar svg{width:100%;height:auto;max-width:520px;display:block;margin:0 auto}
+
+table{border-collapse:collapse;width:100%;font-size:.84rem}
+th,td{text-align:left;vertical-align:top;padding:7px 8px;border-bottom:1px solid var(--line)}
+th{font-size:.76rem;color:var(--ink3);font-weight:600;background:var(--p50)}
+td.n,th.n{text-align:center;font-variant-numeric:tabular-nums}
+td.sc{text-align:center;font-weight:700;font-size:.98rem}
+.sg{background:var(--goodbg);color:var(--good)} .sw{background:var(--warnbg);color:var(--warn)} .sb{background:var(--badbg);color:var(--bad)}
+tr.tot td{font-weight:700;border-bottom:none;background:var(--p50)}
+.tw{overflow-x:auto}
+
+.certrow{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.certrow:last-child{border-bottom:none}
+.certrow .ic{flex:0 0 40px;height:40px;border-radius:10px;background:var(--p100);display:flex;align-items:center;justify-content:center}
+.certrow .ic svg{width:22px;height:22px}
+.certrow .tt{font-weight:600;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.certrow .dd{font-size:.84rem;color:var(--ink2);margin-top:2px}
+ul.sig{list-style:none;margin:0;padding:0}
+ul.sig li{display:flex;gap:10px;padding:6px 0;font-size:.87rem;color:var(--ink2)}
+ul.sig li .dot{flex:0 0 20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;margin-top:1px}
+.dot.ok{background:var(--goodbg);color:var(--good)} .dot.gap{background:var(--badbg);color:var(--bad)}
+.snap td:first-child{color:var(--ink2)} .snap td:last-child{text-align:right}
+.snap td{border-bottom:none;padding:5px 4px}
+ul.plain{margin:4px 0 10px;padding-left:18px;font-size:.86rem;color:var(--ink2)} ul.plain li{margin-bottom:3px}
+ol.steps{list-style:none;margin:0;padding:0;counter-reset:st}
+ol.steps li{counter-increment:st;display:flex;gap:10px;padding:5px 0;font-size:.86rem;color:var(--ink2)}
+ol.steps li::before{content:counter(st);flex:0 0 22px;height:22px;border-radius:50%;background:var(--p600);color:#fff;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+
+.summary{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start}
+.summary .big{font-size:2.6rem;font-weight:800;color:var(--p700);line-height:1}
+.summary .big small{font-size:1rem;color:var(--ink3);font-weight:500}
+.summary p{margin:0 0 6px;max-width:92ch}
+
+/* raised cards */
+.cards{display:grid;gap:10px}
+details.card{background:var(--paper);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);transition:box-shadow .15s}
+details.card[open]{box-shadow:var(--shadow-lift)}
+details.card>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto 1fr auto auto;gap:12px;align-items:center;padding:12px 16px}
+details.card>summary::-webkit-details-marker{display:none}
+.card .code{font-weight:700;color:var(--p600);font-size:.8rem;min-width:44px}
+.card .ttl{font-weight:600;font-size:.92rem}
+.card .one{display:block;font-weight:400;font-size:.82rem;color:var(--ink3);margin-top:1px}
+.card .chev{width:18px;height:18px;transition:transform .15s;color:var(--ink3)}
+details.card[open] .chev{transform:rotate(90deg)}
+.card .body{padding:2px 16px 16px 72px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;border-top:1px solid var(--line);padding-top:14px}
+.card .body h4{margin:0 0 4px;font-size:.74rem;color:var(--ink3);font-weight:600;letter-spacing:.2px}
+.card .body p{margin:0;font-size:.86rem;color:var(--ink2)}
+.card .body ul{margin:0;padding-left:16px;font-size:.84rem;color:var(--ink2)}
+.bar{height:6px;background:var(--mutbg);border-radius:3px;width:90px;overflow:hidden}
+.bar i{display:block;height:6px;border-radius:3px}
+.scorebox{display:flex;align-items:center;gap:10px}
+.expandall{display:flex;gap:8px;margin:0 0 10px}
+.expandall button{border:1px solid var(--line);background:var(--paper);color:var(--ink2);border-radius:6px;padding:4px 10px;font-size:.8rem;cursor:pointer}
+.expandall button:hover{background:var(--p50)}
+
+.ovbar{display:flex;align-items:center;gap:10px}
+.ovbar .track{flex:1;height:10px;background:var(--mutbg);border-radius:5px;overflow:hidden;min-width:120px}
+.ovbar .track i{display:block;height:10px;border-radius:5px}
+.note{font-size:.84rem;color:var(--ink2);background:var(--p50);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin-top:10px}
+.src{font-size:.82rem;color:var(--ink2)} .src li{margin-bottom:3px}
+footer{padding:26px 30px;color:var(--ink3);font-size:.78rem}
+
+.menu-btn{display:none}
+.banner .meta span.critbadge{border:0;padding:4px 14px;font-size:.84rem;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.banner .meta span.critbadge b{font-weight:800}
+.cb-critical{background:#e5484d!important;color:#fff}
+.cb-high{background:#f5a623!important;color:#2b1a00}
+.cb-moderate{background:#3fb37f!important;color:#062a1a}
+.cb-low{background:#9ad9b8!important;color:#062a1a}
+.selft{display:flex;gap:8px;align-items:center;font-size:.8rem;color:var(--ink3);margin:14px 10px 0;cursor:pointer}
+.selft input{accent-color:var(--p600)}
+li.selfsep{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+.crit{display:grid;grid-template-columns:210px 1fr;gap:22px;align-items:start;border-left:4px solid var(--p600)}
+.crit .lbl{font-size:.78rem;color:var(--ink3);font-weight:600}
+.crit .tv{display:inline-block;font-size:1.5rem;font-weight:800;padding:4px 16px;border-radius:10px;margin:6px 0 4px}
+.crit .pts{font-size:.8rem;color:var(--ink3);margin-bottom:8px}
+.crit .pri{font-size:.84rem;color:var(--ink2)}
+.cfs{display:grid;gap:7px}
+.cf{display:grid;grid-template-columns:170px 60px 1fr;gap:10px;align-items:center;font-size:.86rem}
+.cf .cn{font-weight:600;color:var(--ink)}
+.cf .cr{color:var(--ink2)}
+.dots{display:flex;gap:4px}
+.dots i{width:14px;height:14px;border-radius:4px;background:var(--mutbg);display:block}
+.dots i.on.l1{background:var(--goodfill)} .dots i.on.l2{background:var(--warnfill)} .dots i.on.l3{background:var(--badfill)}
+.cad{margin-top:10px;font-size:.84rem;color:var(--ink2)}
+@media (max-width:860px){.crit{grid-template-columns:1fr}.cf{grid-template-columns:1fr 60px}.cf .cr{grid-column:1 / -1}}
+@media (max-width:1180px){ .g3{grid-template-columns:1fr 1fr} .g3>.panel:last-child{grid-column:1 / -1} .g3b{grid-template-columns:1fr 1fr} }
+@media (max-width:860px){
+  .shell{grid-template-columns:1fr}
+  aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}
+  .idx{display:flex;flex-wrap:wrap;gap:4px} .idx li{flex:1 1 140px}
+  .g3,.g3b{grid-template-columns:1fr}
+  .card .body{grid-template-columns:1fr;padding-left:16px}
+  .wrap,.banner{padding-left:16px;padding-right:16px}
+  details.card>summary{grid-template-columns:auto 1fr auto}
+  details.card>summary .bar{display:none}
+}
+@media print{ aside{display:none} .shell{grid-template-columns:1fr} details.card .body{display:grid} }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside aria-label="Vendor index">
+    <div class="brand"><div class="t">PromptHalo TPRM</div><div class="s">External security assessments<br>as of 29 Sep 2026</div></div>
+    <ul class="idx" id="idx"></ul>
+    <label class="selft"><input type="checkbox" id="selfToggle"> Show PromptHalo self-assessment</label>
+    <div class="sizer" role="group" aria-label="Text size">
+      <div class="lab">Text size</div>
+      <div class="row">
+        <button data-fs="13px">A&minus;</button><button data-fs="15px">A</button><button data-fs="17px">A+</button><button data-fs="19px">A++</button>
+      </div>
+    </div>
+  </aside>
+  <main id="main" tabindex="-1"></main>
+</div>
+
+<script>
+"use strict";
+/* ============================ model ============================ */
+var CATS=[
+ {k:"tls",  n:"HTTPS/TLS and web presence",            s:"HTTPS / TLS",                w:15, d:"Public endpoints serve HTTPS with valid certificates and no obvious insecure exposure."},
+ {k:"web",  n:"Web application security signals",      s:"Web App Security",   w:15, d:"Product security signals: bug bounty maturity, advisories, customer security controls, and recent product CVEs."},
+ {k:"email",n:"Domain and email security",             s:"Domain / Email",    w:10, d:"DMARC 4 (reject) or 3 (quarantine); SPF 2 (-all), 1 (~all or not retrievable); DKIM 2; CAA 1; DNSSEC 1."},
+ {k:"vuln", n:"Public vulnerability and exposure evidence", s:"Public Exposure",       w:15, d:"Breaches, exposures, and exploited flaws attributed to the vendor in the last 24 months."},
+ {k:"gov",  n:"Security and privacy governance",       s:"Governance",                 w:15, d:"Published security program, privacy commitments, DPA, and subprocessor transparency."},
+ {k:"assur",n:"SOC 2 / ISO 27001 / independent assurance", s:"SOC 2 / ISO 27001",     w:20, d:"20: SOC 2 Type II self-service plus ISO 27001 and more. 18: on request or in-portal. 17: plan-gated. 15: NDA-only or access path unclear."},
+ {k:"vdp",  n:"Vulnerability disclosure and security contact", s:"Vuln Disclosure",   w:5,  d:"5: paid bug bounty or formal VDP. 3: channel claimed but not verified. 0: none found."},
+ {k:"cont", n:"Continuous assurance and transparency", s:"Continuous Assurance",       w:5,  d:"5: public status history, advisories, and incident reports. 4: two of three. 3: one."}
+];
+var TSC=[
+ ["CC1","Control environment","Integrity, board oversight, structure, competence, and accountability."],
+ ["CC2","Communication and information","Internal and external communication of security objectives and changes."],
+ ["CC3","Risk assessment","Identification and analysis of risks, including fraud and change."],
+ ["CC4","Monitoring activities","Ongoing and separate evaluations of controls; deficiencies communicated."],
+ ["CC5","Control activities","Controls, technology general controls, and policies deployed."],
+ ["CC6","Logical and physical access","Authentication, authorization, encryption, and boundary protection."],
+ ["CC7","System operations","Vulnerability detection, monitoring, and incident response."],
+ ["CC8","Change management","Authorized, tested, and approved changes to systems and code."],
+ ["CC9","Risk mitigation","Business disruption planning and vendor risk management."],
+ ["A1","Availability","Capacity, backup, recovery, and resilience commitments."],
+ ["C1","Confidentiality","Identification, protection, and disposal of confidential information."],
+ ["PI1","Processing integrity","Complete, accurate, timely, and authorized processing."],
+ ["P","Privacy","Notice, choice, collection, use, retention, disclosure, and quality of personal information."]
+];
+function riskOf(t){return t>=85?["Low","c-good"]:(t>=65?["Moderate","c-warn"]:["High","c-bad"]);}
+function band(v,w){var p=v/w;return p>=.8?"g":(p>=.5?"w":"b");}
+
+/* shared text */
+var TLS_EXPL="HTTPS observed on the primary site. Protocol, cipher, and HSTS were not handshake-tested from this environment, so 2 points are withheld.";
+var TLS_EV=["HTTPS responses observed via web fetch and search results, 29 Sep 2026","No direct HTTPS egress from the assessment environment"];
+
+/* ============================ vendors ============================ */
+var V=[
+{id:"auth0",name:"Auth0",parent:"Okta, Inc.",domain:"auth0.com",
+ use:"Customer login for the PromptHalo app (login.prompthalo.ai production tenant; auth.prompthalo.ai dev tenant).",crit:"Critical",
+ sc:{tls:13,web:11,email:6,vuln:11,gov:12,assur:18,vdp:5,cont:5},
+ notes:{tls:"HTTPS operational",web:"Frequent 2026 SDK advisories",email:"DMARC quarantine; no CAA",vuln:"No Auth0 platform breach found in 24 months",gov:"Okta trust program; parent history",assur:"SOC 2 Type II and ISO family via Okta Trust Center",vdp:"Okta bug bounty",cont:"Advisories and status page"},
+ summary:"Strong attestations and unusually transparent advisory publishing. Held back by a steady flow of 2026 SDK vulnerabilities in libraries PromptHalo embeds, weak DNS hygiene on auth0.com, and Okta's breach history.",
+ certs:[["SOC 2 Type II","req","Vendor-published. Obtain through the Okta Trust Center under NDA."],["ISO/IEC 27001, 27017, 27018","pub","Vendor-published certificates for the Auth0 platform."],["Other","pub","CSA STAR and HIPAA BAA listed by Okta (confirm scope in portal)."]],
+ pos:["DMARC at quarantine with aggregate reporting to okta.com","Public security advisories page with CVEs through 8 Sep 2026","Okta bug bounty program","Dedicated Auth0 status page","Customer controls: MFA, attack protection, breached password detection"],
+ gaps:["Auth0 SDK CVEs in 2026: Next.js SDK (Apr), Auth0.js (May), Symfony SDK (Jun), AD/LDAP Connector (Sep)","No CAA record on auth0.com","auth0.com zone not DNSSEC-signed","Parent (Okta) support-system breach affected all customers in 2023","PromptHalo exposes a dev tenant on auth.prompthalo.ai"],
+ snap:[["Website availability","OK","g"],["HTTPS/TLS","OK","g"],["Email security (DMARC)","Quarantine","w"],["Known vulnerabilities","2026 SDK CVEs","w"],["Security headers","Not analyzed","m"],["DNS hosting","Cloudflare","p"],["security.txt","Not checked","m"]],
+ drivers:["Identity provider: compromise grants access to every user session","Client SDK vulnerability cadence","Parent-company incident history"],
+ comp:["Fast, public advisory disclosure","Independent attestations across SOC 2 and ISO","Rich tenant-side security controls"],
+ steps:["Check each Auth0 SDK in use against the 2026 advisories and patch.","Retire or lock down the dev tenant behind auth.prompthalo.ai.","Enforce MFA for all Auth0 dashboard admins.","Enable brute-force, bot, and breached-password protection.","Obtain the SOC 2 Type II report from the Okta Trust Center.","Subscribe to Okta security advisories."],
+ det:{
+  web:["Advisory volume shows active disclosure, but also recurring defects in client libraries that ship inside customer apps. PromptHalo carries that risk directly.",["Okta advisories: Next.js SDK CVE-2026-40155 (17 Apr), Auth0.js CVE-2026-42280 (6 May), Symfony SDK CVE-2026-50157 (10 Jun)","AD/LDAP Connector CVE-2026-85981 to 85983 (8 Sep 2026)"]],
+  email:["DMARC quarantine 3, SPF not retrievable 1, DKIM 2, CAA 0, DNSSEC 0.",["_dmarc.auth0.com: p=quarantine; sp=quarantine; rua to okta.com","DKIM selectors found: google, s1, s2, mandrill, zendesk1, m1","CAA: none. DNSKEY: none. NS: Cloudflare"]],
+  vuln:["No Auth0 platform breach found in the last 24 months. Points withheld for the parent's 2022 to 2023 incidents, including theft of Auth0 code repositories and the Okta support-system breach.",["Okta 2023 support breach later confirmed to affect all customers","2022 Auth0 code repository security event"]],
+  gov:["Okta runs a mature trust program and reprioritized security after 2023. Governance history still weighs on the score.",["trust.okta.com security advisories and compliance listings"]],
+  assur:["SOC 2 Type II and ISO certifications exist; reports require the Okta Trust Center and an NDA.",["Okta Trust Center compliance documents"]],
+  vdp:["Paid bug bounty operated by Okta.",["Okta bug bounty program"]],
+  cont:["Public advisories, a dedicated Auth0 status page, and incident history.",["status.okta.com notes Auth0 status is published separately"]]},
+ soc:{CC6:[4,"Tenant isolation, admin authentication, and key management are in the vendor's SOC 2 scope.","Enforce admin MFA; separate dev and prod tenants; rotate client secrets; restrict allowed callback URLs."],
+      CC7:[4,"Vendor monitors the platform and publishes advisories.","Stream Auth0 logs to your SIEM or log store; alert on anomalous logins; track SDK advisories."],
+      CC8:[3,"Vendor change management is audited, but 2026 SDK defects show residual risk in shipped libraries.","Pin SDK versions and patch within your vulnerability SLA."],
+      A1:[4,"Dedicated status page and published SLA for paid tiers.","Design a login outage runbook; cache nothing sensitive client-side."],
+      C1:[4,"Customer identity data encrypted and segregated per tenant.","Minimize custom user metadata; avoid storing secrets in app_metadata."],
+      P:[4,"DPA and subprocessor list available.","Record Auth0 in your privacy notice and data map as an identity processor."]}},
+
+{id:"aws",name:"AWS",parent:"Amazon Web Services, Inc.",domain:"amazon.com / aws.com",
+ use:"Production hosting (CloudFront, compute, storage) and outbound email through Amazon SES.",crit:"Critical",
+ sc:{tls:13,web:13,email:6,vuln:14,gov:14,assur:20,vdp:5,cont:5},
+ notes:{tls:"HTTPS operational",web:"Mature bulletins and VDP",email:"DMARC quarantine; no CAA",vuln:"No infrastructure breach found",gov:"Shared responsibility well documented",assur:"Self-service via AWS Artifact",vdp:"VDP and bug bounty",cont:"Health dashboard and bulletins"},
+ summary:"The strongest assurance in the set: SOC reports and certifications are self-service in AWS Artifact. The real risk sits on PromptHalo's side of the shared responsibility model, plus recurring us-east-1 availability events in 2026.",
+ certs:[["SOC 1, 2, 3","ok","Available self-service in AWS Artifact; reports issued twice a year."],["ISO/IEC 27001, 27017, 27018, 27701","ok","Certificates available in AWS Artifact."],["Other","ok","PCI DSS Level 1, FedRAMP High and Moderate, HIPAA-eligible services."]],
+ pos:["All attestations downloadable without NDA through AWS Artifact","Detailed shared responsibility documentation","Public security bulletins and Health Dashboard","DMARC at quarantine on amazon.com and aws.com with reporting","No AWS infrastructure breach found"],
+ gaps:["us-east-1 events in 2026: AZ cooling failure (8 May), API disruption (27 Jul), EC2 launch errors (21 Sep)","No CAA records on amazon.com or aws.com","amazon.com zone not DNSSEC-signed","Most AWS-hosted breaches stem from customer misconfiguration"],
+ snap:[["Website availability","OK","g"],["HTTPS/TLS","OK","g"],["Email security (DMARC)","Quarantine","w"],["Known vulnerabilities","None found","g"],["Security headers","Not analyzed","m"],["DNS hosting","Route 53","p"],["security.txt","Not checked","m"]],
+ drivers:["Hosts all production workloads and data","Customer-side configuration risk","Regional availability concentration"],
+ comp:["Best-in-class attestation access","Multi-AZ and multi-region options","Native detective controls (CloudTrail, GuardDuty, Config)"],
+ steps:["Download the current SOC 2 report from AWS Artifact and record the CUECs.","Confirm root MFA and no root access keys.","Enable an organization CloudTrail trail and GuardDuty.","Run production across at least two Availability Zones.","Subscribe to AWS Health and security bulletin notifications."],
+ det:{
+  web:["Mature product security program with public bulletins, a VDP, and extensive customer-side guardrails.",["AWS security bulletins","AWS vulnerability disclosure program"]],
+  email:["DMARC quarantine 3, SPF not retrievable 1, DKIM 2, CAA 0, DNSSEC 0.",["_dmarc.amazon.com: p=quarantine with rua and ruf","_dmarc.aws.com: p=quarantine","amazonaws.com SPF: include:amazon.com ~all","CAA: none on amazon.com, aws.com, amazonaws.com"]],
+  vuln:["No AWS infrastructure breach found. One point withheld for recurring 2026 us-east-1 disruptions that affect availability rather than confidentiality.",["IsDown: 34 AWS outages in the 12 months to Mar 2026","8 May 2026 use1-az4 cooling event; 27 Jul and 21 Sep 2026 us-east-1 API errors"]],
+  gov:["Comprehensive public documentation of controls, data privacy, and the shared responsibility model.",["AWS Compliance Center; AWS Data Privacy FAQ"]],
+  assur:["Self-service SOC 1, 2, 3 and ISO certificates in AWS Artifact at no cost.",["AWS Artifact"]],
+  vdp:["Formal vulnerability disclosure program.",["AWS VDP"]],
+  cont:["Health Dashboard, post-event summaries, and security bulletins.",["health.aws.amazon.com"]]},
+ soc:{CC6:[5,"Physical security, hypervisor isolation, and service access are in AWS's SOC 2 scope.","IAM least privilege, root MFA, SCPs, encryption with KMS, security groups. This is PromptHalo's side of CC6."],
+      CC7:[5,"AWS monitors its infrastructure and publishes bulletins.","Enable CloudTrail, GuardDuty, and alerting on your accounts."],
+      CC8:[5,"AWS service changes are controlled and audited.","Use infrastructure as code with reviewed pull requests for your AWS changes."],
+      A1:[4,"Regional and AZ redundancy; 2026 us-east-1 events show concentration risk.","Multi-AZ deployment, backups, and a tested restore."],
+      C1:[5,"Encryption at rest and in transit available for all core services.","Enable default encryption; block public S3 access at the account level."],
+      P:[5,"GDPR DPA built into the service terms.","Choose regions deliberately if EU customers are onboarded."]}},
+
+{id:"stripe",name:"Stripe",parent:"Stripe, Inc.",domain:"stripe.com",
+ use:"Billing and payment processing for PromptHalo customers.",crit:"High",
+ sc:{tls:13,web:13,email:8,vuln:13,gov:13,assur:18,vdp:5,cont:4},
+ notes:{tls:"HTTPS operational",web:"Strong API key controls",email:"DMARC reject; CAA set",vuln:"Merchant-side key leaks in 2026",gov:"Clear security docs",assur:"PCI L1; SOC 2 in Dashboard",vdp:"HackerOne bug bounty",cont:"Status history"},
+ summary:"PCI DSS Level 1 with SOC reports available from the Dashboard and strong email and certificate controls. The 2026 threats were merchant-side: leaked API keys and skimmers abusing the Stripe API.",
+ certs:[["SOC 1 and SOC 2 Type II","req","Downloadable by account admins from the Stripe Dashboard."],["ISO/IEC 27001","none","Not found in this review."],["PCI DSS Service Provider Level 1","ok","Attestation of Compliance available from the Dashboard."]],
+ pos:["DMARC at reject with aggregate and forensic reporting","CAA restricts issuance to DigiCert, Amazon, and Visa","HackerOne bug bounty","Restricted API keys and webhook signing","No Stripe infrastructure breach found"],
+ gaps:["Aug 2026 leak of merchant Stripe API keys and data (threat actor claim, merchant-side)","Jun 2026 skimming campaign used the Stripe API to store stolen card data","SPF record not retrievable (oversized TXT)","stripe.com zone not DNSSEC-signed"],
+ snap:[["Website availability","OK","g"],["HTTPS/TLS","OK","g"],["Email security (DMARC)","Reject","g"],["Known vulnerabilities","Merchant-side only","w"],["Security headers","Not analyzed","m"],["DNS hosting","Route 53","p"],["security.txt","Not checked","m"]],
+ drivers:["Payment and customer billing data","API secret keys as a high-value target","Merchant-side abuse patterns in 2026"],
+ comp:["PCI DSS Level 1 and tokenization","Restricted keys and signed webhooks","Hosted Checkout keeps card data off PromptHalo systems"],
+ steps:["Replace full secret keys with restricted keys scoped per integration.","Store Stripe keys only in AWS Secrets Manager; rotate after any exposure.","Verify webhook signatures on every endpoint.","Require hardware-key MFA on Dashboard accounts.","Use Stripe Checkout or Elements to stay in PCI SAQ A scope.","Download the SOC 2 report and PCI AOC for the evidence file."],
+ det:{
+  web:["Strong customer-side controls (restricted keys, webhook signing, Radar) and a paid bug bounty.",["Stripe security documentation","HackerOne program"]],
+  email:["DMARC reject 4, SPF not retrievable 1, DKIM 2, CAA 1, DNSSEC 0.",["_dmarc.stripe.com: p=reject; pct=100; rua and ruf","CAA: digicert.com, amazon.com, visa.com, iodef set","DKIM: google, s1, s2, mandrill, zendesk1, m1"]],
+  vuln:["No Stripe infrastructure breach found. Two points withheld for 2026 campaigns that abused Stripe accounts and keys at merchants.",["Infostealers: 18 Aug 2026 release of data from vendors using Stripe, including 1,033 API keys","Aviatrix: Jun 2026 skimmer stored stolen card data in Stripe customer records"]],
+  gov:["Clear public security and privacy documentation with a DPA and subprocessor list.",["docs.stripe.com/security"]],
+  assur:["SOC 2 and PCI AOC available to account admins in the Dashboard. ISO 27001 not found.",["Stripe Dashboard compliance documents"]],
+  vdp:["Paid bug bounty.",["HackerOne"]],
+  cont:["Public status history; no public advisories feed found.",["IsDown Stripe outage history"]]},
+ soc:{CC6:[4,"Card vault access, encryption, and key management in scope.","Restricted keys, Dashboard MFA, least-privilege team roles."],
+      CC7:[4,"Stripe monitors fraud and platform events.","Alert on new API keys, key usage from unknown IPs, and payout changes."],
+      CC8:[4,"API versioning and change control audited.","Pin the API version; test upgrades in test mode."],
+      A1:[4,"Frequent short payment-method incidents, generally resolved within hours.","Retry logic and idempotency keys on all API calls."],
+      C1:[5,"Card data tokenized; PCI DSS Level 1.","Never log full card data or secret keys."],
+      PI1:[5,"Payment processing integrity is Stripe's core function.","Reconcile Stripe events with your billing records."],
+      P:[4,"DPA and subprocessor list published.","List Stripe as a processor in your privacy notice."]}},
+
+{id:"github",name:"GitHub",parent:"GitHub, Inc. (Microsoft)",domain:"github.com",
+ use:"Source code, CI/CD with GitHub Actions, and pipeline secrets.",crit:"Critical",
+ sc:{tls:13,web:12,email:7,vuln:8,gov:13,assur:17,vdp:5,cont:5},
+ notes:{tls:"HTTPS operational",web:"Mature bounty; IDE supply-chain exposure",email:"DMARC quarantine; CAA set",vuln:"May 2026 internal repo breach",gov:"Strong docs",assur:"SOC reports plan-gated",vdp:"Paid bug bounty",cont:"Fast disclosure"},
+ summary:"Mature security program and fast, candid disclosure. The May 2026 theft of about 3,800 internal repositories through a malicious VS Code extension is the most significant incident in this set.",
+ certs:[["SOC 1 and SOC 2 Type 2","req","Available to GitHub Enterprise customers in account settings; other plans must request."],["ISO/IEC 27001:2022","pub","Vendor-published certificate."],["Other","pub","FedRAMP Tailored (LI-SaaS) and CSA STAR listed."]],
+ pos:["Public bug bounty with published rewards","CAA restricts issuance to four named CAs","Multi-provider DNS (Route 53 and NS1)","Disclosed the May 2026 incident within two days","Secret scanning and push protection available"],
+ gaps:["May 2026: about 3,800 internal repositories exfiltrated via a malicious VS Code extension","Customer exposure limited to possible support-interaction excerpts, per GitHub","DMARC quarantine on the root domain (subdomains reject)","SOC reports require an Enterprise plan","github.com zone not DNSSEC-signed"],
+ snap:[["Website availability","OK","g"],["HTTPS/TLS","OK","g"],["Email security (DMARC)","Quarantine","w"],["Known vulnerabilities","May 2026 breach","b"],["Security headers","Not analyzed","m"],["DNS hosting","Route 53 + NS1","p"],["security.txt","Not checked","m"]],
+ drivers:["Holds all source code and CI secrets","Developer-tool supply chain attacks in 2026","Internal repo theft may aid future attacks"],
+ comp:["Rapid disclosure and secret rotation","Strong customer-side controls","Independent attestations"],
+ steps:["Require 2FA (passkeys preferred) for the organization.","Replace classic PATs with fine-grained tokens that expire.","Pin third-party Actions to full commit SHAs.","Enable secret scanning and push protection where your plan allows.","Restrict OAuth app and GitHub App installs to admin approval.","Publish an allowlist for IDE extensions (the May 2026 vector)."],
+ det:{
+  web:["Mature bounty and product security. One area weighs against it: developer-tool supply chain compromises reached GitHub's own staff in 2026.",["GitHub Security Bug Bounty","SANS: Nx Console 18.95.0 malicious extension"]],
+  email:["DMARC quarantine 3, SPF not retrievable 1, DKIM 2, CAA 1, DNSSEC 0.",["_dmarc.github.com: p=quarantine; sp=reject; rua and ruf","CAA: DigiCert, Sectigo, GlobalSign, Let's Encrypt","DKIM: google, selector1, selector2, k1, k2, s1, s2, zendesk1"]],
+  vuln:["Seven points withheld. Attacker exfiltrated about 3,800 internal repositories after compromising an employee device. GitHub reports no evidence of customer repository impact.",["FINRA Cyber Alert, 22 May 2026","SANS NewsBites: detection 18 May, disclosure 20 May 2026"]],
+  gov:["Comprehensive security, privacy, and DPA documentation.",["GitHub Trust Center"]],
+  assur:["SOC 1 and SOC 2 Type 2 plus ISO 27001. Reports are self-service only on Enterprise plans.",["GitHub Enterprise compliance reports"]],
+  vdp:["Paid public bug bounty.",["bounty.github.com"]],
+  cont:["Status history, availability reports, and prompt incident posts.",["githubstatus.com"]]},
+ soc:{CC6:[4,"Platform access and data isolation in scope.","Org 2FA, SSO if available, fine-grained tokens, branch protection."],
+      CC7:[3,"May 2026 breach shows detection worked within about two days, but after exfiltration.","Review the org audit log; alert on new deploy keys, tokens, and app installs."],
+      CC8:[4,"GitHub's change control is audited.","Protected branches, required reviews, and signed commits for your code."],
+      CC9:[3,"The 2026 incident originated in a third-party developer tool.","Vet IDE extensions and Actions used by PromptHalo developers."],
+      A1:[4,"Status history shows periodic Actions and Copilot degradation.","Keep a local clone policy and document manual deploy fallback."],
+      C1:[4,"Private repositories encrypted and access-controlled.","Keep secrets out of repos; use Actions secrets or OIDC to AWS."],
+      P:[4,"DPA available.","Limit personal data in issues and commit metadata."]}},
+
+{id:"google",name:"Google Workspace",parent:"Google LLC",domain:"google.com",
+ use:"Corporate email (prompthalo.ai MX), documents, and staff identity.",crit:"Critical",
+ sc:{tls:13,web:14,email:8,vuln:13,gov:14,assur:20,vdp:5,cont:5},
+ notes:{tls:"HTTPS operational",web:"Google VRP; strong admin controls",email:"DMARC reject; SPF softfail",vuln:"No Workspace breach found",gov:"Extensive documentation",assur:"Self-service Compliance Reports Manager",vdp:"Google VRP",cont:"Detailed incident reports"},
+ summary:"Top score in the set: DMARC reject, self-service attestations, and a long-running VRP. The practical risks are account takeover through social engineering and a 13-hour 2026 outage that blocked security-key sign-in.",
+ certs:[["SOC 1, 2, 3","ok","SOC 2 in Compliance Reports Manager; SOC 3 public."],["ISO/IEC 27001, 27017, 27018, 27701","ok","Certificates available in Compliance Reports Manager."],["Other","ok","ISO/IEC 42001, FedRAMP High, HIPAA BAA."]],
+ pos:["DMARC at reject with reporting","CAA limits issuance to Google Trust Services","Google Vulnerability Reward Program","Self-service compliance reports","Status dashboard publishes full incident reports"],
+ gaps:["10 Apr 2026: about 13 hours where Google IdP users could not sign in with security keys or passkeys","SPF softfail (~all)","google.com zone not DNSSEC-signed","Jan 2026 SSO vishing campaigns targeted Google and Okta accounts","PromptHalo's own Google DKIM selector was not found in an earlier check"],
+ snap:[["Website availability","OK","g"],["HTTPS/TLS","OK","g"],["Email security (DMARC)","Reject","g"],["Known vulnerabilities","None found","g"],["Security headers","Not analyzed","m"],["DNS hosting","Google","p"],["security.txt","Not checked","m"]],
+ drivers:["Email is the reset path for every other account","Social-engineering attacks on SSO accounts","Third-party OAuth app grants (the Vercel pattern)"],
+ comp:["Phishing-resistant MFA and context-aware access","Self-service attestations","Detailed admin audit logs"],
+ steps:["Enable DKIM signing for prompthalo.ai in the Admin console.","Move prompthalo.ai DMARC from p=none to quarantine after a report review.","Require security keys or passkeys for admins; store backup codes offline.","Restrict third-party app access to admin-approved apps.","Download the SOC 2 report from Compliance Reports Manager."],
+ det:{
+  web:["Long-running VRP and strong admin security controls.",["Google VRP","Workspace security center"]],
+  email:["DMARC reject 4, SPF ~all 1, DKIM 2, CAA 1, DNSSEC 0.",["_dmarc.google.com: p=reject","SPF: include:_spf.google.com ~all","CAA: pki.goog","DKIM selectors 20230601 and 20161025"]],
+  vuln:["No Workspace platform breach found. Points withheld for the April 2026 sign-in incident and customer-targeted SSO campaigns.",["Workspace Status Dashboard incident, 10 Apr 2026","Aug 2025 breach of Google's corporate Salesforce instance (not Workspace)"]],
+  gov:["Extensive public documentation on privacy, data processing, and AI use.",["Workspace Trust and Compliance pages"]],
+  assur:["Self-service SOC and ISO reports; SOC 3 public.",["Compliance Reports Manager"]],
+  vdp:["Paid VRP.",["bughunters.google.com"]],
+  cont:["Detailed incident reports with root cause and workarounds.",["Workspace Status Dashboard"]]},
+ soc:{CC6:[5,"Authentication, data isolation, and encryption in scope.","Enforce 2-step verification, restrict app access, review admin roles."],
+      CC7:[5,"Google monitors and publishes incident reports.","Enable alert center rules for suspicious logins and OAuth grants."],
+      CC8:[5,"Change management audited.","None beyond tracking Workspace release notes."],
+      A1:[4,"April 2026 security-key sign-in outage lasted about 13 hours.","Keep offline backup codes for admins."],
+      C1:[5,"Encryption at rest and in transit; DLP available.","Set external sharing defaults for Drive."],
+      P:[5,"Cloud Data Processing Addendum available.","Sign the DPA in the Admin console."]}},
+
+{id:"slack",name:"Slack",parent:"Salesforce, Inc.",domain:"slack.com",
+ use:"Internal team communication, including security and incident discussions.",crit:"High",
+ sc:{tls:13,web:12,email:10,vuln:13,gov:13,assur:18,vdp:5,cont:4},
+ notes:{tls:"HTTPS operational",web:"Bug bounty; AI feature data use",email:"Best DNS hygiene in set",vuln:"No platform breach in 24 months",gov:"Clear trust pages",assur:"SOC 2 on request; SOC 3 public",vdp:"HackerOne bug bounty",cont:"Status history"},
+ summary:"Best email and DNS hygiene of all eight vendors, including signed DNSSEC. No platform breach in 24 months. Remaining risk is what staff put into Slack and how third-party apps and AI features reach it.",
+ certs:[["SOC 2 Type II and SOC 3","req","SOC 3 public; SOC 2 on request through the Slack trust site."],["ISO/IEC 27001, 27017, 27018","pub","Vendor-published certificates."],["Other","pub","FedRAMP Moderate (GovSlack High), HIPAA on eligible plans."]],
+ pos:["DMARC reject, SPF -all, and DNSSEC signed with DS","CAA bound to specific CA accounts","HackerOne bug bounty","No Slack platform breach found in 24 months","Admin controls for app approval and retention"],
+ gaps:["30 Jan 2026 outage caused by a TLS certificate rotation","2022 theft of Slack GitHub repositories via stolen employee tokens","Customer account takeovers with stolen credentials (Nikkei, Nov 2025)","AI feature data handling needs a settings review"],
+ snap:[["Website availability","OK","g"],["HTTPS/TLS","OK","g"],["Email security (DMARC)","Reject","g"],["Known vulnerabilities","None found","g"],["Security headers","Not analyzed","m"],["DNS hosting","Route 53","p"],["security.txt","Not checked","m"]],
+ drivers:["Messages may contain credentials, customer details, or incident data","Third-party app integrations","Credential-based account takeover"],
+ comp:["Strong platform hygiene","Admin app approval and retention settings","Independent attestations"],
+ steps:["Require SSO or 2FA for all members.","Restrict app installs to admin approval.","Set a message and file retention period.","Review Slack AI data settings against your AI policy.","Prohibit sharing secrets in Slack; point staff to a password manager."],
+ det:{
+  web:["Mature bug bounty. Points withheld because third-party app and AI features widen the data path.",["HackerOne Slack program"]],
+  email:["DMARC reject 4, SPF -all 2, DKIM 2, CAA 1, DNSSEC 1.",["_dmarc.slack.com: p=reject; pct=100","SPF ends in -all","DNSKEY published and DS present at .com","CAA bound to DigiCert and Let's Encrypt accounts","DKIM zone answers any selector (wildcard); presence counted"]],
+  vuln:["No platform breach found in 24 months. Points withheld for the 2022 repository theft and 2026 availability incident.",["Pingoru: 30 Jan 2026 TLS rotation incident","Slack Dec 2022 repository disclosure"]],
+  gov:["Clear trust, privacy, and AI data pages.",["slack.com/trust"]],
+  assur:["SOC 2 Type II on request; SOC 3 public; ISO family.",["slack.com/trust/compliance"]],
+  vdp:["Paid bug bounty.",["HackerOne"]],
+  cont:["Public status history; advisories are limited.",["status.slack.com"]]},
+ soc:{CC6:[4,"Workspace isolation, encryption, and access controls in scope.","SSO or 2FA, guest restrictions, session duration limits."],
+      CC7:[4,"Slack monitors its platform.","Review access logs; alert on new app installs where your plan allows."],
+      CC8:[4,"Change control audited; one 2026 outage came from a certificate change.","None."],
+      CC9:[3,"Third-party apps are the main data path out.","Admin-approve every app and review scopes annually."],
+      A1:[4,"Short incidents; status history public.","Document an out-of-band channel for incidents."],
+      C1:[4,"Encryption at rest and in transit.","Set retention; restrict external shared channels."],
+      P:[4,"DPA and subprocessor list published.","List Slack as a processor for employee data."]}},
+
+{id:"wix",name:"Wix",parent:"Wix.com Ltd.",domain:"wix.com",
+ use:"DNS hosting for prompthalo.ai (wixdns nameservers). Controls login, email, and web records.",crit:"Critical",
+ sc:{tls:13,web:10,email:6,vuln:11,gov:11,assur:15,vdp:5,cont:3},
+ notes:{tls:"HTTPS operational",web:"2026 XSS CVE in account settings",email:"DMARC quarantine; no CAA",vuln:"Base44 auth bypass (2025)",gov:"Trust center, limited detail",assur:"SOC 2 claimed; access path unclear",vdp:"Bug bounty",cont:"Limited incident reporting"},
+ summary:"Broad certification claims, but the lowest assurance access and weakest DNS hygiene in the set. That matters more than the score suggests: Wix controls every DNS record PromptHalo depends on.",
+ certs:[["SOC 2 Type 2","pub","Claimed on the Wix trust center; report request path not published."],["ISO/IEC 27001, 27017, 27018, 27701","pub","Vendor-published."],["Other","pub","PCI DSS Level 1 merchant and service provider."]],
+ pos:["Trust center lists SOC 2 Type 2, PCI DSS Level 1, and the ISO family","Bug bounty program","AES-256 at rest and TLS 1.2+ stated","External penetration tests stated"],
+ gaps:["CVE-2026-2276: stored XSS in account settings SVG upload (Feb 2026)","Base44 (Wix subsidiary) authentication bypass, Jul 2025","No CAA; wix.com not DNSSEC-signed; DMARC quarantine","SOC 2 report access path not published","PromptHalo's DNS changes are not tied to AWS IAM or audit logs"],
+ snap:[["Website availability","OK","g"],["HTTPS/TLS","OK","g"],["Email security (DMARC)","Quarantine","w"],["Known vulnerabilities","2026 XSS CVE","w"],["Security headers","Not analyzed","m"],["DNS hosting","NS1","p"],["security.txt","Not checked","m"]],
+ drivers:["Wix account takeover would let an attacker redirect login, email, and API records","No DNSSEC or CAA on prompthalo.ai today","Limited attestation access"],
+ comp:["Certification breadth","Bug bounty","Low data sensitivity beyond DNS"],
+ steps:["Enforce 2FA on every Wix account with access to prompthalo.ai.","Limit Wix owners to two named people.","Enable registrar lock on prompthalo.ai.","Add CAA records for prompthalo.ai.","Evaluate moving DNS to Route 53 for DNSSEC and IAM-audited changes.","Request the SOC 2 report through Wix support."],
+ det:{
+  web:["A 2026 stored XSS in the account settings area and a 2025 auth bypass at a subsidiary lower confidence in web application controls.",["NVD CVE-2026-2276","Base44 auth bypass report, Jul 2025"]],
+  email:["DMARC quarantine 3, SPF not retrievable 1, DKIM 2, CAA 0, DNSSEC 0.",["_dmarc.wix.com: p=quarantine with rua","CAA: none. DNSKEY: none. NS: NS1","DKIM: google, selector1, selector2, default, k1, k2, s1, s2, sendgrid, mandrill, m1"]],
+  vuln:["No Wix platform breach found. Four points withheld for CVE-2026-2276 and the Base44 authentication bypass, which was patched within 24 hours with no evidence of exploitation.",["NVD CVE-2026-2276","Security reporting on Base44, Jul 2025"]],
+  gov:["Trust center and security overview exist but are high-level.",["wix.com/trust-center/security","Wix security measures overview"]],
+  assur:["Certifications claimed; no published route to obtain the SOC 2 report.",["Wix trust center"]],
+  vdp:["Bug bounty program.",["Wix trust center"]],
+  cont:["Status page exists; no public advisories feed found.",["Wix status"]]},
+ soc:{CC6:[3,"Account access controls claimed; SOC 2 not reviewed.","2FA, minimal owners, registrar lock. This is the highest-value control for PromptHalo here."],
+      CC7:[3,"Vendor states monitoring and pen testing.","Monitor prompthalo.ai DNS records for unexpected changes."],
+      CC8:[3,"Not visible.","Document every DNS change in a ticket."],
+      CC9:[3,"Hosted on AWS, Google Cloud, and Equinix.","Keep an exported copy of the zone file."],
+      A1:[3,"Not visible beyond the status page.","Keep a tested plan to move nameservers."],
+      C1:[3,"AES-256 at rest stated.","None; DNS data is public by design."],
+      P:[3,"Privacy policy published.","Minimal personal data held."]}},
+
+{id:"checkr",name:"Checkr",parent:"Checkr, Inc.",domain:"checkr.com",
+ use:"Pre-employment background screening. Holds candidate SSNs, addresses, and criminal records.",crit:"High",
+ sc:{tls:13,web:10,email:7,vuln:13,gov:12,assur:15,vdp:3,cont:4},
+ notes:{tls:"HTTPS operational",web:"Limited public detail",email:"DMARC reject; no CAA",vuln:"No breach found",gov:"ISO 42001; FCRA regulated",assur:"SOC 2 under NDA",vdp:"Not verified",cont:"Trust portal updates"},
+ summary:"Solid certification set, including ISO 42001 for AI, and DMARC at reject. Assurance access is NDA-gated and the newest SOC 2 period seen ends June 2025. Data sensitivity is the highest of the eight vendors.",
+ certs:[["SOC 2 Type II","req","Under NDA via security.checkr.com. Newest period seen: 1 Jul 2024 to 30 Jun 2025."],["ISO/IEC 27001","pub","Certificate and Statement of Applicability on the trust portal."],["Other","pub","ISO/IEC 42001 (AI management system). FCRA-regulated consumer reporting agency."]],
+ pos:["DMARC at reject with Proofpoint reporting","Trust portal publishes compliance updates","ISO/IEC 42001 certification for AI use","SSO with custom roles for customer accounts","No breach found"],
+ gaps:["Newest SOC 2 period seen ended 30 Jun 2025; confirm a later report","SOC 2 requires an NDA","Vulnerability disclosure program not verified","No CAA; checkr.com not DNSSEC-signed","Frequent data-source delays (availability, not security)"],
+ snap:[["Website availability","OK","g"],["HTTPS/TLS","OK","g"],["Email security (DMARC)","Reject","g"],["Known vulnerabilities","None found","g"],["Security headers","Not analyzed","m"],["DNS hosting","Cloudflare","p"],["security.txt","Not checked","m"]],
+ drivers:["Highly sensitive candidate PII","FCRA obligations on PromptHalo as the employer","Report copies leaking into email, Drive, or Slack"],
+ comp:["SOC 2, ISO 27001, and ISO 42001","Regulated as a consumer reporting agency","SSO and role controls"],
+ steps:["Sign the NDA and obtain the current SOC 2 report; confirm the period after Jun 2025.","Limit Checkr access to named hiring staff with SSO.","Keep reports inside Checkr; do not copy them to Drive or Slack.","Follow the FCRA pre-adverse and adverse action workflow.","Confirm Checkr's retention and deletion terms."],
+ det:{
+  web:["Customer controls (SSO, roles) are published; little public detail on product security testing.",["Checkr enterprise platform page"]],
+  email:["DMARC reject 4, SPF not retrievable 1, DKIM 2, CAA 0, DNSSEC 0.",["_dmarc.checkr.com: p=reject with rua and ruf to Proofpoint","DKIM: google, s1, s2, smtp, mandrill, zendesk1, m1","CAA: none. NS: Cloudflare"]],
+  vuln:["No breach or exploited vulnerability found. Two points withheld for low public visibility into security testing.",["Searches of breach and incident reporting, 29 Sep 2026"]],
+  gov:["ISO 42001 and FCRA regulation indicate structured governance; privacy by design stated.",["security.checkr.com","engineering.checkr.com/trust-and-security"]],
+  assur:["SOC 2 Type II and ISO 27001 exist; SOC 2 is NDA-gated and the newest period seen ended Jun 2025.",["security.checkr.com portal update"]],
+  vdp:["No bug bounty or VDP verified in this review.",["Not found"]],
+  cont:["Trust portal updates and a public status page.",["Pingoru Checkr incident history"]]},
+ soc:{CC6:[4,"Access to candidate data in SOC 2 scope.","SSO, least-privilege roles, remove leavers promptly."],
+      CC7:[3,"Not visible beyond attestation.","Review Checkr user list quarterly."],
+      CC8:[3,"Secure SDLC stated; not independently visible.","None."],
+      A1:[3,"Frequent data-source delays in 2026.","Allow time in hiring schedules for delays."],
+      C1:[4,"Sensitive PII protected under SOC 2 and ISO 27001.","Do not export reports outside Checkr."],
+      PI1:[4,"Report accuracy is regulated under FCRA.","Follow dispute and adverse action procedures."],
+      P:[4,"Privacy policy and FCRA consumer rights processes.","Provide candidates FCRA disclosures and authorization."]}}
+];
+
+var SOURCES={
+ auth0:[["Okta security advisories","https://trust.okta.com/security-advisories/"],["Okta status (Auth0 status link)","https://status.okta.com/"]],
+ aws:[["AWS outage history (IsDown)","https://isdown.app/status/aws/outage-history"],["AWS Artifact","https://aws.amazon.com/artifact/"]],
+ stripe:[["Infostealers: Stripe vendor data release, Aug 2026","https://www.infostealers.com/?p=6770"],["Aviatrix: Stripe-hosted skimmer, Jun 2026","https://aviatrix.ai/threat-research-center/credit-card-theft-campaign-abuses-stripe-to-host-stolen-payment-info-2026"],["Stripe outage history (IsDown)","https://isdown.app/status/stripe/outage-history"]],
+ github:[["FINRA Cyber Alert: GitHub security incident","https://www.finra.org/rules-guidance/guidance/cybersecurity-alert-github-security-incident-20260522"],["SANS NewsBites","https://www.sans.org/newsletters/newsbites/xxviii-39"]],
+ google:[["Workspace Status Dashboard incident, 10 Apr 2026","https://www.google.com.br/appsstatus/dashboard/incidents/JTgxXCtXTaw3aEVzUUfa?hl=en"]],
+ slack:[["Slack incident, 30 Jan 2026 (Pingoru)","https://pingoru.io/providers/slack/incidents/1765653"]],
+ wix:[["Wix trust center: security","https://www.wix.com/trust-center/security"],["Wix security measures overview","https://support.wix.com/en/article/wix-security-measures-overview"],["NVD CVE-2026-2276","https://nvd.nist.gov/vuln/detail/CVE-2026-2276"]],
+ checkr:[["Checkr Trust and Security Portal","https://security.checkr.com/"],["Checkr trust and security","https://engineering.checkr.com/trust-and-security"]]
+};
+
+/* ---------- Secureframe ---------- */
+V.push({id:"secureframe",name:"Secureframe",parent:"Secureframe, Inc.",domain:"secureframe.com",
+ use:"PromptHalo's compliance platform: control monitoring, evidence collection, and the SOC 2 audit workflow. Integrates with AWS, GitHub, and Google Workspace.",crit:"",
+ sc:{tls:13,web:11,email:7,vuln:13,gov:13,assur:18,vdp:3,cont:5},
+ notes:{tls:"HTTPS operational",web:"Internal admin host directly routable",email:"DMARC reject; no CAA",vuln:"No breach found",gov:"52 published controls; public POA&M",assur:"SOC 2 current; ISO; CMMC; FedRAMP",vdp:"Reporting channel claimed",cont:"Status page, POA&M, trust updates"},
+ summary:"Current SOC 2 Type II and an unusually transparent trust center, including a public FedRAMP POA&M. Held back by unpublished AI subprocessor terms, an internet-routable internal admin host, and the broad read access every compliance platform needs.",
+ certs:[["SOC 2 Type II","req","Period 1 Aug 2025 to 31 Jul 2026. Request through trust.secureframe.com."],["ISO/IEC 27001:2022","req","Certificate on request; issue year not stated."],["Other","pub","CMMC Level 2 (valid to 9 Sep 2028), TX-RAMP Level 1, FedRAMP 20x. Moderate reported Jun 2026; trust center still shows the Low letter that expired 20 Aug 2026."]],
+ pos:["DMARC at reject for the domain and subdomains, with reporting","DKIM present for every sending service","52 continuously monitored controls published","FedRAMP POA&M and control test results open for download","Product hosts sit behind Cloudflare"],
+ gaps:["internal.secureframe.com resolves to a self-hosted Retool load balancer outside Cloudflare","No published training or retention terms for OpenAI and Intercom (Fin)","No encryption-at-rest control in the public catalogue","Trust center shows a FedRAMP Low letter that expired 20 Aug 2026","No CAA; DNSSEC keys without a DS record; SPF ~all","More than 70 status-page incidents since 2022"],
+ snap:[["Website availability","OK","g"],["HTTPS/TLS","OK","g"],["Email security (DMARC)","Reject","g"],["Known vulnerabilities","None found","g"],["Security headers","Not analyzed","m"],["DNS hosting","Cloudflare","p"],["security.txt","Not checked","m"]],
+ drivers:["Read access into PromptHalo's AWS, GitHub, and Google Workspace","Tenant isolation not described; a competitor had a cross-tenant exposure in May 2025","AI subprocessors may process compliance evidence"],
+ comp:["Current SOC 2 Type II","Public POA&M and control catalogue","CISO with prior FedRAMP delivery"],
+ steps:["Review the scopes granted to Secureframe in AWS, GitHub, and Google; keep them read-only.","Request the SOC 2 report (Aug 2025 to Jul 2026) and a bridge letter.","Get written AI training and retention terms for OpenAI and Intercom.","Ask how tenant isolation is built and tested.","Confirm internal.secureframe.com is SSO or IP restricted.","Keep an evidence export before each audit window."],
+ det:{
+  web:["Strong published control catalogue. Points withheld for an internal Retool admin host on a public AWS load balancer and publicly resolvable test and sandbox hosts.",["internal.secureframe.com CNAME retool-alb-199154510.us-east-1.elb.amazonaws.com","test and sandbox resolve through Cloudflare"]],
+  email:["DMARC reject 4, SPF ~all 1, DKIM 2, CAA 0, DNSSEC 0.",["_dmarc.secureframe.com: p=reject; sp=reject; pct=100; rua to Cloudflare","SPF ends in ~all","DKIM: google, s1, s2, zendesk1, zendesk2, sf1, sf2","DNSKEY at Cloudflare but no DS at .com; CAA none"]],
+  vuln:["No breach, enforcement action, or attributed CVE found. Two points withheld for the category precedent (Vanta cross-tenant exposure, May 2025) and a fourth-party incident at Vercel, which hosts the marketing site.",["Vanta disclosure, May 2025","Vercel breach disclosed 19 Apr 2026"]],
+  gov:["Publishes 52 monitored controls and its FedRAMP POA&M. Points withheld for the stale FedRAMP letter and unpublished AI data terms.",["trust.secureframe.com, read 29 Sep 2026"]],
+  assur:["Current SOC 2 Type II on request, plus ISO 27001:2022, CMMC Level 2, and TX-RAMP.",["trust.secureframe.com resources"]],
+  vdp:["Trust center lists a confidential reporting channel. No bug bounty or security.txt verified.",["trust.secureframe.com Communications controls"]],
+  cont:["Status page, open POA&M (12 Mar 2026), and control tests (31 Mar 2026).",["StatusGator and IsDown monitors","FedRAMP 20x resources on the trust center"]]},
+ soc:{CC6:[4,"Least privilege, access reviews, unique IDs, and encryption in transit published. No encryption-at-rest or MFA control published.","Grant read-only integration roles; review scopes in AWS, GitHub, and Google each quarter."],
+      CC7:[4,"Alerting, traffic monitoring, incident response plan, and testing published.","Watch Secureframe integration activity in CloudTrail and Google audit logs."],
+      CC8:[4,"Secure development, change testing, and environment segregation published. No stated gate for changes affecting tenant boundaries.","None."],
+      CC9:[3,"Vendor due diligence published; AI subprocessor terms are not.","Obtain AI training and retention terms in writing."],
+      A1:[3,"BC/DR controls published; frequent status incidents and no RTO or RPO.","Export evidence before each audit window."],
+      C1:[3,"Encryption at rest not in the public catalogue.","Limit uploads of sensitive personnel data."],
+      P:[4,"Privacy policy published; subprocessors located in the United States.","List Secureframe as a processor in the data map."]}});
+SOURCES.secureframe=[["Secureframe Trust Center","https://trust.secureframe.com"],["Secureframe status history (StatusGator)","https://statusgator.com/services/secureframe"],["Secureframe status history (IsDown)","https://isdown.app/status/secureframe"],["Secureframe FedRAMP 20x Phase Two post","https://secureframe.com/blog/fedramp-20x-phase-two"]];
+
+/* ---------- PromptHalo self-assessment (hidden by default) ---------- */
+var SELF={id:"prompthalo",name:"PromptHalo (self)",parent:"PromptHalo Technologies",domain:"prompthalo.ai",self:true,
+ use:"How PromptHalo appears to a customer who runs this same external assessment on it.",crit:"",
+ sc:{tls:13,web:9,email:2,vuln:13,gov:11,assur:7,vdp:0,cont:3},
+ notes:{tls:"HTTPS operational",web:"Dev tenant and staging publicly resolvable",email:"DMARC p=none; no DKIM found",vuln:"No known breaches",gov:"Trust Center with published policies",assur:"No public SOC 2 or ISO",vdp:"No security.txt verified",cont:"Trust Center only"},
+ summary:"A good architecture story and a public Trust Center, but weak externally measurable hygiene. Email authentication, DNS protections, and a disclosure channel are quick wins, and no independent attestation is publicly verifiable yet.",
+ certs:[["SOC 2 Type II","none","Not publicly verified. The program runs in Secureframe; no report is published."],["ISO/IEC 27001","none","Not publicly verified."],["Other","none","No additional public certifications."]],
+ pos:["HTTPS with valid TLS","No known breaches or public exposures","Trust Center at prompthalo.ai/trustcenter with published policies","AI security architecture described (runtime monitoring, input and output inspection)","Decision-level audit trails described"],
+ gaps:["DMARC at p=none with no reporting address","Google DKIM selector not found","No CAA records; zone not DNSSEC-signed","auth.prompthalo.ai points to an Auth0 dev tenant","api.prompthalo.ai IP not attributed to known hosting","staging.prompthalo.ai publicly resolvable on CloudFront","No security.txt verified","No publicly verifiable SOC 2 or ISO 27001","Lookalike prompthalo.com is parked and for sale"],
+ snap:[["Website availability","OK","g"],["HTTPS/TLS","OK","g"],["Email security (DMARC)","p=none","b"],["Known vulnerabilities","None found","g"],["Security headers","Not analyzed","m"],["DNS hosting","Wix","p"],["security.txt","Not verified","w"]],
+ drivers:["No independent attestation a customer can verify","Email domain can be spoofed","Public non-production endpoints"],
+ comp:["Modern AI security architecture","Published policy library","No known incidents"],
+ steps:["Enable Google DKIM; move DMARC to quarantine with a rua address.","Add CAA records for prompthalo.ai.","Publish /.well-known/security.txt with a monitored contact.","Retire or lock down the Auth0 dev tenant on auth.prompthalo.ai.","Confirm ownership of api.prompthalo.ai (47.209.88.71).","Put staging behind authentication or a WAF allowlist.","Complete SOC 2 Type II and publish a summary on the Trust Center.","Consider acquiring prompthalo.com."],
+ det:{
+  web:["Architecture is well described. Points withheld for public non-production endpoints and an API host that could not be attributed.",["auth.prompthalo.ai CNAME dev-rwu8vsu2ego5xuu0 Auth0 tenant","staging.prompthalo.ai CNAME d2os9w8d0p5oxo.cloudfront.net","api.prompthalo.ai A 47.209.88.71, no PTR"]],
+  email:["DMARC p=none 1, SPF ~all 1, DKIM 0, CAA 0, DNSSEC 0.",["_dmarc.prompthalo.ai: v=DMARC1; p=none","SPF: Google and Amazon SES, ~all","No DKIM at google or common selectors","NS: wixdns.net; no CAA; no DNSKEY"]],
+  vuln:["No breach or exposure found. Two points withheld because the lookalike domain prompthalo.com is listed for sale.",["prompthalo.com NS afternic.com (parked)"]],
+  gov:["Trust Center publishes policies generated from controlled sources. Points withheld because DPA and subprocessor detail were not confirmed in this review.",["prompthalo.ai/trustcenter"]],
+  assur:["No SOC 2 report or ISO certificate is publicly verifiable.",["Trust Center review"]],
+  vdp:["No security.txt or disclosure policy verified.",["Not found"]],
+  cont:["Trust Center only; no public status page found.",["Not found"]]},
+ soc:{}};
+
+/* ---------- criticality factors: 1 low to 3 high ---------- */
+var CFN=["Data sensitivity","Access into PromptHalo","Operational dependency","Exit difficulty","Blast radius"];
+var CRIT={
+ auth0:[[3,"Customer identities and credentials"],[3,"Authenticates every user session to the app"],[3,"Login outage takes the product down"],[2,"Migration requires user and SDK changes"],[3,"Compromise enables account takeover across customers"]],
+ aws:[[3,"All production and customer data"],[3,"Runs all production workloads"],[3,"Outage takes the product down"],[3,"Re-platforming is a major project"],[3,"Account compromise exposes everything"]],
+ stripe:[[2,"Billing data; card data tokenized by Stripe"],[1,"No access into PromptHalo systems beyond webhooks"],[3,"Billing and revenue stop during an outage"],[2,"Payment migration is moderate effort"],[2,"Key misuse limited to payments"]],
+ github:[[3,"All source code and CI configuration"],[3,"CI deploys to AWS"],[2,"Development pauses; production keeps running"],[2,"Repos portable; Actions workflows are not"],[3,"Code or pipeline tampering reaches production"]],
+ google:[[3,"Corporate email and documents"],[3,"Email is the reset path for every other account"],[3,"Staff communication and identity stop"],[2,"Mail and document migration is moderate effort"],[3,"Mailbox takeover cascades to other vendors"]],
+ slack:[[2,"Internal discussions; may include incident detail"],[2,"Integrations can reach other tools"],[2,"Internal communication degrades"],[1,"Easy to replace"],[3,"Workspace compromise exposes all internal conversation"]],
+ wix:[[1,"DNS records are public by design"],[3,"Controls routing for login, email, and API hosts"],[3,"DNS outage takes everything down"],[1,"Nameservers can move in hours"],[3,"Record changes can redirect login and email"]],
+ checkr:[[3,"Candidate SSNs, addresses, and criminal records"],[1,"No access into PromptHalo systems"],[1,"Hiring delays only"],[1,"Alternatives readily available"],[2,"Breach creates FCRA and privacy liability"]],
+ secureframe:[[3,"Compliance evidence, policies, personnel records"],[3,"Read access into AWS, GitHub, and Google Workspace"],[2,"Outage delays audits, not operations"],[2,"Evidence history and workflows create lock-in"],[3,"Compromise exposes a map of PromptHalo's controls"]]
+};
+function critOf(id){
+ var f=CRIT[id]; if(!f) return null;
+ var t=0;for(var i=0;i<f.length;i++)t+=f[i][0];
+ var tier=t>=12?"Critical":(t>=9?"High":(t>=6?"Moderate":"Low"));
+ if((f[0][0]===3||f[1][0]===3)&&(tier==="Moderate"||tier==="Low")) tier="High";
+ return {t:t,tier:tier,f:f};
+}
+function priorityOf(v){
+ var c=critOf(v.id); if(!c) return ["N/A","c-mut",""];
+ var s=total(v);
+ if((c.tier==="Critical"&&s<85)||s<70) return ["P1","c-bad","Act this quarter"];
+ if(c.tier==="Critical"||(c.tier==="High"&&s<85)) return ["P2","c-warn","Act within six months"];
+ return ["P3","c-good","Routine monitoring"];
+}
+var CADENCE={Critical:"Full review every 12 months; continuous monitoring of advisories and status",High:"Full review every 12 months",Moderate:"Review every 24 months",Low:"Review at renewal"};
+for(var ci=0;ci<V.length;ci++){var cc0=critOf(V[ci].id);if(cc0)V[ci].crit=cc0.tier;}
+SELF.crit="Self";
+var SHOWSELF=false;
+try{SHOWSELF=localStorage.getItem("ph-tprm-self")==="1";}catch(e){}
+function allV(){return SHOWSELF?V.concat([SELF]):V;}
+
+function critPanel(v){
+ if(v.self){
+  return '<div class="panel crit"><div class="tier"><div class="lbl">Criticality</div><div class="tv c-pur">Self</div><div class="pri">Not applicable</div></div>'
+   +'<div><p style="margin:0 0 6px"><strong>This is PromptHalo\'s own external posture.</strong> It shows what a customer\'s vendor assessment would see. Use it to prioritize fixes before customer security reviews.</p>'
+   +'<p style="margin:0;font-size:.86rem;color:var(--ink2)">Hidden by default. Turn it off in the sidebar before sharing this page.</p></div></div>';}
+ var c=critOf(v.id),pr=priorityOf(v),cls=c.tier==="Critical"?"c-bad":(c.tier==="High"?"c-warn":"c-good");
+ var fr="";for(var i=0;i<c.f.length;i++){var x=c.f[i];
+  fr+='<div class="cf"><div class="cn">'+CFN[i]+'</div><div class="dots">'+[1,2,3].map(function(n){return '<i class="'+(n<=x[0]?"on l"+x[0]:"")+'"></i>';}).join("")+'</div><div class="cr">'+x[1]+'</div></div>';}
+ return '<div class="panel crit"><div class="tier"><div class="lbl">Vendor criticality</div><div class="tv '+cls+'">'+c.tier+'</div>'
+  +'<div class="pts">'+c.t+' of 15 points</div><div class="pri">'+pill(pr[0],pr[1])+' '+pr[2]+'</div></div>'
+  +'<div><div class="cfs">'+fr+'</div><div class="cad"><strong>Review cadence:</strong> '+CADENCE[c.tier]+'.</div></div></div>';
+}
+
+/* default SOC 2 texts for criteria not overridden */
+function socDefault(v,code){
+ if(v.self){ if(code==="PI1") return [null,"Not claimed.","None."]; return [2,"Policy published on the Trust Center; controls tracked internally in Secureframe. No external attestation published.","Customers will ask for a SOC 2 Type II report or bridge letter covering this criterion."]; }
+ var a=v.sc.assur, s=a>=20?5:(a>=17?4:3);
+ var access={20:"self-service",18:"on request",17:"on Enterprise plans",15:"under NDA or by request"}[a]||"on request";
+ var cue={
+  CC1:"No customer action beyond due diligence.",
+  CC2:"Name a PromptHalo owner for this vendor; subscribe to its security and status notices.",
+  CC3:"Carry the vendor in the risk register at "+v.crit+" criticality.",
+  CC4:"Review the SOC 2 report, exceptions, and any bridge letter each year.",
+  CC5:"Map the report's CUECs to PromptHalo controls.",
+  CC6:"Enforce MFA and least privilege on PromptHalo accounts.",
+  CC7:"Watch vendor advisories and status notices.",
+  CC8:"None.",
+  CC9:"Keep an exit and export plan for this vendor.",
+  A1:"Document the fallback if the service is unavailable.",
+  C1:"Share only the data the service needs.",
+  PI1:"Not relied on for this service.",
+  P:"List the vendor in the privacy notice and data map."}[code];
+ var ven=(code==="PI1")?"Processing integrity is not a meaningful criterion for this service.":"Tested in the vendor's SOC 2 Type II, available "+access+". No criterion-level detail is public.";
+ var sc=(code==="PI1")?null:s;
+ return [sc,ven,cue];
+}
+
+/* ============================ rendering ============================ */
+function el(id){return document.getElementById(id);}
+function total(v){var t=0;for(var i=0;i<CATS.length;i++)t+=v.sc[CATS[i].k];return t;}
+var CH='<svg class="chev" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function fillFor(b){return b==="g"?css("--goodfill"):(b==="w"?css("--warnfill"):css("--badfill"));}
+
+function gauge(t){
+ var r=78,c=2*Math.PI*r,p=t/100,col=t>=85?css("--goodfill"):(t>=65?css("--warnfill"):css("--badfill"));
+ return '<svg viewBox="0 0 190 190" role="img" aria-label="Score '+t+' of 100">'
+  +'<circle cx="95" cy="95" r="'+r+'" fill="none" stroke="'+css("--mutbg")+'" stroke-width="16"/>'
+  +'<circle cx="95" cy="95" r="'+r+'" fill="none" stroke="'+col+'" stroke-width="16" stroke-linecap="round" stroke-dasharray="'+(c*p).toFixed(1)+' '+c.toFixed(1)+'" transform="rotate(-90 95 95)"/>'
+  +'<text x="95" y="98" text-anchor="middle" font-size="48" font-weight="800" fill="'+css("--p700")+'" font-family="Inter,Calibri,Segoe UI,sans-serif">'+t+'</text>'
+  +'<text x="95" y="126" text-anchor="middle" font-size="16" fill="'+css("--ink3")+'" font-family="Inter,Calibri,Segoe UI,sans-serif">/ 100</text></svg>';
+}
+function radar(v){
+ var W=600,H=440,cx=300,cy=222,R=125,n=CATS.length,ff="Inter,Calibri,Segoe UI,sans-serif";
+ var s=['<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Score by category">'];
+ for(var ring=1;ring<=4;ring++){
+  var pts=[];for(var i=0;i<n;i++){var a=-Math.PI/2+i*2*Math.PI/n;pts.push((cx+R*ring/4*Math.cos(a)).toFixed(1)+","+(cy+R*ring/4*Math.sin(a)).toFixed(1));}
+  s.push('<polygon points="'+pts.join(" ")+'" fill="none" stroke="'+css("--line")+'" stroke-width="1"/>');}
+ var vp=[];
+ for(var j=0;j<n;j++){var a2=-Math.PI/2+j*2*Math.PI/n,c=CATS[j],f=v.sc[c.k]/c.w;
+  s.push('<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+R*Math.cos(a2)).toFixed(1)+'" y2="'+(cy+R*Math.sin(a2)).toFixed(1)+'" stroke="'+css("--line")+'"/>');
+  vp.push((cx+R*f*Math.cos(a2)).toFixed(1)+","+(cy+R*f*Math.sin(a2)).toFixed(1));}
+ s.push('<polygon points="'+vp.join(" ")+'" fill="'+css("--p500")+'" fill-opacity=".22" stroke="'+css("--p600")+'" stroke-width="2"/>');
+ for(var k=0;k<n;k++){var a3=-Math.PI/2+k*2*Math.PI/n,cc=CATS[k],ff2=v.sc[cc.k]/cc.w;
+  var px=cx+R*ff2*Math.cos(a3),py=cy+R*ff2*Math.sin(a3);
+  s.push('<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="4" fill="'+css("--p600")+'"/>');
+  var lx=cx+(R+42)*Math.cos(a3),ly=cy+(R+34)*Math.sin(a3),anc=Math.abs(Math.cos(a3))<.2?"middle":(Math.cos(a3)>0?"start":"end");
+  var b=band(v.sc[cc.k],cc.w),col=b==="g"?css("--good"):(b==="w"?css("--warn"):css("--bad"));
+  s.push('<text x="'+lx.toFixed(1)+'" y="'+(ly-8).toFixed(1)+'" text-anchor="'+anc+'" font-size="15" fill="'+css("--ink2")+'" font-family="'+ff+'">'+cc.s+'</text>');
+  s.push('<text x="'+lx.toFixed(1)+'" y="'+(ly+12).toFixed(1)+'" text-anchor="'+anc+'" font-size="16" font-weight="700" fill="'+col+'" font-family="'+ff+'">'+v.sc[cc.k]+'/'+cc.w+'</text>');}
+ s.push('</svg>');return s.join("");
+}
+var ICON={
+ doc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>',
+ globe:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>',
+ shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>'
+};
+var CERTST={ok:["Available","c-good"],req:["On request","c-pur"],pub:["Vendor-published","c-warn"],none:["Not found","c-mut"]};
+function pill(t,c){return '<span class="chip '+c+'">'+t+'</span>';}
+function snapPill(t,b){var m={g:"c-good",w:"c-warn",b:"c-bad",m:"c-mut",p:"c-pur"};return pill(t,m[b]);}
+
+function card(code,title,one,score,max,cols){
+ var b=score==null?"m":band(score,max),fill=score==null?css("--line"):fillFor(b);
+ var chip=score==null?pill("N/A","c-mut"):pill(score+" / "+max,b==="g"?"c-good":(b==="w"?"c-warn":"c-bad"));
+ var body="";for(var i=0;i<cols.length;i++){var c=cols[i];
+  body+='<div><h4>'+c[0]+'</h4>'+(Array.isArray(c[1])?'<ul>'+c[1].map(function(x){return "<li>"+x+"</li>";}).join("")+'</ul>':'<p>'+c[1]+'</p>')+'</div>';}
+ return '<details class="card"><summary><span class="code">'+code+'</span><span class="ttl">'+title+'<span class="one">'+one+'</span></span>'
+  +'<span class="scorebox"><span class="bar"><i style="width:'+(score==null?0:score/max*100)+'%;background:'+fill+'"></i></span>'+chip+'</span>'+CH+'</summary>'
+  +'<div class="body">'+body+'</div></details>';
+}
+
+function renderVendor(v){
+ var t=total(v),rk=riskOf(t);
+ var h='<div class="banner"><h1>'+v.name+': External Security Assessment <span class="as">(as of Sep 29, 2026)</span></h1>'
+  +'<div class="sub">External, passive assessment based on publicly available information. Not a penetration test.</div>'
+  +'<div class="meta"><span>'+v.parent+'</span><span>'+v.domain+'</span>'+(v.self?'<span>Self-assessment</span>':'<span class="critbadge cb-'+v.crit.toLowerCase()+'">Criticality to PromptHalo: <b>'+v.crit+'</b></span>')+'</div></div><div class="wrap">';
+
+ h+=critPanel(v);
+ /* summary strip */
+ h+='<div class="panel summary" style="margin-top:16px"><div><div class="big">'+t+'<small> / 100</small></div>'+pill(rk[0]+" risk",rk[1])+'</div>'
+  +'<div><p><strong>Use at PromptHalo.</strong> '+v.use+'</p><p><strong>Rationale.</strong> '+v.summary+'</p></div></div>';
+
+ /* row 1 */
+ h+='<div class="grid g3" style="margin-top:16px">';
+ h+='<div class="panel gauge"><h2 style="align-self:flex-start">Overall Security Score</h2>'+gauge(t)
+   +'<span class="riskpill '+rk[1]+'">'+rk[0].toUpperCase()+' RISK</span>'
+   +'<div class="reason"><strong>Reason:</strong> '+v.summary.split(". ")[0]+'.</div></div>';
+ h+='<div class="panel radar"><h2>Score by Category</h2>'+radar(v)+'</div>';
+ var rows="";for(var i=0;i<CATS.length;i++){var c=CATS[i],sv=v.sc[c.k],b=band(sv,c.w);
+  rows+='<tr><td>'+c.n+'</td><td class="n">'+c.w+'</td><td class="sc s'+b+'">'+sv+'</td><td>'+v.notes[c.k]+'</td></tr>';}
+ rows+='<tr class="tot"><td>TOTAL</td><td class="n">100</td><td class="sc s'+(t>=85?"g":(t>=65?"w":"b"))+'">'+t+'</td><td>'+rk[0]+' risk</td></tr>';
+ h+='<div class="panel"><h2>Detailed Scoring Criteria</h2><div class="tw"><table><thead><tr><th>Category</th><th class="n">Weight</th><th class="n">Score</th><th>Notes</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
+ h+='</div>';
+
+ /* row 2 */
+ var ic=[ICON.shield,ICON.globe,ICON.doc],ce="";
+ for(var j=0;j<v.certs.length;j++){var cr=v.certs[j],st=CERTST[cr[1]];
+  ce+='<div class="certrow"><div class="ic" style="color:var(--p600)">'+ic[j%3]+'</div><div><div class="tt">'+cr[0]+' '+pill(st[0],st[1])+'</div><div class="dd">'+cr[2]+'</div></div></div>';}
+ h+='<div class="grid g3b" style="margin-top:16px">';
+ h+='<div class="panel"><h2>Compliance and Certification Evidence</h2>'+ce+'</div>';
+ h+='<div class="panel"><h2>What We Found (Positive Signals)</h2><ul class="sig">'+v.pos.map(function(x){return '<li><span class="dot ok">&#10003;</span>'+x+'</li>';}).join("")+'</ul></div>';
+ h+='<div class="panel"><h2>Key Gaps and Areas of Concern</h2><ul class="sig">'+v.gaps.map(function(x){return '<li><span class="dot gap">!</span>'+x+'</li>';}).join("")+'</ul></div>';
+ h+='</div>';
+
+ /* row 3 */
+ h+='<div class="grid g3b" style="margin-top:16px">';
+ h+='<div class="panel"><h2>Technical Security Snapshot (External)</h2><table class="snap"><tbody>'+v.snap.map(function(r){return '<tr><td>'+r[0]+'</td><td>'+snapPill(r[1],r[2])+'</td></tr>';}).join("")+'</tbody></table></div>';
+ h+='<div class="panel"><h2>Risk Summary</h2><div>Overall risk level '+pill(rk[0].toUpperCase(),rk[1])+'</div>'
+   +'<h3>Key risk drivers</h3><ul class="plain">'+v.drivers.map(function(x){return "<li>"+x+"</li>";}).join("")+'</ul>'
+   +'<h3>Compensating factors</h3><ul class="plain">'+v.comp.map(function(x){return "<li>"+x+"</li>";}).join("")+'</ul></div>';
+ h+='<div class="panel"><h2>Recommended Next Steps for PromptHalo</h2><ol class="steps">'+v.steps.map(function(x){return "<li>"+x+"</li>";}).join("")+'</ol></div>';
+ h+='</div>';
+
+ /* security requirement cards */
+ h+='<div class="sectitle">Security risk requirements</div><p class="seclede">One card per scoring category. Open a card for the requirement, the explanation of the score, and the evidence.</p>'
+  +'<div class="expandall"><button data-x="sec" data-o="1">Expand all</button><button data-x="sec" data-o="0">Collapse all</button></div><div class="cards" id="sec">';
+ for(var k=0;k<CATS.length;k++){var cc=CATS[k],sv2=v.sc[cc.k];
+  var d=cc.k==="tls"?[TLS_EXPL,TLS_EV]:v.det[cc.k];
+  h+=card("S"+(k+1),cc.n,v.notes[cc.k],sv2,cc.w,[["Requirement",cc.d],["Explanation",d[0]],["Evidence",d[1]]]);}
+ h+='</div>';
+
+ /* SOC 2 cards */
+ h+='<div class="sectitle">SOC 2 Trust Services Criteria</div><p class="seclede">Evidence score out of 5 for each criterion, with what the vendor covers and what PromptHalo must do as the customer (complementary user entity controls).</p>'
+  +'<div class="expandall"><button data-x="soc" data-o="1">Expand all</button><button data-x="soc" data-o="0">Collapse all</button></div><div class="cards" id="soc">';
+ for(var m=0;m<TSC.length;m++){var tc=TSC[m],o=v.soc[tc[0]],sd=socDefault(v,tc[0]);
+  var scv=o?o[0]:sd[0],ven=o?o[1]:sd[1],cue=o?o[2]:sd[2];
+  h+=card(tc[0],tc[1],tc[2],scv,5,[[v.self?"PromptHalo evidence":"Vendor coverage",ven],[v.self?"What customers will ask for":"PromptHalo responsibility",cue],["Evidence",[certLine(v),"Public sources listed below"]]]);}
+ h+='</div>';
+
+ /* sources */
+ var src=(SOURCES[v.id]||[]).map(function(s){return '<li><a href="'+s[1]+'" target="_blank" rel="noopener">'+s[0]+'</a></li>';}).join("");
+ h+='<div class="panel" style="margin-top:22px"><h2>Sources</h2><ul class="src">'+src
+  +'<li>DNS queries (NS, MX, TXT, DMARC, DKIM selectors, CAA, DNSKEY, DS) run 29 Sep 2026.</li><li>Vendor trust and compliance pages as described in each certification entry.</li></ul></div>';
+ h+='</div>';
+ return h;
+}
+function certLine(v){return "Attestation: "+v.certs[0][0]+" ("+CERTST[v.certs[0][1]][0].toLowerCase()+")";}
+
+function renderOverview(){
+ var rankP={P1:0,P2:1,P3:2};var sorted=V.slice().sort(function(a,b){var d=rankP[priorityOf(a)[0]]-rankP[priorityOf(b)[0]];return d!==0?d:total(a)-total(b);});
+ var h='<div class="banner"><h1>Vendor Security Assessments <span class="as">(as of Sep 29, 2026)</span></h1>'
+  +'<div class="sub">Nine PromptHalo vendors assessed from public information on one model. External and passive only; not a penetration test.</div></div><div class="wrap">';
+ var rows="";
+ for(var i=0;i<sorted.length;i++){var v=sorted[i],t=total(v),rk=riskOf(t);
+  rows+='<tr><td><a href="#'+v.id+'" data-go="'+v.id+'"><strong>'+v.name+'</strong></a><div style="font-size:.78rem;color:var(--ink3)">'+v.use+'</div></td>'
+   +'<td>'+pill(priorityOf(v)[0],priorityOf(v)[1])+'</td><td>'+pill(v.crit,v.crit==="Critical"?"c-bad":(v.crit==="High"?"c-warn":"c-good"))+'</td><td><div class="ovbar"><div class="track"><i style="width:'+t+'%;background:'+(t>=85?css("--goodfill"):(t>=65?css("--warnfill"):css("--badfill")))+'"></i></div><strong>'+t+'</strong></div></td>'
+   +'<td>'+pill(rk[0],rk[1])+'</td><td>'+v.gaps[0]+'</td></tr>';}
+ h+='<div class="panel"><h2>Portfolio summary</h2><div class="tw"><table><thead><tr><th>Vendor</th><th>Priority</th><th>Criticality</th><th style="min-width:180px">Score</th><th>Risk</th><th>Top concern</th></tr></thead><tbody>'+rows+'</tbody></table></div>'
+  +'<div class="note"><strong>Reading the table.</strong> Score measures the vendor\'s externally visible posture. Criticality measures what the vendor means to PromptHalo. Priority combines them: P1 is a Critical vendor scoring below 85, or any vendor below 70. Auth0, GitHub, and Secureframe are P1: each is Critical to PromptHalo and scores in the low 80s.</div>'+(SHOWSELF?'<div class="note"><strong>PromptHalo self-assessment:</strong> '+total(SELF)+' / 100, '+riskOf(total(SELF))[0]+' risk. <a href="#prompthalo" data-go="prompthalo">Open the self-assessment</a>.</div>':'')+'</div>';
+ var cr="";for(var j=0;j<CATS.length;j++){var c=CATS[j];cr+='<tr><td>'+c.n+'</td><td class="n">'+c.w+'</td><td>'+c.d+'</td></tr>';}
+ h+='<div class="panel" style="margin-top:16px"><h2>How scores are computed</h2><div class="tw"><table><thead><tr><th>Category</th><th class="n">Weight</th><th>Rubric</th></tr></thead><tbody>'+cr+'</tbody></table></div>'
+  +'<p style="font-size:.86rem;color:var(--ink2);margin:10px 0 0">Risk bands: Low at 85 and above, Moderate from 65 to 84, High below 65. Category colors: green at 80% of weight or more, amber from 50% to 79%, red below 50%. Criticality: five factors (data sensitivity, access into PromptHalo, operational dependency, exit difficulty, blast radius) scored 1 to 3; 12 to 15 is Critical, 9 to 11 High, 6 to 8 Moderate, 5 Low. A 3 in data sensitivity or access sets a floor of High. SOC 2 cards score external evidence from 0 to 5 per criterion. TLS, security headers, and security.txt could not be tested from this environment; TLS receives 13 of 15 for every vendor on observed HTTPS alone.</p></div>';
+ h+='</div>';return h;
+}
+
+/* ---------- nav ---------- */
+var CUR="overview";
+function buildIdx(){
+ var h='<li><button data-go="overview"><span class="nm">Overview</span></button></li>';
+ for(var i=0;i<V.length;i++){var t=total(V[i]),rk=riskOf(t);
+  h+='<li><button data-go="'+V[i].id+'"><span class="nm">'+V[i].name+'</span><span class="chip '+rk[1]+'">'+t+'</span></button></li>';}
+ if(SHOWSELF){var ts=total(SELF),rs=riskOf(ts);
+  h+='<li class="selfsep"><button data-go="'+SELF.id+'"><span class="nm">'+SELF.name+'</span><span class="chip '+rs[1]+'">'+ts+'</span></button></li>';}
+ el("idx").innerHTML=h;
+ var bs=el("idx").querySelectorAll("button");
+ for(var j=0;j<bs.length;j++) bs[j].addEventListener("click",function(){go(this.getAttribute("data-go"));});
+ el("selfToggle").checked=SHOWSELF;
+}
+el("selfToggle").addEventListener("change",function(){
+ SHOWSELF=this.checked; try{localStorage.setItem("ph-tprm-self",SHOWSELF?"1":"0");}catch(e){}
+ buildIdx(); go(SHOWSELF?"prompthalo":(CUR==="prompthalo"?"overview":CUR));
+});
+function go(id){
+ CUR=id; var v=null,L=allV();for(var i=0;i<L.length;i++) if(L[i].id===id) v=L[i];
+ el("main").innerHTML=v?renderVendor(v):renderOverview();
+ var bs=el("idx").querySelectorAll("button");
+ for(var j=0;j<bs.length;j++){var on=bs[j].getAttribute("data-go")===id;bs[j].classList.toggle("on",on);if(on)bs[j].setAttribute("aria-current","page");else bs[j].removeAttribute("aria-current");}
+ var ex=el("main").querySelectorAll(".expandall button");
+ for(var k=0;k<ex.length;k++) ex[k].addEventListener("click",function(){
+  var ds=el(this.getAttribute("data-x")).querySelectorAll("details"),o=this.getAttribute("data-o")==="1";
+  for(var m=0;m<ds.length;m++) ds[m].open=o;});
+ var links=el("main").querySelectorAll("a[data-go]");
+ for(var n=0;n<links.length;n++) links[n].addEventListener("click",function(e){e.preventDefault();go(this.getAttribute("data-go"));});
+ try{history.replaceState(null,"","#"+id);}catch(e){}
+ window.scrollTo(0,0);
+}
+
+/* ---------- text size ---------- */
+(function(){
+ var saved=null;try{saved=localStorage.getItem("ph-tprm-fs");}catch(e){}
+ function apply(v){document.documentElement.style.setProperty("--fs",v);
+  var bs=document.querySelectorAll(".sizer button");for(var i=0;i<bs.length;i++)bs[i].classList.toggle("on",bs[i].getAttribute("data-fs")===v);
+  try{localStorage.setItem("ph-tprm-fs",v);}catch(e){}}
+ apply(saved||"15px");
+ var bs=document.querySelectorAll(".sizer button");for(var i=0;i<bs.length;i++)bs[i].addEventListener("click",function(){apply(this.getAttribute("data-fs"));});
+})();
+
+buildIdx();
+var start=(location.hash||"").replace("#","");
+go(start&&(start==="overview"||allV().some(function(v){return v.id===start;}))?start:"overview");
+if(window.matchMedia){try{window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){go(CUR);});}catch(e){}}
+</script>
+</body>
+</html>
