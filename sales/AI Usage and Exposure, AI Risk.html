@@ -6,8 +6,8 @@
 <title>AI Usage and Exposure, AI Risk</title>
 <style>
 :root{--bg:#f3f7fc;--surface:#fff;--soft:#eaf1fa;--ink:#0c1826;--muted:#3b4d61;--blue:#2f6aa8;--line:#c8dbf1;--ghost:#bcd0ea;--navy:#16324f;
- --t1:#2f6aa8;--t1b:#eaf1f9;--t2:#b9475f;--t2b:#fbeef1;--t3:#a5781f;--t3b:#faf4e6;--t4:#2a8068;--t4b:#e8f4ef;--t5:#5f52a0;--t5b:#f0eef8;--t6:#b8653a;--t6b:#fbf1ea;--t7:#25808f;--t7b:#e7f4f6;--t8:#56677c;--t8b:#eff2f6;
- --good:#2a8068;--warn:#a5781f;--bad:#b9475f;
+ --t1:#2f6aa8;--t1b:#eaf1f9;--t2:#8a5a86;--t2b:#f4eef6;--t3:#a5781f;--t3b:#faf4e6;--t4:#2a8068;--t4b:#e8f4ef;--t5:#5f52a0;--t5b:#f0eef8;--t6:#b8653a;--t6b:#fbf1ea;--t7:#25808f;--t7b:#e7f4f6;--t8:#56677c;--t8b:#eff2f6;
+ --good:#2a8068;--warn:#a5781f;--bad:#a8553f;
  --shadow:0 1px 2px rgba(23,40,59,.05),0 4px 16px rgba(23,40,59,.06);--fs:16px;
  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1722;--surface:#17212e;--soft:#1e2a39;--ink:#e6edf5;--muted:#9aabbf;--blue:#8db6e2;--line:#2c4567;--ghost:#3b5578;--navy:#0b1a2b;
@@ -340,65 +340,26 @@ details.card>summary .sumbar p.note{margin-bottom:0!important}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 @media print{.top{position:static}.tabrow,.x,.addit,.chips,input[type=range],.tg{display:none!important}.view{display:block!important;break-before:page}body{background:#fff}.card{box-shadow:none}}
 
-/* contrasting top bar */
-.top{background:linear-gradient(100deg,#1d4f8c 0%,#2f6aa8 55%,#2a7f8f 100%)!important;color:#fff!important;border:0!important;box-shadow:0 4px 10px rgba(29,79,140,.18),0 14px 30px rgba(29,79,140,.16)!important}
-.top .who{color:#dbe8f6!important}
-.co-sel{background:rgba(255,255,255,.14)!important;color:#fff!important;border:1px solid rgba(255,255,255,.45)!important}
+/* dark professional top bar */
+.top{background:linear-gradient(100deg,#1b2d47 0%,#213c5c 60%,#26496a 100%)!important;color:#fff!important;border:0!important;box-shadow:0 4px 12px rgba(20,35,60,.20),0 14px 30px rgba(20,35,60,.14)!important}
+.top .who{color:#c9d7e8!important}
+.co-sel{background:rgba(255,255,255,.10)!important;color:#fff!important;border:1px solid rgba(255,255,255,.35)!important}
 .co-sel option{color:#17283b;background:#fff}
-.top .btn{background:rgba(255,255,255,.12)!important;color:#fff!important;border-color:rgba(255,255,255,.45)!important}
-.top .btn:hover{background:rgba(255,255,255,.22)!important;border-color:#fff!important}
-.bdg{background:#fff!important;color:#17283b!important;border:0!important;box-shadow:0 2px 6px rgba(10,30,60,.18)!important}
-.bdg span{color:#566a80!important}.bdg .pj{color:#2a8068!important}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .top{background:linear-gradient(100deg,#163a66,#1f4e8c 55%,#1d5f6b)!important}}
+.top .btn{background:rgba(255,255,255,.08)!important;color:#e8eef6!important;border-color:rgba(255,255,255,.35)!important}
+.top .btn:hover{background:rgba(255,255,255,.18)!important;border-color:#fff!important}
+.bdg{background:#fff!important;color:#0c1826!important;border:0!important;box-shadow:0 2px 6px rgba(10,25,45,.25)!important}
+.bdg span{color:#3b4d61!important}.bdg .pj{color:#1d7a4b!important}
+/* pastel fills */
+.stack span{position:relative;isolation:isolate;color:var(--ink)!important;font-weight:700}
+.stack span::before{content:"";position:absolute;inset:0;background:rgba(255,255,255,.58);z-index:-1}
+.bar i{opacity:.82}
+.vb .col{opacity:.55}
+.tri button[aria-pressed="true"][data-a="0"]{background:var(--t6b)!important;color:var(--t6)!important}
 
-details.why{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 2px 6px rgba(47,106,168,.06),0 10px 24px rgba(47,106,168,.08);margin:.2rem 0 1rem;padding:0 1.2rem}
-details.why>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:.8rem;padding:.85rem 0}
-details.why>summary::-webkit-details-marker{display:none}
-details.why>summary::after{content:"";margin-left:auto;width:.5rem;height:.5rem;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s}
-details.why[open]>summary::after{transform:rotate(-135deg)}
-.whyt{font-size:1.45rem;font-weight:800;letter-spacing:-.015em;color:var(--ink);line-height:1.2}
-.whyc{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.9rem;padding:.2rem 0 .3rem}
-.wcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;box-shadow:0 1px 3px rgba(47,106,168,.08)}
-.wcard b{display:block;font-size:2.4rem;font-weight:800;color:#2f5e94;line-height:1.05;margin-bottom:.35rem;letter-spacing:-.02em}
-.wcard span{font-size:.92rem;color:var(--ink);line-height:1.45}
-.whys{margin:.7rem 0 1rem;font-size:.8rem;color:var(--muted)}
-.whys a{color:var(--blue)}
-@media (max-width:860px){.whyc{grid-template-columns:1fr 1fr}.whyt{font-size:1.15rem}}
-@media (max-width:480px){.whyc{grid-template-columns:1fr}}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .wcard b{color:var(--blue)}}
-
-.whyt.sm{font-size:1.1rem}
-details.about #aboutTag{background:var(--t3b);color:var(--t3)}
-.aboutg{display:grid;grid-template-columns:1fr 1fr;gap:1rem;font-size:.9rem}
-.aboutg h5{margin:0 0 .3rem;font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.aboutg ul{margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:.35rem}
-@media (max-width:760px){.aboutg{grid-template-columns:1fr}}
-
-details.ev{padding:0 1rem;margin:.1rem 0 .6rem;border-radius:14px}
-details.ev>summary{padding:.5rem 0;gap:.9rem;flex-wrap:nowrap;overflow:hidden}
-.evt{font-weight:800;font-size:.95rem;white-space:nowrap;color:var(--ink)}
-.evs{display:flex;gap:.5rem;min-width:0;overflow:hidden;flex:1}
-.evs>span{white-space:nowrap;font-size:.8rem;color:var(--muted);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:.12rem .6rem}
-.evs b{color:#2f5e94;font-weight:800;margin-right:.15rem}
-details.ev .whyc{padding-top:.3rem}
-details.ev .wcard b{font-size:1.8rem}
-details.about{padding:0 1rem;margin:0 0 .8rem;border-radius:14px}
-details.about>summary{padding:.5rem 0}
-details.about .whyt.sm{font-size:.95rem;font-weight:800}
-@media (max-width:1100px){.evs>span:nth-child(n+3){display:none}}
-@media (max-width:700px){.evs{display:none}.evt{white-space:normal}}
-.cdl{display:flex;flex-direction:column;gap:.5rem}
-details.cdi{border:1px solid var(--line);border-left:3px solid var(--c);border-radius:10px;background:var(--surface)}
-details.cdi>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem}
-details.cdi>summary::-webkit-details-marker{display:none}
-details.cdi>summary::after{content:"";width:.4rem;height:.4rem;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s;margin-left:.3rem}
-details.cdi[open]>summary::after{transform:rotate(-135deg)}
-details.cdi .pn{font-weight:600}
-details.cdi .num{margin-left:auto;font-size:.78rem;font-weight:700;color:var(--c);background:var(--cb);border-radius:999px;padding:0 .55rem}
-.cdb{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;padding:.6rem .9rem .9rem;border-top:1px dashed var(--line);font-size:.88rem}
-.cdb h5{margin:.2rem 0 .15rem;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.cdb p{margin:0 0 .4rem}
-@media (max-width:760px){.cdb{grid-template-columns:1fr}}
+.pbar{margin:0 0 1rem!important}
+.pbar .evs b.up{color:var(--good)}
+.pillars.prow{flex-direction:row;flex-wrap:wrap;margin-bottom:.9rem}
+.pillars.prow .pil{flex:1 1 13rem}
 </style>
 </head>
 <body>
@@ -419,7 +380,7 @@ details.cdi .num{margin-left:auto;font-size:.78rem;font-weight:700;color:var(--c
  </div>
  <p class="whys">Sources: <a href="https://newsroom.ibm.com/2025-07-30-ibm-report-13-of-organizations-reported-breaches-of-ai-models-or-applications,-97-of-which-reported-lacking-proper-ai-access-controls" target="_blank" rel="noopener">IBM, Cost of a Data Breach Report 2025 (press release, July 30, 2025)</a>; <a href="https://genai.owasp.org/llmrisk/llm01-prompt-injection/" target="_blank" rel="noopener">OWASP Top 10 for LLM Applications 2025, LLM01:2025 Prompt Injection</a>.</p>
 </details>
-<details class="why about"><summary><span class="whyt sm">Are these scores real?</span><span class="tag" id="aboutTag"></span><span class="meta">What is measured, what is client-provided, and what is estimated</span></summary><div id="aboutBody"></div></details>
+
 <div class="tabrow">
  <div class="tabs" role="tablist">
   <button role="tab" data-v="usage" aria-selected="true"><b>1</b>AI Usage and Exposure</button>
@@ -583,9 +544,10 @@ function aboutHTML(){var t=st.tpl,src,tag;
 function coSel(){$('#coSel').innerHTML=Object.keys(db.cos).map(function(k){return '<option value="'+k+'"'+(k===db.cur?' selected':'')+'>'+esc(db.cos[k].org)+'</option>';}).join('');var ft=$('#foot');if(!ft.dataset.mid)ft.dataset.mid=ft.innerHTML;ft.style.display=(st.tpl==='midcap'||TPL[st.tpl])?'':'none';ft.innerHTML=st.tpl==='midcap'?ft.dataset.mid:'Every value on this page can be edited. Changes save in this browser. Starting values for '+esc(st.org)+' are estimates from public information and typical patterns for this kind of organization; items marked "example" are placeholders. Confirm them in discovery.';document.title=st.org+': AI Usage and Exposure, AI Risk';}
 function lc(x){return x.toLowerCase().replace(/\bai\b/g,'AI').replace(/\bllm\b/g,'LLM').replace(/\brag\b/g,'RAG');}
 function lv(n,t){var r=t[0][1];t.forEach(function(x){if(n>=x[0])r=x[1];});return r;}
-function safeCol(v){return v>80?'var(--good)':v>60?'var(--t4)':v>40?'var(--warn)':v>20?'var(--t6)':'var(--bad)';}
+function safeCol(v){return v>=75?'var(--good)':v>=60?'var(--t7)':v>=40?'var(--warn)':v>=25?'var(--t6)':'var(--bad)';}
+function safeBg(v){return v>=75?'var(--t4b)':v>=60?'var(--t7b)':v>=40?'var(--t3b)':'var(--t6b)';}
 function riskCol(r){return r<=20?'var(--good)':r<=40?'var(--t1)':r<=60?'var(--warn)':r<=80?'var(--t6)':'var(--bad)';}
-function riskBg(r){return r<=20?'var(--t4b)':r<=40?'var(--t1b)':r<=60?'var(--t3b)':r<=80?'var(--t6b)':'var(--t2b)';}
+function riskBg(r){return r<=20?'var(--t4b)':r<=40?'var(--t1b)':r<=60?'var(--t3b)':'var(--t6b)';}
 
 function calc(s,noOv){
  var u=s.u,raw={breadth:u.fTot?clamp(u.fAI/u.fTot*100):0,pen:s.emp?clamp(u.active/s.emp*100):0,intensity:+u.intensity,crit:+u.crit,scale:clamp(Math.round(Math.sqrt(u.scalePct)*10))};
@@ -758,9 +720,12 @@ var E2E=[
  {k:'rem',n:'Remediation',v:'Fix',c:3,i:'wrench',b:['Prioritize gaps by risk and value','Fix controls, permissions, and prompts','Assign owners and track to closure','Re-score to show progress']}];
 function solHeader(){
  var all=clone(st);all.sol={jiffy:true,septa:true,litmus:true};var keep=st;st=all;var pa=project();st=keep;var c=calc(st),P=calc(pa);
- return '<div class="punch"><div class="pl"><h2>Turn AI into safe, high-value productivity</h2><p>See every AI use, stop risky data and actions in real time, prove defenses hold, and fix what matters.</p>'+
-  '<div class="pstats"><span><small>AI Risk</small><b>'+c.R+'</b><i>to</i><b class="up">'+P.R+'</b></span><span><small>AI Safety</small><b>'+c.S+'</b><i>to</i><b class="up">'+P.S+'</b></span><span><small>External chatbot risk</small><b>'+catRisk(st,st.cats[0])+'</b><i>to</i><b class="up">'+catRisk(pa,pa.cats[0])+'</b></span><span class="note">'+esc(st.org)+', all three capabilities, about 90 days</span></div></div>'+
-  '<div class="pillars">'+[['risk','Reduce risk','Protect data, people, IP, and customers'],['grow','Enable innovation','Use AI securely and confidently'],['aim','Know where to act','Find gaps and prioritize investment']].map(function(x){return '<div class="pil"><span class="pic">'+si(x[0])+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>';}).join('')+'</div></div>';}
+ var was=$('#punch details');was=was&&was.open;
+ return '<details class="why ev pbar"'+(was?' open':'')+'><summary><span class="evt">Turn AI into safe, high-value productivity</span><span class="evs">'+
+  '<span>AI Risk <b>'+c.R+'</b> to <b class="up">'+P.R+'</b></span><span>AI Safety <b>'+c.S+'</b> to <b class="up">'+P.S+'</b></span><span>External chatbot risk <b>'+catRisk(st,st.cats[0])+'</b> to <b class="up">'+catRisk(pa,pa.cats[0])+'</b></span></span></summary>'+
+  '<p class="whys" style="margin:.1rem 0 .6rem">See every AI use, stop risky data and actions in real time, prove defenses hold, and fix what matters. Figures shown for '+esc(st.org)+' with all three capabilities, about 90 days.</p>'+
+  '<div class="pillars prow">'+[['risk','Reduce risk','Protect data, people, IP, and customers'],['grow','Enable innovation','Use AI securely and confidently'],['aim','Know where to act','Find gaps and prioritize investment']].map(function(x){return '<div class="pil"><span class="pic">'+si(x[0])+'</span><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></div>';}).join('')+'</div></details>';
+}
 function e2eHTML(){
  return '<div class="e2e">'+E2E.map(function(x,i){return (i?'<div class="e2a" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg></div>':'')+
   '<div class="e2c" style="--c:var(--t'+x.c+');--cb:var(--t'+x.c+'b)"><div class="e2h"><span class="e2i">'+si(x.i)+'</span><div><small>'+(i+1)+'. '+x.v+'</small><b>'+x.n+'</b></div></div><ul>'+x.b.map(function(t){return '<li>'+t+'</li>';}).join('')+'</ul></div>';}).join('')+'</div>'+
@@ -818,11 +783,11 @@ function render(){
  var s=st,c=calc(s),on=anySol(),p=on?project():null,P=p?calc(p):null;
  $('#orgName').textContent=s.org;$('#orgWho').textContent=s.who+', '+(+s.emp).toLocaleString()+' employees';
  function bd(n,lbl,lvl,col,bg,pj){return '<div class="bdg"><span class="n" style="background:'+bg+';color:'+col+'">'+n+'</span><span class="l"><b>'+lbl+'</b><span>'+lvl+(pj!=null&&pj!==n?' <span class="pj">to '+pj+' with plan</span>':'')+'</span></span></div>';}
- $('#badges').innerHTML=bd(c.E,'AI Usage and Exposure',lv(c.E,USE_L),'var(--t5)','var(--t5b)',P&&P.E)+bd(c.S,'AI Safety',lv(c.S,SAFE_L)+(c.ovS?', your score':''),safeCol(c.S),'var(--t4b)',P&&P.S)+bd(c.R,'AI Risk',lv(c.R,RISK_L)+(c.ovR?', your score':''),riskCol(c.R),riskBg(c.R),P&&P.R);
+ $('#badges').innerHTML=bd(c.E,'AI Usage and Exposure',lv(c.E,USE_L),safeCol(c.E),safeBg(c.E),P&&P.E)+bd(c.S,'AI Safety',lv(c.S,SAFE_L)+(c.ovS?', your score':''),safeCol(c.S),safeBg(c.S),P&&P.S)+bd(c.R,'AI Risk',lv(c.R,RISK_L)+(c.ovR?', your score':''),riskCol(c.R),riskBg(c.R),P&&P.R);
  // usage
  var uh=$('#uHero');if(uh){
   var lo=USE.slice().sort(function(a,b){return c.raw[a.k]-c.raw[b.k];});
-  uh.innerHTML=dial(c.E,'var(--t5)','8.5rem','/ 100')+'<div><div class="eyebrow">AI Usage and Exposure Score</div><div class="big">'+c.E+'<small> / 100</small></div><div class="lvl" style="color:var(--t5)">'+lv(c.E,USE_L)+'</div><p class="say">'+esc(s.org)+' uses AI '+(c.raw.pen>=50?'broadly':'in pockets')+': '+Math.round(c.raw.pen)+'% of employees use it actively across '+s.u.fAI+' of '+s.u.fTot+' functions. Shadow AI is '+c.shadow+'% of AI use. The lowest components are '+lc(lo[0].n)+' ('+Math.round(c.raw[lo[0].k])+') and '+lc(lo[1].n)+' ('+Math.round(c.raw[lo[1].k])+').</p></div>'+
+  uh.innerHTML=dial(c.E,safeCol(c.E),'8.5rem','/ 100')+'<div><div class="eyebrow">AI Usage and Exposure Score</div><div class="big">'+c.E+'<small> / 100</small></div><div class="lvl" style="color:'+safeCol(c.E)+'">'+lv(c.E,USE_L)+'</div><p class="say">'+esc(s.org)+' uses AI '+(c.raw.pen>=50?'broadly':'in pockets')+': '+Math.round(c.raw.pen)+'% of employees use it actively across '+s.u.fAI+' of '+s.u.fTot+' functions. Shadow AI is '+c.shadow+'% of AI use. The lowest components are '+lc(lo[0].n)+' ('+Math.round(c.raw[lo[0].k])+') and '+lc(lo[1].n)+' ('+Math.round(c.raw[lo[1].k])+').</p></div>'+
    '<div>'+USE.map(function(u){return '<div class="brow"><span>'+u.n+' <span class="note">'+u.w+'%</span></span>'+bar(c.raw[u.k],'var(--t'+u.c+')',P?P.raw[u.k]:null)+'<b>'+Math.round(c.raw[u.k])+'</b></div>';}).join('')+'</div>';
   USE.forEach(function(u){var e=$('[data-uc="'+u.k+'"]');if(e)e.textContent=Math.round(c.raw[u.k]);var e2=$('[data-cdv="'+u.k+'"]');if(e2)e2.textContent='Now '+Math.round(c.raw[u.k]);});
   TYPES.forEach(function(t){var e=$('[data-tn="'+t.k+'"]');if(e)e.textContent=c.agg[t.k]+' '+(c.agg[t.k]===1?t.hu.replace(/s$/,''):t.hu);});
@@ -837,19 +802,19 @@ function render(){
   rh.className='card rhero';
   rh.innerHTML='<div class="dials"><div class="dw">'+dial(c.R,riskCol(c.R),'8rem','/ 100')+'<div class="eyebrow">AI Risk'+(c.ovR?'<span class="ovtag">Your score</span>':'')+'</div><div class="lvl" style="color:'+riskCol(c.R)+'">'+lv(c.R,RISK_L)+'</div>'+(P?'<div class="note" style="color:var(--good)">'+P.R+' with plan</div>':'')+'</div>'+
    '<div class="dw">'+dial(c.S,safeCol(c.S),'8rem','/ 100')+'<div class="eyebrow">AI Safety'+(c.ovS?'<span class="ovtag">Your score</span>':'')+'</div><div class="lvl" style="color:'+safeCol(c.S)+'">'+lv(c.S,SAFE_L)+'</div>'+(P?'<div class="note" style="color:var(--good)">'+P.S+' with plan</div>':'')+'</div></div>'+
-   '<div class="hbars"><div class="h4">AI safety controls</div>'+SAFE.map(function(a){var v=+s.safe[a.k];return '<div class="brow"><span>'+a.n+' <span class="note">'+Math.round(a.w/SWT*100)+'%</span></span>'+bar(v,safeCol(v),P?p.safe[a.k]:null)+'<b>'+v+'</b></div>';}).join('')+'</div>'+
+   '<div class="hbars"><div class="h4">AI safety controls</div>'+SAFE.map(function(a){var v=+s.safe[a.k];return '<div class="brow"><span>'+a.n+' <span class="note">'+Math.round(a.w/SWT*100)+'%</span></span>'+bar(v,'var(--t'+a.c+')',P?p.safe[a.k]:null)+'<b style="color:'+safeCol(v)+'">'+v+'</b></div>';}).join('')+'</div>'+
    '<p class="say wide">AI Safety is <b>'+c.S+'</b> ('+lv(c.S,SAFE_L)+') against AI Usage and Exposure of <b>'+c.E+'</b>. '+(c.S<c.E?'Controls lag use, so risk is ':'Controls keep pace with use, so risk is ')+lv(c.R,RISK_L).toLowerCase()+'. Weakest areas: '+lc(w[0].n)+' ('+s.safe[w[0].k]+'), '+lc(w[1].n)+' ('+s.safe[w[1].k]+'), and '+lc(w[2].n)+' ('+s.safe[w[2].k]+').'+(c.ovS||c.ovR?' Calculated values: safety '+c.Sc+', risk '+c.Rc+'.':'')+'</p>';
   SAFE.forEach(function(a){var v=+s.safe[a.k],b=$('[data-sb="'+a.k+'"]');if(b)b.innerHTML=bar(v,'var(--t'+a.c+')',P?p.safe[a.k]:null);var o=$('[data-so="'+a.k+'"]');if(o)o.innerHTML='<b>'+v+'</b> <span style="color:'+safeCol(v)+'">'+lv(v,SAFE_L)+'</span>';});
   $('#vbars').innerHTML=TYPES.map(function(t){var v=+s.ts[t.k];return '<div class="vb"><b>'+v+'</b><div class="col" style="height:'+(v*.8)+'%;background:var(--t'+t.c+')"></div></div>';}).join('');
   $('#ie').innerHTML=[['Internal AI safety',c.inner,'Sanctioned, shadow, built, and agentic AI'],['External AI safety',c.outer,'Vendor AI and customer-facing products']].map(function(x){return '<div class="sub" style="text-align:center">'+'<div class="h4">'+x[0]+'</div>'+dial(x[1],safeCol(x[1]),'6rem','/ 100')+'<div class="lvl" style="color:'+safeCol(x[1])+'">'+lv(x[1],SAFE_L)+'</div><p class="note" style="margin:.3rem 0 0">'+x[2]+'</p></div>';}).join('');
-  KM.forEach(function(k){var e=$('[data-kb="'+k[0]+'"]'),v=+s.km[k[0]];if(e)e.innerHTML=bar(v,k[0]==='shU'?'var(--bad)':safeCol(v));});
+  KM.forEach(function(k){var e=$('[data-kb="'+k[0]+'"]'),v=+s.km[k[0]];if(e)e.innerHTML=bar(v,k[0]==='shU'?'var(--t6)':safeCol(v));});
  }
  // solutions
  if($('#punch'))$('#punch').innerHTML=solHeader();
  var ab=aboutHTML();if($('#aboutTag')){$('#aboutTag').textContent=ab.tag;$('#aboutBody').innerHTML=ab.html;}
  if($('#solLead')){
   var w2=SAFE.slice().sort(function(a,b){return s.safe[a.k]-s.safe[b.k];});
-  $('#solLead').innerHTML='<b>'+esc(s.org)+' has an AI Usage and Exposure Score of '+c.E+' ('+lv(c.E,USE_L)+') and an AI Risk Score of '+c.R+' ('+lv(c.R,RISK_L)+').</b> '+(c.S<c.E?'Use is ahead of safety ('+c.S+').':'Safety ('+c.S+') keeps pace with use.')+' The biggest gaps are '+lc(w2[0].n)+' ('+s.safe[w2[0].k]+'), '+lc(w2[1].n)+' ('+s.safe[w2[1].k]+'), and shadow AI at '+c.shadow+'% of AI use. '+(on?'With the selected solutions, AI Usage and Exposure moves to <b>'+P.E+'</b> and AI Risk falls to <b>'+P.R+'</b> ('+lv(P.R,RISK_L)+') within about 90 days.':'Add solutions below to see the projected effect on both scores.');
+  $('#solLead').innerHTML='<b>Usage '+c.E+', Risk '+c.R+' ('+lv(c.R,RISK_L)+').</b> '+(c.S<c.E?'Safety ('+c.S+') trails use.':'Safety ('+c.S+') keeps pace.')+' Top gaps: '+lc(w2[0].n).split(' and ')[0]+' ('+s.safe[w2[0].k]+'), '+lc(w2[1].n).split(' and ')[0]+' ('+s.safe[w2[1].k]+'), shadow AI ('+c.shadow+'%).'+(on?' With the plan: Risk <b>'+P.R+'</b>.':'');
   SOLS.forEach(function(sl){
    var el=$('.sol[data-sol="'+sl.k+'"]');el.classList.toggle('on',!!st.sol[sl.k]);$('.tg',el).textContent=st.sol[sl.k]?'In plan':'Add to plan';
    var single=clone(st);single.sol={jiffy:false,septa:false,litmus:false};single.sol[sl.k]=true;var keep=st;st=single;var sp=project();st=keep;var sc=calc(sp);
@@ -859,7 +824,7 @@ function render(){
    fx.push(['AI Risk Score',c.R,sc.R]);
    $('[data-fixes="'+sl.k+'"]').innerHTML=fx.map(function(f){return '<div class="fix"><span>'+f[0]+'</span><b>'+f[1]+' <span class="up">to '+f[2]+'</span></b></div>';}).join('');
   });
-  var xr=catRisk(st,st.cats[0]);var rows=[['External chatbot risk',xr,P?catRisk(p,p.cats[0]):xr,riskCol(xr)],['AI Usage and Exposure',c.E,P?P.E:c.E,'var(--t5)'],['AI Safety',c.S,P?P.S:c.S,'var(--t4)'],['AI Risk',c.R,P?P.R:c.R,riskCol(c.R)]];
+  var xr=catRisk(st,st.cats[0]);var rows=[['External chatbot risk',xr,P?catRisk(p,p.cats[0]):xr,'var(--t2)'],['AI Usage and Exposure',c.E,P?P.E:c.E,'var(--t5)'],['AI Safety',c.S,P?P.S:c.S,'var(--t4)'],['AI Risk',c.R,P?P.R:c.R,'var(--t6)']];
   $('#cmp').innerHTML=rows.map(function(r){return '<div class="cmp"><span>'+r[0]+'</span>'+bar(Math.min(r[1],r[2]),r[3],Math.max(r[1],r[2]))+'<span>'+r[1]+(r[2]!==r[1]?' to <b>'+r[2]+'</b>':'')+'</span></div>';}).join('')+(on?'':'<p class="note" style="margin:.3rem 0 0">Add a solution above to see the projection.</p>');
   var gaps=USE.map(function(u){return['AI Usage and Exposure',u.n,Math.round(c.raw[u.k]),FIX[u.k],SOLMAP[u.k]];}).concat(SAFE.map(function(a){return['AI Risk',a.n,s.safe[a.k],FIX[a.k],SOLMAP[a.k]];})).concat([['AI Risk','Shadow AI',100-c.shadow,'Discover shadow tools and stop sensitive data from reaching them in real time.',SOLMAP.shadow]]);
   gaps.sort(function(a,b){return a[2]-b[2];});
