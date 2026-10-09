@@ -1,0 +1,540 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>GenAI Monitoring at a Glance</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one calm column, three numbered answers in the order asked. Pastel category colors carry through every table. */
+:root{
+  --bg:#F7F5F0; --panel:#FFFFFF; --ink:#24323A; --soft:#5B6970; --line:#E1E4DF;
+  --san:#D6E9DA; --uns:#F7E6BE; --ven:#DCE6F3; --dev:#E7DFF2;
+  --full:#CFE9D6; --full-ink:#1F5133; --part:#F8E6B8; --part-ink:#5E4408; --none:#F1EFEA; --none-ink:#7A847F;
+  --mine:#EAF3FA; --accent:#4F7A64;
+  --f-display:'Lora', Georgia, serif; --f-body:'IBM Plex Sans', 'Segoe UI', Arial, sans-serif;
+  --scale:1;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141A1D; --panel:#1C2428; --ink:#E6ECEA; --soft:#A9B6B2; --line:#2E3A3E;
+  --san:#20372A; --uns:#3A3017; --ven:#1F2D40; --dev:#2C2440;
+  --full:#21432E; --full-ink:#CFEFD9; --part:#45391A; --part-ink:#F6E3B2; --none:#232C30; --none-ink:#8E9A96;
+  --mine:#1C2F3D; --accent:#8CC3A4; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141A1D; --panel:#1C2428; --ink:#E6ECEA; --soft:#A9B6B2; --line:#2E3A3E;
+  --san:#20372A; --uns:#3A3017; --ven:#1F2D40; --dev:#2C2440;
+  --full:#21432E; --full-ink:#CFEFD9; --part:#45391A; --part-ink:#F6E3B2; --none:#232C30; --none-ink:#8E9A96;
+  --mine:#1C2F3D; --accent:#8CC3A4; color-scheme:dark}
+*{box-sizing:border-box}
+html{font-size:16px}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1rem;line-height:1.5;padding-inline:20px;padding-block:28px 56px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:36px}
+h1,h2{font-family:var(--f-display);font-weight:600;text-wrap:balance;margin:0}
+h1{font-size:2.1rem;line-height:1.15}
+h2{font-size:1.5rem;display:flex;gap:12px;align-items:baseline}
+h2 .n{font-family:var(--f-body);font-size:.95rem;font-weight:700;color:var(--accent);letter-spacing:.08em}
+p{margin:0}
+.lead{color:var(--soft);font-size:1.08rem;max-width:68ch;margin-top:8px}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.size{display:flex;gap:6px;align-items:center;color:var(--soft);font-size:.9rem}
+.size button{font:600 .95rem var(--f-body);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:4px 10px;cursor:pointer}
+.size button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+section{display:flex;flex-direction:column;gap:14px}
+.sub{color:var(--soft);max-width:72ch}
+.scroll{overflow-x:auto;border-radius:14px;border:1px solid var(--line);background:var(--panel)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th{text-align:left;font-weight:600;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);padding:12px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
+td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.cat{font-weight:700;white-space:nowrap}
+.cat span{display:inline-block;border-radius:8px;padding:3px 10px}
+.c-san{background:var(--san)} .c-uns{background:var(--uns)} .c-ven{background:var(--ven)} .c-dev{background:var(--dev)}
+.mon{min-width:1600px}
+.mon td.wh,.mon td.tl2{min-width:240px}
+.mon td.cat{min-width:240px;white-space:normal}
+.mon td.cat .exd{margin-top:8px;font-weight:400}
+.mon td.cat .exd summary{font-size:.88rem;color:var(--soft)}
+.mon td.risk{min-width:220px;font-size:.92rem}
+.mon td.resid{min-width:200px;font-size:.92rem;color:var(--soft)}
+.mon td:nth-child(2),.mon td:nth-child(3){color:var(--ink)}
+.mine{font-weight:700}
+.note{font-size:.92rem;color:var(--soft)}
+.callout{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.callout b{color:var(--accent)}
+
+.cov td.c{text-align:center;width:104px;padding:10px 6px}
+.cov th.c{text-align:center}
+.cov th.c span{display:inline-block;border-radius:8px;padding:2px 8px;color:var(--ink);letter-spacing:.02em}
+.f,.p,.x{display:inline-block;min-width:74px;border-radius:999px;padding:2px 10px;font-weight:700;font-size:.85rem}
+.f{background:var(--full);color:var(--full-ink)} .p{background:var(--part);color:var(--part-ink)} .x{background:var(--none);color:var(--none-ink);font-weight:500}
+.cov tr.grp td{background:var(--bg);font-weight:700;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);padding:8px 14px}
+.cov tr.yours td{background:var(--mine)}
+.cov tr.total td{background:var(--mine);font-weight:700;border-top:2px solid var(--accent)}
+.tool{font-weight:700}
+.tool small{display:block;font-weight:400;color:var(--soft)}
+.cost{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+.legend{display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-size:.9rem;color:var(--soft)}
+.fit{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.fitcard{background:var(--mine);border-radius:14px;padding:14px 16px}
+.fitcard h3{margin:0 0 4px;font-size:1.05rem}
+.fitcard .verb{font-family:var(--f-display);font-size:1.25rem;color:var(--accent)}
+.gaps{min-width:820px}
+.gaps td:first-child{font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.tags span{border-radius:6px;padding:1px 8px;font-size:.85rem;font-weight:600}
+.bottom{background:var(--san);border-radius:14px;padding:16px 18px;font-size:1.05rem}
+.bottom b{font-weight:700}
+
+.cov{min-width:1500px}
+.cov td.risk{min-width:200px;font-size:.9rem}
+.cov td.resid{min-width:200px;font-size:.9rem;color:var(--soft)}
+a.tl{color:inherit;text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:3px}
+a.tl:hover{color:var(--accent)}
+a.tl:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.tdetails{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));align-items:start}
+details.td{min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:14px;scroll-margin-top:16px}
+details.td[open]{border-color:var(--accent)}
+details.td summary{cursor:pointer;list-style:none;display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:12px 16px}
+details.td summary::-webkit-details-marker{display:none}
+details.td summary .nm{font-weight:700;flex:0 1 230px;min-width:0}
+details.td summary .ds{color:var(--soft);flex:1 1 180px;min-width:0}
+details.td summary .ch{transition:transform .2s;color:var(--soft)}
+details.td[open] summary .ch{transform:rotate(90deg)}
+.tdbody{padding:4px 16px 16px;border-top:1px solid var(--line);display:grid;gap:12px}
+.ex{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.ex div{border-radius:10px;padding:10px 12px}
+.ex b{display:block;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px}
+.ex .na{background:var(--none);color:var(--none-ink)}
+.rr{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.rr div{background:var(--bg);border-radius:10px;padding:10px 12px}
+.rr h4{margin:0 0 4px;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+.site{font-size:.92rem}
+.site a{color:var(--accent)}
+.badge{font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:1px 8px;color:var(--soft);margin-left:6px}
+@media (prefers-reduced-motion: reduce){details.td summary .ch{transition:none}}
+
+/* flow diagrams */
+:root{--b-san:#A8D3B5;--b-uns:#E9CD86;--b-ven:#AFC6E8;--b-dev:#C6B5E6;--gapc:#FBE3DB;--gapb:#EDB8A8;--shadow:0 6px 18px rgba(40,60,70,.10),0 1px 3px rgba(40,60,70,.08);--box:#FFFFFF}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--b-san:#3F7A55;--b-uns:#8A7230;--b-ven:#3F5F8C;--b-dev:#5E4C8A;--gapc:#3A2620;--gapb:#7A4535;--shadow:0 6px 18px rgba(0,0,0,.35);--box:#222C31}}
+:root[data-theme="dark"]{--b-san:#3F7A55;--b-uns:#8A7230;--b-ven:#3F5F8C;--b-dev:#5E4C8A;--gapc:#3A2620;--gapb:#7A4535;--shadow:0 6px 18px rgba(0,0,0,.35);--box:#222C31}
+.flows{display:grid;gap:18px}
+.flowcard{border-radius:18px;padding:16px 18px 18px;min-width:0}
+.flowcard.san{background:var(--san)} .flowcard.uns{background:var(--uns)} .flowcard.ven{background:var(--ven)} .flowcard.dev{background:var(--dev)}
+.flowcard h3{margin:0 0 2px;font-family:var(--f-display);font-size:1.2rem;font-weight:600}
+.flowcard .lede{font-size:.95rem;color:var(--soft);margin-bottom:12px}
+.fscroll{overflow-x:auto;padding:6px 4px 10px}
+.frow{display:flex;align-items:stretch;gap:0;min-width:1120px}
+.stagecol{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:8px}
+.node{background:var(--box);border:2px solid var(--bc);border-radius:14px;box-shadow:var(--shadow);padding:10px 12px;min-height:96px}
+.node .st{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);display:flex;align-items:center;gap:6px}
+.node .st svg{color:var(--ink)}
+.node p{font-size:.92rem;line-height:1.35;margin-top:4px;font-weight:600}
+.helps{display:flex;flex-direction:column;gap:6px}
+.help{background:var(--box);border:1px solid var(--line);border-radius:10px;padding:6px 9px;font-size:.84rem;line-height:1.3;box-shadow:0 1px 2px rgba(40,60,70,.06)}
+.help{font-weight:400}
+.help b{display:block;font-size:.86rem;font-weight:700}
+.help.mine{border:1.5px solid var(--bc)}
+.help.mine b::after{content:"yours";margin-left:6px;font-size:.66rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+.farrow{flex:0 0 30px;display:flex;align-items:flex-start;justify-content:center;padding-top:40px;color:var(--soft)}
+.gapcol{flex:0 0 190px;display:flex;flex-direction:column;gap:8px;margin-left:10px;padding-left:12px;border-left:2px dashed var(--bc)}
+.gapnode{background:var(--gapc);border:2px solid var(--gapb);border-radius:14px;padding:10px 12px;box-shadow:var(--shadow)}
+.gapnode .st{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.gapnode p{font-size:.9rem;line-height:1.35;margin-top:4px}
+.flowcard.san{--bc:var(--b-san)} .flowcard.uns{--bc:var(--b-uns)} .flowcard.ven{--bc:var(--b-ven)} .flowcard.dev{--bc:var(--b-dev)}
+.flowlegend{display:flex;flex-wrap:wrap;gap:16px;font-size:.9rem;color:var(--soft)}
+.flowlegend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:22px;height:14px;border-radius:4px;background:var(--box);border:1px solid var(--line)}
+.sw.m{border:1.5px solid var(--accent)} .sw.g{background:var(--gapc);border:2px solid var(--gapb)}
+
+/* inline collapsibles in section 1 */
+.inl{display:grid;gap:6px}
+details.ic{background:var(--panel);border:1px solid var(--line);border-radius:10px}
+details.ic[open]{border-color:var(--accent);background:var(--bg)}
+details.ic summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;padding:5px 9px;font-weight:600;font-size:.92rem}
+details.ic summary::-webkit-details-marker{display:none}
+details.ic summary::before{content:"";width:7px;height:7px;border-right:2px solid var(--soft);border-bottom:2px solid var(--soft);transform:rotate(-45deg);transition:transform .15s;flex:none}
+details.ic[open] summary::before{transform:rotate(45deg)}
+details.ic.mine summary{font-weight:700}
+details.ic .ib{padding:0 10px 8px 22px;font-size:.88rem;line-height:1.4}
+details.ic .ib b{font-weight:600;color:var(--soft)}
+details.ic .ib a{color:var(--accent);font-weight:600}
+@media (prefers-reduced-motion: reduce){details.ic summary::before{transition:none}}
+
+.reco{background:var(--panel);border:2px solid var(--accent);border-radius:16px;padding:16px 18px;display:grid;gap:14px}
+.reco h3{margin:0;font-family:var(--f-display);font-size:1.25rem;font-weight:600}
+.reco .picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.reco .pk{border-radius:12px;padding:10px 12px}
+.reco .pk b{display:block;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px}
+.reco ol{margin:0;padding-left:22px;display:grid;gap:6px}
+.reco .why{font-size:.95rem;color:var(--soft)}
+
+.cov{min-width:1780px}
+.cov td.rec{min-width:250px;font-size:.9rem}
+.rk{display:inline-block;border-radius:999px;padding:1px 10px;font-weight:700;font-size:.8rem;margin-right:6px;margin-bottom:3px}
+.rk-Recommend{background:var(--full);color:var(--full-ink)} .rk-Consider{background:var(--part);color:var(--part-ink)} .rk-Optional{background:var(--none);color:var(--none-ink)}
+.why{color:var(--soft)}
+/* recommendation box */
+.reco .tier{display:grid;gap:6px}
+.reco .tier h4{margin:0;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+.reco .pk p{margin-top:6px;font-size:.93rem}
+.reco .pk .lbl{font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);display:block;margin-top:8px}
+/* icon flow diagrams */
+.fl{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) minmax(0,1.05fr);min-width:1120px;padding:6px 0 4px}
+.fs{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 10px}
+.ring{width:68px;height:68px;border-radius:50%;background:var(--box);border:3px solid var(--bc);display:grid;place-items:center;box-shadow:var(--shadow);position:relative;z-index:1;color:var(--ink)}
+.conn{position:absolute;top:33px;left:calc(-50% + 40px);right:calc(50% + 42px);height:3px;background:var(--bc);border-radius:2px}
+.conn::after{content:"";position:absolute;right:-8px;top:-5px;border-left:10px solid var(--bc);border-top:6.5px solid transparent;border-bottom:6.5px solid transparent}
+.fs.gapst .conn{background:none;border-top:3px dashed var(--gapb);height:0}
+.fs.gapst .conn::after{border-left-color:var(--gapb);top:-8px}
+.fs.gapst .ring{border-color:var(--gapb);background:var(--gapc)}
+.fs .stl{margin-top:8px;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
+.fs .what{font-weight:700;font-size:.95rem;line-height:1.3;margin-top:2px}
+.fs .tools{margin-top:8px;display:grid;gap:5px;text-align:left;font-size:.86rem;line-height:1.3;width:100%;max-width:200px}
+.fs .tools div{display:grid;grid-template-columns:10px 1fr;gap:6px;align-items:start}
+.fs .tools i{width:9px;height:9px;border-radius:50%;background:var(--soft);margin-top:5px;opacity:.55}
+.fs .tools i.m{background:var(--bc);opacity:1;box-shadow:0 0 0 2px var(--box),0 0 0 3.5px var(--accent)}
+.fs .tools b{font-weight:700}
+.fs .gtext{margin-top:8px;font-size:.9rem;line-height:1.35;max-width:210px}
+.flowlegend .dot{width:10px;height:10px;border-radius:50%;background:var(--soft);opacity:.55;display:inline-block}
+.flowlegend .dot.m{background:var(--accent);opacity:1}
+
+/* streamlined layout */
+.glance{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.gl{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;text-decoration:none;color:inherit;display:block}
+.gl:hover{border-color:var(--accent)}
+.gl:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.gl .k{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.gl .t{display:block;font-family:var(--f-display);font-size:1.12rem;font-weight:600;margin:2px 0 4px}
+.gl p{color:var(--soft);font-size:.95rem}
+.sum4{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.sc{border-radius:14px;padding:12px 14px;display:grid;gap:4px;font-size:.95rem}
+.sc b.h{font-size:.82rem;letter-spacing:.06em;text-transform:uppercase}
+.sc .lb{font-weight:700}
+details.more{background:var(--panel);border:1px solid var(--line);border-radius:14px}
+details.more > summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;padding:11px 16px;font-weight:600;color:var(--ink)}
+details.more > summary::-webkit-details-marker{display:none}
+details.more > summary .mc{color:var(--soft);transition:transform .2s;flex:none}
+details.more[open] > summary .mc{transform:rotate(90deg)}
+details.more > summary .hint{font-weight:400;color:var(--soft);font-size:.9rem}
+details.more > .in{padding:0 14px 14px;display:grid;gap:12px}
+details.more > .in .scroll{border-radius:10px}
+details.flowcard{padding:0}
+details.flowcard > summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px}
+details.flowcard > summary::-webkit-details-marker{display:none}
+details.flowcard > summary .mc{color:var(--soft);transition:transform .2s;flex:none}
+details.flowcard[open] > summary .mc{transform:rotate(90deg)}
+details.flowcard .lede{margin-bottom:0}
+details.flowcard > .fscroll{padding:0 18px 16px}
+.gapchips{display:flex;flex-wrap:wrap;gap:8px}
+.gapchips span{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:.93rem;font-weight:600;display:inline-flex;align-items:center;gap:8px}
+.gapchips i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.recrow{display:grid;gap:8px}
+.recrow div{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.recrow .rk{margin:0}
+.recrow a{font-weight:600}
+@media (prefers-reduced-motion: reduce){details.more > summary .mc,details.flowcard > summary .mc{transition:none}}
+
+.needs{display:grid;gap:12px}
+.nd{border-radius:12px;padding:10px 12px;overflow-x:auto}
+.nd .nh{display:block;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.ndt{width:100%;border-collapse:collapse;font-size:.93rem;min-width:760px;background:var(--panel);border-radius:10px;overflow:hidden}
+.ndt th{font-size:.75rem;padding:8px 10px;background:var(--panel)}
+.ndt td{padding:8px 10px;border-bottom:1px solid var(--line)}
+.ndt tr:last-child td{border-bottom:none}
+.ndt td:first-child{font-weight:600;width:24%}
+.ndt td.best{font-weight:700;width:20%}
+.ndt td.alt{color:var(--soft);width:22%}
+.stack{background:var(--bg);border-radius:10px;padding:10px 12px}
+.mineNote{margin-top:8px;font-weight:600;color:var(--accent)}
+@media (max-width:640px){h1{font-size:1.7rem}}
+</style>
+
+<div class="wrap">
+  <header class="head">
+    <div>
+      <h1>GenAI Monitoring at a Glance</h1>
+      <p class="lead">Three answers for sanctioned, unsanctioned, vendor and software/CI-CD GenAI: how to monitor them, which tools cover what and where your four fit, and what stays uncovered.</p>
+      <p class="note mineNote">* Jiffy, Septa, Litmus and Bit-Vendor are mine: the tools I am proposing.</p>
+    </div>
+  </header>
+
+
+  <!-- 1 -->
+  <section aria-labelledby="h1s">
+    <h2 id="h1s"><span class="n">1</span>How to monitor GenAI across the organization</h2>
+    <p class="sub">Each category leaks through a different door, so each is watched at a different control point. Send every signal to one SIEM. Open any item in the Where and Tools columns for detail.</p>
+
+    <div class="scroll"><table class="mon" id="mon">
+      <tr><th>Category and examples</th><th>What to watch</th><th>Where to watch it</th><th>Tools</th><th>Known risks</th><th>Residual risk after tools</th></tr>
+      <tr><td class="cat"><span class="c-san">Sanctioned</span><details class="ic exd"><summary>Examples</summary><div class="ib">Microsoft 365 Copilot, ChatGPT Enterprise, Claude for Work, Gemini for Workspace, an internal chatbot on Azure OpenAI or Bedrock</div></details></td><td>Prompts and responses, agent tool calls, what data the AI can reach</td><td>AI gateway or proxy, Microsoft 365 audit logs, DLP</td><td><a class="tl mine" href="#t-septa">Septa</a>, <a class="tl" href="#t-ms">Microsoft Purview</a>, <a class="tl" href="#t-datadog">Datadog AI Guard</a>, <a class="tl mine" href="#t-jiffy">Jiffy</a></td><td class="risk">Oversharing through broad file access (H), prompt injection in docs and email (H), agents with excess privilege (M)</td><td class="resid">Injection hidden in tool outputs; agents built outside Microsoft or AWS</td></tr>
+      <tr><td class="cat"><span class="c-uns">Unsanctioned</span><details class="ic exd"><summary>Examples</summary><div class="ib">Personal ChatGPT or Claude accounts, Perplexity, Grok, AI browser extensions, AI meeting note-takers, local models run with Ollama</div></details></td><td>New AI apps and accounts, uploads and pastes, local agents and MCP servers</td><td>Identity and OAuth grants, browser and endpoint, network proxy</td><td><a class="tl mine" href="#t-jiffy">Jiffy</a>, <a class="tl" href="#t-nudge">Nudge Security</a>, <a class="tl" href="#t-ms">Defender for Cloud Apps</a>, <a class="tl" href="#t-netskope">Netskope</a>, <a class="tl" href="#t-nightfall">Nightfall</a></td><td class="risk">Data pasted into personal accounts (H), local MCP servers holding credentials (M), inputs used for training (M)</td><td class="resid">Personal devices and personal accounts; CLI tools and local models</td></tr>
+      <tr><td class="cat"><span class="c-ven">Vendor</span><details class="ic exd"><summary>Examples</summary><div class="ib">Salesforce Einstein, Zoom AI Companion, Notion AI, ServiceNow Now Assist, a vendor chatbot running on AWS Bedrock</div></details></td><td>AI switched on inside SaaS, data shared with vendors, model or sub-processor changes</td><td>Vendor intake and renewal, SaaS integrations, contracts</td><td><a class="tl mine" href="#t-bitv">Bit-Vendor</a>, Vanta, <a class="tl" href="#t-bigid">BigID</a></td><td class="risk">Your data used to train models (M), AI switched on without notice (M), opaque sub-processors (L)</td><td class="resid">Controls inside the vendor are attested, not observed</td></tr>
+      <tr><td class="cat"><span class="c-dev">Software / CI-CD</span><details class="ic exd"><summary>Examples</summary><div class="ib">GitHub Copilot, Cursor, Claude Code, Amazon Q Developer, MCP servers, AI features in your own product</div></details></td><td>Packages, MCP servers, IDE rule files, AI-written code, LLM calls from your features</td><td>IDE and agent loop, CI pipeline, runtime</td><td><a class="tl mine" href="#t-jiffy">Jiffy</a>, <a class="tl" href="#t-code">Snyk, Semgrep, Socket</a>, <a class="tl mine" href="#t-litmus">Litmus</a>, <a class="tl mine" href="#t-septa">Septa</a></td><td class="risk">Malicious packages (H), poisoned MCP tools and rule files (H), insecure AI-written code (M)</td><td class="resid">Logic flaws in AI-written code; new packages lack history</td></tr>
+    </table></div>
+    <p class="note">Your four tools are in bold. Open any item in the Where and Tools columns to see what it watches for. Ratings in brackets: H high, M medium, L low.</p>
+    
+  </section>
+
+  <section aria-labelledby="h2r">
+    <div class="reco">
+      <h3 id="h2r">Recommendation</h3>
+      <p>For each category: what is needed, the tool option that does it best, why, and the fallback.</p>
+      <div class="needs">
+        <div class="nd c-san"><b class="nh">Sanctioned</b><table class="ndt"><tr><th>What is needed</th><th>Best option</th><th>Why</th><th>Alternative</th></tr><tr><td>Protect the data the AI can reach</td><td class="best"><a class="tl" href="#t-ms">Microsoft Purview</a></td><td>Already in Microsoft 365 E5; labels and DLP are enforced inside Copilot itself</td><td class="alt">Nightfall if you are not on Microsoft 365</td></tr><tr><td>Guard live prompts and responses</td><td class="best"><a class="tl" href="#t-septa">Septa</a></td><td>One base-URL change covers every internal AI app, whatever the model provider</td><td class="alt"><a class="tl" href="#t-lakera">Lakera Guard</a> (API, free tier)</td></tr><tr><td>See and control what agents do</td><td class="best"><a class="tl" href="#t-jiffy">Jiffy</a> + <a class="tl" href="#t-septa">Septa</a></td><td>Jiffy inventories agents and the tools they can call; Septa sees each live call</td><td class="alt"><a class="tl" href="#t-datadog">Datadog AI Guard</a>, but only if Datadog is already your monitoring platform</td></tr><tr><td>Test before each release</td><td class="best"><a class="tl" href="#t-litmus">Litmus</a></td><td>Continuous, managed red teaming with risk scores</td><td class="alt"><a class="tl" href="#t-redteam">Promptfoo</a> (free, runs in CI)</td></tr></table></div>
+        <div class="nd c-uns"><b class="nh">Unsanctioned</b><table class="ndt"><tr><th>What is needed</th><th>Best option</th><th>Why</th><th>Alternative</th></tr><tr><td>Find shadow AI apps and accounts</td><td class="best"><a class="tl" href="#t-ms">Defender for Cloud Apps</a></td><td>Included in E5, so no new cost if you are on Microsoft 365</td><td class="alt"><a class="tl" href="#t-nudge">Nudge Security</a> if not: agentless and fast to deploy</td></tr><tr><td>Find local AI tools and MCP servers</td><td class="best"><a class="tl" href="#t-jiffy">Jiffy</a></td><td>No suite sees MCP servers or agent configs on a laptop</td><td class="alt">None today</td></tr><tr><td>Stop sensitive data leaving</td><td class="best"><a class="tl" href="#t-netskope">Netskope</a></td><td>Inline control for any browser or app, and blocks personal tenants</td><td class="alt"><a class="tl" href="#t-nightfall">Nightfall</a>: lighter and cheaper, browser only</td></tr></table></div>
+        <div class="nd c-ven"><b class="nh">Vendor</b><table class="ndt"><tr><th>What is needed</th><th>Best option</th><th>Why</th><th>Alternative</th></tr><tr><td>Assess vendor AI at intake</td><td class="best"><a class="tl" href="#t-bitv">Bit-Vendor</a></td><td>Scores vendor AI risk using CSA AI-CAIQ questions</td><td class="alt">Questionnaire alone, with manual scoring</td></tr><tr><td>Detect AI changes and data flowing to vendors</td><td class="best"><a class="tl" href="#t-bitv">Bit-Vendor</a></td><td>The big suites do not track what vendors switch on or where your data goes</td><td class="alt"><a class="tl" href="#t-bigid">BigID</a> for a large estate, at higher cost</td></tr><tr><td>Track evidence and renewals</td><td class="best">Vanta</td><td>Reuses the SOC 2 vendor workflow you likely already run</td><td class="alt"><a class="tl" href="#t-bigid">OneTrust</a> for large GRC programs</td></tr><tr><td>Bind the vendor contractually</td><td class="best">Contract terms</td><td>No-training and change-notice clauses close what no tool can see</td><td class="alt">None</td></tr></table></div>
+        <div class="nd c-dev"><b class="nh">Software / CI-CD</b><table class="ndt"><tr><th>What is needed</th><th>Best option</th><th>Why</th><th>Alternative</th></tr><tr><td>Scan AI-written code</td><td class="best"><a class="tl" href="#t-code">Semgrep</a></td><td>Free CLI and MCP server, low noise, runs inside the coding agent</td><td class="alt"><a class="tl" href="#t-code">Snyk</a> for broader SCA and containers</td></tr><tr><td>Block malicious or hallucinated packages</td><td class="best"><a class="tl" href="#t-code">Socket</a></td><td>Catches typosquats and brand-new malicious packages before install</td><td class="alt">Snyk Open Source</td></tr><tr><td>Stop leaked secrets</td><td class="best">GitHub secret scanning</td><td>Built into GitHub, blocks keys at push</td><td class="alt">Gitleaks (free)</td></tr><tr><td>Trust MCP servers and rule files</td><td class="best"><a class="tl" href="#t-jiffy">Jiffy</a></td><td>Covers the AI supply chain that code scanners miss</td><td class="alt">JFrog MCP registry</td></tr><tr><td>Guard and test the AI features you ship</td><td class="best"><a class="tl" href="#t-septa">Septa</a> + <a class="tl" href="#t-litmus">Litmus</a></td><td>Septa blocks attacks at runtime; Litmus finds weaknesses before release</td><td class="alt"><a class="tl" href="#t-lakera">Lakera Guard</a>, <a class="tl" href="#t-redteam">Promptfoo</a></td></tr></table></div>
+      </div>
+      <p class="stack"><b>Minimum complete stack:</b> Microsoft Purview and Defender for Cloud Apps (or Nudge Security with Netskope), Semgrep, Socket, GitHub secret scanning, Jiffy, Septa, Litmus, Bit-Vendor, all reporting to one SIEM.</p>
+      <details class="more"><summary><svg class="mc" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>Rollout plan and why this mix</summary><div class="in">
+      <ol>
+        <li><b>Now:</b> turn on Purview or Netskope DLP and Defender for Cloud Apps, add Semgrep and Socket to the pipeline, and route logs to the SIEM.</li>
+        <li><b>Next 30 days:</b> pilot Jiffy for discovery across all four categories and run Bit-Vendor on every vendor with AI features.</li>
+        <li><b>Next 90 days:</b> put Septa in front of internal AI apps and AI features, and run Litmus in CI before each release.</li>
+      </ol>
+      <p class="why">Why this mix: suites cover sanctioned and unsanctioned AI well but not vendor or software. Low-cost market tools cover code and discovery. Your four cover agents, MCP, live AI traffic and vendors. Total cost stays at $$ to $$$. Section 2 rates every tool; confirm Jiffy's scope and pricing before committing.</p>
+      </div></details>
+    </div>
+  </section>
+
+  <section aria-labelledby="h1b">
+    <h2 id="h1b"><span class="n">1a</span>End-to-end flow by category</h2>
+    <p class="sub">Left to right: where data starts, where it goes, which tools help at each step, and what remains. Open a category to see its flow.</p>
+    <div class="flowlegend"><span><span class="dot"></span>Market or existing tool</span><span><span class="dot m"></span>Your tool</span><span>Dashed arrow leads to the remaining gap</span></div>
+    <div class="flows" id="flows"></div>
+  </section>
+
+  <!-- 2 -->
+  <section aria-labelledby="h2s">
+    <h2 id="h2s"><span class="n">2</span>Which tools cover what, and where mine fit</h2>
+    <div class="callout"><b>Short answer:</b> suites like Microsoft, Netskope and Palo Alto cover sanctioned and unsanctioned AI. Vendor and software are where they fall short, and where your four tools fit.</div>
+
+    <div class="fit">
+      <div class="fitcard"><h3>Jiffy</h3><p class="verb">Sees</p><p>What AI is in use, plus MCP servers, agent configs and IDE rule files.</p></div>
+      <div class="fitcard"><h3>Septa</h3><p class="verb">Guards</p><p>Live prompts and responses for AI you build or run, as an LLM security proxy.</p></div>
+      <div class="fitcard"><h3>Litmus</h3><p class="verb">Tests</p><p>Red-teams models, apps and agents before and after release.</p></div>
+      <div class="fitcard"><h3>Bit-Vendor</h3><p class="verb">Vets</p><p>Vendor AI risk and the data flowing to vendors.</p></div>
+    </div>
+
+    <div class="recrow" aria-label="Recommendation by tool">
+      <div><span class="rk rk-Recommend">Recommend</span><a class="tl" href="#t-jiffy">Jiffy</a>, <a class="tl" href="#t-septa">Septa</a>, <a class="tl" href="#t-litmus">Litmus</a>, <a class="tl" href="#t-bitv">Bit-Vendor</a>, <a class="tl" href="#t-ms">Microsoft Purview + Defender</a> (if on Microsoft 365), <a class="tl" href="#t-nudge">Nudge Security</a> (if not), <a class="tl" href="#t-code">Snyk, Semgrep, Socket</a></div>
+      <div><span class="rk rk-Consider">Consider</span><a class="tl" href="#t-netskope">Netskope</a> (instead of Microsoft), <a class="tl" href="#t-nightfall">Nightfall</a>, <a class="tl" href="#t-datadog">Datadog AI Guard</a> (if on Datadog)</div>
+      <div><span class="rk rk-Optional">Optional</span><a class="tl" href="#t-prisma">Prisma AIRS</a>, <a class="tl" href="#t-lakera">Lakera Guard</a>, <a class="tl" href="#t-redteam">Promptfoo, Garak</a>, <a class="tl" href="#t-bigid">BigID, OneTrust</a></div>
+    </div>
+    <details class="more"><summary><svg class="mc" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>Full comparison <span class="hint">14 tools: coverage, recommendation and why, usability, integration, cost, risks and residual risk</span></summary><div class="in">
+    <div class="legend"><span><span class="f">Full</span> covers it well</span><span><span class="p">Partial</span> covers part</span><span><span class="x">None</span> not designed for it</span><span>Cost: $ low, $$ moderate, $$$ higher</span></div>
+    <div class="scroll"><table class="cov" id="cov"></table></div>
+    <p class="note">Ratings are planning estimates from public vendor information as of October 2026. Unsanctioned reaches Full only with a DLP or CASB tool alongside Jiffy, because Jiffy finds shadow AI and DLP stops the data. Septa sees only traffic routed through it, so it does not cover shadow AI.</p>
+    </div></details>
+  </section>
+
+  <section aria-labelledby="h2b">
+    <h2 id="h2b"><span class="n">2a</span>Tool details and examples</h2>
+    <p class="sub">Open a tool for an example in each category, its recommendation, the risks it addresses and what remains.</p>
+    <div class="tdetails" id="tdetails"></div>
+  </section>
+
+  <!-- 3 -->
+  <section aria-labelledby="h3s">
+    <h2 id="h3s"><span class="n">3</span>Key gaps that remain</h2>
+    <p class="sub">Even with your four tools and the existing stack in place, these stay open or only partly closed.</p>
+    <div class="gapchips">
+      <span><i style="background:var(--b-uns)"></i>Personal devices and accounts</span>
+      <span><i style="background:var(--b-uns)"></i>CLI tools and local models</span>
+      <span><i style="background:var(--b-ven)"></i>Controls inside the vendor</span>
+      <span><i style="background:var(--b-san)"></i>Indirect prompt injection</span>
+      <span><i style="background:var(--b-dev)"></i>Logic flaws in AI-written code</span>
+      <span><i style="background:var(--b-dev)"></i>MCP and agent trust standards</span>
+      <span><i style="background:var(--accent)"></i>One combined view</span>
+    </div>
+    <details class="more"><summary><svg class="mc" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>Why each stays open and what reduces it</summary><div class="in">
+    <div class="scroll"><table class="gaps">
+      <tr><th>Gap</th><th>Where</th><th>Why it stays open</th><th>What reduces it</th></tr>
+      <tr><td>Personal devices and personal AI accounts</td><td><div class="tags"><span class="c-uns">Unsanctioned</span></div></td><td>No agent, proxy or DLP reaches a phone or home laptop the company does not manage</td><td>An approved AI option, policy and training, conditional access</td></tr>
+      <tr><td>CLI tools and local models</td><td><div class="tags"><span class="c-uns">Unsanctioned</span><span class="c-dev">Software</span></div></td><td>They never touch the browser or network proxy</td><td>Endpoint inventory, Jiffy for MCP and agent tooling</td></tr>
+      <tr><td>Controls inside the vendor</td><td><div class="tags"><span class="c-ven">Vendor</span></div></td><td>You see the data flow, not what the vendor does with it</td><td>Contract terms (no training, notice of change), Bit-Vendor reviews at renewal</td></tr>
+      <tr><td>Indirect prompt injection through tool outputs</td><td><div class="tags"><span class="c-san">Sanctioned</span><span class="c-dev">Software</span></div></td><td>Attacks hide in documents and tool results, not the user's prompt</td><td>Septa on agent traffic, Litmus testing every release</td></tr>
+      <tr><td>Logic flaws in AI-written code</td><td><div class="tags"><span class="c-dev">Software</span></div></td><td>Scanners find known patterns, not wrong business logic</td><td>Human code review on AI-written changes</td></tr>
+      <tr><td>MCP and agent trust standards</td><td><div class="tags"><span class="c-uns">Unsanctioned</span><span class="c-dev">Software</span></div></td><td>The category is new and signing and provenance are still maturing</td><td>Allowlisted MCP servers, Jiffy, a curated registry</td></tr>
+      <tr><td>One combined view</td><td><div class="tags"><span class="c-san">All four</span></div></td><td>Signals sit in five or more consoles</td><td>Route everything to one SIEM and review weekly</td></tr>
+    </table></div>
+    </div></details>
+  </section>
+
+  <p class="bottom"><b>Bottom line:</b> use the suite you already license for sanctioned and unsanctioned AI, add Jiffy to see AI tools and agents, Septa to guard live traffic, Litmus to test before release, and Bit-Vendor for vendors. That covers all four categories. The gaps above are what to watch next.</p>
+</div>
+
+
+<script>
+(function(){
+const C=[["san","Sanctioned"],["uns","Unsanctioned"],["ven","Vendor"],["dev","Software"]];
+const V={F:'<span class="f">Full</span>',P:'<span class="p">Partial</span>',N:'<span class="x">None</span>'};
+const T=[
+ {g:"Market tools",id:"ms",n:"Microsoft Purview + Defender for Cloud Apps",cov:"FPPN",cap:"DLP, labels, shadow app discovery",use:"Easy on Microsoft 365",int:"Native to Microsoft",cost:"$$ E5 bundle",site:["microsoft.com/security","https://www.microsoft.com/en-us/security/business/microsoft-purview"],
+  risks:"Copilot oversharing, sensitive data in Microsoft 365 prompts, unapproved SaaS AI apps",resid:"Non-Microsoft AI and agents, personal devices, what vendors do with data",
+  ex:["Sensitivity labels stop Copilot from summarizing files marked Confidential HR.","Defender for Cloud Apps finds 40 users on an unapproved AI note-taker and marks it unsanctioned.","The app catalog risk score flags a SaaS tool that added an AI feature.",null]},
+ {id:"netskope",n:"Netskope SSE",cov:"PFPN",cap:"Inline AI app control and DLP",use:"Moderate",int:"Proxy plus endpoint agent",cost:"$$$",site:["netskope.com","https://www.netskope.com"],
+  risks:"Uploads to unapproved AI, personal versus corporate account use, data in prompts over the web",resid:"Unmanaged devices off the proxy, CLI tools and local models, certificate-pinned apps",
+  ex:["Allows the corporate ChatGPT Enterprise tenant and blocks the personal tenant.","Blocks a paste of source code into personal ChatGPT and shows a coaching banner.","Inspects data sent to a SaaS vendor's AI feature as it crosses the proxy.",null]},
+ {id:"nudge",n:"Nudge Security",cov:"PFPN",cap:"Shadow AI discovery, OAuth governance",use:"Easy",int:"Identity and email signals",cost:"$$",site:["nudgesecurity.com","https://www.nudgesecurity.com"],
+  risks:"Shadow AI sign-ups, risky OAuth grants to AI apps, unknown AI app owners",resid:"No inline blocking of content, personal accounts on personal email",
+  ex:["Keeps an inventory of approved AI tenants and who owns each.","Spots an employee signing up for an AI meeting bot with a work email and nudges them to the approved tool.","Flags a vendor app that requested new AI-related OAuth scopes.",null]},
+ {id:"nightfall",n:"Nightfall",cov:"PFNN",cap:"DLP for GenAI uploads and pastes",use:"Easy",int:"Browser, SaaS APIs",cost:"$$",site:["nightfall.ai","https://www.nightfall.ai"],
+  risks:"PII, PHI and secrets pasted or uploaded into AI tools",resid:"Finding new AI apps, desktop and CLI tools outside the browser",
+  ex:["Redacts patient identifiers before a prompt reaches Copilot in the browser.","Blocks an upload of a customer list to a personal Claude account.",null,null]},
+ {id:"prisma",n:"Palo Alto Prisma AIRS",cov:"FPPP",cap:"AI runtime security platform",use:"Moderate",int:"Network and API",cost:"$$$",site:["paloaltonetworks.com","https://www.paloaltonetworks.com"],
+  risks:"Prompt injection, data leakage from AI apps, AI app inventory",resid:"Vendor-side processing, cost and effort for a small team",
+  ex:["Inspects traffic between internal apps and Azure OpenAI.","Applies AI app control on Palo Alto firewalls for unapproved tools.","Protects a vendor model integration your own app calls.","Scans models and AI apps before they ship."]},
+ {id:"lakera",n:"Lakera Guard",cov:"FNPP",cap:"Prompt injection firewall",use:"Easy",int:"One API call",cost:"Free to $$$",site:["lakera.ai","https://www.lakera.ai"],
+  risks:"Prompt injection, jailbreaks, PII in prompts",resid:"Injection hidden in tool outputs is only partly caught, no discovery of AI use",
+  ex:["Screens every chatbot input before it reaches the model.",null,"Screens your app's calls to a vendor-hosted model.","Wraps an AI feature in your product with one API call."]},
+ {id:"datadog",n:"Datadog AI Guard",cov:"FNNP",cap:"Agent runtime observability",use:"Easy on Datadog",int:"Agent and SDKs",cost:"$$ usage",site:["datadoghq.com","https://www.datadoghq.com"],
+  risks:"Agent misuse, PII leaving AI services, malicious skills loaded by coding agents",resid:"Only services instrumented with Datadog, no view of shadow AI",
+  ex:["Alerts when an internal agent sends PII to an outside endpoint.",null,null,"Flags a coding agent that loads a malicious skill or package."]},
+ {id:"code",n:"Snyk, Semgrep, Socket",cov:"NNNF",cap:"Code, dependency and package scanning",use:"Easy",int:"IDE, CI, MCP",cost:"Free to $$",site:["snyk.io, semgrep.dev, socket.dev","https://snyk.io"],
+  risks:"Insecure AI-written code, vulnerable or malicious packages, leaked secrets",resid:"Business logic flaws, brand-new packages with no history, poisoned MCP tools",
+  ex:[null,null,null,"Semgrep's MCP server scans Copilot-written code before commit; Socket blocks a typosquatted npm package."]},
+ {id:"redteam",n:"Promptfoo, Garak",cov:"PNPF",cap:"Open-source red teaming",use:"Easy to moderate",int:"CI/CD",cost:"Free to $$",site:["promptfoo.dev","https://www.promptfoo.dev"],
+  risks:"Jailbreaks, injection and leakage found before release",resid:"Finds problems but does not block them; coverage depends on the test suite",
+  ex:["Promptfoo runs OWASP LLM tests against the internal chatbot on every pull request.",null,"Garak probes a vendor model endpoint you integrate, with permission.","Acts as a release gate in CI for AI features."]},
+ {id:"bigid",n:"BigID, OneTrust",cov:"PNFN",cap:"Data and third-party governance",use:"Involved",int:"GRC platform",cost:"$$$",site:["bigid.com","https://bigid.com"],
+  risks:"Vendor data handling, third-party AI inventory, regulatory mapping",resid:"Vendor answers are self-attested, cost for a small team",
+  ex:["BigID maps which data stores Copilot can reach.",null,"AI-specific vendor assessments at onboarding and renewal.",null]},
+ {g:"Your four",id:"jiffy",n:"Jiffy",note:"confirm scope and price",mine:1,cov:"PFPF",cap:"AI visibility and AI supply chain trust",use:"High",int:"MCP, agent configs, IDE rules",cost:"$$",site:null,
+  risks:"Unknown AI tools, unvetted MCP servers, agent config drift, poisoned rule files",resid:"Does not inspect live prompt content; scope and pricing still to confirm with Jiffy",
+  ex:["Keeps an inventory of approved agents and the tools each can call.","Finds a local MCP server holding stored credentials on a developer laptop.","Lists vendor-supplied agents and MCP servers in use.","Detects a poisoned IDE rule file committed to a repository."]},
+ {id:"septa",n:"Septa",note:"PromptHalo",mine:1,cov:"FNPF",cap:"LLM security proxy, runtime defense",use:"High",int:"Change the SDK base URL",cost:"$$$",site:null,
+  risks:"Prompt injection, jailbreaks, PII and PHI leaking in live prompts and responses",resid:"Sees only routed traffic, so no shadow AI; vendor internals stay unseen",
+  ex:["The internal chatbot points its OpenAI SDK base URL at Septa, which masks PHI before the model sees it.",null,"Your app's calls to AWS Bedrock run through Septa.","An AI feature in your product is filtered at runtime."]},
+ {id:"litmus",n:"Litmus",note:"PromptHalo",mine:1,cov:"FNPF",cap:"Automated AI red teaming",use:"Medium",int:"SaaS, points at your endpoints",cost:"$$",site:null,
+  risks:"Unknown weaknesses before release, regressions after model or prompt changes",resid:"Finds but does not block live attacks; pair with Septa",
+  ex:["Monthly red team of the internal copilot.",null,"Tests a vendor-integrated assistant in staging.","Red-teams an agent in CI before each release."]},
+ {id:"bitv",n:"Bit-Vendor",note:"BitSense",mine:1,cov:"NNFN",cap:"Vendor AI risk and vendor data flow",use:"High",int:"Vendor records, intake",cost:"$$",site:["thebitsense.com","https://thebitsense.com"],
+  risks:"AI switched on inside vendor products, company data flowing to vendor models, sub-processor changes",resid:"Controls inside the vendor are attested, not observed; pair with contract terms",
+  ex:[null,null,"Flags that a CRM vendor switched on AI summaries and that customer data now flows to its model provider.",null]}
+];
+const REC={ms:["Recommend","if you run Microsoft 365: already in E5, native Copilot controls, adds shadow app discovery at no new cost"],
+ netskope:["Consider","pick Netskope or Microsoft, not both; best inline control of AI uploads and tenants for mixed estates"],
+ nudge:["Recommend","for teams without E5: fastest shadow AI discovery, no agent to deploy, low cost"],
+ nightfall:["Consider","adds browser DLP for AI where Purview does not reach"],
+ prisma:["Optional","only for Palo Alto shops; broad but costly and overlaps with Septa"],
+ lakera:["Optional","free tier is handy for prototypes; overlaps with Septa in production"],
+ datadog:["Consider","if you already run Datadog; watches agent actions with agents you have"],
+ code:["Recommend","free tiers, covers AI-written code and packages, and nothing else on this list does"],
+ redteam:["Optional","free CI tests; Litmus already gives managed, continuous red teaming"],
+ bigid:["Optional","only for a large vendor estate; Bit-Vendor plus CAIQ covers a small team"],
+ jiffy:["Recommend","pilot first: the only tool here covering MCP servers, agent configs and rule files across unsanctioned and software"],
+ septa:["Recommend","one base-URL change guards every AI app and feature you build or run"],
+ litmus:["Recommend","continuous red teaming before each release; pairs with Septa"],
+ bitv:["Recommend","fills the vendor gap the big suites leave open"]};
+const recCell=id=>{const r=REC[id];return r?`<td class="rec"><span class="rk rk-${r[0]}">${r[0]}</span><span class="why">${r[1]}</span></td>`:"<td></td>"};
+const tname=t=>`<a class="tl" href="#t-${t.id}">${t.n}</a>${t.note?`<small>${t.note}</small>`:""}`;
+let h=`<tr><th>Tool</th><th>Recommendation and why</th>${C.map(c=>`<th class="c"><span class="c-${c[0]}">${c[1]}</span></th>`).join("")}<th>Main capability</th><th>Usability</th><th>Integration</th><th>Cost</th><th>Known risks it addresses</th><th>Residual risk after use</th></tr>`;
+T.forEach(t=>{ if(t.g)h+=`<tr class="grp"><td colspan="12">${t.g}</td></tr>`;
+ h+=`<tr${t.mine?' class="yours"':""}><td class="tool">${tname(t)}</td>${recCell(t.id)}${[...t.cov].map(k=>`<td class="c">${V[k]}</td>`).join("")}<td>${t.cap}</td><td>${t.use}</td><td>${t.int}</td><td class="cost">${t.cost}</td><td class="risk">${t.risks}</td><td class="resid">${t.resid}</td></tr>`;});
+h+=`<tr class="total"><td class="tool">Your four together<small>plus DLP you already own</small></td><td class="rec"><span class="rk rk-Recommend">Recommend</span><span class="why">with the market picks above, covers all four categories</span></td>${C.map(()=>`<td class="c">${V.F}</td>`).join("")}<td>See, guard, test and vet across all four</td><td>High</td><td>Feeds one SIEM</td><td class="cost">$$ to $$$</td><td class="risk">All rated risks across the four categories</td><td class="resid">Personal devices, local models, vendor internals, logic flaws (see section 3)</td></tr>`;
+document.getElementById("cov").innerHTML=h;
+const chev='<svg class="ch" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+document.getElementById("tdetails").innerHTML=T.map(t=>`<details class="td" id="t-${t.id}"><summary><span class="nm">${t.n}${t.mine?'<span class="badge">Yours</span>':""}</span><span class="ds">${t.cap}</span>${chev}</summary>
+ <div class="tdbody">
+  <div class="ex">${C.map((c,i)=>t.ex[i]?`<div class="c-${c[0]}"><b>${c[1]}</b>${t.ex[i]}</div>`:`<div class="na"><b>${c[1]}</b>Not designed for this category.</div>`).join("")}</div>
+  <div class="rr">${REC[t.id]?`<div><h4>Recommendation</h4><p><span class="rk rk-${REC[t.id][0]}">${REC[t.id][0]}</span> ${REC[t.id][1]}.</p></div>`:""}<div><h4>Known risks it addresses</h4><p>${t.risks}</p></div><div><h4>Residual risk after use</h4><p>${t.resid}</p></div><div><h4>Fit</h4><p>Usability: ${t.use}. Integration: ${t.int}. Cost: ${t.cost}.</p></div></div>
+  <p class="site">${t.site?`Website: <a href="${t.site[1]}" target="_blank" rel="noopener">${t.site[0]}</a>`:(t.note==="PromptHalo"?"PromptHalo product; ask the PromptHalo team for documentation.":"Confirm current scope and pricing directly with Jiffy Labs.")}</p>
+ </div></details>`).join("");
+function openFromHash(){const id=location.hash.slice(1);const d=id&&document.getElementById(id);if(d&&d.tagName==="DETAILS"){d.open=true;d.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});}}
+document.addEventListener("click",e=>{const a=e.target.closest("a.tl");if(!a)return;e.preventDefault();const d=document.getElementById(a.getAttribute("href").slice(1));if(d){d.open=true;d.scrollIntoView({behavior:"smooth",block:"start"});d.querySelector("summary").focus({preventScroll:true});}});
+window.addEventListener("hashchange",openFromHash);openFromHash();
+})();
+</script>
+
+<script>
+(function(){
+const ic={user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/>',laptop:'<path d="M4 6h16v10H4zM2 19h20"/>',phone:'<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
+ users:'<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-4 3-6 7-6s7 2 7 6M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2.5.6 4 2.6 4 6"/>',code:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M10 9l-3 3 3 3M14 9l3 3-3 3"/>',
+ net:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',wifi:'<path d="M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1"/>',
+ lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',
+ ai:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
+ data:'<path d="M6 2h9l5 5v15H6zM14 2v6h6M9 13h8M9 17h6"/>',db:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',
+ cloud:'<path d="M7 18h11a4 4 0 0 0 .5-8A6 6 0 0 0 7 9a4.5 4.5 0 0 0 0 9z"/>',building:'<path d="M4 21V5l8-3v19M12 9h8v12M7 8h2M7 12h2M7 16h2M15 13h2M15 17h2M2 21h20"/>',
+ warn:'<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/>'};
+const I=n=>`<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ic[n]}</svg>`;
+const ST=["Users and endpoints","Access and network","GenAI service","Data in motion","Destination"];
+const MINE={Jiffy:"jiffy",Septa:"septa",Litmus:"litmus","Bit-Vendor":"bitv"};
+const CARD={Netskope:"netskope","Nudge Security":"nudge",Nightfall:"nightfall","Microsoft Purview":"ms","Defender for Cloud Apps":"ms","Datadog AI Guard":"datadog","Snyk, Semgrep":"code",Socket:"code",BigID:"bigid"};
+const tool=([n,w])=>{const id=MINE[n]||CARD[n];const nm=id?`<a class="tl" href="#t-${id}">${n}</a>`:n;return `<div><i class="${MINE[n]?"m":""}"></i><span><b>${nm}</b> ${w}</span></div>`};
+const F=[
+ {k:"san",t:"Sanctioned GenAI",l:"Employees using approved AI with company data.",
+  s:[["laptop","Employees on managed devices",[["Jiffy","sees AI tools and agents in use"],["Intune, Defender","check device health"]]],
+     ["net","Corporate network and SSO",[["Netskope","inspects traffic, applies DLP"],["Entra ID","controls access"]]],
+     ["ai","Copilot, Azure OpenAI, internal chatbot",[["Septa","filters prompts and responses"],["Litmus","red-teams before release"]]],
+     ["data","Business data, customer records",[["Microsoft Purview","labels data, blocks oversharing"]]],
+     ["cloud","Microsoft 365, CRM, cloud",[["Datadog AI Guard","watches agent actions"],["SIEM","collects every signal"]]]],
+  g:"Injection hidden in tool outputs. Agents built outside Microsoft or AWS."},
+ {k:"uns",t:"Unsanctioned GenAI",l:"People using AI the company has not approved.",
+  s:[["phone","Personal or unmanaged devices",[["Jiffy","finds local AI tools and MCP servers"],["Defender","managed devices only"]]],
+     ["wifi","Home Wi-Fi, public networks",[["Netskope","blocks on managed devices"],["DNS filtering","blocks risky AI sites"]]],
+     ["ai","Personal ChatGPT, Claude, Perplexity",[["Nudge Security","finds sign-ups and OAuth grants"],["Defender for Cloud Apps","marks apps unsanctioned"]]],
+     ["data","Pasted text, uploads, tokens",[["Nightfall","redacts or blocks sensitive data"]]],
+     ["cloud","Consumer AI clouds",[["SIEM","alerts on risky uploads"]]]],
+  g:"Personal devices and local models stay out of reach. Septa does not see this traffic."},
+ {k:"ven",t:"Vendor / Third-Party GenAI",l:"AI inside the vendors and SaaS you already use.",
+  s:[["users","Vendors, partners, contractors",[["Bit-Vendor","vendor intake and AI risk score"]]],
+     ["lock","Partner access, APIs, SSO",[["Entra ID","conditional access, MFA"],["Netskope","sees data sent to SaaS AI"]]],
+     ["ai","Bedrock, Vertex, SaaS AI features",[["Septa","guards your calls to vendor models"],["Litmus","tests the integration"]]],
+     ["data","Project, customer, financial data",[["Bit-Vendor","detects data flowing to vendors"],["BigID","maps where data lives"]]],
+     ["building","Vendor clouds, sub-processors",[["Contract terms","no training, notice of change"],["Bit-Vendor","re-checks at renewal"]]]],
+  g:"Controls inside the vendor are attested, not observed."},
+ {k:"dev",t:"Software / CI-CD",l:"AI used to build software, and AI features you ship.",
+  s:[["code","Developers and coding agents",[["Jiffy","checks IDE rules and agent configs"]]],
+     ["gear","Source control and CI/CD",[["Snyk, Semgrep","scan code in the agent loop"],["Socket","blocks malicious packages"]]],
+     ["ai","Copilot, Amazon Q, MCP servers",[["Jiffy","trusts or blocks MCP servers"],["Litmus","red-teams AI features"]]],
+     ["data","Code, secrets, configs",[["GitHub secret scanning","stops leaked keys"]]],
+     ["db","Repos, registries, cloud runtime",[["Septa","guards AI features at runtime"],["SIEM","collects pipeline signals"]]]],
+  g:"Logic flaws in AI-written code. New packages lack history."}
+];
+document.getElementById("flows").innerHTML=F.map(f=>`<details class="flowcard ${f.k}"${f.k==="san"?" open":""}><summary><span><h3>${f.t}</h3><p class="lede">${f.l} <b>Remaining gap:</b> ${f.g}</p></span><svg class="mc" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></summary>
+ <div class="fscroll"><div class="fl">${f.s.map((x,i)=>`<div class="fs">${i?'<span class="conn" aria-hidden="true"></span>':""}<div class="ring">${I(x[0])}</div><span class="stl">${i+1}. ${ST[i]}</span><span class="what">${x[1]}</span><div class="tools">${x[2].map(tool).join("")}</div></div>`).join("")}
+ <div class="fs gapst"><span class="conn" aria-hidden="true"></span><div class="ring">${I("warn")}</div><span class="stl">Remaining gap</span><p class="gtext">${f.g}</p></div></div></div></details>`).join("");
+})();
+</script>
+
+<script>
+(function(){
+const ID={Septa:"septa",Jiffy:"jiffy",Litmus:"litmus","Bit-Vendor":"bitv","Microsoft Purview":"ms","Defender for Cloud Apps":"ms","Datadog AI Guard":"datadog","Nudge Security":"nudge",Netskope:"netskope",Nightfall:"nightfall",BigID:"bigid","Snyk, Semgrep, Socket":"code"};
+const MINE=["Septa","Jiffy","Litmus","Bit-Vendor"];
+const W=[
+ {where:[["AI gateway or proxy","Prompt injection attempts, PII or PHI in prompts and responses, unusual volume per user","Septa"],
+         ["Microsoft 365 audit logs","Copilot reaching sensitive files, sudden jumps in what a user can reach, admin changes","Microsoft Purview"],
+         ["DLP","Labeled data appearing in prompts or outputs, blocked shares","Microsoft Purview, Netskope"]],
+  tools:[["Septa","Injection and jailbreak attempts, PII and PHI in live prompts and responses"],["Microsoft Purview","Sensitive files touched by Copilot, oversharing alerts"],["Datadog AI Guard","Agent tool calls to unexpected endpoints, PII leaving AI services"],["Jiffy","New agents and MCP servers, changes to agent configs"]]},
+ {where:[["Identity and OAuth grants","New AI app sign-ups with work email, OAuth scopes granted to AI apps","Nudge Security"],
+         ["Browser and endpoint","Pastes and uploads of sensitive data to AI sites, AI extensions, local models","Nightfall, Jiffy, Defender"],
+         ["Network proxy","Traffic to AI domains, personal versus corporate tenant use","Netskope"]],
+  tools:[["Jiffy","Local AI tools, MCP servers holding credentials"],["Nudge Security","AI sign-ups and OAuth grants"],["Defender for Cloud Apps","AI app usage volume, access to unsanctioned apps"],["Netskope","Uploads to AI sites, personal tenant use"],["Nightfall","PII, PHI and secrets in pastes and uploads"]]},
+ {where:[["Vendor intake and renewal","AI features declared, training on your data, sub-processor list","Bit-Vendor"],
+         ["SaaS integrations","New AI scopes, rising data volume sent to a vendor","Bit-Vendor, Netskope"],
+         ["Contracts","No-training and change-notice clauses, renewal dates","Bit-Vendor, legal"]],
+  tools:[["Bit-Vendor","AI switched on, data flowing to vendor models, sub-processor changes"],["Vanta","Overdue vendor reviews, missing evidence"],["BigID","Which sensitive data stores vendors can reach"]]},
+ {where:[["IDE and agent loop","Insecure code suggestions, MCP servers added, IDE rule file changes","Jiffy, Snyk, Semgrep"],
+         ["CI pipeline","New dependencies, typosquatted packages, secrets in commits","Socket, Snyk, GitHub secret scanning"],
+         ["Runtime","Injection against AI features, abnormal outputs","Septa"]],
+  tools:[["Jiffy","Changes to MCP servers, agent configs and IDE rule files"],["Snyk, Semgrep, Socket","Vulnerable code, malicious packages, leaked secrets"],["Litmus","New weaknesses after each release"],["Septa","Attacks on AI features in production"]]}
+];
+const det=(title,body,mine,link)=>`<details class="ic${mine?" mine":""}"><summary>${title}</summary><div class="ib">${body}${link?` <a class="tl" href="#t-${link}">Full details</a>`:""}</div></details>`;
+const rows=[...document.querySelectorAll("#mon tr")].slice(1);
+rows.forEach((tr,i)=>{const d=W[i];if(!d)return;const td=tr.children;
+ td[2].className="wh";td[2].innerHTML=`<div class="inl">${d.where.map(w=>det(w[0],`<b>Watch for:</b> ${w[1]}. <b>Tool:</b> ${w[2]}.`,false,null)).join("")}</div>`;
+ td[3].className="tl2";td[3].innerHTML=`<div class="inl">${d.tools.map(t=>det(t[0]+(MINE.includes(t[0])?" (yours)":""),`<b>Watches for:</b> ${t[1]}.`,MINE.includes(t[0]),ID[t[0]]||null)).join("")}</div>`;
+});
+})();
+</script>
+
+<script>
+(function(){
+const w=document.createTreeWalker(document.querySelector(".wrap"),NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement.closest("script,style,.mineNote")?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});
+const nodes=[];while(w.nextNode())nodes.push(w.currentNode);
+nodes.forEach(n=>{let t=n.nodeValue,o=t;
+ t=t.replace(/\b(Jiffy|Septa|Litmus|Bit-Vendor)\b(?!\*)/g,"$1*");
+ t=t.replace(/\(yours\)/gi,"(mine)").replace(/^\s*yours\s*$/i,m=>m.replace(/yours/i,"Mine"));
+ t=t.replace(/\bYour (four|tools|tool)\b/g,"My $1").replace(/\byour (four|tools|tool)\b/g,"my $1");
+ if(t!==o)n.nodeValue=t;});
+})();
+</script>
+
+</body></html>
