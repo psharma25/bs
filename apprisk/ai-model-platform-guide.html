@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Model and Platform Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{
+  --petrol:#1b4965; --petrol-2:#2c6e91; --petrol-soft:#e8f0f5;
+  --amber:#B45309; --amber-soft:#fdf1e3;
+  --ink:#1d2731; --muted:#5a6773; --line:#d8e0e6; --bg:#f6f8fa; --card:#ffffff;
+  --hi:#b42318; --hi-soft:#fde8e6; --md:#B45309; --md-soft:#fdf1e3; --lo:#2f7d4f; --lo-soft:#e5f4ea;
+  --fs:16px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --petrol:#7fb3d5; --petrol-2:#9cc6e2; --petrol-soft:#16303f;
+    --amber:#f0a35a; --amber-soft:#3a2a17;
+    --ink:#e6ecf1; --muted:#a3b1bd; --line:#2d3b47; --bg:#0f1820; --card:#16222c;
+    --hi:#f08a7e; --hi-soft:#3d1f1c; --md:#f0a35a; --md-soft:#3a2a17; --lo:#7fd09c; --lo-soft:#183223;
+  }
+}
+:root[data-theme="dark"]{
+  --petrol:#7fb3d5; --petrol-2:#9cc6e2; --petrol-soft:#16303f;
+  --amber:#f0a35a; --amber-soft:#3a2a17;
+  --ink:#e6ecf1; --muted:#a3b1bd; --line:#2d3b47; --bg:#0f1820; --card:#16222c;
+  --hi:#f08a7e; --hi-soft:#3d1f1c; --md:#f0a35a; --md-soft:#3a2a17; --lo:#7fd09c; --lo-soft:#183223;
+}
+*{box-sizing:border-box}
+html{font-size:var(--fs)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Calibri,"Segoe UI",system-ui,sans-serif;line-height:1.55}
+a{color:var(--petrol-2)}
+header.top{background:var(--petrol);color:#fff;padding-block:28px 22px}
+:root[data-theme="dark"] header.top{background:#0b2433}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) header.top{background:#0b2433}}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+header.top h1{margin:0 0 6px;font-size:1.75rem;letter-spacing:-.01em}
+header.top p{margin:0;opacity:.9;max-width:860px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;align-items:center}
+.toolbar button{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:6px;padding:5px 10px;font:inherit;font-size:.85rem;cursor:pointer}
+.toolbar button:hover{background:rgba(255,255,255,.25)}
+.toolbar span{font-size:.8rem;opacity:.8;margin-right:2px}
+nav.toc{position:sticky;top:env(safe-area-inset-top, 0px);z-index:5;background:var(--card);border-bottom:1px solid var(--line)}
+nav.toc .wrap{display:flex;gap:4px;overflow-x:auto;padding-block:8px}
+nav.toc a{white-space:nowrap;text-decoration:none;color:var(--petrol);font-size:.85rem;padding:5px 10px;border-radius:6px}
+nav.toc a:hover{background:var(--petrol-soft)}
+section{padding:30px 0 8px}
+h2{color:var(--petrol);font-size:1.4rem;margin:0 0 6px;border-left:4px solid var(--amber);padding-left:10px}
+h3{color:var(--petrol);font-size:1.1rem;margin:22px 0 8px}
+.lede{color:var(--muted);margin:0 0 16px;max-width:900px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:18px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+.stat b{display:block;font-size:1.6rem;color:var(--amber)}
+.stat span{font-size:.85rem;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin:14px 0}
+.note{background:var(--amber-soft);border-left:4px solid var(--amber);padding:10px 14px;border-radius:6px;font-size:.92rem;margin:12px 0}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--petrol-soft);color:var(--petrol);font-weight:600;position:sticky;top:0}
+tr:last-child td{border-bottom:0}
+.pill{display:inline-block;font-size:.72rem;padding:2px 8px;border-radius:999px;font-weight:600;white-space:nowrap}
+.t-closed{background:#e9e3f7;color:#4b2f8f}
+.t-open{background:var(--lo-soft);color:var(--lo)}
+.t-mixed{background:var(--amber-soft);color:var(--amber)}
+.t-platform{background:var(--petrol-soft);color:var(--petrol)}
+.t-runtime{background:#e3eef7;color:#255d86}
+:root[data-theme="dark"] .t-closed{background:#2a2140;color:#c7b5f2}
+:root[data-theme="dark"] .t-runtime{background:#1a2c3b;color:#9cc6e2}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .t-closed{background:#2a2140;color:#c7b5f2}:root:not([data-theme="light"]) .t-runtime{background:#1a2c3b;color:#9cc6e2}}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.filters button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:5px 12px;font:inherit;font-size:.82rem;cursor:pointer}
+.filters button.on{background:var(--petrol);color:#fff;border-color:var(--petrol)}
+input.search{width:100%;max-width:340px;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);font:inherit;font-size:.9rem;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+.detail{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;scroll-margin-top:60px;display:flex;flex-direction:column}
+.detail h4{margin:0;font-size:1.08rem;color:var(--petrol)}
+.detail .sub{font-size:.82rem;color:var(--muted);margin:2px 0 10px}
+.detail p{margin:6px 0;font-size:.9rem}
+.detail dl{margin:6px 0;font-size:.88rem}
+.detail dt{font-weight:600;color:var(--petrol);margin-top:8px;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em}
+.detail dd{margin:2px 0 0}
+.detail ul{margin:4px 0 0;padding-left:18px}
+.detail li{margin:2px 0}
+.detail .links{margin-top:auto;padding-top:10px;border-top:1px dashed var(--line);font-size:.85rem;display:flex;flex-wrap:wrap;gap:4px 12px}
+.diagram{width:100%;height:auto;display:block}
+.svgbox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;overflow-x:auto}
+.svgbox svg{min-width:720px}
+.layers{display:grid;gap:10px}
+.layer{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:12px}
+.layer h5{margin:0 0 8px;font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips a{text-decoration:none;font-size:.85rem;padding:4px 10px;border-radius:6px;border:1px solid var(--line);color:var(--ink);background:var(--bg)}
+.chips a:hover{border-color:var(--petrol-2)}
+.chips a.c{border-left:4px solid #6b4fbf}
+.chips a.o{border-left:4px solid var(--lo)}
+.chips a.m{border-left:4px solid var(--amber)}
+.chips a.p{border-left:4px solid var(--petrol)}
+.chips a.r{border-left:4px solid #3a86c2}
+.arrow{text-align:center;color:var(--muted);font-size:.85rem}
+.heat td.h{background:var(--hi-soft);color:var(--hi);font-weight:600;text-align:center}
+.heat td.m{background:var(--md-soft);color:var(--md);font-weight:600;text-align:center}
+.heat td.l{background:var(--lo-soft);color:var(--lo);font-weight:600;text-align:center}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+ol.check, ul.check{padding-left:20px}
+ol.check li, ul.check li{margin:5px 0}
+code{background:var(--petrol-soft);padding:1px 5px;border-radius:4px;font-size:.85em}
+footer{padding:30px 0 40px;color:var(--muted);font-size:.82rem}
+@media (max-width:600px){header.top h1{font-size:1.35rem}.grid{grid-template-columns:1fr}}
+.cat-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.cat-tools .search{margin:0;flex:1;min-width:220px;max-width:460px}
+.cat-tools button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;padding:6px 12px;font:inherit;font-size:.85rem;cursor:pointer}
+.cat-count{font-size:.85rem;color:var(--amber);font-weight:600}
+details.plat{background:var(--card);border:1px solid var(--line);border-radius:10px;margin:8px 0;overflow:hidden}
+details.plat>summary{cursor:pointer;padding:12px 14px;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;list-style:none;border-left:4px solid var(--petrol)}
+details.plat>summary::-webkit-details-marker,details.grp>summary::-webkit-details-marker{display:none}
+details.plat>summary::before{content:"\25B8";color:var(--amber);transition:transform .15s}
+details.plat[open]>summary::before{transform:rotate(90deg)}
+details.plat[open]>summary{background:var(--petrol-soft)}
+.pname{font-weight:600;color:var(--petrol)}
+.pkind{font-size:.8rem;color:var(--muted)}
+.pnum{margin-left:auto;font-size:.75rem;background:var(--amber-soft);color:var(--amber);padding:2px 8px;border-radius:999px;font-weight:600}
+.pbody{padding:4px 16px 14px}
+.pbody>p{font-size:.9rem;margin:8px 0}
+.plinks{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.85rem;margin-bottom:8px}
+details.grp{border-top:1px dashed var(--line)}
+details.grp>summary{cursor:pointer;padding:8px 2px;font-weight:600;font-size:.9rem;list-style:none}
+details.grp>summary::before{content:"+ ";color:var(--amber)}
+details.grp[open]>summary::before{content:"\2212  "}
+.gnum{font-weight:500;font-size:.75rem;color:var(--muted)}
+details.grp ul{margin:0 0 8px;padding-left:22px;font-size:.88rem}
+details.grp li{margin:3px 0}
+li.hit{background:var(--amber-soft)}
+table.matrix td,table.matrix th{text-align:center}
+table.matrix td:first-child,table.matrix th:first-child{text-align:left;font-weight:600}
+table.matrix td.my{background:var(--lo-soft);color:var(--lo);font-weight:700}
+table.matrix td.mq{background:var(--md-soft);color:var(--md);font-weight:700}
+table.fit td:first-child{min-width:170px}table.fit td{font-size:.86rem}
+section.sec{padding:12px 0 0;scroll-margin-top:56px}
+details.secd{background:var(--card);border:1px solid var(--line);border-radius:12px}
+details.secd>summary{list-style:none;cursor:pointer;padding:14px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:2px 12px;align-items:baseline}
+details.secd>summary::-webkit-details-marker{display:none}
+details.secd>summary::after{content:"Show";grid-column:3;grid-row:1;font-size:.78rem;font-weight:600;color:var(--amber);border:1px solid var(--line);border-radius:999px;padding:2px 10px}
+details.secd[open]>summary::after{content:"Hide"}
+details.secd>summary:hover{background:var(--petrol-soft);border-radius:12px}
+details.secd>summary:focus-visible,details.plat>summary:focus-visible,details.grp>summary:focus-visible,details.detail>summary:focus-visible,details.refs>summary:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.secno{grid-column:1;grid-row:1 / span 2;font-weight:700;color:var(--amber);font-variant-numeric:tabular-nums;font-size:.95rem;padding-top:2px}
+details.secd>summary h2{grid-column:2;margin:0;border:0;padding:0;display:block;text-wrap:balance}
+.secsub{grid-column:2;font-size:.85rem;color:var(--muted)}
+.secbody{padding:4px 16px 18px;border-top:1px solid var(--line)}
+details.secd .secbody>.lede:first-child{margin-top:12px}
+details.refs{margin-top:14px;border:1px dashed var(--line);border-radius:8px;background:var(--bg)}
+details.refs>summary{cursor:pointer;padding:8px 12px;font-size:.85rem;font-weight:600;color:var(--petrol);list-style:none}
+details.refs>summary::-webkit-details-marker{display:none}
+details.refs>summary::before{content:"\25B8  ";color:var(--amber)}
+details.refs[open]>summary::before{content:"\25BE  "}
+details.refs ul{margin:0;padding:0 14px 10px 30px;font-size:.85rem;columns:2 300px;column-gap:28px}
+details.refs li{margin:3px 0;break-inside:avoid}
+details.refgrp{margin-top:10px}
+.navbtn{white-space:nowrap;margin-left:auto;border:1px solid var(--line);background:var(--card);color:var(--amber);border-radius:6px;padding:4px 10px;font:inherit;font-size:.8rem;font-weight:600;cursor:pointer}
+.grid{align-items:start}
+details.detail{display:block;padding:0}
+details.detail>summary{list-style:none;cursor:pointer;padding:14px 16px}
+details.detail>summary::-webkit-details-marker{display:none}
+details.detail>summary h4::after{content:"  +";color:var(--amber)}
+details.detail[open]>summary h4::after{content:"  \2212"}
+details.detail .sub{margin:2px 0 4px}
+.dsum{font-size:.84rem;color:var(--muted)}
+details.detail[open] .dsum{display:none}
+.dbody{padding:0 16px 14px;display:flex;flex-direction:column}
+@media (max-width:600px){details.secd>summary::after{display:none}}
+@media print{details{display:block}nav.toc,.toolbar,.filters,input.search{display:none}.detail{break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <h1>AI Model and Platform Guide</h1>
+    <p>Reference for 22 foundation models, model hubs, cloud AI platforms, and serving runtimes. Each entry covers what it is, how enterprises use it, the main security and governance risks, and practical controls. Deep dives cover Hugging Face model types and Amazon Bedrock.</p>
+    <div class="toolbar">
+      <span>Text size</span>
+      <button type="button" data-fs="14">A−</button>
+      <button type="button" data-fs="16">A</button>
+      <button type="button" data-fs="18">A+</button>
+      <span style="margin-left:10px">Theme</span>
+      <button type="button" id="themeBtn">Toggle light / dark</button>
+    </div>
+  </div>
+</header>
+
+<nav class="toc"><div class="wrap">
+  <a href="#summary">Executive summary</a>
+  <a href="#fit">Model fit</a>
+  <a href="#landscape">Landscape</a>
+  <a href="#catalogs">Model catalogs</a>
+  <a href="#table">Summary table</a>
+  <a href="#details">Model and platform details</a>
+  <a href="#hf">Hugging Face deep dive</a>
+  <a href="#bedrock">Amazon Bedrock deep dive</a>
+  <a href="#clouds">Cloud platform comparison</a>
+  <a href="#heat">Risk heat map</a>
+  <a href="#controls">Baseline controls</a>
+  <a href="#refs">All references</a>
+  <button type="button" id="secAll" class="navbtn">Expand all sections</button>
+</div></nav>
+
+<main class="wrap">
+
+<section id="summary" class="sec">
+<details class="secd" open>
+<summary><span class="secno">01</span><h2>Executive summary</h2><span class="secsub">The four layers of the AI stack and where the risk sits in each</span></summary>
+<div class="secbody">
+  <p class="lede">The AI stack breaks into four layers: the <b>models</b> themselves, the <b>hubs</b> that distribute open-weight models, the <b>cloud platforms</b> that host and wrap models with enterprise controls, and the <b>runtimes</b> that serve models on your own infrastructure. Risk follows the layer. Closed models move risk to data handling by a third party. Open-weight models move risk to provenance and to your own hosting. Platforms concentrate risk in IAM and data connections. Runtimes concentrate risk in exposed endpoints and unmanaged use.</p>
+  <div class="stats">
+    <div class="stat"><b>6</b><span>Closed / commercial model families</span></div>
+    <div class="stat"><b>10</b><span>Open-weight or mixed families</span></div>
+    <div class="stat"><b>5</b><span>Cloud and enterprise AI platforms</span></div>
+    <div class="stat"><b>1</b><span>Model and dataset hub (Hugging Face)</span></div>
+    <div class="stat"><b>2</b><span>Self-hosted serving runtimes</span></div>
+  </div>
+  <div class="two">
+    <div class="card">
+      <h3 style="margin-top:0">Key takeaways</h3>
+      <ul class="check">
+        <li><b>Closed APIs</b> (GPT, Claude, Gemini, Command, Grok): the main question is what data leaves your boundary, under which contract terms, retention setting, and region.</li>
+        <li><b>Open weights</b> (Llama, Mistral, Qwen, DeepSeek, Gemma, Phi, Granite, Falcon, gpt-oss): the weights can run privately, but you inherit provenance, license, and patching duties.</li>
+        <li><b>Hugging Face</b> is the main distribution channel for open weights. Treat it like a public package registry: pin, scan, and prefer safe formats.</li>
+        <li><b>Bedrock, Azure, Vertex</b> give one IAM-governed door to many models. Misconfigured IAM, logging, and agent permissions are the main failure points.</li>
+        <li><b>Ollama and vLLM</b> are common sources of shadow AI and unauthenticated model endpoints.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Decision questions for any model or platform</h3>
+      <ol class="check">
+        <li>Where does inference run, and in which jurisdiction?</li>
+        <li>Is input or output data retained or used for training? Under which agreement?</li>
+        <li>Where did the weights come from, and can you verify them?</li>
+        <li>What tools, data sources, and credentials can the model or agent reach?</li>
+        <li>What is logged, who can read the logs, and how long are they kept?</li>
+        <li>What license and acceptable use terms apply to the model and its outputs?</li>
+      </ol>
+    </div>
+  </div>
+  <div class="note">Model versions and catalogs change monthly. This page describes families and platforms. Confirm current versions, terms, and regional availability on the linked provider pages before a decision.</div>
+
+  <details class="refs"><summary>References (4)</summary><ul><li><a href="https://genai.owasp.org/llm-top-10/" target="_blank" rel="noopener">OWASP Top 10 for LLM Applications</a></li><li><a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener">NIST AI Risk Management Framework</a></li><li><a href="https://atlas.mitre.org/" target="_blank" rel="noopener">MITRE ATLAS</a></li><li><a href="https://www.iso.org/standard/81230.html" target="_blank" rel="noopener">ISO/IEC 42001 AI management system</a></li></ul></details>
+
+</div>
+</details>
+</section>
+
+<section id="fit" class="sec">
+<details class="secd" open>
+<summary><span class="secno">02</span><h2>Which model for which application</h2><span class="secsub">17 application types matched to model types, examples, and controls</span></summary>
+<div class="secbody">
+  <p class="lede">Starting points, not endorsements. Pick the smallest model that passes your own evaluation set, then scale up only where quality requires it. Examples reflect catalogs reviewed October 17, 2026.</p>
+  <div class="tbl-wrap">
+    <table class="fit">
+      <thead><tr><th>Application type</th><th>Model type that fits</th><th>Closed / API examples</th><th>Open-weight examples</th><th>Where to run it</th><th>Main control</th></tr></thead>
+      <tbody>
+        <tr><td><b>Internal chat assistant</b> (Q&amp;A, drafting, summaries)</td><td>General mid-tier LLM</td><td>Claude Sonnet 5.5, GPT-5.6 Terra, Gemini 3.8 Flash</td><td>Llama 4, Qwen3.8 27B, Mistral Medium 3.5</td><td>Bedrock, Foundry, or vendor business plan</td><td>No-training terms; SSO; data classification rules</td></tr>
+        <tr><td><b>RAG over company documents</b></td><td>Embedding model + reranker + LLM</td><td>Cohere Embed v5 and Rerank v4, Titan/Nova embeddings, text-embedding-3, gemini-embedding-2</td><td>BGE-M3, Qwen3-Embedding, EmbeddingGemma 2, nomic-embed</td><td>Bedrock Knowledge Bases, Azure AI Search, self-hosted vector DB</td><td>Enforce source-document permissions at retrieval</td></tr>
+        <tr><td><b>Agentic workflows</b> (tool use, multi-step tasks)</td><td>Frontier reasoning LLM with strong tool calling</td><td>Claude Opus 5.5, GPT-6 Sol, Gemini 4 Argon, Grok 4.7</td><td>Kimi K3, GLM 5.3, DeepSeek V4, gpt-oss-120b</td><td>Bedrock AgentCore, Foundry Agent Service, Agent Platform</td><td>Least-privilege tools; human approval for irreversible actions</td></tr>
+        <tr><td><b>Coding assistants</b></td><td>Coding-tuned or frontier LLM</td><td>Claude Opus 5.5, GPT-5.3 Codex, Gemini 4 Argon</td><td>Qwen3 Coder, Devstral 2, GLM 4.7, Kimi K2.7 Code</td><td>Vendor IDE tools, Bedrock, local via Ollama or vLLM</td><td>Secrets scanning; code review before merge; repo access scope</td></tr>
+        <tr><td><b>High-volume classification, routing, extraction</b></td><td>Small, fast LLM or fine-tuned classifier</td><td>Claude Haiku 5.5, GPT-5.4 nano, Gemini 3.5 Flash-Lite, Nova Micro</td><td>Ministral 3, Gemma 4 E2B, Qwen3.5 small, Phi-4-mini</td><td>Bedrock batch, Databricks, self-hosted vLLM</td><td>Output schema validation; sampled human review</td></tr>
+        <tr><td><b>Document processing and OCR</b> (forms, invoices, PDFs)</td><td>Vision-language model or dedicated OCR</td><td>Mistral OCR, Cohere Parse, Claude and Gemini (image input)</td><td>Qwen3 VL, Gemma 4, Florence, Nemotron Nano VL</td><td>Bedrock, Foundry, self-hosted</td><td>Treat prompts in documents as untrusted input</td></tr>
+        <tr><td><b>Customer-facing chatbot</b></td><td>Mid-tier LLM + guardrail model</td><td>Claude Sonnet 5.5, GPT-5.6 Luna, Nova 2 Lite</td><td>Llama 4 + Llama Guard, Granite + Granite Guardian</td><td>Bedrock with Guardrails, Foundry with Content Safety</td><td>Guardrails, grounding checks, escalation to a human</td></tr>
+        <tr><td><b>Voice agents and transcription</b></td><td>Speech-to-speech, ASR, and TTS models</td><td>gpt-realtime-2.1, Nova 2 Sonic, Gemini 3.8 Live, gpt-transcribe</td><td>Whisper, Parakeet, Voxtral, Kokoro TTS</td><td>Bedrock, Foundry, NVIDIA Riva on-prem</td><td>Consent and recording notices; voice-clone abuse controls</td></tr>
+        <tr><td><b>Image generation</b> (marketing, design)</td><td>Diffusion or native image models</td><td>gpt-image-2.5, Nano Banana 2.1, Nova Canvas, FLUX.2 pro, Stable Image Ultra</td><td>FLUX.1 dev, SD 3.5, Qwen-Image 2.1</td><td>Bedrock, Foundry, Gemini API</td><td>License and IP review; brand and likeness rules</td></tr>
+        <tr><td><b>Video understanding or generation</b></td><td>Video models and video embeddings</td><td>TwelveLabs Pegasus and Marengo, Veo 3.1, Gemini Omni, Nova Reel, Luma Ray2</td><td>LTX-2.5, Wan, SAM 3 (segmentation)</td><td>Bedrock, Agent Platform, self-hosted GPUs</td><td>Cost limits; deepfake and consent policy</td></tr>
+        <tr><td><b>Deep reasoning and research</b> (analysis, math, science)</td><td>Highest-tier reasoning model</td><td>Claude Fable 5.1, GPT-6 Astra, Gemini 4 Argon, GPT-5.5 Pro</td><td>DeepSeek V4 Pro, Kimi K3, Qwen3.5 122B</td><td>Vendor API or cloud platform</td><td>Cost controls; verify cited facts</td></tr>
+        <tr><td><b>Regulated or air-gapped data</b></td><td>Self-hosted open-weight LLM</td><td>Not applicable (or in-account cloud such as Bedrock with PrivateLink)</td><td>gpt-oss, Llama, Mistral Large 3, Granite, Nemotron</td><td>vLLM, NVIDIA NIM, private Kubernetes</td><td>Provenance checks, safetensors, authenticated endpoints, patching</td></tr>
+        <tr><td><b>Edge and on-device</b></td><td>Small language models (under ~10B)</td><td>Not applicable</td><td>Gemma 4 E2B, Phi-4-mini, Llama 3.2 1B/3B, Ministral 3B, Granite 4 3B</td><td>Ollama, ONNX Runtime, llama.cpp, MLX</td><td>Endpoint management; approved model list</td></tr>
+        <tr><td><b>Translation and multilingual</b></td><td>Multilingual LLM or translation model</td><td>Command A Translate, GPT-5.6, Gemini, gpt-realtime-translate</td><td>Qwen3.x, Aya Expanse (non-commercial), Mistral Saba</td><td>Any cloud platform</td><td>Human review for legal or regulated text</td></tr>
+        <tr><td><b>Safety and moderation layer</b></td><td>Guard and policy classifiers</td><td>Bedrock Guardrails, Azure Content Safety, Model Armor</td><td>Llama Guard, ShieldGemma, Granite Guardian, gpt-oss-safeguard</td><td>Inline in front of and behind the main model</td><td>Test false-negative rate with your own red-team set</td></tr>
+        <tr><td><b>Healthcare imaging</b></td><td>Domain-specific medical models</td><td>MedImageInsight, CXRReportGen (Foundry)</td><td>MedGemma</td><td>Foundry, Agent Platform, self-hosted</td><td>Not for diagnosis without regulatory clearance; PHI controls</td></tr>
+        <tr><td><b>Security operations</b> (triage, code audit)</td><td>Frontier or restricted cyber models</td><td>GPT-5.5-Cyber and Daybreak (vetted access), Claude Opus 5.5</td><td>gpt-oss, Qwen3 Coder</td><td>Vendor programs, Bedrock (limited availability)</td><td>Scope to authorized assets; log all actions</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <details class="refs"><summary>References (8)</summary><ul><li><a href="https://platform.claude.com/docs/en/models/overview" target="_blank" rel="noopener">Claude models overview</a></li><li><a href="https://platform.openai.com/docs/models" target="_blank" rel="noopener">OpenAI models</a></li><li><a href="https://ai.google.dev/gemini-api/docs/changelog" target="_blank" rel="noopener">Gemini API changelog</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-cards.html" target="_blank" rel="noopener">Amazon Bedrock models at a glance</a></li><li><a href="https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure" target="_blank" rel="noopener">Foundry Models sold by Azure</a></li><li><a href="https://docs.cohere.com/docs/models" target="_blank" rel="noopener">Cohere models</a></li><li><a href="https://docs.mistral.ai/getting-started/models/" target="_blank" rel="noopener">Mistral models</a></li><li><a href="https://huggingface.co/tasks" target="_blank" rel="noopener">Hugging Face Tasks</a></li></ul></details>
+
+</div>
+</details>
+</section>
+
+<section id="landscape" class="sec">
+<details class="secd">
+<summary><span class="secno">03</span><h2>Landscape</h2><span class="secsub">Every model, hub, platform, and runtime on one map</span></summary>
+<div class="secbody">
+  <p class="lede">How the entries relate. Click any chip to jump to its detail card.</p>
+  <div class="layers" id="layers"></div>
+
+  <details class="refs"><summary>References (4)</summary><ul><li><a href="https://huggingface.co/models" target="_blank" rel="noopener">Hugging Face model hub</a></li><li><a href="https://aws.amazon.com/bedrock/" target="_blank" rel="noopener">Amazon Bedrock</a></li><li><a href="https://ai.azure.com/catalog/models" target="_blank" rel="noopener">Microsoft Foundry model catalog</a></li><li><a href="https://cloud.google.com/model-garden" target="_blank" rel="noopener">Google Cloud Model Garden</a></li></ul></details>
+
+</div>
+</details>
+</section>
+
+<section id="catalogs" class="sec">
+<details class="secd">
+<summary><span class="secno">04</span><h2>Model catalogs by platform</h2><span class="secsub">Running model lists for 13 platforms, plus an availability matrix</span></summary>
+<div class="secbody">
+  <p class="lede">A running list of what each platform offers, grouped by model type. Snapshot reviewed October 17, 2026. Catalogs change monthly; the "Live catalog" link on each platform is the source of truth. Click a platform to expand it, then expand each model type.</p>
+  <div class="cat-tools">
+    <input class="search" id="catQ" type="search" placeholder="Find a model across all platforms (e.g. qwen, embed, llama)">
+    <button type="button" id="catOpen">Expand all</button>
+    <button type="button" id="catClose">Collapse all</button>
+    <span class="cat-count" id="catCount"></span>
+  </div>
+  <div id="catList"></div>
+
+  <h3>Availability matrix: which platforms carry which model families</h3>
+  <p class="lede">Y = listed in the platform catalog as of this review. ? = expected or partial, confirm before relying on it. Blank = not found. "Native" means the model maker's own API or app.</p>
+  <div class="tbl-wrap"><table class="matrix" id="matrix"></table></div>
+
+  <details class="refs"><summary>References (17)</summary><ul><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-cards.html" target="_blank" rel="noopener">Amazon Bedrock models at a glance</a></li><li><a href="https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure" target="_blank" rel="noopener">Foundry Models sold by Azure</a></li><li><a href="https://foundrymap.fyi/models" target="_blank" rel="noopener">Foundry model map (third-party mirror)</a></li><li><a href="https://platform.claude.com/docs/en/models/overview" target="_blank" rel="noopener">Claude models overview</a></li><li><a href="https://en.wikipedia.org/wiki/GPT-5.5" target="_blank" rel="noopener">GPT-5.5 (Wikipedia)</a></li><li><a href="https://ai.google.dev/gemini-api/docs/changelog" target="_blank" rel="noopener">Gemini API changelog</a></li><li><a href="https://en.wikipedia.org/wiki/Gemini_Enterprise_Agent_Platform" target="_blank" rel="noopener">Gemini Enterprise Agent Platform (Wikipedia)</a></li><li><a href="https://docs.cloud.google.com/vertex-ai/generative-ai/docs/release-notes" target="_blank" rel="noopener">Vertex AI generative AI release notes</a></li><li><a href="https://docs.databricks.com/aws/en/machine-learning/foundation-model-apis/supported-models" target="_blank" rel="noopener">Databricks supported foundation models</a></li><li><a href="https://build.nvidia.com/models" target="_blank" rel="noopener">NVIDIA Build model catalog</a></li><li><a href="https://pasqualepillitteri.it/en/news/1621/nvidia-build-free-api-100-ai-models-2026" target="_blank" rel="noopener">NVIDIA Build free API guide (secondary)</a></li><li><a href="https://ollama.com/library" target="_blank" rel="noopener">Ollama library</a></li><li><a href="https://www.morphllm.com/best-ollama-models" target="_blank" rel="noopener">Best Ollama models (secondary)</a></li><li><a href="https://modelcompare.dev/providers/mistral" target="_blank" rel="noopener">Mistral models (modelcompare.dev)</a></li><li><a href="https://docs.cohere.com/docs/models" target="_blank" rel="noopener">Cohere models</a></li><li><a href="https://betterstack.com/community/guides/ai/xai-grok-46.md" target="_blank" rel="noopener">xAI Grok 4.6 guide (Better Stack)</a></li><li><a href="https://github.com/duanyytop/agents-radar/issues/3738" target="_blank" rel="noopener">Hugging Face trending digest, Oct 12, 2026</a></li></ul></details>
+
+</div>
+</details>
+</section>
+
+<section id="table" class="sec">
+<details class="secd">
+<summary><span class="secno">05</span><h2>Summary table</h2><span class="secsub">All 22 entries with type, usage, and primary risk; filter and search</span></summary>
+<div class="secbody">
+  <p class="lede">Filter by type or search. Each name links to its detail card. The reference column links to the provider.</p>
+  <input class="search" id="q" type="search" placeholder="Search models, providers, risks">
+  <div class="filters" id="filters"></div>
+  <div class="tbl-wrap">
+    <table id="sumTable">
+      <thead><tr><th>Model / platform</th><th>Provider</th><th>Type</th><th>Typical enterprise usage</th><th>Primary risk consideration</th><th>Reference</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <details class="refs"><summary>References (13)</summary><ul><li><a href="https://platform.openai.com/docs/models" target="_blank" rel="noopener">OpenAI models</a></li><li><a href="https://platform.claude.com/docs/en/models/overview" target="_blank" rel="noopener">Anthropic Claude</a></li><li><a href="https://ai.google.dev/gemini-api/docs/models" target="_blank" rel="noopener">Google Gemini</a></li><li><a href="https://www.llama.com/" target="_blank" rel="noopener">Meta Llama</a></li><li><a href="https://docs.mistral.ai/" target="_blank" rel="noopener">Mistral AI</a></li><li><a href="https://www.deepseek.com/" target="_blank" rel="noopener">DeepSeek</a></li><li><a href="https://qwen.ai/" target="_blank" rel="noopener">Qwen</a></li><li><a href="https://docs.cohere.com/docs/models" target="_blank" rel="noopener">Cohere</a></li><li><a href="https://docs.x.ai/" target="_blank" rel="noopener">xAI</a></li><li><a href="https://azure.microsoft.com/en-us/products/phi" target="_blank" rel="noopener">Microsoft Phi</a></li><li><a href="https://ai.google.dev/gemma" target="_blank" rel="noopener">Google Gemma</a></li><li><a href="https://www.ibm.com/granite" target="_blank" rel="noopener">IBM Granite</a></li><li><a href="https://falconllm.tii.ae/" target="_blank" rel="noopener">TII Falcon</a></li></ul></details>
+
+</div>
+</details>
+</section>
+
+<section id="details" class="sec">
+<details class="secd">
+<summary><span class="secno">06</span><h2>Model and platform details</h2><span class="secsub">One collapsible card per entry: variants, deployment, risks, controls</span></summary>
+<div class="secbody">
+  <p class="lede">One card per entry: what it is, variants, deployment options, enterprise uses, risks, and controls.</p>
+  <div class="cat-tools"><button type="button" id="dOpen">Expand all cards</button><button type="button" id="dClose">Collapse all cards</button></div>
+  <div class="grid" id="detailGrid"></div>
+
+  <details class="refs"><summary>References (8)</summary><ul><li><a href="https://huggingface.co/docs/hub/security" target="_blank" rel="noopener">Hugging Face Hub security</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html" target="_blank" rel="noopener">Amazon Bedrock user guide</a></li><li><a href="https://learn.microsoft.com/en-us/azure/ai-foundry/" target="_blank" rel="noopener">Microsoft Foundry docs</a></li><li><a href="https://cloud.google.com/model-garden" target="_blank" rel="noopener">Google Cloud Model Garden</a></li><li><a href="https://www.databricks.com/product/artificial-intelligence" target="_blank" rel="noopener">Databricks AI</a></li><li><a href="https://developer.nvidia.com/nim" target="_blank" rel="noopener">NVIDIA NIM</a></li><li><a href="https://github.com/ollama/ollama" target="_blank" rel="noopener">Ollama on GitHub</a></li><li><a href="https://docs.vllm.ai/" target="_blank" rel="noopener">vLLM documentation</a></li></ul></details>
+
+</div>
+</details>
+</section>
+
+<section id="hf" class="sec">
+<details class="secd">
+<summary><span class="secno">07</span><h2>Hugging Face deep dive</h2><span class="secsub">What the Hub hosts, model task types, the derivative tree, and file-format risk</span></summary>
+<div class="secbody">
+  <p class="lede">Hugging Face Hub hosts models, datasets, and Spaces (hosted demo apps). Most open-weight models in this guide are published there, along with a much larger set of community fine-tunes, adapters, quantizations, and merges.</p>
+
+  <h3>1. What the Hub hosts</h3>
+  <div class="svgbox">
+  <svg class="diagram" viewBox="0 0 1100 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hugging Face Hub artifact types">
+    <style>
+      .bx{fill:var(--card);stroke:var(--line);stroke-width:1.5}
+      .bxp{fill:var(--petrol);}
+      .tw{fill:#fff;font:600 15px Inter,Calibri,sans-serif}
+      .tt{fill:var(--ink);font:600 14px Inter,Calibri,sans-serif}
+      .ts{fill:var(--muted);font:12px Inter,Calibri,sans-serif}
+      .ln{stroke:var(--muted);stroke-width:1.5;fill:none}
+      .ra{fill:var(--hi);font:600 11px Inter,Calibri,sans-serif}
+    </style>
+    <rect x="420" y="10" width="260" height="46" rx="8" class="bxp"/>
+    <text x="550" y="39" text-anchor="middle" class="tw">Hugging Face Hub</text>
+    <path d="M550 56 V80 H180 V100 M550 80 V100 M550 80 H920 V100" class="ln"/>
+    <rect x="30" y="100" width="300" height="118" rx="8" class="bx"/>
+    <text x="180" y="124" text-anchor="middle" class="tt">Models</text>
+    <text x="45" y="148" class="ts">Weights, config, tokenizer, model card</text>
+    <text x="45" y="166" class="ts">Optional custom Python code</text>
+    <text x="45" y="184" class="ts">Base, fine-tune, adapter, quantized, merge</text>
+    <text x="45" y="206" class="ra">Risk: unsafe formats, remote code, provenance</text>
+    <rect x="400" y="100" width="300" height="118" rx="8" class="bx"/>
+    <text x="550" y="124" text-anchor="middle" class="tt">Datasets</text>
+    <text x="415" y="148" class="ts">Training, fine-tuning, and eval data</text>
+    <text x="415" y="166" class="ts">Parquet, JSON, CSV, images, audio</text>
+    <text x="415" y="184" class="ts">Optional loading scripts</text>
+    <text x="415" y="206" class="ra">Risk: poisoning, PII, license, scripts</text>
+    <rect x="770" y="100" width="300" height="118" rx="8" class="bx"/>
+    <text x="920" y="124" text-anchor="middle" class="tt">Spaces</text>
+    <text x="785" y="148" class="ts">Hosted demo apps (Gradio, Streamlit,</text>
+    <text x="785" y="166" class="ts">Docker, static)</text>
+    <text x="785" y="184" class="ts">Inference Endpoints are a separate paid service</text>
+    <text x="785" y="206" class="ra">Risk: data pasted into third-party demos</text>
+  </svg>
+  </div>
+
+  <h3>2. Model types by task (Hub task taxonomy)</h3>
+  <p class="lede">The Hub tags each model with a pipeline task. LLMs are only one branch. Embedding, vision, speech, and document models often enter the enterprise quietly through RAG pipelines and document processing.</p>
+  <div class="svgbox">
+  <svg class="diagram" viewBox="0 0 1100 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hugging Face model task taxonomy">
+    <style>
+      .hd{font:600 14px Inter,Calibri,sans-serif;fill:#fff}
+      .it{font:12.5px Inter,Calibri,sans-serif;fill:var(--ink)}
+      .ib{fill:var(--bg);stroke:var(--line)}
+      .ex{font:italic 11px Inter,Calibri,sans-serif;fill:var(--muted)}
+      .ln2{stroke:var(--muted);stroke-width:1.2;fill:none}
+    </style>
+    <rect x="440" y="8" width="220" height="40" rx="8" fill="var(--petrol)"/>
+    <text x="550" y="33" text-anchor="middle" class="hd">Models on the Hub</text>
+    <path d="M550 48 V64 H94 V80 M550 64 H276 V80 M550 64 H458 V80 M550 64 V80 M550 64 H642 V80 M550 64 H824 V80 M550 64 H1006 V80" class="ln2"/>
+    <!-- columns: x centers 94,276,458,642(824..),1006 ; use 6 columns width 170 -->
+    <g>
+      <rect x="12" y="80" width="164" height="36" rx="6" fill="#6b4fbf"/><text x="94" y="103" text-anchor="middle" class="hd">Text / NLP</text>
+      <g class="it">
+        <rect x="12" y="124" width="164" height="26" rx="5" class="ib"/><text x="20" y="141">Text generation (LLMs)</text>
+        <rect x="12" y="154" width="164" height="26" rx="5" class="ib"/><text x="20" y="171">Feature extraction</text>
+        <rect x="12" y="184" width="164" height="26" rx="5" class="ib"/><text x="20" y="201">Sentence similarity</text>
+        <rect x="12" y="214" width="164" height="26" rx="5" class="ib"/><text x="20" y="231">Text classification</text>
+        <rect x="12" y="244" width="164" height="26" rx="5" class="ib"/><text x="20" y="261">Token classification</text>
+        <rect x="12" y="274" width="164" height="26" rx="5" class="ib"/><text x="20" y="291">Question answering</text>
+        <rect x="12" y="304" width="164" height="26" rx="5" class="ib"/><text x="20" y="321">Summarization</text>
+        <rect x="12" y="334" width="164" height="26" rx="5" class="ib"/><text x="20" y="351">Translation</text>
+        <rect x="12" y="364" width="164" height="26" rx="5" class="ib"/><text x="20" y="381">Zero-shot / fill-mask</text>
+      </g>
+      <text x="14" y="408" class="ex">e.g. Llama, Qwen, Mistral,</text>
+      <text x="14" y="423" class="ex">embedding and reranker models,</text>
+      <text x="14" y="438" class="ex">NER and sentiment classifiers</text>
+    </g>
+    <g>
+      <rect x="194" y="80" width="164" height="36" rx="6" fill="#2c6e91"/><text x="276" y="103" text-anchor="middle" class="hd">Computer vision</text>
+      <g class="it">
+        <rect x="194" y="124" width="164" height="26" rx="5" class="ib"/><text x="202" y="141">Image classification</text>
+        <rect x="194" y="154" width="164" height="26" rx="5" class="ib"/><text x="202" y="171">Object detection</text>
+        <rect x="194" y="184" width="164" height="26" rx="5" class="ib"/><text x="202" y="201">Image segmentation</text>
+        <rect x="194" y="214" width="164" height="26" rx="5" class="ib"/><text x="202" y="231">Depth estimation</text>
+        <rect x="194" y="244" width="164" height="26" rx="5" class="ib"/><text x="202" y="261">Text-to-image</text>
+        <rect x="194" y="274" width="164" height="26" rx="5" class="ib"/><text x="202" y="291">Image-to-image</text>
+        <rect x="194" y="304" width="164" height="26" rx="5" class="ib"/><text x="202" y="321">Video classification</text>
+        <rect x="194" y="334" width="164" height="26" rx="5" class="ib"/><text x="202" y="351">Text-to-video</text>
+      </g>
+      <text x="196" y="378" class="ex">e.g. ViT, DETR, YOLO variants,</text>
+      <text x="196" y="393" class="ex">diffusion models</text>
+    </g>
+    <g>
+      <rect x="376" y="80" width="164" height="36" rx="6" fill="#B45309"/><text x="458" y="103" text-anchor="middle" class="hd">Audio</text>
+      <g class="it">
+        <rect x="376" y="124" width="164" height="26" rx="5" class="ib"/><text x="384" y="141">Speech recognition</text>
+        <rect x="376" y="154" width="164" height="26" rx="5" class="ib"/><text x="384" y="171">Text-to-speech</text>
+        <rect x="376" y="184" width="164" height="26" rx="5" class="ib"/><text x="384" y="201">Audio classification</text>
+        <rect x="376" y="214" width="164" height="26" rx="5" class="ib"/><text x="384" y="231">Voice activity detection</text>
+        <rect x="376" y="244" width="164" height="26" rx="5" class="ib"/><text x="384" y="261">Audio-to-audio</text>
+      </g>
+      <text x="378" y="288" class="ex">e.g. Whisper, speech</text>
+      <text x="378" y="303" class="ex">synthesis models.</text>
+      <text x="378" y="318" class="ex">Voice cloning raises</text>
+      <text x="378" y="333" class="ex">fraud and consent risk.</text>
+    </g>
+    <g>
+      <rect x="558" y="80" width="164" height="36" rx="6" fill="#1b4965"/><text x="640" y="103" text-anchor="middle" class="hd">Multimodal</text>
+      <g class="it">
+        <rect x="558" y="124" width="164" height="26" rx="5" class="ib"/><text x="566" y="141">Image-text-to-text</text>
+        <rect x="558" y="154" width="164" height="26" rx="5" class="ib"/><text x="566" y="171">Visual question answer</text>
+        <rect x="558" y="184" width="164" height="26" rx="5" class="ib"/><text x="566" y="201">Document QA</text>
+        <rect x="558" y="214" width="164" height="26" rx="5" class="ib"/><text x="566" y="231">Image-to-text</text>
+        <rect x="558" y="244" width="164" height="26" rx="5" class="ib"/><text x="566" y="261">Any-to-any</text>
+      </g>
+      <text x="560" y="288" class="ex">e.g. vision-language models,</text>
+      <text x="560" y="303" class="ex">OCR and document parsers.</text>
+      <text x="560" y="318" class="ex">Prompt injection can hide</text>
+      <text x="560" y="333" class="ex">inside images and PDFs.</text>
+    </g>
+    <g>
+      <rect x="740" y="80" width="164" height="36" rx="6" fill="#2f7d4f"/><text x="822" y="103" text-anchor="middle" class="hd">Tabular / time series</text>
+      <g class="it">
+        <rect x="740" y="124" width="164" height="26" rx="5" class="ib"/><text x="748" y="141">Tabular classification</text>
+        <rect x="740" y="154" width="164" height="26" rx="5" class="ib"/><text x="748" y="171">Tabular regression</text>
+        <rect x="740" y="184" width="164" height="26" rx="5" class="ib"/><text x="748" y="201">Time series forecasting</text>
+      </g>
+      <text x="742" y="228" class="ex">Often scikit-learn or</text>
+      <text x="742" y="243" class="ex">joblib pickles: treat as</text>
+      <text x="742" y="258" class="ex">executable code.</text>
+    </g>
+    <g>
+      <rect x="922" y="80" width="164" height="36" rx="6" fill="#5a6773"/><text x="1004" y="103" text-anchor="middle" class="hd">RL / robotics</text>
+      <g class="it">
+        <rect x="922" y="124" width="164" height="26" rx="5" class="ib"/><text x="930" y="141">Reinforcement learning</text>
+        <rect x="922" y="154" width="164" height="26" rx="5" class="ib"/><text x="930" y="171">Robotics policies</text>
+      </g>
+      <text x="924" y="198" class="ex">Physical safety risk when</text>
+      <text x="924" y="213" class="ex">policies drive actuators.</text>
+    </g>
+  </svg>
+  </div>
+
+  <h3>3. Model variants and the provenance chain (Hub "model tree")</h3>
+  <p class="lede">The Hub links derivatives back to a base model. Every step is a new publisher and a new trust decision. A quantized file from an unknown account is not the same artifact as the vendor's base model, even if the name matches.</p>
+  <div class="svgbox">
+  <svg class="diagram" viewBox="0 0 1100 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Model derivative tree">
+    <style>
+      .nb{fill:var(--card);stroke:var(--petrol-2);stroke-width:1.5}
+      .nt{font:600 13.5px Inter,Calibri,sans-serif;fill:var(--ink)}
+      .ns{font:11.5px Inter,Calibri,sans-serif;fill:var(--muted)}
+      .ar{stroke:var(--amber);stroke-width:2;fill:none;marker-end:url(#ah)}
+    </style>
+    <defs><marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--amber)"/></marker></defs>
+    <rect x="20" y="95" width="190" height="64" rx="8" class="nb" style="stroke:var(--petrol);stroke-width:2.5"/>
+    <text x="115" y="120" text-anchor="middle" class="nt">Base model</text>
+    <text x="115" y="140" text-anchor="middle" class="ns">Vendor org account</text>
+    <path d="M210 127 C250 127 250 45 300 45" class="ar"/>
+    <path d="M210 127 H300" class="ar"/>
+    <path d="M210 127 C250 127 250 210 300 210" class="ar"/>
+    <rect x="300" y="15" width="200" height="60" rx="8" class="nb"/>
+    <text x="400" y="40" text-anchor="middle" class="nt">Fine-tune</text>
+    <text x="400" y="59" text-anchor="middle" class="ns">Instruct, chat, domain tuned</text>
+    <rect x="300" y="97" width="200" height="60" rx="8" class="nb"/>
+    <text x="400" y="122" text-anchor="middle" class="nt">Adapter (LoRA / PEFT)</text>
+    <text x="400" y="141" text-anchor="middle" class="ns">Small delta loaded on base</text>
+    <rect x="300" y="180" width="200" height="60" rx="8" class="nb"/>
+    <text x="400" y="205" text-anchor="middle" class="nt">Merge</text>
+    <text x="400" y="224" text-anchor="middle" class="ns">Weights combined from models</text>
+    <path d="M500 45 C540 45 540 127 590 127" class="ar"/>
+    <path d="M500 127 H590" class="ar"/>
+    <path d="M500 210 C540 210 540 127 590 127" class="ar"/>
+    <rect x="590" y="90" width="210" height="74" rx="8" class="nb"/>
+    <text x="695" y="116" text-anchor="middle" class="nt">Quantization</text>
+    <text x="695" y="135" text-anchor="middle" class="ns">GGUF, AWQ, GPTQ, MLX, 4/8-bit</text>
+    <text x="695" y="152" text-anchor="middle" class="ns">Often third-party uploads</text>
+    <path d="M800 127 H860" class="ar"/>
+    <rect x="860" y="90" width="220" height="74" rx="8" class="nb" style="stroke:var(--hi)"/>
+    <text x="970" y="116" text-anchor="middle" class="nt">Runs in your environment</text>
+    <text x="970" y="135" text-anchor="middle" class="ns">Ollama, vLLM, llama.cpp, NIM</text>
+    <text x="970" y="152" text-anchor="middle" class="ns">You own the risk from here</text>
+  </svg>
+  </div>
+
+  <h3>4. File formats and load-time risk</h3>
+  <p class="lede">Some formats are data only. Others run code when loaded. This chart rates the risk of loading an untrusted file, not the model's behavior.</p>
+  <div class="svgbox">
+  <svg class="diagram" viewBox="0 0 1100 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Model file format risk">
+    <style>
+      .fl{font:600 13px Inter,Calibri,sans-serif;fill:var(--ink)}
+      .fs{font:11.5px Inter,Calibri,sans-serif;fill:var(--muted)}
+      .gl{stroke:var(--line);stroke-width:1}
+      .ax{font:11px Inter,Calibri,sans-serif;fill:var(--muted)}
+    </style>
+    <line x1="260" y1="20" x2="260" y2="300" class="gl"/>
+    <line x1="510" y1="20" x2="510" y2="300" class="gl" stroke-dasharray="3 3"/>
+    <line x1="760" y1="20" x2="760" y2="300" class="gl" stroke-dasharray="3 3"/>
+    <text x="385" y="318" text-anchor="middle" class="ax">Low (data only)</text>
+    <text x="635" y="318" text-anchor="middle" class="ax">Medium (parser bugs, limited code)</text>
+    <text x="885" y="318" text-anchor="middle" class="ax">High (arbitrary code on load)</text>
+    <g>
+      <text x="250" y="42" text-anchor="end" class="fl">Safetensors</text>
+      <rect x="260" y="28" width="120" height="22" rx="4" fill="var(--lo)"/>
+      <text x="390" y="44" class="fs">Tensors only. Preferred default.</text>
+
+      <text x="250" y="80" text-anchor="end" class="fl">GGUF</text>
+      <rect x="260" y="66" width="300" height="22" rx="4" fill="var(--amber)"/>
+      <text x="570" y="82" class="fs">Data format, but parser vulnerabilities have occurred in runtimes</text>
+
+      <text x="250" y="118" text-anchor="end" class="fl">ONNX</text>
+      <rect x="260" y="104" width="280" height="22" rx="4" fill="var(--amber)"/>
+      <text x="550" y="120" class="fs">Graph format; custom operators can load native code</text>
+
+      <text x="250" y="156" text-anchor="end" class="fl">Keras (.keras / .h5)</text>
+      <rect x="260" y="142" width="520" height="22" rx="4" fill="var(--hi)" opacity=".75"/>
+      <text x="790" y="158" class="fs">Lambda layers can embed code; use safe mode</text>
+
+      <text x="250" y="194" text-anchor="end" class="fl">PyTorch pickle (.bin/.pt)</text>
+      <rect x="260" y="180" width="700" height="22" rx="4" fill="var(--hi)"/>
+      <text x="970" y="196" class="fs">Pickle runs code</text>
+
+      <text x="250" y="232" text-anchor="end" class="fl">joblib / .pkl (sklearn)</text>
+      <rect x="260" y="218" width="700" height="22" rx="4" fill="var(--hi)"/>
+      <text x="970" y="234" class="fs">Pickle runs code</text>
+
+      <text x="250" y="270" text-anchor="end" class="fl">trust_remote_code repos</text>
+      <rect x="260" y="256" width="740" height="22" rx="4" fill="var(--hi)"/>
+      <text x="1010" y="272" class="fs">Runs repo Python</text>
+    </g>
+  </svg>
+  </div>
+
+  <h3>5. Practical Hugging Face controls</h3>
+  <div class="two">
+    <div class="card">
+      <h4 style="margin:0 0 6px;color:var(--petrol)">Policy-level requirements</h4>
+      <ul class="check">
+        <li>Models and datasets must come from approved publisher accounts (the vendor's official organization) unless a reviewer approves an exception.</li>
+        <li>Teams must record the model ID, commit hash, license, and source for every model used in production.</li>
+        <li>Teams must not load pickle-based weights or enable remote code from unapproved sources.</li>
+        <li>Personnel must not paste confidential data into public Spaces.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4 style="margin:0 0 6px;color:var(--petrol)">Implementation guidance</h4>
+      <ul class="check">
+        <li>Pin downloads with <code>revision=&lt;commit hash&gt;</code>, not a branch name.</li>
+        <li>Prefer <code>use_safetensors=True</code>; keep <code>trust_remote_code=False</code> by default.</li>
+        <li>Review the Hub's file security scan results before use; add a pickle scanner such as ModelScan or picklescan in CI.</li>
+        <li>Mirror approved models to a private S3 bucket or internal registry and load only from there in production.</li>
+        <li>Read the model card for training data, limitations, and license (Llama, Gemma, and others have custom terms).</li>
+        <li>Track models in your SBOM or AIBOM alongside software dependencies.</li>
+      </ul>
+    </div>
+  </div>
+
+  <details class="refs"><summary>References (7)</summary><ul><li><a href="https://huggingface.co/tasks" target="_blank" rel="noopener">Hugging Face Tasks</a></li><li><a href="https://huggingface.co/docs/hub/security" target="_blank" rel="noopener">Hugging Face Hub security</a></li><li><a href="https://huggingface.co/docs/safetensors" target="_blank" rel="noopener">Safetensors documentation</a></li><li><a href="https://huggingface.co/docs/hub/model-cards" target="_blank" rel="noopener">Model cards</a></li><li><a href="https://github.com/protectai/modelscan" target="_blank" rel="noopener">ModelScan (Protect AI)</a></li><li><a href="https://github.com/mmaitre314/picklescan" target="_blank" rel="noopener">picklescan</a></li><li><a href="https://github.com/duanyytop/agents-radar/issues/3738" target="_blank" rel="noopener">Trending models digest, Oct 12, 2026</a></li></ul></details>
+
+</div>
+</details>
+</section>
+
+<section id="bedrock" class="sec">
+<details class="secd">
+<summary><span class="secno">08</span><h2>Amazon Bedrock deep dive</h2><span class="secsub">Reference architecture, capabilities, and a right-sized control set</span></summary>
+<div class="secbody">
+  <p class="lede">Amazon Bedrock is a managed AWS service that gives one API to many foundation models, plus building blocks for RAG, agents, guardrails, customization, and evaluation. It is a platform, not a model. AWS documentation lists 100+ foundation models from providers including Amazon, Anthropic, DeepSeek, Moonshot AI, MiniMax, OpenAI, and xAI, and the catalog changes frequently. AWS also added an OpenAI API-compatible endpoint (<code>bedrock-mantle</code>, powered by Project Mantle) alongside the native <code>bedrock-runtime</code> endpoint.</p>
+
+  <h3>1. Reference architecture</h3>
+  <div class="svgbox">
+  <svg class="diagram" viewBox="0 0 1100 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Amazon Bedrock reference architecture">
+    <style>
+      .b1{fill:var(--card);stroke:var(--line);stroke-width:1.5}
+      .b2{fill:var(--petrol-soft);stroke:var(--petrol);stroke-width:2}
+      .b3{fill:var(--card);stroke:var(--petrol-2);stroke-width:1.3}
+      .b4{fill:var(--amber-soft);stroke:var(--amber);stroke-width:1.5}
+      .tl{font:600 13.5px Inter,Calibri,sans-serif;fill:var(--ink)}
+      .tp{font:700 15px Inter,Calibri,sans-serif;fill:var(--petrol)}
+      .tsm{font:11.5px Inter,Calibri,sans-serif;fill:var(--muted)}
+      .fa{stroke:var(--petrol-2);stroke-width:2;fill:none;marker-end:url(#bh)}
+      .fd{stroke:var(--muted);stroke-width:1.4;fill:none;stroke-dasharray:5 4;marker-end:url(#bh2)}
+    </style>
+    <defs>
+      <marker id="bh" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--petrol-2)"/></marker>
+      <marker id="bh2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--muted)"/></marker>
+    </defs>
+    <!-- VPC -->
+    <rect x="15" y="20" width="250" height="340" rx="10" class="b1" stroke-dasharray="6 4"/>
+    <text x="30" y="44" class="tp">Your VPC</text>
+    <rect x="35" y="62" width="210" height="64" rx="8" class="b3"/>
+    <text x="140" y="88" text-anchor="middle" class="tl">Application workload</text>
+    <text x="140" y="107" text-anchor="middle" class="tsm">ECS, Lambda, EC2, EKS</text>
+    <rect x="35" y="146" width="210" height="64" rx="8" class="b3"/>
+    <text x="140" y="172" text-anchor="middle" class="tl">IAM role (least privilege)</text>
+    <text x="140" y="191" text-anchor="middle" class="tsm">Allowed model ARNs only</text>
+    <rect x="35" y="230" width="210" height="64" rx="8" class="b4"/>
+    <text x="140" y="256" text-anchor="middle" class="tl">VPC interface endpoint</text>
+    <text x="140" y="275" text-anchor="middle" class="tsm">AWS PrivateLink, no internet</text>
+    <path d="M140 126 V146" class="fa"/><path d="M140 210 V230" class="fa"/>
+    <path d="M245 262 H300" class="fa"/>
+
+    <!-- Bedrock -->
+    <rect x="300" y="20" width="510" height="340" rx="10" class="b2"/>
+    <text x="318" y="46" class="tp">Amazon Bedrock</text>
+    <rect x="318" y="62" width="230" height="74" rx="8" class="b3"/>
+    <text x="433" y="86" text-anchor="middle" class="tl">Runtime APIs</text>
+    <text x="433" y="104" text-anchor="middle" class="tsm">InvokeModel, Converse</text>
+    <text x="433" y="120" text-anchor="middle" class="tsm">OpenAI-compatible endpoint</text>
+    <rect x="562" y="62" width="230" height="74" rx="8" class="b4"/>
+    <text x="677" y="86" text-anchor="middle" class="tl">Guardrails</text>
+    <text x="677" y="104" text-anchor="middle" class="tsm">Content filters, denied topics,</text>
+    <text x="677" y="120" text-anchor="middle" class="tsm">PII redaction, grounding checks</text>
+    <rect x="318" y="150" width="230" height="74" rx="8" class="b3"/>
+    <text x="433" y="174" text-anchor="middle" class="tl">Knowledge Bases</text>
+    <text x="433" y="192" text-anchor="middle" class="tsm">Managed RAG: ingest, chunk,</text>
+    <text x="433" y="208" text-anchor="middle" class="tsm">embed, retrieve</text>
+    <rect x="562" y="150" width="230" height="74" rx="8" class="b3"/>
+    <text x="677" y="174" text-anchor="middle" class="tl">Agents / AgentCore</text>
+    <text x="677" y="192" text-anchor="middle" class="tsm">Tool calling, runtime, memory,</text>
+    <text x="677" y="208" text-anchor="middle" class="tsm">identity, gateway</text>
+    <rect x="318" y="238" width="230" height="64" rx="8" class="b3"/>
+    <text x="433" y="263" text-anchor="middle" class="tl">Model customization</text>
+    <text x="433" y="282" text-anchor="middle" class="tsm">Fine-tuning, distillation, import</text>
+    <rect x="562" y="238" width="230" height="64" rx="8" class="b3"/>
+    <text x="677" y="263" text-anchor="middle" class="tl">Evaluation</text>
+    <text x="677" y="282" text-anchor="middle" class="tsm">Model and RAG evaluation jobs</text>
+    <text x="318" y="330" class="tsm">Throughput: on-demand, batch, provisioned; inference profiles route In-Region, Geo, or Global</text>
+
+    <!-- Models -->
+    <rect x="850" y="20" width="235" height="340" rx="10" class="b1"/>
+    <text x="866" y="46" class="tp">Foundation models</text>
+    <text x="866" y="70" class="tsm">Served inside AWS. Examples:</text>
+    <g class="tl" style="font-weight:500;font-size:12.5px">
+      <text x="866" y="96">Amazon Nova (text, image, video, speech)</text>
+      <text x="866" y="118">Anthropic Claude</text>
+      <text x="866" y="140">OpenAI GPT and gpt-oss</text>
+      <text x="866" y="162">Meta Llama</text>
+      <text x="866" y="184">Mistral AI</text>
+      <text x="866" y="206">Cohere Command, Embed, Rerank</text>
+      <text x="866" y="228">DeepSeek, Qwen, Kimi, MiniMax</text>
+      <text x="866" y="250">xAI Grok</text>
+      <text x="866" y="272">AI21, Stability AI, Writer</text>
+      <text x="866" y="294">Google Gemma, NVIDIA Nemotron</text>
+    </g>
+    <text x="866" y="326" class="tsm">Check the model card for</text>
+    <text x="866" y="342" class="tsm">Region and feature support</text>
+    <path d="M810 190 H850" class="fa"/>
+
+    <!-- Bottom services -->
+    <rect x="15" y="395" width="1070" height="110" rx="10" class="b1"/>
+    <text x="30" y="419" class="tp">Supporting AWS services</text>
+    <rect x="30" y="432" width="195" height="60" rx="8" class="b3"/><text x="127" y="456" text-anchor="middle" class="tl">S3 + vector store</text><text x="127" y="476" text-anchor="middle" class="tsm">OpenSearch, Aurora, S3 Vectors</text>
+    <rect x="240" y="432" width="195" height="60" rx="8" class="b3"/><text x="337" y="456" text-anchor="middle" class="tl">Lambda / APIs</text><text x="337" y="476" text-anchor="middle" class="tsm">Agent tools and actions</text>
+    <rect x="450" y="432" width="195" height="60" rx="8" class="b3"/><text x="547" y="456" text-anchor="middle" class="tl">AWS KMS</text><text x="547" y="476" text-anchor="middle" class="tsm">Customer managed keys</text>
+    <rect x="660" y="432" width="195" height="60" rx="8" class="b3"/><text x="757" y="456" text-anchor="middle" class="tl">CloudTrail</text><text x="757" y="476" text-anchor="middle" class="tsm">API activity audit</text>
+    <rect x="870" y="432" width="200" height="60" rx="8" class="b4"/><text x="970" y="456" text-anchor="middle" class="tl">Invocation logging</text><text x="970" y="476" text-anchor="middle" class="tsm">CloudWatch / S3 (holds prompts)</text>
+    <path d="M433 224 C433 360 127 360 127 432" class="fd"/>
+    <path d="M677 224 C677 370 337 370 337 432" class="fd"/>
+    <path d="M760 302 V360 C760 380 970 380 970 432" class="fd"/>
+  </svg>
+  </div>
+
+  <h3>2. Bedrock capabilities and their security meaning</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Capability</th><th>What it does</th><th>Security consideration</th></tr></thead>
+      <tbody>
+        <tr><td><b>Model catalog</b></td><td>One API for many providers' models, served in AWS.</td><td>Restrict which model IDs each role can call. Review each provider's EULA and acceptable use terms.</td></tr>
+        <tr><td><b>Data handling</b></td><td>AWS states prompts and outputs are not used to train base models or shared with model providers.</td><td>Keep this claim tied to AWS documentation in vendor files. Fine-tuning data stays in your account.</td></tr>
+        <tr><td><b>Cross-Region inference</b></td><td>Inference profiles route requests across Regions within a geography (Geo) or worldwide (Global).</td><td>Global routing can process data outside your home geography. Choose In-Region or Geo where residency matters.</td></tr>
+        <tr><td><b>Guardrails</b></td><td>Content filters, denied topics, word filters, PII detection and redaction, contextual grounding, prompt attack detection.</td><td>Reduces, but does not eliminate, prompt injection and data leakage. Test with your own red-team prompts.</td></tr>
+        <tr><td><b>Knowledge Bases</b></td><td>Managed RAG over S3 and other sources into a vector store.</td><td>Retrieval does not enforce source-document permissions by default. Use metadata filters or separate knowledge bases per audience.</td></tr>
+        <tr><td><b>Agents and AgentCore</b></td><td>Tool-calling agents, managed runtime, memory, identity, and tool gateway.</td><td>Agent execution roles and Lambda tools are the blast radius. Scope each tool narrowly; require approval for destructive actions.</td></tr>
+        <tr><td><b>Customization</b></td><td>Fine-tuning, distillation, continued pretraining, custom model import.</td><td>Training data governance; imported weights carry provenance risk. Encrypt with KMS.</td></tr>
+        <tr><td><b>Invocation logging</b></td><td>Logs full prompts and responses to CloudWatch Logs or S3.</td><td>Off by default. When on, logs contain sensitive data: restrict access, encrypt, and set retention.</td></tr>
+        <tr><td><b>Networking</b></td><td>VPC interface endpoints via PrivateLink.</td><td>Combine with endpoint policies and <code>aws:SourceVpce</code> conditions to block calls from outside the VPC.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>3. Right-sized Bedrock control set for a small team</h3>
+  <div class="two">
+    <div class="card">
+      <h4 style="margin:0 0 6px;color:var(--petrol)">Must have</h4>
+      <ol class="check">
+        <li>IAM policies that allow <code>bedrock:InvokeModel*</code> and <code>bedrock:Converse*</code> only on approved model and inference profile ARNs.</li>
+        <li>An SCP in AWS Organizations that denies unapproved models and Regions.</li>
+        <li>CloudTrail enabled for all Regions (already a SOC 2 baseline control).</li>
+        <li>Model invocation logging to a KMS-encrypted S3 bucket with a defined retention period, if you need prompt-level evidence.</li>
+        <li>A Guardrail attached to any customer-facing or agent flow.</li>
+        <li>AWS Budgets alert on Bedrock spend.</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h4 style="margin:0 0 6px;color:var(--petrol)">Add as usage grows</h4>
+      <ol class="check">
+        <li>PrivateLink endpoint for <code>bedrock-runtime</code> with an endpoint policy.</li>
+        <li>Separate AWS accounts for dev and prod Bedrock workloads.</li>
+        <li>Per-tenant Knowledge Bases or metadata filtering for multi-tenant RAG.</li>
+        <li>AWS Config rules or Security Hub checks for Bedrock settings.</li>
+        <li>Scheduled evaluation jobs to detect quality regressions after model version changes.</li>
+      </ol>
+    </div>
+  </div>
+
+  <details class="refs"><summary>References (10)</summary><ul><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html" target="_blank" rel="noopener">What is Amazon Bedrock</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-cards.html" target="_blank" rel="noopener">Models at a glance</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/data-protection.html" target="_blank" rel="noopener">Data protection</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference.html" target="_blank" rel="noopener">Cross-Region inference</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-invocation-logging.html" target="_blank" rel="noopener">Model invocation logging</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/vpc-interface-endpoints.html" target="_blank" rel="noopener">VPC interface endpoints (PrivateLink)</a></li><li><a href="https://aws.amazon.com/bedrock/guardrails/" target="_blank" rel="noopener">Bedrock Guardrails</a></li><li><a href="https://aws.amazon.com/bedrock/agentcore/" target="_blank" rel="noopener">Bedrock AgentCore</a></li><li><a href="https://aws.amazon.com/about-aws/whats-new/2026/02/amazon-bedrock-adds-support-six-open-weights-models" target="_blank" rel="noopener">Six open-weight models and Project Mantle (Feb 2026)</a></li><li><a href="https://hidekazu-konishi.com/entry/amazon_bedrock_model_catalog_2026.html" target="_blank" rel="noopener">Bedrock catalog 2026 snapshot (secondary)</a></li></ul></details>
+
+</div>
+</details>
+</section>
+
+<section id="clouds" class="sec">
+<details class="secd">
+<summary><span class="secno">09</span><h2>Cloud platform comparison</h2><span class="secsub">Bedrock, Microsoft Foundry, and Google Cloud building blocks side by side</span></summary>
+<div class="secbody">
+  <p class="lede">The three hyperscaler AI platforms offer similar building blocks under different names.</p>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Building block</th><th>Amazon Bedrock</th><th>Microsoft Foundry</th><th>Google Cloud (Gemini Enterprise Agent Platform, formerly Vertex AI)</th></tr></thead>
+      <tbody>
+        <tr><td>Model catalog</td><td>Bedrock model catalog (multi-provider)</td><td>Foundry model catalog, including Azure OpenAI</td><td>Model Garden, Gemini, partner and open models</td></tr>
+        <tr><td>Safety filtering</td><td>Bedrock Guardrails</td><td>Azure AI Content Safety, Prompt Shields</td><td>Gemini safety filters, Model Armor</td></tr>
+        <tr><td>Managed RAG</td><td>Knowledge Bases</td><td>Azure AI Search integration</td><td>Vertex AI Search, RAG Engine</td></tr>
+        <tr><td>Agents</td><td>Bedrock Agents, AgentCore</td><td>Foundry Agent Service</td><td>Vertex AI Agent Builder, Agent Engine</td></tr>
+        <tr><td>Private networking</td><td>AWS PrivateLink</td><td>Azure Private Endpoint</td><td>Private Service Connect, VPC Service Controls</td></tr>
+        <tr><td>Identity</td><td>AWS IAM, SCPs</td><td>Microsoft Entra ID, Azure RBAC</td><td>Google Cloud IAM, Org Policy</td></tr>
+        <tr><td>Audit</td><td>CloudTrail, invocation logging</td><td>Azure Monitor, diagnostic logs</td><td>Cloud Audit Logs, request-response logging</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="lede" style="margin-top:10px">Product names in this space change often. Azure AI Foundry is now Microsoft Foundry, and Google renamed Vertex AI to Gemini Enterprise Agent Platform in April 2026.</p>
+
+  <details class="refs"><summary>References (6)</summary><ul><li><a href="https://aws.amazon.com/bedrock/" target="_blank" rel="noopener">Amazon Bedrock</a></li><li><a href="https://learn.microsoft.com/en-us/azure/ai-foundry/" target="_blank" rel="noopener">Microsoft Foundry docs</a></li><li><a href="https://learn.microsoft.com/en-us/azure/ai-services/content-safety/" target="_blank" rel="noopener">Azure AI Content Safety</a></li><li><a href="https://en.wikipedia.org/wiki/Gemini_Enterprise_Agent_Platform" target="_blank" rel="noopener">Gemini Enterprise Agent Platform (Wikipedia)</a></li><li><a href="https://cloud.google.com/model-garden" target="_blank" rel="noopener">Google Cloud Model Garden</a></li><li><a href="https://cloud.google.com/security/products/model-armor" target="_blank" rel="noopener">Model Armor</a></li></ul></details>
+
+</div>
+</details>
+</section>
+
+<section id="heat" class="sec">
+<details class="secd">
+<summary><span class="secno">10</span><h2>Risk heat map</h2><span class="secsub">Indicative risk by entry across five dimensions</span></summary>
+<div class="secbody">
+  <p class="lede">Relative risk for a typical enterprise deployment, before controls. H = higher, M = moderate, L = lower. Your configuration changes the result.</p>
+  <div class="tbl-wrap">
+    <table class="heat" id="heatTable">
+      <thead><tr><th>Model / platform</th><th>Third-party data exposure</th><th>Provenance / supply chain</th><th>Agent and tool permissions</th><th>Jurisdiction / residency</th><th>Endpoint and config exposure</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <details class="refs"><summary>References (3)</summary><ul><li><a href="https://genai.owasp.org/llm-top-10/" target="_blank" rel="noopener">OWASP Top 10 for LLM Applications</a></li><li><a href="https://atlas.mitre.org/" target="_blank" rel="noopener">MITRE ATLAS</a></li><li><a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener">NIST AI 600-1 Generative AI Profile</a></li></ul></details>
+
+</div>
+</details>
+</section>
+
+<section id="controls" class="sec">
+<details class="secd">
+<summary><span class="secno">11</span><h2>Baseline controls</h2><span class="secsub">Governance and technical controls that apply to every entry</span></summary>
+<div class="secbody">
+  <div class="two">
+    <div class="card">
+      <h3 style="margin-top:0">Governance</h3>
+      <ul class="check">
+        <li>Keep an approved AI model and service inventory with owner, use case, data classification, and review date.</li>
+        <li>Review vendor terms for data retention, training use, subprocessors, and region before approval.</li>
+        <li>Map models into the vendor risk process the same way as other SaaS and open-source components.</li>
+        <li>Define which data classifications may be sent to which tier (closed API, cloud platform, self-hosted).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Technical</h3>
+      <ul class="check">
+        <li>Route model access through a single gateway or cloud account so usage is logged and controllable.</li>
+        <li>Store API keys in AWS Secrets Manager or GitHub encrypted secrets; enable GitHub secret scanning.</li>
+        <li>Scope agent tools to least privilege and require human approval for irreversible actions.</li>
+        <li>Detect shadow AI: watch for Ollama (port 11434) and unknown model endpoints on endpoints and cloud networks.</li>
+        <li>Test against OWASP Top 10 for LLM Applications risks before release.</li>
+      </ul>
+    </div>
+  </div>
+
+  <details class="refs"><summary>References (4)</summary><ul><li><a href="https://genai.owasp.org/llm-top-10/" target="_blank" rel="noopener">OWASP Top 10 for LLM Applications</a></li><li><a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener">NIST AI Risk Management Framework</a></li><li><a href="https://docs.github.com/en/code-security/secret-scanning" target="_blank" rel="noopener">GitHub secret scanning</a></li><li><a href="https://aws.amazon.com/secrets-manager/" target="_blank" rel="noopener">AWS Secrets Manager</a></li></ul></details>
+
+</div>
+</details>
+</section>
+
+<section id="refs" class="sec">
+<details class="secd">
+<summary><span class="secno">12</span><h2>All references</h2><span class="secsub">Every source used on this page, grouped</span></summary>
+<div class="secbody">
+  <p class="lede">Grouped and de-duplicated. Each section also lists its own references at the bottom.</p>
+  <details class="refs refgrp" open><summary>Frameworks (4)</summary><ul><li><a href="https://genai.owasp.org/llm-top-10/" target="_blank" rel="noopener">OWASP Top 10 for LLM Applications</a></li><li><a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener">NIST AI Risk Management Framework</a></li><li><a href="https://atlas.mitre.org/" target="_blank" rel="noopener">MITRE ATLAS</a></li><li><a href="https://www.iso.org/standard/81230.html" target="_blank" rel="noopener">ISO/IEC 42001 AI management system</a></li></ul></details>
+  <details class="refs refgrp" open><summary>Model catalogs and provider docs (18)</summary><ul><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-cards.html" target="_blank" rel="noopener">Amazon Bedrock models at a glance</a></li><li><a href="https://platform.claude.com/docs/en/models/overview" target="_blank" rel="noopener">Claude models overview</a></li><li><a href="https://platform.openai.com/docs/models" target="_blank" rel="noopener">OpenAI models</a></li><li><a href="https://ai.google.dev/gemini-api/docs/changelog" target="_blank" rel="noopener">Gemini API changelog</a></li><li><a href="https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure" target="_blank" rel="noopener">Foundry Models sold by Azure</a></li><li><a href="https://foundrymap.fyi/models" target="_blank" rel="noopener">Foundry model map (third-party mirror)</a></li><li><a href="https://en.wikipedia.org/wiki/GPT-5.5" target="_blank" rel="noopener">GPT-5.5 (Wikipedia)</a></li><li><a href="https://en.wikipedia.org/wiki/Gemini_Enterprise_Agent_Platform" target="_blank" rel="noopener">Gemini Enterprise Agent Platform (Wikipedia)</a></li><li><a href="https://docs.cloud.google.com/vertex-ai/generative-ai/docs/release-notes" target="_blank" rel="noopener">Vertex AI generative AI release notes</a></li><li><a href="https://docs.databricks.com/aws/en/machine-learning/foundation-model-apis/supported-models" target="_blank" rel="noopener">Databricks supported foundation models</a></li><li><a href="https://build.nvidia.com/models" target="_blank" rel="noopener">NVIDIA Build model catalog</a></li><li><a href="https://pasqualepillitteri.it/en/news/1621/nvidia-build-free-api-100-ai-models-2026" target="_blank" rel="noopener">NVIDIA Build free API guide (secondary)</a></li><li><a href="https://ollama.com/library" target="_blank" rel="noopener">Ollama library</a></li><li><a href="https://www.morphllm.com/best-ollama-models" target="_blank" rel="noopener">Best Ollama models (secondary)</a></li><li><a href="https://modelcompare.dev/providers/mistral" target="_blank" rel="noopener">Mistral models (modelcompare.dev)</a></li><li><a href="https://docs.cohere.com/docs/models" target="_blank" rel="noopener">Cohere models</a></li><li><a href="https://betterstack.com/community/guides/ai/xai-grok-46.md" target="_blank" rel="noopener">xAI Grok 4.6 guide (Better Stack)</a></li><li><a href="https://github.com/duanyytop/agents-radar/issues/3738" target="_blank" rel="noopener">Hugging Face trending digest, Oct 12, 2026</a></li></ul></details>
+  <details class="refs refgrp" open><summary>Hugging Face (6)</summary><ul><li><a href="https://huggingface.co/tasks" target="_blank" rel="noopener">Hugging Face Tasks</a></li><li><a href="https://huggingface.co/docs/hub/security" target="_blank" rel="noopener">Hugging Face Hub security</a></li><li><a href="https://huggingface.co/docs/safetensors" target="_blank" rel="noopener">Safetensors documentation</a></li><li><a href="https://huggingface.co/docs/hub/model-cards" target="_blank" rel="noopener">Model cards</a></li><li><a href="https://github.com/protectai/modelscan" target="_blank" rel="noopener">ModelScan (Protect AI)</a></li><li><a href="https://github.com/mmaitre314/picklescan" target="_blank" rel="noopener">picklescan</a></li></ul></details>
+  <details class="refs refgrp" open><summary>Amazon Bedrock (9)</summary><ul><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html" target="_blank" rel="noopener">What is Amazon Bedrock</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/data-protection.html" target="_blank" rel="noopener">Data protection</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference.html" target="_blank" rel="noopener">Cross-Region inference</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/model-invocation-logging.html" target="_blank" rel="noopener">Model invocation logging</a></li><li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/vpc-interface-endpoints.html" target="_blank" rel="noopener">VPC interface endpoints (PrivateLink)</a></li><li><a href="https://aws.amazon.com/bedrock/guardrails/" target="_blank" rel="noopener">Bedrock Guardrails</a></li><li><a href="https://aws.amazon.com/bedrock/agentcore/" target="_blank" rel="noopener">Bedrock AgentCore</a></li><li><a href="https://aws.amazon.com/about-aws/whats-new/2026/02/amazon-bedrock-adds-support-six-open-weights-models" target="_blank" rel="noopener">Six open-weight models and Project Mantle (Feb 2026)</a></li><li><a href="https://hidekazu-konishi.com/entry/amazon_bedrock_model_catalog_2026.html" target="_blank" rel="noopener">Bedrock catalog 2026 snapshot (secondary)</a></li></ul></details>
+  <details class="refs refgrp" open><summary>Other platforms and tools (10)</summary><ul><li><a href="https://learn.microsoft.com/en-us/azure/ai-foundry/" target="_blank" rel="noopener">Microsoft Foundry docs</a></li><li><a href="https://cloud.google.com/model-garden" target="_blank" rel="noopener">Google Cloud Model Garden</a></li><li><a href="https://www.databricks.com/product/artificial-intelligence" target="_blank" rel="noopener">Databricks AI</a></li><li><a href="https://developer.nvidia.com/nim" target="_blank" rel="noopener">NVIDIA NIM</a></li><li><a href="https://github.com/ollama/ollama" target="_blank" rel="noopener">Ollama on GitHub</a></li><li><a href="https://docs.vllm.ai/" target="_blank" rel="noopener">vLLM documentation</a></li><li><a href="https://learn.microsoft.com/en-us/azure/ai-services/content-safety/" target="_blank" rel="noopener">Azure AI Content Safety</a></li><li><a href="https://cloud.google.com/security/products/model-armor" target="_blank" rel="noopener">Model Armor</a></li><li><a href="https://docs.github.com/en/code-security/secret-scanning" target="_blank" rel="noopener">GitHub secret scanning</a></li><li><a href="https://aws.amazon.com/secrets-manager/" target="_blank" rel="noopener">AWS Secrets Manager</a></li></ul></details>
+
+</div>
+</details>
+</section>
+
+<footer>Prepared October 2026. Model catalogs last reviewed October 17, 2026. Model catalogs, names, and terms change frequently; verify on the provider links before relying on any specific detail.</footer>
+</main>
+
+<script>
+(function(){
+var T={closed:{l:"Commercial / closed",c:"t-closed",k:"c"},open:{l:"Open-weight",c:"t-open",k:"o"},mixed:{l:"Commercial + open-weight",c:"t-mixed",k:"m"},platform:{l:"Platform / hub",c:"t-platform",k:"p"},runtime:{l:"Runtime / serving",c:"t-runtime",k:"r"}};
+var D=[
+{id:"gpt",n:"GPT",p:"OpenAI",t:"closed",use:"Chatbots, RAG, coding, reasoning, agents",risk:"External processing, sensitive data, agents/tools",
+ what:"OpenAI's flagship closed model family, available through the OpenAI API, ChatGPT business plans, Azure OpenAI in Microsoft's cloud, and now Amazon Bedrock.",
+ vars:"General flagship models, smaller low-cost tiers, reasoning-focused models, plus separate image, speech, and embedding models.",
+ dep:"OpenAI API (SaaS), ChatGPT Enterprise/Team, Azure OpenAI, Amazon Bedrock.",
+ risks:["Data sent to a third party; retention depends on plan and settings","Agent and tool features (function calling, computer use) widen blast radius","Consumer ChatGPT accounts used for work data (shadow AI)"],
+ ctl:["Use business or API terms with no-training defaults; confirm retention options","Access through Azure OpenAI or Bedrock if you need a single cloud boundary","Block or manage personal ChatGPT use for company data"],
+ links:[["Models","https://platform.openai.com/docs/models"],["Enterprise privacy","https://openai.com/enterprise-privacy/"]],
+ h:["H","L","H","M","L"]},
+{id:"gptoss",n:"gpt-oss",p:"OpenAI",t:"open",use:"Private/self-hosted reasoning, coding",risk:"Model provenance, hosting/security",
+ what:"OpenAI's open-weight reasoning models released under the Apache 2.0 license, designed to run on your own hardware or managed hosts.",
+ vars:"A larger model for single-GPU data center use and a smaller model for local and edge use.",
+ dep:"Self-hosted via vLLM, Ollama, or llama.cpp; also offered on Bedrock, Azure, and other hosts.",
+ risks:["Weights downloaded from mirrors may not match the official release","You own patching, scaling, and endpoint security","Safety tuning can be removed by fine-tuning"],
+ ctl:["Download only from OpenAI's official Hugging Face organization; pin the commit","Serve behind authentication on a private network","Prefer a managed host if you lack GPU operations capacity"],
+ links:[["GitHub","https://github.com/openai/gpt-oss"],["Hugging Face","https://huggingface.co/openai"]],
+ h:["L","M","M","L","M"]},
+{id:"claude",n:"Claude",p:"Anthropic",t:"closed",use:"Documents, coding, RAG, agents, reasoning",risk:"Data exposure, agent permissions, third party",
+ what:"Anthropic's closed model family, available through the Claude API, Claude apps for business, Amazon Bedrock, Google Vertex AI, and Microsoft Foundry.",
+ vars:"Tiers trade capability against speed and cost (Opus, Sonnet, Haiku), plus higher tiers with restricted access.",
+ dep:"Claude API, Claude Team/Enterprise, Bedrock, Vertex AI, Microsoft Foundry.",
+ risks:["Third-party processing of prompts and files","Agentic coding and tool use can act on code and systems","Connectors to internal data sources widen access"],
+ ctl:["Use commercial terms; access through Bedrock to stay in your AWS boundary","Scope agent tools and file system access; review actions before execution","Review connector permissions per user"],
+ links:[["Models","https://docs.anthropic.com/en/docs/about-claude/models"],["Trust center","https://trust.anthropic.com/"]],
+ h:["H","L","H","M","L"]},
+{id:"gemini",n:"Gemini",p:"Google",t:"closed",use:"Workspace, multimodal, coding, RAG, agents",risk:"Enterprise data integration, permissions",
+ what:"Google's closed multimodal model family, embedded in Google Workspace and available through the Gemini API and Vertex AI.",
+ vars:"Pro, Flash, and Flash-Lite tiers, plus image, video, and embedding models.",
+ dep:"Gemini API (AI Studio), Vertex AI, Gemini in Workspace.",
+ risks:["Workspace integration can surface any file a user can access, including overshared files","Free-tier API terms differ from paid terms on data use","Multimodal inputs can carry hidden instructions"],
+ ctl:["Fix Drive oversharing before enabling Workspace AI","Use Vertex AI or paid API terms for company data","Apply Model Armor or equivalent input screening on agent flows"],
+ links:[["Models","https://ai.google.dev/gemini-api/docs/models"],["Vertex AI","https://cloud.google.com/vertex-ai/generative-ai/docs"]],
+ h:["H","L","M","M","L"]},
+{id:"llama",n:"Llama",p:"Meta",t:"open",use:"Local/private LLM, RAG, fine-tuning",risk:"Model provenance, supply chain, configuration",
+ what:"Meta's open-weight model family and the base for a very large number of community fine-tunes.",
+ vars:"Multiple sizes from small edge models to large multimodal mixture-of-experts models; many third-party derivatives.",
+ dep:"Self-hosted, Bedrock, Azure, Vertex, Databricks, and many inference providers.",
+ risks:["Custom Llama license with use and attribution terms","Derivatives on the Hub vary widely in quality and safety","Self-hosted endpoints are often left unauthenticated"],
+ ctl:["Record license acceptance and terms","Use Meta's official repos or a managed cloud host","Pair with Llama Guard or a guardrail layer for content screening"],
+ links:[["Llama","https://www.llama.com/"],["Hugging Face","https://huggingface.co/meta-llama"]],
+ h:["L","H","M","L","M"]},
+{id:"mistral",n:"Mistral / Mixtral",p:"Mistral AI",t:"mixed",use:"Enterprise assistants, RAG, coding",risk:"Hosting choice, model provenance",
+ what:"French provider offering both commercial API models and open-weight models, including mixture-of-experts (Mixtral) designs.",
+ vars:"Large and medium commercial models, small open models, coding models (Codestral), OCR and embedding models.",
+ dep:"La Plateforme API, Le Chat, self-hosted, Bedrock, Azure, Vertex.",
+ risks:["License differs by model: some Apache 2.0, some research-only or commercial","Provenance for community quantizations"],
+ ctl:["Check the license per model version","Use EU hosting if data residency in the EU is a driver"],
+ links:[["Docs","https://docs.mistral.ai/"],["Hugging Face","https://huggingface.co/mistralai"]],
+ h:["M","M","M","L","M"]},
+{id:"deepseek",n:"DeepSeek",p:"DeepSeek",t:"mixed",use:"Reasoning, coding, research",risk:"Data handling, provenance, hosting jurisdiction",
+ what:"Chinese lab publishing strong open-weight reasoning and general models under permissive licenses, plus a hosted API and consumer app.",
+ vars:"General chat models (V series) and reasoning models (R series); many distilled derivatives.",
+ dep:"DeepSeek API and app (hosted in China), self-hosted weights, Bedrock, Azure, and other hosts.",
+ risks:["The hosted service is operated from China; several governments restricted its app on official devices","Open weights remove the data-transfer issue but not training-data and alignment questions","Distilled derivatives of uncertain origin"],
+ ctl:["Block the hosted DeepSeek app and API for company data unless approved","If used, run open weights in your own cloud or via Bedrock/Azure","Evaluate outputs for bias and refusal behavior on your use cases"],
+ links:[["DeepSeek","https://www.deepseek.com/"],["GitHub","https://github.com/deepseek-ai"]],
+ h:["H","M","M","H","M"]},
+{id:"qwen",n:"Qwen",p:"Alibaba",t:"mixed",use:"Multilingual, coding, RAG, agents",risk:"Supply chain, provenance, jurisdiction",
+ what:"Alibaba Cloud's model family, widely used as an open-weight base for fine-tunes, especially for multilingual and coding work.",
+ vars:"Dense and mixture-of-experts LLMs, coder models, vision-language models, embedding and reranker models.",
+ dep:"Alibaba Cloud Model Studio, self-hosted, Bedrock, and other hosts.",
+ risks:["Alibaba Cloud hosted APIs fall under Chinese jurisdiction","Very large derivative ecosystem on the Hub","License varies by model"],
+ ctl:["Prefer self-hosting or Bedrock over Alibaba hosted APIs for regulated data","Pin official Qwen organization repos"],
+ links:[["Qwen","https://qwen.ai/"],["Hugging Face","https://huggingface.co/Qwen"]],
+ h:["M","H","M","H","M"]},
+{id:"cohere",n:"Command",p:"Cohere",t:"closed",use:"Enterprise RAG/search",risk:"Enterprise data access, retrieval permissions",
+ what:"Cohere's enterprise-focused models built for RAG with citations, plus Embed and Rerank models that sit inside search pipelines.",
+ vars:"Command generation models, Embed (multilingual, multimodal), Rerank.",
+ dep:"Cohere API, private deployment in your VPC, Bedrock, Azure, Oracle.",
+ risks:["RAG pipelines can return documents the user should not see","Embeddings of sensitive text are still sensitive data"],
+ ctl:["Enforce document-level permissions at retrieval time","Classify and protect vector stores like the source data"],
+ links:[["Models","https://docs.cohere.com/docs/models"]],
+ h:["M","L","M","L","L"]},
+{id:"grok",n:"Grok",p:"xAI",t:"mixed",use:"General GenAI, coding, reasoning",risk:"Data handling, external service",
+ what:"xAI's model family, available through the xAI API, the X platform, and now Amazon Bedrock; some older versions released as open weights.",
+ vars:"Flagship reasoning models, faster tiers, coding models, image generation.",
+ dep:"xAI API, X and Grok apps, Bedrock, Azure.",
+ risks:["Consumer integration with a social platform","Third-party processing and retention terms to verify"],
+ ctl:["Use only through approved enterprise channels such as Bedrock","Review xAI data terms before approval"],
+ links:[["Docs","https://docs.x.ai/"]],
+ h:["H","L","M","M","L"]},
+{id:"phi",n:"Phi",p:"Microsoft",t:"open",use:"Small/local models, edge AI",risk:"Model provenance, local deployment security",
+ what:"Microsoft's small language models, built to run on laptops, phones, and edge devices under the MIT license.",
+ vars:"Mini, small, reasoning, and multimodal variants.",
+ dep:"Local runtimes (Ollama, ONNX Runtime), Azure AI Foundry.",
+ risks:["Runs on endpoints outside central logging","Smaller models are more prone to errors and jailbreaks"],
+ ctl:["Manage local AI runtimes through endpoint management","Use for low-risk tasks; validate outputs"],
+ links:[["Phi","https://azure.microsoft.com/en-us/products/phi"],["Hugging Face","https://huggingface.co/microsoft"]],
+ h:["L","M","L","L","M"]},
+{id:"gemma",n:"Gemma",p:"Google",t:"open",use:"Local AI, research, fine-tuning",risk:"Fine-tuning data, provenance",
+ what:"Google's open-weight models derived from Gemini research, sized for local and single-GPU use.",
+ vars:"Several sizes, plus specialized variants for medicine (MedGemma), safety classification (ShieldGemma), and embeddings.",
+ dep:"Self-hosted, Vertex AI, Bedrock, Kaggle, Hugging Face.",
+ risks:["Gemma terms of use include prohibited use policies","Fine-tuning on sensitive data creates a sensitive model"],
+ ctl:["Record terms acceptance","Treat fine-tuned weights as data at the classification of the training set"],
+ links:[["Gemma","https://ai.google.dev/gemma"]],
+ h:["L","M","L","L","M"]},
+{id:"granite",n:"Granite",p:"IBM",t:"open",use:"Enterprise RAG, code, governance",risk:"Model/data governance",
+ what:"IBM's Apache 2.0 open models with published training data disclosures, aimed at enterprise and regulated use.",
+ vars:"Language, code, time series, vision, embedding, and Granite Guardian safety models.",
+ dep:"watsonx.ai, self-hosted, Hugging Face, Ollama.",
+ risks:["Same self-hosting duties as other open weights"],
+ ctl:["Use Granite Guardian or another classifier for input and output screening","Keep IBM's data disclosures in your model record"],
+ links:[["Granite","https://www.ibm.com/granite"],["Hugging Face","https://huggingface.co/ibm-granite"]],
+ h:["L","L","L","L","M"]},
+{id:"falcon",n:"Falcon",p:"TII",t:"open",use:"Research/self-hosted AI",risk:"Model provenance, supply chain",
+ what:"Open models from the Technology Innovation Institute in Abu Dhabi, including transformer and hybrid architectures.",
+ vars:"Several generations and sizes, including small and state-space hybrid models.",
+ dep:"Self-hosted via Hugging Face weights.",
+ risks:["TII license terms vary by release","Smaller enterprise ecosystem and tooling"],
+ ctl:["Review the license per release","Pin official TII repositories"],
+ links:[["Falcon","https://falconllm.tii.ae/"],["Hugging Face","https://huggingface.co/tiiuae"]],
+ h:["L","M","L","L","M"]},
+{id:"hf",n:"Hugging Face Hub",p:"Hugging Face",t:"platform",use:"Download, host, fine-tune models/datasets",risk:"Untrusted models/datasets, malicious artifacts, licenses, provenance",
+ what:"The main public registry for open models, datasets, and demo apps. See the deep dive section for model types and formats.",
+ vars:"Models, datasets, Spaces, Inference Endpoints, Inference Providers, Enterprise Hub.",
+ dep:"Public Hub, Enterprise Hub with SSO and audit logs, private repos, dedicated endpoints.",
+ risks:["Malicious pickle files and remote code","Typosquatted or impersonating accounts","Poisoned or license-restricted datasets","Leaked HF tokens with write access"],
+ ctl:["Safetensors, commit pinning, and no remote code by default","Mirror approved artifacts internally","Use fine-grained read-only tokens; enable secret scanning"],
+ links:[["Models","https://huggingface.co/models"],["Security","https://huggingface.co/docs/hub/security"],["Deep dive","#hf"]],
+ h:["M","H","L","L","M"]},
+{id:"azure",n:"Azure AI / Foundry",p:"Microsoft",t:"platform",use:"Enterprise model hosting, RAG, agents",risk:"IAM, data boundaries, model selection, agents",
+ what:"Microsoft's platform for model hosting and AI apps, including Azure OpenAI, a multi-provider model catalog, and an agent service.",
+ vars:"Azure OpenAI, serverless and managed model deployments, Foundry Agent Service, AI Search, Content Safety.",
+ dep:"Azure subscriptions with Entra ID, private endpoints, regional or data-zone deployments.",
+ risks:["Broad Entra ID roles grant model and data access","Global deployment types can process data outside your region","Agents connected to Microsoft 365 and SharePoint data"],
+ ctl:["Use managed identities and least-privilege RBAC","Choose regional or data-zone deployments for residency","Enable Content Safety and Prompt Shields"],
+ links:[["Foundry docs","https://learn.microsoft.com/en-us/azure/ai-foundry/"],["Azure OpenAI","https://learn.microsoft.com/en-us/azure/ai-services/openai/"]],
+ h:["M","M","H","M","M"]},
+{id:"bedrock",n:"Amazon Bedrock",p:"AWS",t:"platform",use:"Managed access to multiple foundation models",risk:"IAM, data access, agents, model selection",
+ what:"AWS managed service giving one API to 100+ foundation models plus RAG, agents, guardrails, and customization. See the deep dive section.",
+ vars:"Runtime APIs, OpenAI-compatible endpoint, Knowledge Bases, Agents, AgentCore, Guardrails, Evaluations, custom models.",
+ dep:"Your AWS accounts, IAM, PrivateLink, KMS, CloudTrail.",
+ risks:["Over-broad IAM allows any model in the catalog","Invocation logs contain prompts","Global cross-Region inference","Agent execution roles"],
+ ctl:["Model ARN allowlist via IAM and SCP","Encrypted invocation logs with retention","Guardrails on production flows"],
+ links:[["Bedrock","https://aws.amazon.com/bedrock/"],["User guide","https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html"],["Deep dive","#bedrock"]],
+ h:["L","L","H","M","M"]},
+{id:"vertex",n:"Vertex AI",p:"Google Cloud",t:"platform",use:"Model hosting, RAG, ML/GenAI",risk:"IAM, data, model/API configuration",
+ what:"Google Cloud's ML and generative AI platform, with Gemini, Model Garden partner and open models, search, and agent tooling.",
+ vars:"Gemini on Vertex, Model Garden, Agent Builder, Agent Engine, Vertex AI Search, custom training.",
+ dep:"Google Cloud projects with IAM, VPC Service Controls, CMEK.",
+ risks:["Service account sprawl","Public endpoints for custom models","Model Garden deployments of unvetted open models"],
+ ctl:["Use VPC Service Controls around AI projects","Restrict Model Garden deployments with Org Policy","Use CMEK for regulated data"],
+ links:[["Vertex AI","https://cloud.google.com/vertex-ai"],["Model Garden","https://cloud.google.com/model-garden"]],
+ h:["M","M","M","M","M"]},
+{id:"databricks",n:"Databricks Mosaic AI",p:"Databricks",t:"platform",use:"Enterprise data + RAG + models",risk:"Large enterprise-data access",
+ what:"Databricks' AI tooling on the lakehouse: model serving, vector search, agent frameworks, and AI gateway over data governed by Unity Catalog.",
+ vars:"Model Serving, Vector Search, Agent Framework, AI Gateway, evaluation.",
+ dep:"Databricks workspaces on AWS, Azure, or GCP.",
+ risks:["Agents and RAG sit next to the whole data estate","Service principal permissions in Unity Catalog"],
+ ctl:["Govern access with Unity Catalog grants","Use AI Gateway for rate limits, logging, and guardrails"],
+ links:[["Databricks AI","https://www.databricks.com/product/artificial-intelligence"]],
+ h:["M","M","H","L","M"]},
+{id:"nvidia",n:"NVIDIA NIM / NeMo",p:"NVIDIA",t:"platform",use:"Private model deployment/customization",risk:"Containers/models/supply chain",
+ what:"NIM packages models as optimized inference containers; NeMo is a framework for training, customizing, and guarding models.",
+ vars:"NIM microservices, NeMo framework, NeMo Guardrails, Nemotron models.",
+ dep:"Self-hosted Kubernetes or cloud GPUs; containers pulled from NGC.",
+ risks:["Container images and dependencies need scanning","NGC API keys","GPU driver and runtime vulnerabilities"],
+ ctl:["Scan NIM images like any container (ECR scanning, Trivy)","Store NGC keys in a secrets manager","Patch GPU drivers on a schedule"],
+ links:[["NIM","https://developer.nvidia.com/nim"],["NeMo","https://developer.nvidia.com/nemo-framework"]],
+ h:["L","M","M","L","M"]},
+{id:"ollama",n:"Ollama",p:"Ollama",t:"runtime",use:"Running Llama/Mistral/Qwen/etc. locally",risk:"Unmanaged models, shadow AI, endpoint data",
+ what:"Easy local runtime for open models on laptops and servers, with its own model library and a local REST API.",
+ vars:"Desktop app, CLI, server mode, cloud-hosted models option.",
+ dep:"Developer laptops, workstations, small servers.",
+ risks:["API has no built-in authentication; exposed when bound to 0.0.0.0","Internet-exposed Ollama servers are commonly found in scans","Models pulled from unvetted sources"],
+ ctl:["Keep bound to localhost; put a reverse proxy with auth in front if shared","Inventory installs through endpoint management","Allow only approved models"],
+ links:[["Ollama","https://ollama.com/"],["GitHub","https://github.com/ollama/ollama"]],
+ h:["L","H","L","L","H"]},
+{id:"vllm",n:"vLLM",p:"Open source",t:"runtime",use:"High-performance private LLM serving",risk:"API exposure, model/configuration security",
+ what:"Open-source high-throughput inference engine with an OpenAI-compatible server, widely used under managed and self-hosted platforms.",
+ vars:"OpenAI-compatible server, offline batch inference, multi-GPU and multi-node serving.",
+ dep:"Kubernetes, EC2 GPU instances, SageMaker, and many inference providers.",
+ risks:["API key is optional and off by default","--trust-remote-code runs model repo code","Fast release cadence with security fixes"],
+ ctl:["Set an API key and keep the server on a private subnet","Do not enable remote code for unvetted models","Track vLLM security advisories and upgrade"],
+ links:[["Docs","https://docs.vllm.ai/"],["GitHub","https://github.com/vllm-project/vllm"]],
+ h:["L","M","L","L","H"]}
+];
+
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function ext(u){return u.charAt(0)==="#"?"":' target="_blank" rel="noopener"';}
+
+// Layers
+var groups=[["Closed / commercial models",["closed"]],["Open-weight and mixed models",["open","mixed"]],["Hubs and cloud platforms",["platform"]],["Self-hosted runtimes",["runtime"]]];
+var L=document.getElementById("layers"),html="";
+groups.forEach(function(g,i){
+  html+='<div class="layer"><h5>'+g[0]+'</h5><div class="chips">';
+  D.filter(function(d){return g[1].indexOf(d.t)>-1;}).forEach(function(d){html+='<a class="'+T[d.t].k+'" href="#d-'+d.id+'">'+esc(d.n)+'</a>';});
+  html+='</div></div>';
+  if(i===1)html+='<div class="arrow">Open weights are distributed through hubs and platforms, then served by runtimes or managed hosts</div>';
+});
+L.innerHTML=html;
+
+// Table
+var tb=document.querySelector("#sumTable tbody");
+tb.innerHTML=D.map(function(d){
+  var ref=d.links[0];
+  return '<tr data-t="'+d.t+'" data-s="'+esc((d.n+" "+d.p+" "+d.use+" "+d.risk).toLowerCase())+'"><td><a href="#d-'+d.id+'"><b>'+esc(d.n)+'</b></a></td><td>'+esc(d.p)+'</td><td><span class="pill '+T[d.t].c+'">'+T[d.t].l+'</span></td><td>'+esc(d.use)+'</td><td>'+esc(d.risk)+'</td><td><a href="'+ref[1]+'"'+ext(ref[1])+'>'+esc(d.p)+'</a></td></tr>';
+}).join("");
+
+// Filters
+var F=document.getElementById("filters"),cur="all";
+var fl=[["all","All"]].concat(Object.keys(T).map(function(k){return [k,T[k].l];}));
+F.innerHTML=fl.map(function(f){return '<button type="button" data-f="'+f[0]+'"'+(f[0]==="all"?' class="on"':'')+'>'+f[1]+'</button>';}).join("");
+function apply(){
+  var q=document.getElementById("q").value.toLowerCase().trim();
+  tb.querySelectorAll("tr").forEach(function(r){
+    var ok=(cur==="all"||r.getAttribute("data-t")===cur)&&(!q||r.getAttribute("data-s").indexOf(q)>-1);
+    r.style.display=ok?"":"none";
+  });
+  document.querySelectorAll(".detail").forEach(function(c){
+    var ok=(cur==="all"||c.getAttribute("data-t")===cur)&&(!q||c.getAttribute("data-s").indexOf(q)>-1);
+    c.style.display=ok?"":"none";
+  });
+}
+F.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;cur=b.getAttribute("data-f");F.querySelectorAll("button").forEach(function(x){x.classList.toggle("on",x===b);});apply();});
+document.getElementById("q").addEventListener("input",apply);
+
+// Details
+document.getElementById("detailGrid").innerHTML=D.map(function(d){
+  return '<details class="detail" id="d-'+d.id+'" data-t="'+d.t+'" data-s="'+esc((d.n+" "+d.p+" "+d.use+" "+d.risk+" "+d.what).toLowerCase())+'">'+
+  '<summary><h4>'+esc(d.n)+'</h4><div class="sub">'+esc(d.p)+' &middot; <span class="pill '+T[d.t].c+'">'+T[d.t].l+'</span></div><div class="dsum"><b>Primary risk:</b> '+esc(d.risk)+'</div></summary>'+
+  '<div class="dbody"><p>'+esc(d.what)+'</p><dl>'+
+  '<dt>Variants</dt><dd>'+esc(d.vars)+'</dd>'+
+  '<dt>Deployment options</dt><dd>'+esc(d.dep)+'</dd>'+
+  '<dt>Typical enterprise usage</dt><dd>'+esc(d.use)+'</dd>'+
+  '<dt>Key risks</dt><dd><ul>'+d.risks.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></dd>'+
+  '<dt>Practical controls</dt><dd><ul>'+d.ctl.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></dd>'+
+  '</dl><div class="links">'+d.links.map(function(l){return '<a href="'+l[1]+'"'+ext(l[1])+'>'+esc(l[0])+'</a>';}).join("")+'<a href="#table">Back to table</a></div></div></details>';
+}).join("");
+
+// Heat map
+var cls={H:"h",M:"m",L:"l"};
+document.querySelector("#heatTable tbody").innerHTML=D.map(function(d){
+  return '<tr><td><a href="#d-'+d.id+'">'+esc(d.n)+'</a></td>'+d.h.map(function(v){return '<td class="'+cls[v]+'">'+v+'</td>';}).join("")+'</tr>';
+}).join("");
+
+// Preferences (per viewer, optional)
+function get(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function set(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function setFs(v){document.documentElement.style.setProperty("--fs",v+"px");set("aiguide-fs",v);}
+var fs=get("aiguide-fs");if(fs)setFs(fs);
+document.querySelectorAll("[data-fs]").forEach(function(b){b.addEventListener("click",function(){setFs(b.getAttribute("data-fs"));});});
+var th=get("aiguide-theme");if(th)document.documentElement.setAttribute("data-theme",th);
+document.getElementById("themeBtn").addEventListener("click",function(){
+  var curT=document.documentElement.getAttribute("data-theme");
+  if(!curT){curT=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}
+  var n=curT==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);set("aiguide-theme",n);
+});
+})();
+</script>
+<script>
+(function(){
+var CAT=[
+{id:"hf",name:"Hugging Face Hub",kind:"Hub (open models, datasets, Spaces)",intro:"Millions of public repos. The useful view is by task type and by trusted publisher organization. Anyone can publish, so the publisher account matters as much as the model name.",
+ links:[["Live catalog","https://huggingface.co/models"],["Tasks","https://huggingface.co/tasks"],["Trending","https://huggingface.co/models?sort=trending"]],
+ groups:[
+  ["Text generation (LLMs): official publisher orgs",["meta-llama (Llama 3.x, Llama 4)","Qwen (Qwen3, Qwen3.5, Qwen3.6, Qwen3.8, Qwen3 Coder)","deepseek-ai (V3.x, V4, R1 and distills)","mistralai (Mistral Small, Medium, Large, Ministral, Devstral, Magistral)","google (Gemma 3, Gemma 4)","openai (gpt-oss-20b, gpt-oss-120b, gpt-oss-safeguard)","microsoft (Phi-4 family)","ibm-granite (Granite 4.x)","nvidia (Nemotron)","moonshotai (Kimi)","zai-org (GLM)","MiniMaxAI (MiniMax M2.x)","tiiuae (Falcon)","CohereLabs (Command R, Aya; non-commercial licenses)"]],
+  ["Quantized and community derivatives",["unsloth (GGUF and fine-tune-ready builds)","bartowski, lmstudio-community (GGUF quantizations)","Format families: GGUF, AWQ, GPTQ, MLX, NVFP4","Community fine-tunes, merges, and \"uncensored\" variants (high provenance risk)"]],
+  ["Embeddings and rerankers",["google/embeddinggemma-2","Qwen/Qwen3-Embedding","BAAI/bge family (bge-large, bge-m3, bge-reranker)","nomic-ai/nomic-embed-text","sentence-transformers (all-MiniLM, all-mpnet)","jinaai embeddings","Alibaba-NLP/gte family"]],
+  ["Vision and multimodal",["Qwen VL and Qwen3.8 image-text-to-text","Gemma 4 (image input)","facebook/sam3 (image and video segmentation)","Florence, PaliGemma, SmolVLM (captioning, OCR, VQA)","Object detection: DETR, RT-DETR, YOLO variants"]],
+  ["Image and video generation",["black-forest-labs (FLUX.1 dev and schnell, FLUX.2)","stabilityai (Stable Diffusion 3.5)","Qwen/Qwen-Image-2.1 (generation and editing)","Lightricks/LTX-2.5 (image-to-video)","Wan and HunyuanVideo (video generation)"]],
+  ["Audio and speech",["openai/whisper (speech recognition)","nvidia parakeet and canary (ASR)","mistralai/Voxtral (speech understanding)","TTS: Kokoro, Dia, F5-TTS, Orpheus","pyannote (speaker diarization; gated)"]],
+  ["Safety and guard models",["meta-llama/Llama-Guard","google/ShieldGemma","ibm-granite/granite-guardian","openai/gpt-oss-safeguard","Prompt injection classifiers (e.g. protectai, meta Prompt-Guard)"]],
+  ["Trending snapshot (week of Oct 12, 2026)",["Qwen/Qwen3.8-27B","Qwen/Qwen-Image-2.1","google/embeddinggemma-2","facebook/sam3","Lightricks/LTX-2.5","unsloth/Qwen3.8-27B-GGUF","Several community GGUF fine-tunes and \"uncensored\" variants of Qwen models"]]
+ ]},
+{id:"openai",name:"OpenAI (API and ChatGPT)",kind:"Closed models plus open-weight gpt-oss",intro:"The same families appear in the OpenAI API, Azure OpenAI in Microsoft Foundry, and (for some) Bedrock and Databricks. GPT-6 introduced named tiers (Sol, Luna, Astra; GPT-5.6 also has Terra).",
+ links:[["Live catalog","https://platform.openai.com/docs/models"],["Deprecations","https://platform.openai.com/docs/deprecations"]],
+ groups:[
+  ["Frontier and reasoning",["GPT-6.1 Sol","GPT-6 Sol, GPT-6 Luna, GPT-6 Astra","GPT-5.6 Sol, Terra, Luna","GPT-5.5 and GPT-5.5 Pro","GPT-5.4, 5.4 Pro, 5.4 mini, 5.4 nano","GPT-5.x and o-series (o3, o3-pro, o4-mini): older but still listed","gpt-chat-latest (preview alias)"]],
+  ["Coding",["GPT-5.3 Codex","GPT-5.2 Codex","GPT-5.1 Codex, Codex mini, Codex max","codex-mini"]],
+  ["Specialized and restricted",["GPT-5.5-Cyber and Daybreak Red/Blue cybersecurity models (vetted access)","computer-use-preview (agentic computer use)"]],
+  ["Open-weight",["gpt-oss-120b","gpt-oss-20b","gpt-oss-safeguard-120b and -20b (policy classifiers)"]],
+  ["Image and video",["gpt-image-2, gpt-image-2.5 (flare, sunburst)","gpt-image-1.5, gpt-image-1, gpt-image-1-mini","sora-2 (video; marked deprecated in some catalogs)"]],
+  ["Audio, speech, realtime",["gpt-realtime-2.1 and -2.1-mini","gpt-realtime-translate, gpt-realtime-whisper, gpt-live-transcribe","gpt-audio-1.5, gpt-audio-mini","gpt-transcribe, gpt-4o-transcribe-diarize, whisper","gpt-4o-mini-tts, tts, tts-hd"]],
+  ["Embeddings",["text-embedding-3-large","text-embedding-3-small","text-embedding-ada-002 (legacy)"]],
+  ["Retired or retiring",["GPT-4o and GPT-4.1 retired from the OpenAI API; still listed in Azure for some regions","gpt-5.x-chat variants retired June 2026 in Azure"]]
+ ]},
+{id:"anthropic",name:"Anthropic (Claude API)",kind:"Closed models",intro:"Four current models on the Claude API, all with text and image input, tool use, and a 1M-token context window. Also offered through Bedrock, Vertex AI, Microsoft Foundry, and Databricks.",
+ links:[["Live catalog","https://platform.claude.com/docs/en/models/overview"],["Deprecations","https://platform.claude.com/docs/en/about-claude/model-deprecations"]],
+ groups:[
+  ["Current models",["Claude Fable 5.1 (claude-fable-5-1): deepest reasoning, long-horizon agents","Claude Opus 5.5 (claude-opus-5-5): recommended default for agentic coding and knowledge work","Claude Sonnet 5.5 (claude-sonnet-5-5): speed and intelligence balance","Claude Haiku 5.5 (claude-haiku-5-5): high-volume, low-latency tasks"]],
+  ["Restricted access",["Claude Mythos 5.1: limited to vetted organizations (Project Glasswing); listed in Bedrock for eligible customers"]],
+  ["Older versions still on cloud platforms",["Claude Opus 5, Sonnet 5, Fable 5","Claude Opus 4.5 to 4.8, Sonnet 4.5 and 4.6, Haiku 4.5","Claude 3 Haiku (Bedrock)"]]
+ ]},
+{id:"gemini",name:"Google Gemini API (AI Studio)",kind:"Closed models plus Gemma open weights",intro:"Google's developer API. Model IDs change often and older versions are rerouted to newer ones on deprecation.",
+ links:[["Live catalog","https://ai.google.dev/gemini-api/docs/models"],["Changelog","https://ai.google.dev/gemini-api/docs/changelog"]],
+ groups:[
+  ["Text and reasoning",["gemini-4-argon (GA Oct 13, 2026): most capable","gemini-3.8-flash","gemini-3.6-flash","gemini-3.5-flash-lite, gemini-3.1-flash-lite","gemini-3.1-pro-preview","Gemini 2.5: limited to existing users"]],
+  ["Image",["gemini-nano-banana-2.1","gemini-3-pro-image (Nano Banana Pro)","gemini-3.1-flash-lite-image (Nano Banana 2 Lite)","Imagen 4: shut down Aug 2026"]],
+  ["Video",["gemini-omni-1.1-flash","veo-3.1-generate-preview, veo-3.1-fast, veo-3.1-lite"]],
+  ["Audio, live, music",["gemini-3.8-live and -live-extended-thinking","gemini-3.8-flash-tts, gemini-3.8-flash-lite-tts","gemini-3.5-transcribe and -transcribe-live","lyria-3.5 (music)"]],
+  ["Embeddings",["gemini-embedding-2"]],
+  ["Open models via the API",["gemma-4-31b-it","gemma-4-26b-a4b-it"]]
+ ]},
+{id:"vertex",name:"Google Cloud: Gemini Enterprise Agent Platform (formerly Vertex AI)",kind:"Cloud platform",intro:"Google renamed Vertex AI to Gemini Enterprise Agent Platform in April 2026. Model Garden offers Google, partner, and open models with Google Cloud IAM and VPC Service Controls.",
+ links:[["Model Garden","https://cloud.google.com/model-garden"],["Release notes","https://docs.cloud.google.com/vertex-ai/generative-ai/docs/release-notes"]],
+ groups:[
+  ["Google models",["Gemini (Pro, Flash, Flash-Lite generations)","Gemini image models (Nano Banana)","Veo 3.1 and Veo 3.1 Lite (video)","Lyria 3 (music)","Virtual Try-On","Gemini embeddings"]],
+  ["Partner models (managed APIs)",["Anthropic Claude (Opus, Sonnet, Haiku generations)","Mistral AI models","GLM 5 and GLM 4.7 (Z.ai)"]],
+  ["Open models (self-deploy or managed)",["Gemma 4 and Gemma 3","Llama","Other Hugging Face models deployable from Model Garden"]]
+ ]},
+{id:"bedrock",name:"Amazon Bedrock",kind:"Cloud platform",intro:"About 20 providers and well over 100 model variants behind one API, plus an OpenAI-compatible endpoint. Full list from the AWS \"models at a glance\" page.",
+ links:[["Live catalog","https://docs.aws.amazon.com/bedrock/latest/userguide/model-cards.html"],["Bedrock","https://aws.amazon.com/bedrock/"]],
+ groups:[
+  ["Amazon",["Nova 2 Lite, Nova Pro, Nova Lite, Nova Micro (text, multimodal input)","Nova 2 Sonic (speech-to-speech)","Nova Canvas (image), Nova Reel (video)","Nova Multimodal Embeddings, Titan Text Embeddings V2, Titan Multimodal Embeddings"]],
+  ["Anthropic",["Claude Fable 5.1, Opus 5.5, Sonnet 5.5, Haiku 5.5","Claude Mythos 5.1 and 5 (restricted)","Claude Opus 5, Sonnet 5, Fable 5","Claude Opus 4.5 to 4.8, Sonnet 4 to 4.6, Haiku 4.5, Claude 3 Haiku"]],
+  ["OpenAI",["GPT-6 Astra, GPT-6.1 Sol, GPT-6 Sol, GPT-6 Luna","GPT-5.6 Sol, Terra, Luna; GPT-5.5; GPT-5.4","Daybreak Red (GPT-5.6 Cyber) and Daybreak Blue (limited availability)","gpt-oss-120b, gpt-oss-20b, gpt-oss-safeguard 120B and 20B"]],
+  ["Meta",["Llama 4 Maverick, Llama 4 Scout","Llama 3.3 70B; Llama 3.2 1B, 3B, 11B, 90B; Llama 3.1 8B, 70B, 405B; Llama 3 8B, 70B"]],
+  ["Mistral AI",["Mistral Large 3, Mistral Large, Mistral Small","Devstral 2 123B, Magistral Small","Ministral 3 (3B, 8B, 14B), Mistral 7B, Mixtral 8x7B","Pixtral Large (vision)","Voxtral Mini 3B, Voxtral Small 24B (speech)"]],
+  ["DeepSeek, Qwen, Moonshot, MiniMax, Z.AI",["DeepSeek V3.2, V3.1, R1","Qwen3 235B, Qwen3 32B, Qwen3 Next 80B, Qwen3 VL 235B","Qwen3 Coder 480B, Qwen3 Coder 30B, Qwen3 Coder Next","Kimi K3, Kimi K2.5, Kimi K2 Thinking","MiniMax M2.5, M2.1, M2","GLM 5.3, GLM 5, GLM 4.7, GLM 4.7 Flash"]],
+  ["xAI, Google, NVIDIA",["Grok 4.7, 4.6, 4.3","Gemma 4 (31B, 26B-A4B, E2B), Gemma 3 (4B, 12B, 27B)","Nemotron 3 Super 120B, Nemotron Nano 3 30B, Nemotron Nano 9B v2, Nano 12B v2 VL"]],
+  ["Cohere, AI21, Writer",["Command R, Command R+","Embed v4, Embed English, Embed Multilingual; Rerank 3.5","AI21 Jamba 1.5 Large and Mini","Writer Palmyra X5, X4, Palmyra Vision 7B"]],
+  ["Image and video specialists",["Stability AI: Stable Image Ultra, Core, SD 3.5 Large, plus 13 editing tools (inpaint, outpaint, upscale, remove background, style transfer, and more)","Luma AI Ray2 (video)","TwelveLabs Pegasus 1.5 and 1.2 (video understanding), Marengo Embed 3.0 and 2.7 (video embeddings)"]]
+ ]},
+{id:"foundry",name:"Microsoft Foundry (formerly Azure AI Foundry)",kind:"Cloud platform",intro:"Two tiers: \"Foundry Models sold by Azure\" (Microsoft-billed, Azure terms) and partner or community models from the wider catalog. Azure OpenAI is the largest collection.",
+ links:[["Live catalog","https://ai.azure.com/catalog/models"],["Models sold by Azure","https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure"],["Retirement schedule","https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirement-schedule"]],
+ groups:[
+  ["Azure OpenAI",["gpt-6.1-sol, gpt-6-sol, gpt-6-luna, gpt-6-astra","gpt-5.6-sol, -terra, -luna; gpt-5.5; gpt-5.4 (pro, mini, nano)","gpt-5.x codex variants; o3, o3-pro, o4-mini","gpt-4.1 and gpt-4o families (still listed)","gpt-image-2, gpt-image-2.5; sora-2 (deprecated)","gpt-realtime-2.1, gpt-audio-1.5, whisper, gpt-transcribe, tts","text-embedding-3-large and -small","model-router (routes across models)"]],
+  ["Anthropic",["claude-opus-5, claude-sonnet-5-5, claude-haiku-5-5 (check catalog for newest)"]],
+  ["Microsoft",["MAI-Thinking-1 (reasoning), MAI-Code-1.1-Flash","MAI-Image-2.5, MAI-Transcribe-2-Streaming","Phi-4, Phi-4-reasoning, Phi-4-mini-instruct","MedImageInsight, CXRReportGen (healthcare imaging)"]],
+  ["Open and partner LLMs",["DeepSeek-V4-Pro, DeepSeek-V3.2, DeepSeek-R1","Llama-4-Maverick, Llama-3.3-70B, Muse-Glimmer-30B","Mistral-Large-3, Codestral, Ministral-3B, mistral-ocr-4","grok-4.7, grok-4-1-fast-reasoning","Kimi-K2.6, Kimi-K2.7-Code","qwen3-32b, qwen3.6-35b-a3b, Qwen3.8-27B (preview)","gpt-oss-120b, gpt-oss-20b"]],
+  ["Cohere",["cohere-command-a","Cohere-embed-v3-multilingual","Cohere-rerank-v4.0-pro"]],
+  ["Image",["Black Forest Labs FLUX.2-pro, FLUX.1-Kontext-pro","MAI-Image-2.5, gpt-image-2"]]
+ ]},
+{id:"databricks",name:"Databricks Foundation Model APIs",kind:"Data platform",intro:"Pay-per-token endpoints named databricks-*. Databricks explicitly hosts only a few (Gemini 4 Argon and DeepSeek V4); most others are served by the provider. Check each model's hosting before sending regulated data.",
+ links:[["Live catalog","https://docs.databricks.com/aws/en/machine-learning/foundation-model-apis/supported-models"]],
+ groups:[
+  ["OpenAI",["GPT-6.1 Sol, GPT-6 Sol, Luna, Astra","GPT-5.6 Sol, Terra, Luna; GPT-5.5 and 5.5 Pro","GPT-5.4 (mini, nano), GPT-5.3 Codex, GPT-5.2, 5.1, 5","GPT OSS 120B and 20B"]],
+  ["Anthropic",["Claude Fable 5.1, Opus 5.5, Sonnet 5.5, Haiku 5.5","Claude Fable 5, Opus 5, Sonnet 5","Claude Opus 4.1 to 4.8, Sonnet 4.5 and 4.6, Haiku 4.5"]],
+  ["Google",["Gemini 4 Argon (Databricks-hosted)","Gemini 3.8, 3.7, 3.6, 3.5, 3 Flash; 3.5 and 3.1 Flash Lite; 3.1 Pro Preview","Gemini 3.1 Flash Image, Gemini 3 Pro Image","Gemma 3 12B"]],
+  ["Open and other providers",["Llama 4 Maverick, Llama 3.3 70B, Llama 3.1 8B","DeepSeek V4.1 Flash, V4 Pro (retiring Oct 30, 2026)","Qwen3.5 122B A10B, Qwen3-Next 80B (preview)","Grok 4.7, 4.6","GLM 5.3, GLM 5.3 Flash","Kimi K3"]],
+  ["Embeddings and scoring",["Qwen3-Embedding-0.6B","GTE Large (En), BGE Large (En)","OpenJev (Qwen3.5 4B): structured yes/no and scoring answers"]]
+ ]},
+{id:"nim",name:"NVIDIA NIM (build.nvidia.com)",kind:"Inference containers and hosted trial API",intro:"Optimized containers you run on your own GPUs, plus a hosted catalog for trials. Containers come from NGC and need image scanning like any other container.",
+ links:[["Live catalog","https://build.nvidia.com/models"],["NIM","https://developer.nvidia.com/nim"]],
+ groups:[
+  ["LLMs",["NVIDIA Nemotron (including Nemotron 3 Super)","Llama 3.1, 3.2 and vision variants","DeepSeek V3.2 and V4","Kimi K2.5, GLM 5.1 and 4.7, MiniMax M2.7","Mistral and Mixtral 8x22B","Qwen and QwQ, gpt-oss-120b, Gemma, Sarvam-M"]],
+  ["Vision",["Cosmos (world models)","NV-CLIP","LLaVA and other VLMs"]],
+  ["Speech",["Riva (ASR, TTS, translation)","Parakeet (ASR)"]],
+  ["Retrieval",["NV-EmbedQA (embeddings)","NV-Rerank (rerankers)"]],
+  ["Science and safety",["ESMFold and other biology models (BioNeMo)","NeMo Guardrails and Nemotron safety models"]]
+ ]},
+{id:"ollama",name:"Ollama library",kind:"Local runtime",intro:"Tags you can pull with ollama pull. Some tags are cloud-only and send data to Ollama's hosted service, which matters for data handling.",
+ links:[["Live catalog","https://ollama.com/library"]],
+ groups:[
+  ["General chat",["llama3.1, llama3.2, llama3.3:70b, llama4","qwen3, qwen3.5, qwen3.8:27b","gemma3, gemma4","gpt-oss:20b, gpt-oss:120b","mistral-small3.2:24b, granite4"]],
+  ["Coding",["qwen3-coder:30b, qwen3.6:27b and :35b","devstral:24b, codestral:22b","glm-4.7-flash, deepseek-coder-v2:16b","nemotron-3.5-bolt"]],
+  ["Reasoning",["deepseek-r1 (8b to 70b distills)","magistral:24b","phi4:14b"]],
+  ["Vision",["gemma3, gemma4","qwen3-vl:8b, qwen3.5","mistral-small3.2","nemotron-3.5-super:120b"]],
+  ["Embeddings",["nomic-embed-text","embeddinggemma-2"]],
+  ["Small and edge",["llama3.2:1b, qwen3.5:0.8b","gemma3:4b, gemma4:e2b","granite4:3b, granite4.2:3b and :8b"]],
+  ["Cloud-only tags (data leaves the device)",["glm-5.3, kimi-k3, mistral-large-4 (cloud)"]]
+ ]},
+{id:"mistral",name:"Mistral AI (La Plateforme)",kind:"Commercial and open-weight",intro:"Mix of Apache 2.0 open models and commercial-only models. License is per model, so check before self-hosting.",
+ links:[["Live catalog","https://docs.mistral.ai/getting-started/models/"]],
+ groups:[
+  ["Frontier and reasoning",["Mistral Large 4 (commercial)","Mistral Large 3 (open-weight)","Mistral Medium 3.5 (open 128B and commercial)","Magistral Medium (reasoning)","Mistral Small 4 (119B, open)"]],
+  ["Small and edge",["Ministral 3 (3B, 8B, 14B)","Mistral Small 3.2 24B","Mistral Nemo, Mistral 7B"]],
+  ["Coding",["Devstral 2, Devstral Medium, Devstral Small 2","Codestral 25.08"]],
+  ["Vision, OCR, audio",["Pixtral Large, Pixtral 12B","Mistral OCR","Voxtral Small, Voxtral Mini, Voxtral Mini TTS"]],
+  ["Embeddings and other",["Mistral Embed","Saba (Middle East and South Asia languages)","Leanstral 1.5 (formal math)"]]
+ ]},
+{id:"cohere",name:"Cohere",kind:"Commercial (enterprise RAG)",intro:"Strongest in retrieval building blocks. Some research weights (Aya, older Command R) are on Hugging Face under non-commercial licenses.",
+ links:[["Live catalog","https://docs.cohere.com/docs/models"]],
+ groups:[
+  ["Generation and reasoning",["command-a-plus-05-2026","command-a-03-2025","command-a-reasoning-08-2025","command-r-plus-08-2024, command-r-08-2024, command-r7b"]],
+  ["Vision, translation, coding",["command-a-vision-07-2025","command-a-translate-08-2025, north-small-translate-09-2026","north-mini-code-1-0 (agentic coding)"]],
+  ["Embed",["embed-v5.0-pro, embed-v5.0-fast","embed-v4.0","embed-english-v3.0, embed-multilingual-v3.0 (and light)"]],
+  ["Rerank",["rerank-v4.0-pro, rerank-v4.0-fast","rerank-v3.5"]],
+  ["Parse, audio, Aya",["parse-v5.0 (document parsing)","cohere-transcribe-03-2026, cohere-transcribe-arabic","Aya Expanse 32B, Aya Vision 32B, Tiny Aya"]]
+ ]},
+{id:"xai",name:"xAI (Grok API)",kind:"Closed models",intro:"Grok models are also on Bedrock, Foundry, and Databricks.",
+ links:[["Live catalog","https://docs.x.ai/docs/models"]],
+ groups:[
+  ["Text and reasoning",["Grok 4.7","Grok 4.6 (500K context, reasoning effort up to xhigh) and fast variant","Grok 4.3, Grok 4.1 fast reasoning"]],
+  ["Image and video",["Grok Imagine (image and video generation API)"]],
+  ["Open weights",["Older Grok releases published as open weights (check xAI's GitHub)"]]
+ ]}
+];
+
+var M={cols:["Native","Bedrock","Foundry","Google Cloud","Databricks","NVIDIA NIM","Hugging Face","Ollama"],
+rows:[
+["OpenAI GPT (closed)","Y","Y","Y","","Y","","",""],
+["OpenAI gpt-oss","Y","Y","Y","?","Y","Y","Y","Y"],
+["Anthropic Claude","Y","Y","Y","Y","Y","","",""],
+["Google Gemini","Y","","","Y","Y","","",""],
+["Google Gemma","Y","Y","?","Y","Y","Y","Y","Y"],
+["Meta Llama","Y","Y","Y","Y","Y","Y","Y","Y"],
+["Mistral","Y","Y","Y","Y","","Y","Y","Y"],
+["DeepSeek","Y","Y","Y","?","Y","Y","Y","Y"],
+["Qwen (Alibaba)","Y","Y","Y","?","Y","Y","Y","Y"],
+["xAI Grok","Y","Y","Y","","Y","","",""],
+["Moonshot Kimi","Y","Y","Y","","Y","Y","Y","?"],
+["Z.ai GLM","Y","Y","","Y","Y","Y","Y","Y"],
+["MiniMax","Y","Y","","","","Y","Y",""],
+["Cohere","Y","Y","Y","","","","?",""],
+["Amazon Nova","","Y","","","","","",""],
+["Microsoft Phi / MAI","","","Y","","","","Y","Y"],
+["NVIDIA Nemotron","","Y","","","","Y","Y","Y"],
+["Black Forest Labs FLUX","Y","","Y","","","","Y",""],
+["Stability AI","Y","Y","","","","","Y",""]
+]};
+
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+var list=document.getElementById("catList");
+list.innerHTML=CAT.map(function(p){
+  var n=p.groups.reduce(function(a,g){return a+g[1].length;},0);
+  return '<details class="plat" id="cat-'+p.id+'"><summary><span class="pname">'+esc(p.name)+'</span><span class="pkind">'+esc(p.kind)+'</span><span class="pnum">'+n+' entries</span></summary>'+
+  '<div class="pbody"><p>'+esc(p.intro)+'</p><div class="plinks">'+p.links.map(function(l){return '<a href="'+l[1]+'" target="_blank" rel="noopener">'+esc(l[0])+'</a>';}).join("")+'</div>'+
+  p.groups.map(function(g){return '<details class="grp"><summary>'+esc(g[0])+' <span class="gnum">'+g[1].length+'</span></summary><ul>'+g[1].map(function(i){return '<li>'+esc(i)+'</li>';}).join("")+'</ul></details>';}).join("")+
+  '</div></details>';
+}).join("");
+
+function all(open){list.querySelectorAll("details").forEach(function(d){d.open=open;});}
+document.getElementById("catOpen").onclick=function(){all(true);};
+document.getElementById("catClose").onclick=function(){all(false);};
+var cnt=document.getElementById("catCount");
+document.getElementById("catQ").addEventListener("input",function(){
+  var q=this.value.toLowerCase().trim(),hits=0;
+  list.querySelectorAll("details.plat").forEach(function(p){
+    var pHit=false;
+    p.querySelectorAll("details.grp").forEach(function(g){
+      var gHit=false;
+      g.querySelectorAll("li").forEach(function(li){
+        var m=!q||li.textContent.toLowerCase().indexOf(q)>-1;
+        li.classList.toggle("hit",!!q&&m); li.style.display=m?"":"none"; if(q&&m){gHit=true;hits++;}
+      });
+      g.style.display=(!q||gHit)?"":"none"; g.open=!!q&&gHit; if(gHit)pHit=true;
+    });
+    p.style.display=(!q||pHit)?"":"none"; p.open=!!q&&pHit;
+  });
+  cnt.textContent=q?hits+" matches":"";
+});
+
+var t='<thead><tr><th>Model family</th>'+M.cols.map(function(c){return '<th>'+c+'</th>';}).join("")+'</tr></thead><tbody>';
+t+=M.rows.map(function(r){return '<tr><td>'+esc(r[0])+'</td>'+r.slice(1).map(function(v){return '<td class="'+(v==="Y"?"my":v==="?"?"mq":"")+'">'+(v||"")+'</td>';}).join("")+'</tr>';}).join("");
+document.getElementById("matrix").innerHTML=t+'</tbody>';
+})();
+</script>
+
+
+<script>
+(function(){
+function openTo(el){var n=el;while(n){if(n.tagName==="DETAILS")n.open=true;n=n.parentElement;}var c=el.querySelector&&el.querySelector(":scope > details.secd");if(c)c.open=true;}
+function go(id,smooth){var el=document.getElementById(id);if(!el)return false;openTo(el);el.scrollIntoView({behavior:smooth&&!matchMedia("(prefers-reduced-motion: reduce)").matches?"smooth":"auto",block:"start"});return true;}
+document.addEventListener("click",function(e){
+  var a=e.target.closest('a[href^="#"]');if(!a)return;
+  var id=a.getAttribute("href").slice(1);if(!id)return;
+  if(go(id,true))e.preventDefault();
+});
+if(location.hash&&/^#[A-Za-z0-9._~-]+$/.test(location.hash))setTimeout(function(){go(location.hash.slice(1),false);},0);
+var secs=function(){return document.querySelectorAll("details.secd");};
+var btn=document.getElementById("secAll");
+function label(){var all=[].every.call(secs(),function(d){return d.open;});btn.textContent=all?"Collapse all sections":"Expand all sections";}
+btn.addEventListener("click",function(){var all=[].every.call(secs(),function(d){return d.open;});secs().forEach(function(d){d.open=!all;});label();});
+secs().forEach(function(d){d.addEventListener("toggle",label);});label();
+function cards(o){document.querySelectorAll("#detailGrid details.detail").forEach(function(d){d.open=o;});}
+document.getElementById("dOpen").onclick=function(){cards(true);};
+document.getElementById("dClose").onclick=function(){cards(false);};
+})();
+</script>
+</body>
+</html>
